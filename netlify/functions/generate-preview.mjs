@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const WORD_COUNTS = { standard: 750, long: 2200, epic: 4500 };
+const WORD_COUNTS = { standard: 750, long: 1500, epic: 2200 };
 
 // ============================================================
 // SYSTEM PROMPT: This is the single most important piece of

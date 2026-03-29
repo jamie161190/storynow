@@ -248,6 +248,25 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .voice-emoji{font-size:1.6rem;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--yellow-light);border-radius:12px}
 .voice-info h4{font-size:0.95rem;font-weight:800;color:var(--text);font-family:'Nunito',sans-serif;margin-bottom:0.1rem}
 .voice-info p{font-size:0.8rem;color:var(--text-soft);font-weight:500}
+.voice-info .voice-tags{display:flex;gap:0.35rem;margin-top:0.3rem;flex-wrap:wrap}
+.voice-tag{font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:20px;background:var(--purple-light);color:var(--purple)}
+.voice-preview-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--purple);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.2s;margin-left:auto}
+.voice-preview-btn:hover{background:var(--purple);border-color:var(--purple)}
+.voice-preview-btn:hover svg{fill:white}
+.voice-preview-btn svg{width:14px;height:14px;fill:var(--purple);transition:fill 0.2s}
+.voice-preview-btn.playing{background:var(--purple);border-color:var(--purple)}
+.voice-preview-btn.playing svg{fill:white}
+
+/* ===== VOICE FILTERS ===== */
+.voice-filters{width:100%;margin-bottom:1rem}
+.filter-row{display:flex;flex-direction:column;gap:0.75rem}
+.filter-group{display:flex;flex-direction:column;gap:0.35rem}
+.filter-label{font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em}
+.filter-pills{display:flex;gap:0.4rem;flex-wrap:wrap}
+.filter-pill{padding:0.4rem 0.85rem;border:2px solid var(--border);border-radius:var(--radius-full);font-size:0.78rem;font-weight:700;font-family:'Quicksand',sans-serif;color:var(--text-soft);background:var(--card);cursor:pointer;transition:all 0.2s}
+.filter-pill:hover{border-color:var(--purple-soft);color:var(--purple)}
+.filter-pill.active{background:var(--purple);border-color:var(--purple);color:white}
+.voice-empty{text-align:center;color:var(--text-muted);font-size:0.9rem;padding:2rem 0}
 
 /* ===== LOADING ===== */
 .loading-screen{justify-content:center;align-items:center;text-align:center;gap:1.5rem}
@@ -435,7 +454,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         </div>
       </div>
     </div>
-    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;text-align:center">Full stories are 5 to 30 minutes long</p>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;text-align:center">Full stories are 5 to 15 minutes long</p>
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
 
@@ -730,18 +749,18 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="length-cards">
     <div class="length-card selected" onclick="selectLength('standard',this)">
       <div class="len-emoji">&#127769;</div>
-      <div class="len-name">Classic</div>
+      <div class="len-name">Short</div>
       <div class="len-time">~5 min</div>
     </div>
     <div class="length-card" onclick="selectLength('long',this)">
       <div class="len-emoji">&#128214;</div>
-      <div class="len-name">Extended</div>
-      <div class="len-time">~15 min</div>
+      <div class="len-name">Medium</div>
+      <div class="len-time">~10 min</div>
     </div>
     <div class="length-card" onclick="selectLength('epic',this)">
       <div class="len-emoji">&#128640;</div>
-      <div class="len-name">Epic</div>
-      <div class="len-time">~30 min</div>
+      <div class="len-name">Long</div>
+      <div class="len-time">~15 min</div>
     </div>
   </div>
   <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="goTo('screenVoice')">Continue</button>
@@ -752,7 +771,43 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <button class="back-btn" onclick="goTo('screenLength')">&#8592; Back</button>
   <h2 class="section-title">Choose a storyteller</h2>
   <p class="section-sub" id="voiceSubtext">Pick the voice that feels right.</p>
+
+  <!-- VOICE FILTERS -->
+  <div class="voice-filters">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label class="filter-label">Gender</label>
+        <div class="filter-pills" id="filterGender">
+          <button class="filter-pill active" data-val="all" onclick="setFilter('gender','all',this)">All</button>
+          <button class="filter-pill" data-val="female" onclick="setFilter('gender','female',this)">Female</button>
+          <button class="filter-pill" data-val="male" onclick="setFilter('gender','male',this)">Male</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Accent</label>
+        <div class="filter-pills" id="filterAccent">
+          <button class="filter-pill active" data-val="all" onclick="setFilter('accent','all',this)">All</button>
+          <button class="filter-pill" data-val="british" onclick="setFilter('accent','british',this)">British</button>
+          <button class="filter-pill" data-val="american" onclick="setFilter('accent','american',this)">American</button>
+          <button class="filter-pill" data-val="australian" onclick="setFilter('accent','australian',this)">Australian</button>
+          <button class="filter-pill" data-val="irish" onclick="setFilter('accent','irish',this)">Irish</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Age</label>
+        <div class="filter-pills" id="filterAge">
+          <button class="filter-pill active" data-val="all" onclick="setFilter('age','all',this)">All</button>
+          <button class="filter-pill" data-val="young" onclick="setFilter('age','young',this)">Young</button>
+          <button class="filter-pill" data-val="middle" onclick="setFilter('age','middle',this)">Middle aged</button>
+          <button class="filter-pill" data-val="senior" onclick="setFilter('age','senior',this)">Older</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="voice-cards" id="voiceCards"></div>
+  <p class="voice-empty" id="voiceEmpty" style="display:none">No voices match those filters. Try changing one.</p>
+  <audio id="voicePreviewAudio" preload="none"></audio>
   <button class="btn btn-primary" style="width:100%;margin-top:1.5rem" onclick="generatePreview()">Create my preview</button>
 </div>
 
@@ -944,32 +999,43 @@ let storyData = { category:'', length:'standard', themes:[], where:'Surprise me'
 let selectedVoiceId = '';
 let fullStoryText = '';
 
-const VOICES = {
-  bedtime: [
-    { id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Warm and gentle', emoji:'\u{1F469}' },
-    { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm and soothing', emoji:'\u{1F468}' },
-    { id:'XB0fDUnXU5powFXDhCwa', name:'Charlotte', desc:'Soft and kind', emoji:'\u{1F475}' },
-    { id:'IKne3meq5aSn9XLyUdCD', name:'Charlie', desc:'Gentle and warm', emoji:'\u{1F9D4}' }
-  ],
-  journey: [
-    { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh', desc:'Energetic adventurer', emoji:'\u{1F9D7}' },
-    { id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Bold and exciting', emoji:'\u{1F9B8}' },
-    { id:'VR6AewLTigWG4xSOukaG', name:'Arnold', desc:'Strong and brave', emoji:'\u{1F4AA}' },
-    { id:'pNInz6obpgDQGcFmaJgB', name:'Adam', desc:'Deep and dramatic', emoji:'\u{1F3AD}' }
-  ],
-  learning: [
-    { id:'ThT5KcBeYPX3keUQqHPh', name:'Dorothy', desc:'Encouraging teacher', emoji:'\u{1F469}\u{200D}\u{1F3EB}' },
-    { id:'g5CIjZEefAph4nQFvHAz', name:'Ethan', desc:'Fun science teacher', emoji:'\u{1F52C}' },
-    { id:'oWAxZDx7w5VEj9dCyTzz', name:'Grace', desc:'Patient and clear', emoji:'\u{1F4DA}' },
-    { id:'ZQe5CZNOzWyzPSCn5a3c', name:'James', desc:'Wise professor', emoji:'\u{1F393}' }
-  ],
-  custom: [
-    { id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Warm and reassuring', emoji:'\u{1F469}' },
-    { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm and friendly', emoji:'\u{1F468}' },
-    { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh', desc:'Upbeat and fun', emoji:'\u{1F9D7}' },
-    { id:'ThT5KcBeYPX3keUQqHPh', name:'Dorothy', desc:'Gentle and kind', emoji:'\u{1F469}\u{200D}\u{1F3EB}' }
-  ]
-};
+// ===== CURATED VOICE LIBRARY =====
+// Each voice tagged with gender, accent, age, and recommended story types
+// preview_url will be populated from ElevenLabs API on first load
+const ALL_VOICES = [
+  // FEMALE VOICES
+  { id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Warm, gentle, and nurturing', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['bedtime','custom'] },
+  { id:'XB0fDUnXU5powFXDhCwa', name:'Charlotte', desc:'Soft and kind, like a favourite aunt', gender:'female', accent:'british', age:'middle', emoji:'\u{1F469}' , best:['bedtime','custom'] },
+  { id:'ThT5KcBeYPX3keUQqHPh', name:'Dorothy', desc:'Encouraging and patient', gender:'female', accent:'british', age:'senior', emoji:'\u{1F475}', best:['learning','bedtime'] },
+  { id:'oWAxZDx7w5VEj9dCyTzz', name:'Grace', desc:'Clear and reassuring', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['learning','journey'] },
+  { id:'jBpfuIE2acCO8z3wKNLl', name:'Gigi', desc:'Animated and playful', gender:'female', accent:'american', age:'young', emoji:'\u{1F467}', best:['journey','learning'] },
+  { id:'z9fAnlkpzviPz146aGWa', name:'Glinda', desc:'Bright and magical', gender:'female', accent:'american', age:'middle', emoji:'\u{2728}', best:['bedtime','journey'] },
+  { id:'piTKgcLEGmPE4e6mEKli', name:'Nicole', desc:'Warm and expressive storyteller', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey','custom'] },
+  { id:'FGY2WhTYpPnrIDTdsKH5', name:'Laura', desc:'Gentle with a soft Irish lilt', gender:'female', accent:'irish', age:'young', emoji:'\u{2618}\u{FE0F}', best:['bedtime','custom'] },
+  { id:'pFZP5JQG7iQjIQuC4Bku', name:'Lily', desc:'Sweet and soothing', gender:'female', accent:'british', age:'young', emoji:'\u{1F338}', best:['bedtime','learning'] },
+  { id:'XrExE9yKIg1WjnnlVkGX', name:'Matilda', desc:'Warm and friendly, great for adventures', gender:'female', accent:'american', age:'young', emoji:'\u{1F31F}', best:['journey','learning'] },
+  { id:'cgSgspJ2msm6clMCkdW9', name:'Jessica', desc:'Smooth and confident', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey','custom'] },
+  { id:'Xb7hH8MSUJpSbSDYk0k2', name:'Alice', desc:'Confident with a warm Australian tone', gender:'female', accent:'australian', age:'middle', emoji:'\u{1F998}', best:['journey','learning'] },
+
+  // MALE VOICES
+  { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm, deep, and soothing', gender:'male', accent:'british', age:'middle', emoji:'\u{1F468}', best:['bedtime','custom'] },
+  { id:'IKne3meq5aSn9XLyUdCD', name:'Charlie', desc:'Gentle and warm', gender:'male', accent:'australian', age:'middle', emoji:'\u{1F9D4}', best:['bedtime','custom'] },
+  { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh', desc:'Energetic and adventurous', gender:'male', accent:'american', age:'young', emoji:'\u{1F9D7}', best:['journey','learning'] },
+  { id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Bold and expressive', gender:'male', accent:'american', age:'young', emoji:'\u{1F9B8}', best:['journey','custom'] },
+  { id:'VR6AewLTigWG4xSOukaG', name:'Arnold', desc:'Strong and commanding', gender:'male', accent:'american', age:'middle', emoji:'\u{1F4AA}', best:['journey','learning'] },
+  { id:'pNInz6obpgDQGcFmaJgB', name:'Adam', desc:'Deep and dramatic', gender:'male', accent:'american', age:'middle', emoji:'\u{1F3AD}', best:['journey','bedtime'] },
+  { id:'g5CIjZEefAph4nQFvHAz', name:'Ethan', desc:'Fun and enthusiastic', gender:'male', accent:'american', age:'young', emoji:'\u{1F52C}', best:['learning','journey'] },
+  { id:'ZQe5CZNOzWyzPSCn5a3c', name:'James', desc:'Wise and distinguished', gender:'male', accent:'australian', age:'senior', emoji:'\u{1F393}', best:['learning','bedtime'] },
+  { id:'N2lVS1w4EtoT3dr4eOWO', name:'Callum', desc:'Warm, friendly, Scottish charm', gender:'male', accent:'british', age:'young', emoji:'\u{1F3F4}', best:['journey','bedtime'] },
+  { id:'bIHbv24MWmeRgasZH58o', name:'Will', desc:'Friendly and conversational', gender:'male', accent:'american', age:'young', emoji:'\u{1F468}', best:['learning','custom'] },
+  { id:'cjVigY5qzO86Huf0OWal', name:'Eric', desc:'Friendly with a natural Irish warmth', gender:'male', accent:'irish', age:'middle', emoji:'\u{2618}\u{FE0F}', best:['bedtime','journey'] },
+  { id:'TX3LPaxmHKxFdv7VOQHJ', name:'Liam', desc:'Articulate and engaging', gender:'male', accent:'american', age:'young', emoji:'\u{1F468}', best:['learning','journey'] },
+];
+
+// Filters state
+let voiceFilters = { gender: 'all', accent: 'all', age: 'all' };
+// Cache for preview URLs fetched from API
+let voicePreviewUrls = {};
 
 // Tracking helper: fires events to all pixels
 function trackEvent(eventName, params) {
@@ -1082,7 +1148,7 @@ function restoreDetails() {
 function restoreLength() {
   if (!storyData.length) return;
   document.querySelectorAll('.length-card').forEach(c => c.classList.remove('selected'));
-  const labels = { standard: 'Classic', long: 'Extended', epic: 'Epic' };
+  const labels = { standard: 'Short', long: 'Medium', epic: 'Long' };
   document.querySelectorAll('.length-card').forEach(c => {
     const name = c.querySelector('.len-name');
     if (name && name.textContent === labels[storyData.length]) c.classList.add('selected');
@@ -1183,24 +1249,140 @@ function selectLength(len, el) {
   el.classList.add('selected');
 }
 
-function showVoices() {
+function setFilter(type, val, btn) {
+  voiceFilters[type] = val;
+  // Update pill active state
+  btn.parentElement.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  renderFilteredVoices();
+}
+
+function getFilteredVoices() {
+  return ALL_VOICES.filter(v => {
+    if (voiceFilters.gender !== 'all' && v.gender !== voiceFilters.gender) return false;
+    if (voiceFilters.accent !== 'all' && v.accent !== voiceFilters.accent) return false;
+    if (voiceFilters.age !== 'all' && v.age !== voiceFilters.age) return false;
+    return true;
+  });
+}
+
+function renderFilteredVoices() {
   const container = document.getElementById('voiceCards');
-  const voices = VOICES[storyData.category] || VOICES.bedtime;
+  const voices = getFilteredVoices();
   container.innerHTML = '';
-  const subtexts = { bedtime:'Who tucks them in tonight?', journey:'Who leads the adventure?', learning:'Who teaches the lesson?', custom:'Who tells their story?' };
-  document.getElementById('voiceSubtext').textContent = subtexts[storyData.category] || 'Pick the voice that feels right.';
+
+  // Sort: recommended for this category first
+  const cat = storyData.category || 'bedtime';
+  voices.sort((a, b) => {
+    const aRec = a.best.includes(cat) ? 0 : 1;
+    const bRec = b.best.includes(cat) ? 0 : 1;
+    return aRec - bRec;
+  });
+
+  document.getElementById('voiceEmpty').style.display = voices.length === 0 ? 'block' : 'none';
+
+  // Check if currently selected voice is still in filtered results
+  const selectedStillVisible = voices.some(v => v.id === selectedVoiceId);
+
   voices.forEach((v, i) => {
+    const isRecommended = v.best.includes(cat);
+    const isSelected = v.id === selectedVoiceId || (!selectedStillVisible && i === 0);
+    if (!selectedStillVisible && i === 0) selectedVoiceId = v.id;
+
     const card = document.createElement('div');
-    card.className = 'voice-card' + (i===0?' selected':'');
-    card.innerHTML = '<div class="voice-emoji">'+v.emoji+'</div><div class="voice-info"><h4>'+v.name+'</h4><p>'+v.desc+'</p></div>';
+    card.className = 'voice-card' + (isSelected ? ' selected' : '');
+
+    const accentLabel = v.accent.charAt(0).toUpperCase() + v.accent.slice(1);
+    const ageLabels = { young: 'Young', middle: 'Middle aged', senior: 'Older' };
+
+    card.innerHTML = `
+      <div class="voice-emoji">${v.emoji}</div>
+      <div class="voice-info">
+        <h4>${v.name}${isRecommended ? ' <span style="font-size:0.7rem;color:var(--green);font-weight:700">Recommended</span>' : ''}</h4>
+        <p>${v.desc}</p>
+        <div class="voice-tags">
+          <span class="voice-tag">${accentLabel}</span>
+          <span class="voice-tag">${ageLabels[v.age] || v.age}</span>
+        </div>
+      </div>
+      <button class="voice-preview-btn" title="Preview voice" onclick="event.stopPropagation();previewVoice('${v.id}',this)">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    `;
+
     card.onclick = () => {
       document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       selectedVoiceId = v.id;
     };
     container.appendChild(card);
-    if(i===0) selectedVoiceId = v.id;
   });
+}
+
+// Preview a voice using ElevenLabs preview URL
+let currentPreviewBtn = null;
+async function previewVoice(voiceId, btn) {
+  const audio = document.getElementById('voicePreviewAudio');
+
+  // If same voice is playing, stop it
+  if (currentPreviewBtn === btn && !audio.paused) {
+    audio.pause();
+    audio.currentTime = 0;
+    btn.classList.remove('playing');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    currentPreviewBtn = null;
+    return;
+  }
+
+  // Reset previous
+  if (currentPreviewBtn) {
+    currentPreviewBtn.classList.remove('playing');
+    currentPreviewBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  }
+
+  // Check cache for preview URL
+  if (!voicePreviewUrls[voiceId]) {
+    btn.innerHTML = '<span style="font-size:0.6rem;color:var(--purple)">...</span>';
+    try {
+      const res = await fetch(`/api/voice-preview?id=${voiceId}`);
+      const data = await res.json();
+      if (data.success) voicePreviewUrls[voiceId] = data.preview_url;
+    } catch(e) { /* silent */ }
+  }
+
+  if (voicePreviewUrls[voiceId]) {
+    audio.src = voicePreviewUrls[voiceId];
+    audio.play();
+    btn.classList.add('playing');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>';
+    currentPreviewBtn = btn;
+
+    audio.onended = () => {
+      btn.classList.remove('playing');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      currentPreviewBtn = null;
+    };
+  } else {
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  }
+}
+
+function showVoices() {
+  const subtexts = { bedtime:'Who tucks them in tonight?', journey:'Who leads the adventure?', learning:'Who teaches the lesson?', custom:'Who tells their story?' };
+  document.getElementById('voiceSubtext').textContent = subtexts[storyData.category] || 'Pick the voice that feels right.';
+
+  // Reset filters
+  voiceFilters = { gender: 'all', accent: 'all', age: 'all' };
+  document.querySelectorAll('.filter-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.val === 'all');
+  });
+
+  // Stop any playing preview
+  const audio = document.getElementById('voicePreviewAudio');
+  if (audio) { audio.pause(); audio.currentTime = 0; }
+  currentPreviewBtn = null;
+
+  renderFilteredVoices();
 }
 
 async function generatePreview() {
@@ -1561,7 +1743,7 @@ function renderLibrary(stories) {
   document.getElementById('libraryEmpty').style.display = 'none';
   const catEmoji = { bedtime:'\u{1F319}', journey:'\u{1F697}', learning:'\u{1F4DA}', custom:'\u{2728}' };
   const catLabel = { bedtime:'Bedtime Story', journey:'Journey Story', learning:'Learning Adventure', custom:'Custom Story' };
-  const lenLabel = { standard:'Classic (~5 min)', long:'Extended (~15 min)', epic:'Epic (~30 min)' };
+  const lenLabel = { standard:'Short (~5 min)', long:'Medium (~10 min)', epic:'Long (~15 min)' };
 
   const list = document.getElementById('libraryList');
   list.innerHTML = '';
