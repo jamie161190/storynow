@@ -365,6 +365,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 
   <div class="form-group">
+    <label>Anything else we should know? (optional)</label>
+    <textarea id="extraDetails" placeholder="e.g. She carries a stuffed rabbit called Mr Flopsy everywhere. He's just started swimming lessons and loves it. She calls her grandma Nanny Rose." style="height:100px"></textarea>
+    <p class="form-hint">The more you tell us, the more personal the story feels. Little details make all the difference.</p>
+  </div>
+
+  <div class="form-group">
     <label>Add a personal message (optional)</label>
     <textarea id="personalMessage" placeholder="e.g. Chase, this is from Daddy. I am so proud of you..."></textarea>
     <p class="form-hint">This will be read aloud at the start of the story.</p>
@@ -521,6 +527,7 @@ function goToLength() {
   storyData.petName = document.getElementById('petName').value.trim();
   storyData.subject = document.getElementById('subject').value;
   storyData.customScenario = document.getElementById('customScenario').value.trim();
+  storyData.extraDetails = document.getElementById('extraDetails').value.trim();
   storyData.personalMessage = document.getElementById('personalMessage').value.trim();
   goTo('screenLength');
 }
