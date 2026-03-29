@@ -761,14 +761,28 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 </div>
 
-<!-- LOGIN -->
+<!-- LOGIN: Step 1 - Email -->
 <div class="screen" id="screenLogin">
   <button class="back-btn" onclick="goTo('screenLanding')">&#8592; Back</button>
   <h2 class="section-title">Your Stories</h2>
-  <p class="section-sub">Enter the email you used when purchasing to see your stories.</p>
+  <p class="section-sub">Enter the email you used when purchasing. We will send you a login code.</p>
   <div style="max-width:380px;margin:0 auto">
     <input type="email" id="loginEmail" placeholder="your@email.com" class="form-input" style="width:100%;margin-bottom:1rem;text-align:center;font-size:1rem">
-    <button class="btn btn-primary" style="width:100%" onclick="loadMyStories()">View my stories</button>
+    <button class="btn btn-primary" style="width:100%" id="sendCodeBtn" onclick="sendLoginCode()">Send me a code</button>
+    <p id="loginError" style="color:#FF6B9D;font-size:0.85rem;text-align:center;margin-top:0.75rem;display:none"></p>
+  </div>
+</div>
+
+<!-- LOGIN: Step 2 - Code -->
+<div class="screen" id="screenVerifyCode">
+  <button class="back-btn" onclick="goTo('screenLogin')">&#8592; Back</button>
+  <h2 class="section-title">Check your email</h2>
+  <p class="section-sub" id="codeSentTo">We sent a 6 digit code to your email.</p>
+  <div style="max-width:380px;margin:0 auto">
+    <input type="text" id="loginCode" placeholder="000000" class="form-input" style="width:100%;margin-bottom:1rem;text-align:center;font-size:1.8rem;letter-spacing:8px;font-weight:800" maxlength="6" inputmode="numeric">
+    <button class="btn btn-primary" style="width:100%" id="verifyCodeBtn" onclick="verifyLoginCode()">Verify</button>
+    <p id="codeError" style="color:#FF6B9D;font-size:0.85rem;text-align:center;margin-top:0.75rem;display:none"></p>
+    <p style="text-align:center;margin-top:1rem"><a class="my-stories-link" onclick="sendLoginCode()">Resend code</a></p>
   </div>
 </div>
 
@@ -1176,54 +1190,121 @@ async function saveStoryToDb(email, audioBase64, stripeSessionId) {
   } catch(e) { /* silent, don't block the experience */ }
 }
 
-// Load stories for email
-async function loadMyStories() {
-  const email = document.getElementById('loginEmail').value.trim();
-  if (!email) { alert('Please enter your email'); return; }
+let loginEmailAddr = '';
 
-  goTo('screenLibrary');
-  document.getElementById('libraryList').innerHTML = '';
-  document.getElementById('libraryEmpty').style.display = 'none';
-  document.getElementById('libraryLoading').style.display = 'block';
+// Step 1: Send login code
+async function sendLoginCode() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) { showLoginError('Please enter your email'); return; }
+  loginEmailAddr = email;
+
+  const btn = document.getElementById('sendCodeBtn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  document.getElementById('loginError').style.display = 'none';
 
   try {
-    const res = await fetch('/api/get-stories', {
+    const res = await fetch('/api/send-login-code', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ email })
     });
     const data = await res.json();
-    document.getElementById('libraryLoading').style.display = 'none';
+    btn.textContent = 'Send me a code';
+    btn.disabled = false;
 
-    if (!data.success || !data.stories.length) {
-      document.getElementById('libraryEmpty').style.display = 'block';
+    if (!res.ok) {
+      showLoginError(data.error || 'Something went wrong');
       return;
     }
 
-    const catEmoji = { bedtime:'\u{1F319}', journey:'\u{1F697}', learning:'\u{1F4DA}', custom:'\u{2728}' };
-    const catLabel = { bedtime:'Bedtime Story', journey:'Journey Story', learning:'Learning Adventure', custom:'Custom Story' };
-    const lenLabel = { standard:'Classic (~5 min)', long:'Extended (~15 min)', epic:'Epic (~30 min)' };
-
-    const list = document.getElementById('libraryList');
-    data.stories.forEach(s => {
-      const date = new Date(s.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-      const card = document.createElement('div');
-      card.className = 'library-card';
-      card.innerHTML = `
-        <div class="lib-icon">${catEmoji[s.category] || '\u{2728}'}</div>
-        <div class="lib-info">
-          <div class="lib-name">${s.childName}'s ${catLabel[s.category] || 'Story'}</div>
-          <div class="lib-meta">${lenLabel[s.length] || s.length} &middot; ${date}${s.isGift ? ' &middot; Gift' : ''}</div>
-        </div>
-        <div class="lib-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
-      `;
-      card.onclick = () => playLibraryStory(s);
-      list.appendChild(card);
-    });
+    document.getElementById('codeSentTo').textContent = 'We sent a 6 digit code to ' + email;
+    document.getElementById('loginCode').value = '';
+    goTo('screenVerifyCode');
   } catch(e) {
-    document.getElementById('libraryLoading').style.display = 'none';
-    document.getElementById('libraryEmpty').style.display = 'block';
+    btn.textContent = 'Send me a code';
+    btn.disabled = false;
+    showLoginError('Something went wrong. Please try again.');
   }
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// Step 2: Verify code and load stories
+async function verifyLoginCode() {
+  const code = document.getElementById('loginCode').value.trim();
+  if (!code || code.length !== 6) { showCodeError('Please enter the 6 digit code'); return; }
+
+  const btn = document.getElementById('verifyCodeBtn');
+  btn.textContent = 'Verifying...';
+  btn.disabled = true;
+  document.getElementById('codeError').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/verify-login-code', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: loginEmailAddr, code })
+    });
+    const data = await res.json();
+    btn.textContent = 'Verify';
+    btn.disabled = false;
+
+    if (!res.ok || !data.success) {
+      showCodeError(data.error || 'Invalid code');
+      return;
+    }
+
+    // Show stories
+    renderLibrary(data.stories);
+  } catch(e) {
+    btn.textContent = 'Verify';
+    btn.disabled = false;
+    showCodeError('Something went wrong. Please try again.');
+  }
+}
+
+function showCodeError(msg) {
+  const el = document.getElementById('codeError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function renderLibrary(stories) {
+  goTo('screenLibrary');
+  document.getElementById('libraryLoading').style.display = 'none';
+
+  if (!stories || !stories.length) {
+    document.getElementById('libraryEmpty').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('libraryEmpty').style.display = 'none';
+  const catEmoji = { bedtime:'\u{1F319}', journey:'\u{1F697}', learning:'\u{1F4DA}', custom:'\u{2728}' };
+  const catLabel = { bedtime:'Bedtime Story', journey:'Journey Story', learning:'Learning Adventure', custom:'Custom Story' };
+  const lenLabel = { standard:'Classic (~5 min)', long:'Extended (~15 min)', epic:'Epic (~30 min)' };
+
+  const list = document.getElementById('libraryList');
+  list.innerHTML = '';
+  stories.forEach(s => {
+    const date = new Date(s.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const card = document.createElement('div');
+    card.className = 'library-card';
+    card.innerHTML = `
+      <div class="lib-icon">${catEmoji[s.category] || '\u{2728}'}</div>
+      <div class="lib-info">
+        <div class="lib-name">${s.childName}'s ${catLabel[s.category] || 'Story'}</div>
+        <div class="lib-meta">${lenLabel[s.length] || s.length} &middot; ${date}${s.isGift ? ' &middot; Gift' : ''}</div>
+      </div>
+      <div class="lib-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+    `;
+    card.onclick = () => playLibraryStory(s);
+    list.appendChild(card);
+  });
 }
 
 // Play a story from the library
