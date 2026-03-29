@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const WORD_COUNTS = { short: 300, standard: 600, epic: 1200 };
+const WORD_COUNTS = { standard: 750, long: 2200, epic: 4500 };
 
 // ============================================================
 // SYSTEM PROMPT: This is the single most important piece of
@@ -60,21 +60,52 @@ function getAgeBand(age) {
 }
 
 // ============================================================
-// STRUCTURED USER PROMPTS: clear sections so nothing gets lost
+// SHARED CHARACTER BLOCK: builds the same info section for all prompts
+// ============================================================
+function characterBlock(d) {
+  const gender = `(${d.gender})`;
+  let block = `THE MAIN CHARACTER:
+- Name: ${d.childName} ${gender}
+- Age: ${d.age}
+${d.proudOf ? '- Something they are proud of: ' + d.proudOf : ''}
+
+PEOPLE IN THE STORY:
+- Best friend: ${d.friendName} (must have at least 3 meaningful moments: dialogue, an action, a connection)
+${d.familyMembers ? '- Family: ' + d.familyMembers + ' (give at least one family member a real moment in the story, not just a mention)' : ''}
+${d.teacherName ? '- Teacher: ' + d.teacherName : ''}
+
+THEMES AND INTERESTS: ${d.interest}
+The themes must drive the world and the plot, not just decorate it. If the child loves dinosaurs, the story lives and breathes dinosaurs.
+
+SETTING: ${d.setting || 'Surprise me'}
+${d.setting === 'Surprise me' ? 'Choose a setting that fits the themes and category perfectly.' : 'Set the story in or around this place.'}`;
+
+  if (d.hasPet && d.petName) {
+    block += `\n\nPET: ${d.petName}${d.petType ? ' (a ' + d.petType + ')' : ''}
+The pet must do something memorable. Not "wagged his tail." Something the child would retell to their friends.`;
+  }
+
+  if (d.favTeddy) {
+    block += `\n\nFAVOURITE TOY/TEDDY: ${d.favTeddy}
+This toy should appear as a character or a special object in the story. Give it a role, a moment, a reason to matter.`;
+  }
+
+  if (d.extraDetails) {
+    block += `\n\nEXTRA DETAILS FROM THE PARENT (these are gold, weave them in naturally):
+${d.extraDetails}`;
+  }
+
+  return block;
+}
+
+// ============================================================
+// STRUCTURED USER PROMPTS
 // ============================================================
 const STORY_PROMPTS = {
   bedtime: (d) => `STORY TYPE: Bedtime
 TONE: Warm, calming, soothing. The story should wind down gradually. The first half can have gentle discovery or a small journey, but the second half must slow. The final quarter should feel drowsy. End with the child feeling safe, warm, and sleepy. The last two sentences should be rhythmic and slow, almost like a lullaby in prose.
 
-THE CHILD:
-- Name: ${d.childName}
-- Age: ${d.age}
-- Gender: ${d.gender}
-- Best friend: ${d.friendName}
-- They love: ${d.interest}
-${d.proudOf ? '- Something they are proud of: ' + d.proudOf : ''}
-${d.hasPet && d.petName ? '- Pet: ' + d.petName : ''}
-${d.extraDetails ? '\nEXTRA DETAILS FROM THE PARENT (weave these in naturally, they are gold):\n' + d.extraDetails : ''}
+${characterBlock(d)}
 
 SENSORY LANGUAGE: Use warmth, soft light, gentle sounds, cosiness. Stars, blankets, rain on windows, a cat purring. Make the listener feel sleepy.
 
@@ -87,17 +118,9 @@ Write the story now. Start immediately, no preamble.`,
   journey: (d) => `STORY TYPE: Journey / Adventure
 TONE: Exciting, fast paced, gripping. This story is designed to be listened to on a long car ride, flight, or train journey. The child must be hooked from the first sentence.
 
-THE CHILD:
-- Name: ${d.childName}
-- Age: ${d.age}
-- Gender: ${d.gender}
-- Best friend: ${d.friendName}
-- They love: ${d.interest}
-${d.proudOf ? '- Something they are proud of: ' + d.proudOf + ' (use this as a source of courage at a critical moment)' : ''}
-${d.hasPet && d.petName ? '- Pet: ' + d.petName + ' (the pet should save the day at a critical moment)' : ''}
-${d.extraDetails ? '\nEXTRA DETAILS FROM THE PARENT (weave these in naturally, they are gold):\n' + d.extraDetails : ''}
+${characterBlock(d)}
 
-STRUCTURE: ${d.length === 'epic' ? '5 short chapters with 4 cliffhangers' : d.length === 'standard' ? '3 short chapters with 2 cliffhangers' : '2 short chapters with 1 cliffhanger'}. Each chapter ends at a moment of maximum tension. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
+STRUCTURE: ${d.length === 'epic' ? '8 to 10 chapters with rich cliffhangers and subplots' : d.length === 'long' ? '5 to 6 chapters with strong cliffhangers' : '3 short chapters with 2 cliffhangers'}. Each chapter ends at a moment of maximum tension. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
 
 PACING: Quick. Dialogue heavy. Short action beats. Minimal description, just enough to set the scene. Think movie, not novel.
 
@@ -108,45 +131,50 @@ ${getAgeBand(d.age)}
 Write the story now. Start immediately with action or intrigue.`,
 
   learning: (d) => `STORY TYPE: Learning Adventure
-TONE: Exciting, immersive, and secretly educational. The child should be so caught up in the adventure that they do not realise they are learning. They are the hero, and their knowledge is their power.
+TONE: Exciting, immersive, and secretly educational. The child should be so caught up in the adventure that they do not realise they are learning.
 
-THE CHILD:
-- Name: ${d.childName}
-- Age: ${d.age}
-- Gender: ${d.gender}
-- Best friend / sidekick: ${d.friendName}
-- They love: ${d.interest}
-${d.hasPet && d.petName ? '- Pet: ' + d.petName + ' (the pet has a special ability that helps solve one challenge)' : ''}
-${d.extraDetails ? '\nEXTRA DETAILS FROM THE PARENT (weave these in naturally, they are gold):\n' + d.extraDetails : ''}
+${characterBlock(d)}
 
 SUBJECT AREA: ${d.subject}
-${d.learningGoal ? 'SPECIFIC LEARNING GOAL: The parent says their child is working on: "' + d.learningGoal + '". This is the most important instruction in this entire prompt. The story MUST contain real, concrete practice of this specific skill built directly into the plot.' : ''}
+${d.learningGoal ? 'SPECIFIC LEARNING GOAL: The parent says their child is working on: "' + d.learningGoal + '". This is the most important instruction in this entire prompt.' : ''}
 
-THIS IS HOW LEARNING STORIES MUST WORK:
+THIS IS HOW LEARNING STORIES WORK:
 
-The learning is not decoration. It is the engine of the story. Every obstacle, every locked door, every puzzle the hero faces requires the child to use the specific skill the parent described.
+The learning is the engine of the story. Every obstacle, every locked door, every puzzle requires the child to use the specific skill.
 
-Examples of how to do this brilliantly:
-- "7 times table" = A series of magic doors. The first needs 7x3 to open. The second needs 7x6. The third needs 7x8. ${d.childName} works each one out inside the story, thinking aloud, sometimes getting it wrong first, then figuring it out. By the end they have practiced at least 5 different 7-times calculations.
-- "Dividing by 2 and 3" = Treasure that must be split equally between characters. 12 gems between 3 friends. 18 coins between 2 teams. The story makes the division feel like a real decision with stakes.
-- "Letter sounds ch and sh" = A magic spell that only works when you say the right sound. "Was it 'ship' or 'chip'? ${d.childName} knew the difference." Words with ch and sh sounds appear throughout as power words.
-- "Telling the time" = A time travel adventure where knowing what the clock says determines where you land. "The big hand pointed to 6 and the little hand pointed to 3. That meant..."
-- "What volcanoes are" = An expedition into a volcano where real science explains what they are seeing. Magma, pressure, eruption, tectonic plates, all explained through wonder and discovery not textbook language.
-- "Counting in 10s" = Stepping stones that only appear in 10s. "10, 20, 30... ${d.childName} called out each number and another stone appeared."
+CRITICAL: INTERACTIVE AUDIO PAUSES
+This story is read aloud by a narrator. At each learning moment, the narrator must PAUSE and invite the child to answer before revealing the answer. Write these pauses directly into the text like this:
+
+For maths: "${d.childName} stared at the magic door. Seven times four. Can you work it out? ... That is right, twenty eight! The door burst open with a flash of golden light."
+
+For spelling: "To unlock the chest, ${d.childName} needed to spell the word 'because.' B, E, C... can you finish it? ... A, U, S, E! The lock clicked open."
+
+For alphabet: "The next stepping stone had a letter. It comes after G. What letter is it? ... H! The stone lit up and ${d.childName} leaped across."
+
+For phonics: "The magic word started with a 'ch' sound. Was it a chair? A ship? Or a cherry? ... Cherry! ${d.childName} shouted it and the spell exploded with colour."
+
+For reading: "The sign on the door said C... A... T. Can you read it? ... Cat! And behind the door was the biggest, fluffiest cat ${d.childName} had ever seen."
+
+For science: "The volcano was building pressure underground. What is the hot liquid rock called before it reaches the surface? ... Magma! ${d.childName} remembered."
+
+For languages: "The friendly dragon spoke French. 'Bonjour!' it said. That means... hello! Can you say it? Bonjour!"
+
+THE PATTERN FOR EVERY CHALLENGE:
+1. Present the question naturally inside the story
+2. The narrator asks "Can you work it out?" or "What do you think?" or similar
+3. Write three dots "..." to create a natural pause (the narrator will pause here)
+4. Then reveal the answer with celebration and excitement
+5. The story continues because the child "got it right"
+
+The child listening at home shouts the answer during the pause. The narrator then confirms it. The child feels like the story is talking directly to them.
 
 YOU MUST:
-1. Include at least ${d.length === 'epic' ? '6 to 8' : d.length === 'standard' ? '4 to 5' : '2 to 3'} distinct practice moments where the specific skill is used inside the plot
-2. Make the practice feel like heroism, not homework
-3. Show the child character thinking through the problem, not just magically knowing the answer
-4. Build difficulty gradually (start easy, get harder, end with a satisfying challenge)
-5. Have the friend or pet help with one of the easier challenges so the child feels supported
-6. End with the child mastering something they found hard, making them feel capable and proud
-
-YOU MUST NOT:
-- Make it feel like a worksheet wrapped in a story
-- Have a teacher character explain things
-- Use the phrase "let's practice" or anything that breaks the adventure
-- Make the child character perfect at the skill from the start (they should grow)
+1. Include at least ${d.length === 'epic' ? '12 to 15' : d.length === 'long' ? '7 to 9' : '4 to 5'} interactive pause moments
+2. Build difficulty gradually (start easy, get harder)
+3. The challenges must be genuinely age-appropriate for a ${d.age} year old
+4. Have the friend or pet help with one of the easier challenges
+5. End with the child mastering something hard, feeling proud and capable
+6. NEVER break the adventure. No "let us practice" or teacher explaining. The learning IS the adventure.
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
@@ -157,15 +185,7 @@ Write the story now. Start immediately with action or discovery.`,
   custom: (d) => `STORY TYPE: Custom / Parent Defined
 TONE: Warm, personalised, emotionally intelligent. The parent has described a specific situation they want this story to address.
 
-THE CHILD:
-- Name: ${d.childName}
-- Age: ${d.age}
-- Gender: ${d.gender}
-- Best friend: ${d.friendName}
-- They love: ${d.interest}
-${d.proudOf ? '- Something they are proud of: ' + d.proudOf : ''}
-${d.hasPet && d.petName ? '- Pet: ' + d.petName : ''}
-${d.extraDetails ? '\nEXTRA DETAILS FROM THE PARENT (weave these in naturally, they are gold):\n' + d.extraDetails : ''}
+${characterBlock(d)}
 
 THE SCENARIO THE PARENT DESCRIBED:
 "${d.customScenario}"
@@ -186,7 +206,8 @@ export default async (req) => {
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
     const anthropic = new Anthropic({ apiKey: Netlify.env.get('ANTHROPIC_API_KEY') });
-    const maxTokens = storyData.length === 'epic' ? 3000 : storyData.length === 'standard' ? 1500 : 800;
+    const tokenMap = { standard: 1800, long: 5000, epic: 8000 };
+    const maxTokens = tokenMap[storyData.length] || 1800;
 
     const storyResponse = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
@@ -198,7 +219,7 @@ export default async (req) => {
     const fullStory = storyResponse.content[0].text;
     const messageIntro = storyData.personalMessage ? `${storyData.personalMessage} ... ` : '';
     const fullStoryWithMessage = messageIntro + fullStory;
-    const previewText = fullStoryWithMessage.split(' ').slice(0, 40).join(' ') + '...';
+    const previewText = fullStoryWithMessage.split(' ').slice(0, 60).join(' ') + '...';
     const useVoiceId = voiceId || 'EXAVITQu4vr4xnSDxMaL';
 
     const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {

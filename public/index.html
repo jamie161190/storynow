@@ -115,6 +115,16 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .cat-info h3{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:0.2rem}
 .cat-info p{font-size:0.82rem;color:var(--text-soft);line-height:1.4;font-weight:500}
 
+/* ===== THEME GRID ===== */
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;width:100%}
+.theme-tile{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:0.9rem 0.5rem;cursor:pointer;text-align:center;transition:all 0.2s;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:0.3rem}
+.theme-tile:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.theme-tile.selected{border-color:var(--purple);background:var(--purple-light)}
+.theme-icon{font-size:1.6rem}
+.theme-label{font-size:0.72rem;font-weight:700;color:var(--text)}
+
+.form-row{display:flex;gap:0.75rem;width:100%}
+
 /* ===== FORM ===== */
 .form-group{width:100%;margin-bottom:1.25rem}
 .form-group label{display:block;font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:0.5rem;letter-spacing:0.01em}
@@ -305,35 +315,29 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 </div>
 
-<!-- DETAILS -->
+<!-- DETAILS: MAIN CHARACTER -->
 <div class="screen" id="screenDetails">
   <button class="back-btn" onclick="goTo('screenCategory')">&#8592; Back</button>
-  <h2 class="section-title">Tell us about them</h2>
-  <p class="section-sub">The more we know, the more magical the story.</p>
+  <h2 class="section-title">The main character</h2>
+  <p class="section-sub">This is who the story is all about.</p>
 
   <div class="form-group">
     <label>Their name</label>
     <input type="text" id="childName" placeholder="e.g. Chase">
   </div>
-  <div class="form-group">
-    <label>Age</label>
-    <input type="number" id="age" min="2" max="14" placeholder="e.g. 7">
-  </div>
-  <div class="form-group">
-    <label>Gender</label>
-    <select id="gender">
-      <option value="">Choose</option>
-      <option value="boy">Boy</option>
-      <option value="girl">Girl</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label>Best friend's name</label>
-    <input type="text" id="friendName" placeholder="e.g. Ellis">
-  </div>
-  <div class="form-group">
-    <label>What do they love?</label>
-    <input type="text" id="interest" placeholder="e.g. Space, dinosaurs, football">
+  <div class="form-row">
+    <div class="form-group" style="flex:1">
+      <label>Age</label>
+      <input type="number" id="age" min="2" max="14" placeholder="e.g. 7">
+    </div>
+    <div class="form-group" style="flex:1">
+      <label>Gender</label>
+      <select id="gender">
+        <option value="">Choose</option>
+        <option value="boy">Boy</option>
+        <option value="girl">Girl</option>
+      </select>
+    </div>
   </div>
   <div class="form-group">
     <label>Something they are proud of (optional)</label>
@@ -341,29 +345,138 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p class="form-hint">We will weave this into the story to celebrate them.</p>
   </div>
 
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenPeople')">Continue</button>
+</div>
+
+<!-- DETAILS: WHO'S IN THE STORY -->
+<div class="screen" id="screenPeople">
+  <button class="back-btn" onclick="goTo('screenDetails')">&#8592; Back</button>
+  <h2 class="section-title">Who else is in the story?</h2>
+  <p class="section-sub">Friends, family, the people they love most.</p>
+
+  <div class="form-group">
+    <label>Best friend's name</label>
+    <input type="text" id="friendName" placeholder="e.g. Ellis">
+  </div>
+  <div class="form-group">
+    <label>Family members (optional)</label>
+    <input type="text" id="familyMembers" placeholder="e.g. Brother Jake, sister Isla, Mum, Dad, Nanny Rose">
+    <p class="form-hint">We will give them real roles in the story, not just a mention.</p>
+  </div>
+  <div class="form-group">
+    <label>Teacher's name (optional)</label>
+    <input type="text" id="teacherName" placeholder="e.g. Mrs Thompson">
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenTheme')">Continue</button>
+</div>
+
+<!-- DETAILS: THEME -->
+<div class="screen" id="screenTheme">
+  <button class="back-btn" onclick="goTo('screenPeople')">&#8592; Back</button>
+  <h2 class="section-title">What are they into?</h2>
+  <p class="section-sub">Pick as many as you like. These shape the whole story.</p>
+
+  <div class="theme-grid" id="themeGrid">
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Dinosaurs"><span class="theme-icon">&#129430;</span><span class="theme-label">Dinosaurs</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Space"><span class="theme-icon">&#128640;</span><span class="theme-label">Space</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Football"><span class="theme-icon">&#9917;</span><span class="theme-label">Football</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Unicorns"><span class="theme-icon">&#129412;</span><span class="theme-label">Unicorns</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Princesses"><span class="theme-icon">&#128120;</span><span class="theme-label">Princesses</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Animals"><span class="theme-icon">&#128054;</span><span class="theme-label">Animals</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Cars"><span class="theme-icon">&#128663;</span><span class="theme-label">Cars</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Fashion"><span class="theme-icon">&#128087;</span><span class="theme-label">Fashion</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Aeroplanes"><span class="theme-icon">&#9992;&#65039;</span><span class="theme-label">Aeroplanes</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Dolls"><span class="theme-icon">&#128030;</span><span class="theme-label">Dolls</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Pirates"><span class="theme-icon">&#127988;&#8205;&#9760;&#65039;</span><span class="theme-label">Pirates</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Superheroes"><span class="theme-icon">&#129464;</span><span class="theme-label">Superheroes</span></div>
+  </div>
+  <div class="form-group" style="margin-top:1rem">
+    <label>Or tell us something else</label>
+    <input type="text" id="customTheme" placeholder="e.g. Minecraft, ballet, cooking, trains">
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenMemorables')">Continue</button>
+</div>
+
+<!-- DETAILS: MEMORABLE THINGS -->
+<div class="screen" id="screenMemorables">
+  <button class="back-btn" onclick="goTo('screenTheme')">&#8592; Back</button>
+  <h2 class="section-title">The special things</h2>
+  <p class="section-sub">Pets, teddies, toys. The things they can not live without.</p>
+
   <div class="toggle-row">
     <button class="toggle" id="petToggle" onclick="togglePet()"></button>
     <span class="toggle-label">Include a pet in the story</span>
   </div>
-  <div class="form-group" id="petNameGroup" style="display:none">
-    <label>Pet's name</label>
-    <input type="text" id="petName" placeholder="e.g. Buddy">
+  <div id="petFields" style="display:none">
+    <div class="form-row">
+      <div class="form-group" style="flex:1">
+        <label>Pet's name</label>
+        <input type="text" id="petName" placeholder="e.g. Buddy">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label>What kind?</label>
+        <input type="text" id="petType" placeholder="e.g. Golden retriever">
+      </div>
+    </div>
   </div>
+
+  <div class="form-group">
+    <label>Favourite teddy or toy (optional)</label>
+    <input type="text" id="favTeddy" placeholder="e.g. Mr Flopsy the rabbit, a red fire engine">
+    <p class="form-hint">This will become a character or a special object in the story.</p>
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenWhere')">Continue</button>
+</div>
+
+<!-- DETAILS: WHERE -->
+<div class="screen" id="screenWhere">
+  <button class="back-btn" onclick="goTo('screenMemorables')">&#8592; Back</button>
+  <h2 class="section-title">Where does the story happen?</h2>
+  <p class="section-sub">Pick a setting or let us surprise them.</p>
+
+  <div class="theme-grid" id="whereGrid">
+    <div class="theme-tile" onclick="toggleWhere(this)" data-where="Their bedroom"><span class="theme-icon">&#128716;</span><span class="theme-label">Bedroom</span></div>
+    <div class="theme-tile" onclick="toggleWhere(this)" data-where="School"><span class="theme-icon">&#127979;</span><span class="theme-label">School</span></div>
+    <div class="theme-tile" onclick="toggleWhere(this)" data-where="A magical forest"><span class="theme-icon">&#127794;</span><span class="theme-label">Magic forest</span></div>
+    <div class="theme-tile" onclick="toggleWhere(this)" data-where="Outer space"><span class="theme-icon">&#127756;</span><span class="theme-label">Outer space</span></div>
+    <div class="theme-tile" onclick="toggleWhere(this)" data-where="Under the sea"><span class="theme-icon">&#127754;</span><span class="theme-label">Under the sea</span></div>
+    <div class="theme-tile" onclick="toggleWhere(this)" data-where="A castle"><span class="theme-icon">&#127984;</span><span class="theme-label">A castle</span></div>
+    <div class="theme-tile selected" onclick="toggleWhere(this)" data-where="Surprise me"><span class="theme-icon">&#10024;</span><span class="theme-label">Surprise me</span></div>
+  </div>
+  <div class="form-group" style="margin-top:1rem">
+    <label>Or a real place they love</label>
+    <input type="text" id="customWhere" placeholder="e.g. Grandma's garden, the park on Elm Street, Disneyland">
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenExtras')">Continue</button>
+</div>
+
+<!-- DETAILS: LEARNING + EXTRAS + MESSAGE -->
+<div class="screen" id="screenExtras">
+  <button class="back-btn" onclick="goTo('screenWhere')">&#8592; Back</button>
+  <h2 class="section-title">Final touches</h2>
+  <p class="section-sub">Almost there. These are the details that make it unforgettable.</p>
 
   <div class="form-group" id="subjectGroup" style="display:none">
     <label>What subject area?</label>
     <select id="subject">
       <option value="maths">Maths</option>
+      <option value="english">English</option>
       <option value="science">Science</option>
       <option value="geography">Geography</option>
       <option value="history">History</option>
       <option value="reading">Reading &amp; Phonics</option>
+      <option value="spelling">Spelling</option>
+      <option value="languages">Languages</option>
     </select>
   </div>
   <div class="form-group" id="learningGoalGroup" style="display:none">
     <label>What specifically are they working on?</label>
-    <textarea id="learningGoal" placeholder="e.g. Their 7 times table, dividing by 2 and 3, letter sounds like ch and sh, what volcanoes are, telling the time, counting in 10s..." style="height:80px"></textarea>
-    <p class="form-hint">Be as specific as you can. The story will have real practice built into the adventure so they learn without realising it.</p>
+    <textarea id="learningGoal" placeholder="e.g. Their 7 times table, dividing by 2 and 3, letter sounds like ch and sh, spelling 'because' and 'together', the alphabet, counting in 10s..." style="height:80px"></textarea>
+    <p class="form-hint">Be as specific as you can. The narrator will pause and let them answer before revealing the answer in the story.</p>
   </div>
 
   <div class="form-group" id="customScenarioGroup" style="display:none">
@@ -374,7 +487,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
   <div class="form-group">
     <label>Anything else we should know? (optional)</label>
-    <textarea id="extraDetails" placeholder="e.g. She carries a stuffed rabbit called Mr Flopsy everywhere. He's just started swimming lessons and loves it. She calls her grandma Nanny Rose." style="height:100px"></textarea>
+    <textarea id="extraDetails" placeholder="e.g. He's scared of thunder but pretends he's not. She calls spaghetti 'pasketti'. He's just started swimming lessons." style="height:100px"></textarea>
     <p class="form-hint">The more you tell us, the more personal the story feels. Little details make all the difference.</p>
   </div>
 
@@ -393,20 +506,20 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <h2 class="section-title">How long?</h2>
   <p class="section-sub">Choose the perfect length for the moment.</p>
   <div class="length-cards">
-    <div class="length-card" onclick="selectLength('short',this)">
-      <div class="len-emoji">&#127769;</div>
-      <div class="len-name">Short</div>
-      <div class="len-time">~2 min</div>
-    </div>
     <div class="length-card selected" onclick="selectLength('standard',this)">
-      <div class="len-emoji">&#128214;</div>
-      <div class="len-name">Standard</div>
+      <div class="len-emoji">&#127769;</div>
+      <div class="len-name">Classic</div>
       <div class="len-time">~5 min</div>
+    </div>
+    <div class="length-card" onclick="selectLength('long',this)">
+      <div class="len-emoji">&#128214;</div>
+      <div class="len-name">Extended</div>
+      <div class="len-time">~15 min</div>
     </div>
     <div class="length-card" onclick="selectLength('epic',this)">
       <div class="len-emoji">&#128640;</div>
       <div class="len-name">Epic</div>
-      <div class="len-time">~10 min</div>
+      <div class="len-time">~30 min</div>
     </div>
   </div>
   <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="goTo('screenVoice')">Continue</button>
@@ -438,7 +551,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="preview-container">
     <div class="preview-badge">&#10003; Preview ready</div>
     <p class="preview-title">Have a listen</p>
-    <p class="preview-sub">This is the first 30 seconds. If it feels right, unlock the full story.</p>
+    <p class="preview-sub">Here is a taste of their story. If it feels right, unlock the full version.</p>
     <div class="audio-player" onclick="playPreview()">
       <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
@@ -465,7 +578,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 </div>
 
 <script>
-let storyData = { category:'', length:'standard' };
+let storyData = { category:'', length:'standard', themes:[], where:'Surprise me' };
 let selectedVoiceId = '';
 let fullStoryText = '';
 
@@ -501,39 +614,74 @@ function goTo(id) {
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
   if(id === 'screenVoice') showVoices();
+  if(id === 'screenExtras') updateExtrasVisibility();
 }
 
 function selectCategory(cat, el) {
   storyData.category = cat;
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('subjectGroup').style.display = cat === 'learning' ? 'block' : 'none';
-  document.getElementById('learningGoalGroup').style.display = cat === 'learning' ? 'block' : 'none';
-  document.getElementById('customScenarioGroup').style.display = cat === 'custom' ? 'block' : 'none';
   setTimeout(() => goTo('screenDetails'), 300);
+}
+
+function updateExtrasVisibility() {
+  document.getElementById('subjectGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
+  document.getElementById('learningGoalGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
+  document.getElementById('customScenarioGroup').style.display = storyData.category === 'custom' ? 'block' : 'none';
 }
 
 function togglePet() {
   const t = document.getElementById('petToggle');
   t.classList.toggle('on');
-  document.getElementById('petNameGroup').style.display = t.classList.contains('on') ? 'block' : 'none';
+  document.getElementById('petFields').style.display = t.classList.contains('on') ? 'block' : 'none';
+}
+
+function toggleTheme(el) {
+  el.classList.toggle('selected');
+}
+
+function toggleWhere(el) {
+  document.querySelectorAll('#whereGrid .theme-tile').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  storyData.where = el.dataset.where;
+}
+
+function getSelectedThemes() {
+  const tiles = document.querySelectorAll('#themeGrid .theme-tile.selected');
+  const themes = Array.from(tiles).map(t => t.dataset.theme);
+  const custom = document.getElementById('customTheme').value.trim();
+  if(custom) themes.push(custom);
+  return themes;
 }
 
 function goToLength() {
+  // Main character
   const name = document.getElementById('childName').value.trim();
   const age = document.getElementById('age').value;
   const gender = document.getElementById('gender').value;
+  if(!name || !age || !gender) { alert('Please fill in the name, age, and gender.'); return; }
+  // People
   const friend = document.getElementById('friendName').value.trim();
-  const interest = document.getElementById('interest').value.trim();
-  if(!name || !age || !gender || !friend || !interest) { alert('Please fill in all required fields.'); return; }
+  if(!friend) { alert('Please tell us their best friend\'s name.'); return; }
+  // Themes
+  const themes = getSelectedThemes();
+  if(themes.length === 0) { alert('Please pick at least one theme or tell us what they love.'); return; }
+
   storyData.childName = name;
   storyData.age = age;
   storyData.gender = gender;
-  storyData.friendName = friend;
-  storyData.interest = interest;
   storyData.proudOf = document.getElementById('proudOf').value.trim();
+  storyData.friendName = friend;
+  storyData.familyMembers = document.getElementById('familyMembers').value.trim();
+  storyData.teacherName = document.getElementById('teacherName').value.trim();
+  storyData.themes = themes;
+  storyData.interest = themes.join(', ');
   storyData.hasPet = document.getElementById('petToggle').classList.contains('on');
   storyData.petName = document.getElementById('petName').value.trim();
+  storyData.petType = document.getElementById('petType').value.trim();
+  storyData.favTeddy = document.getElementById('favTeddy').value.trim();
+  storyData.customWhere = document.getElementById('customWhere').value.trim();
+  storyData.setting = storyData.customWhere || storyData.where;
   storyData.subject = document.getElementById('subject').value;
   storyData.learningGoal = document.getElementById('learningGoal').value.trim();
   storyData.customScenario = document.getElementById('customScenario').value.trim();
