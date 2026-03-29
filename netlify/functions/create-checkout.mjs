@@ -18,7 +18,7 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid storyData or priceTier' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const stripe = new Stripe(Netlify.env.get('STRIPE_SECRET_KEY'));
+    const stripe = new Stripe(typeof Netlify !== 'undefined' ? Netlify.env.get('STRIPE_SECRET_KEY') : process.env.STRIPE_SECRET_KEY);
     const siteUrl = req.headers.get('origin') || process.env.URL || 'https://storytold.netlify.app';
     const pricing = PRICING[priceTier];
 

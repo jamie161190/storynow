@@ -11,8 +11,8 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Email and code required' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const supabaseUrl = Netlify.env.get('SUPABASE_URL');
-    const supabaseKey = Netlify.env.get('SUPABASE_SECRET_KEY');
+    const supabaseUrl = typeof Netlify !== 'undefined' ? Netlify.env.get('SUPABASE_URL') : process.env.SUPABASE_URL;
+    const supabaseKey = typeof Netlify !== 'undefined' ? Netlify.env.get('SUPABASE_SECRET_KEY') : process.env.SUPABASE_SECRET_KEY;
 
     // Check the code
     const codeRes = await fetch(

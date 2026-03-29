@@ -19,7 +19,7 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Missing session_id parameter' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const stripe = new Stripe(Netlify.env.get('STRIPE_SECRET_KEY'));
+    const stripe = new Stripe(typeof Netlify !== 'undefined' ? Netlify.env.get('STRIPE_SECRET_KEY') : process.env.STRIPE_SECRET_KEY);
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 

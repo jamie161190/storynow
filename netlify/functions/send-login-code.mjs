@@ -11,9 +11,9 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Email required' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const supabaseUrl = Netlify.env.get('SUPABASE_URL');
-    const supabaseKey = Netlify.env.get('SUPABASE_SECRET_KEY');
-    const resendKey = Netlify.env.get('RESEND_API_KEY');
+    const supabaseUrl = typeof Netlify !== 'undefined' ? Netlify.env.get('SUPABASE_URL') : process.env.SUPABASE_URL;
+    const supabaseKey = typeof Netlify !== 'undefined' ? Netlify.env.get('SUPABASE_SECRET_KEY') : process.env.SUPABASE_SECRET_KEY;
+    const resendKey = typeof Netlify !== 'undefined' ? Netlify.env.get('RESEND_API_KEY') : process.env.RESEND_API_KEY;
 
     // Check if this email has any stories
     const checkRes = await fetch(
