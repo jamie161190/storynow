@@ -1,7 +1,27 @@
+import Stripe from 'stripe';
+
 export default async (req) => {
   try {
-    const { fullStory, voiceId, childName } = await req.json();
-    const useVoiceId = voiceId || 'EXAVITQu4vr4xnSDxMaL';
+    const { fullStory, voiceId, childName, sessionId } = await req.json();
+
+    // ── Payment verification (server-side) ──────────────────
+    if (!sessionId) {
+      return new Response(JSON.stringify({ error: 'Missing payment session' }), {
+        status: 403, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (!session || session.payment_status !== 'paid') {
+      return new Response(JSON.stringify({ error: 'Payment not confirmed' }), {
+        status: 403, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    // ─────────────────────────────────────────────────────────
+
+    const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
 
     // Generate audio via ElevenLabs
     const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
