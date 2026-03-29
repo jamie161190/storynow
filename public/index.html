@@ -288,6 +288,17 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .share-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:1.4rem;color:var(--text-muted);cursor:pointer;line-height:1}
 .share-success{text-align:center;padding:1rem 0}
 .share-success .tick{font-size:2.5rem;margin-bottom:0.5rem}
+.share-options{display:flex;gap:0.75rem;margin-bottom:1.25rem}
+.share-option{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.5rem;padding:1rem 0.5rem;border:2px solid var(--border);border-radius:14px;cursor:pointer;transition:all 0.2s;background:var(--bg)}
+.share-option:hover{border-color:var(--purple);transform:translateY(-2px)}
+.share-option.active{border-color:var(--purple);background:#F8F5FF}
+.share-option-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.share-option-icon.email-icon{background:var(--purple)}
+.share-option-icon.wa-icon{background:#25D366}
+.share-option-icon svg{width:20px;height:20px;fill:white}
+.share-option-label{font-size:0.8rem;font-weight:700;color:var(--text);font-family:'Nunito',sans-serif}
+.wa-share-btn{width:100%;padding:0.85rem;background:#25D366;color:white;border:none;border-radius:50px;font-size:1rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:background 0.2s}
+.wa-share-btn:hover{background:#1EBE57}
 .library-empty{text-align:center;padding:3rem 1rem}
 
 /* ===== ERROR ===== */
@@ -815,10 +826,28 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div id="shareForm">
       <h3>Share this story</h3>
       <p id="shareSubtext">Send this story to a friend or family member.</p>
-      <input type="text" id="shareFromName" placeholder="Your name" class="form-input">
-      <input type="email" id="shareEmail" placeholder="Their email address" class="form-input">
-      <textarea id="shareMessage" placeholder="Add a message (optional)"></textarea>
-      <button class="share-send-btn" id="shareSendBtn" onclick="sendShareEmail()">Send story</button>
+      <div class="share-options">
+        <div class="share-option active" id="shareOptEmail" onclick="setShareMode('email')">
+          <div class="share-option-icon email-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+          <span class="share-option-label">Email</span>
+        </div>
+        <div class="share-option" id="shareOptWa" onclick="setShareMode('whatsapp')">
+          <div class="share-option-icon wa-icon"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.252-.149-2.868.852.852-2.868-.149-.252A8 8 0 1112 20z"/></svg></div>
+          <span class="share-option-label">WhatsApp</span>
+        </div>
+      </div>
+      <div id="shareEmailFields">
+        <input type="text" id="shareFromName" placeholder="Your name" class="form-input">
+        <input type="email" id="shareEmail" placeholder="Email address" class="form-input">
+        <div id="extraEmailsWrap"></div>
+        <button type="button" style="background:none;border:none;color:var(--purple);font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:0.75rem;font-family:'Nunito',sans-serif" onclick="addEmailField()">+ Add another recipient</button>
+        <textarea id="shareMessage" placeholder="Add a message (optional)"></textarea>
+        <button class="share-send-btn" id="shareSendBtn" onclick="sendShareEmail()">Send story</button>
+      </div>
+      <div id="shareWaFields" style="display:none">
+        <textarea id="waMessage" placeholder="Add a message (optional)" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;resize:none;height:80px;margin-bottom:1rem;background:var(--bg)"></textarea>
+        <button class="wa-share-btn" onclick="shareViaWhatsApp()">Share on WhatsApp</button>
+      </div>
       <p id="shareError" style="color:#FF6B9D;font-size:0.85rem;text-align:center;margin-top:0.75rem;display:none"></p>
     </div>
     <div id="shareSuccess" class="share-success" style="display:none">
@@ -1439,16 +1468,53 @@ function playShared() {
 // Share story via email
 let shareStory = null;
 
+let shareMode = 'email';
+
 function openShareModal(story) {
   shareStory = story;
+  shareMode = 'email';
   document.getElementById('shareForm').style.display = 'block';
   document.getElementById('shareSuccess').style.display = 'none';
   document.getElementById('shareEmail').value = '';
   document.getElementById('shareFromName').value = '';
   document.getElementById('shareMessage').value = '';
+  document.getElementById('waMessage').value = '';
   document.getElementById('shareError').style.display = 'none';
+  document.getElementById('extraEmailsWrap').innerHTML = '';
   document.getElementById('shareSubtext').textContent = `Send ${story.childName}'s story to a friend or family member.`;
+  document.getElementById('shareOptEmail').classList.add('active');
+  document.getElementById('shareOptWa').classList.remove('active');
+  document.getElementById('shareEmailFields').style.display = 'block';
+  document.getElementById('shareWaFields').style.display = 'none';
   document.getElementById('shareOverlay').classList.add('active');
+}
+
+function setShareMode(mode) {
+  shareMode = mode;
+  document.getElementById('shareOptEmail').classList.toggle('active', mode === 'email');
+  document.getElementById('shareOptWa').classList.toggle('active', mode === 'whatsapp');
+  document.getElementById('shareEmailFields').style.display = mode === 'email' ? 'block' : 'none';
+  document.getElementById('shareWaFields').style.display = mode === 'whatsapp' ? 'block' : 'none';
+  document.getElementById('shareError').style.display = 'none';
+}
+
+function addEmailField() {
+  const wrap = document.getElementById('extraEmailsWrap');
+  const input = document.createElement('input');
+  input.type = 'email';
+  input.placeholder = 'Email address';
+  input.className = 'form-input share-extra-email';
+  input.style.cssText = 'width:100%;margin-bottom:0.75rem';
+  wrap.appendChild(input);
+}
+
+function shareViaWhatsApp() {
+  if (!shareStory) return;
+  const msg = document.getElementById('waMessage').value.trim();
+  const listenUrl = `https://storytold.ai?listen=${shareStory.id}`;
+  let text = `Listen to ${shareStory.childName}'s personalised audio story! ${listenUrl}`;
+  if (msg) text = `${msg}\n\n${text}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 function closeShareModal() {
@@ -1457,34 +1523,44 @@ function closeShareModal() {
 }
 
 async function sendShareEmail() {
-  const email = document.getElementById('shareEmail').value.trim();
+  const mainEmail = document.getElementById('shareEmail').value.trim();
   const fromName = document.getElementById('shareFromName').value.trim();
   const message = document.getElementById('shareMessage').value.trim();
   const errEl = document.getElementById('shareError');
   errEl.style.display = 'none';
 
   if (!fromName) { errEl.textContent = 'Please enter your name'; errEl.style.display = 'block'; return; }
-  if (!email || !email.includes('@')) { errEl.textContent = 'Please enter a valid email address'; errEl.style.display = 'block'; return; }
+  if (!mainEmail || !mainEmail.includes('@')) { errEl.textContent = 'Please enter a valid email address'; errEl.style.display = 'block'; return; }
+
+  // Gather all emails
+  const emails = [mainEmail];
+  document.querySelectorAll('.share-extra-email').forEach(input => {
+    const val = input.value.trim();
+    if (val && val.includes('@')) emails.push(val);
+  });
 
   const btn = document.getElementById('shareSendBtn');
   btn.disabled = true;
-  btn.textContent = 'Sending...';
+  btn.textContent = `Sending to ${emails.length} ${emails.length === 1 ? 'person' : 'people'}...`;
 
   try {
-    const res = await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'share',
-        to: email,
-        childName: shareStory.childName,
-        giftFrom: fromName,
-        giftMessage: message || null,
-        storyId: shareStory.id
-      })
-    });
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Failed to send');
+    const results = await Promise.all(emails.map(email =>
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'share',
+          to: email,
+          childName: shareStory.childName,
+          giftFrom: fromName,
+          giftMessage: message || null,
+          storyId: shareStory.id
+        })
+      }).then(r => r.json())
+    ));
+
+    const failed = results.filter(r => !r.success).length;
+    if (failed === emails.length) throw new Error('All emails failed');
 
     document.getElementById('shareForm').style.display = 'none';
     document.getElementById('shareSuccess').style.display = 'block';
