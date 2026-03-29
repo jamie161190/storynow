@@ -1,5 +1,6 @@
 // Transactional email sending via Resend
 // Set RESEND_API_KEY in Netlify env vars after creating account at resend.com
+import Stripe from 'stripe';
 
 export default async (req) => {
   try {
@@ -7,11 +8,42 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const { type, to, childName, giftFrom, giftMessage, category, length, storyId } = await req.json();
+    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId } = await req.json();
 
     if (!type || !to) {
       return new Response(JSON.stringify({ error: 'Missing type or recipient email' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
+
+    // ── Verify the request is legitimate ──────────────────────
+    if (type === 'purchase' || type === 'gift') {
+      // Purchase and gift emails require a valid paid Stripe session
+      if (!sessionId) {
+        return new Response(JSON.stringify({ error: 'Missing payment session' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+      }
+      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (!session || session.payment_status !== 'paid') {
+        return new Response(JSON.stringify({ error: 'Payment not verified' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+      }
+    } else if (type === 'share') {
+      // Share emails require a valid story ID that exists in the database
+      if (!storyId) {
+        return new Response(JSON.stringify({ error: 'Missing story ID' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      }
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+      if (supabaseUrl && supabaseKey) {
+        const checkRes = await fetch(
+          `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=id&limit=1`,
+          { headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey } }
+        );
+        const stories = await checkRes.json();
+        if (!stories || !stories.length) {
+          return new Response(JSON.stringify({ error: 'Story not found' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
+        }
+      }
+    }
+    // ─────────────────────────────────────────────────────────
 
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {

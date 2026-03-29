@@ -19,6 +19,28 @@ export default async (req) => {
         status: 403, headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    // ── Prevent session reuse (one payment = one generation) ──
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+    if (supabaseUrl && supabaseKey) {
+      const checkRes = await fetch(
+        `${supabaseUrl}/rest/v1/stories?stripe_session_id=eq.${encodeURIComponent(sessionId)}&select=id&limit=1`,
+        {
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey
+          }
+        }
+      );
+      const existing = await checkRes.json();
+      if (existing && existing.length > 0) {
+        return new Response(JSON.stringify({ error: 'This payment has already been used to generate a story. Check My Stories to find it.' }), {
+          status: 403, headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
     // ─────────────────────────────────────────────────────────
 
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
@@ -44,8 +66,6 @@ export default async (req) => {
 
     // Upload to Supabase Storage
     let audioUrl = null;
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
     if (supabaseUrl && supabaseKey) {
       const safeName = (childName || 'story').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();

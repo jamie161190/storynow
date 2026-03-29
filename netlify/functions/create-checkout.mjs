@@ -11,7 +11,6 @@ export default async (req) => {
     const childName = storyData.childName || body.childName || 'your child';
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
-    console.log('Stripe key exists:', !!stripeKey, 'Length:', stripeKey ? stripeKey.length : 0);
 
     if (!stripeKey) {
       return new Response(JSON.stringify({ error: 'Stripe not configured' }), { status: 500, headers: { 'Content-Type': 'application/json' } });

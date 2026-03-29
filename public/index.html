@@ -1047,6 +1047,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 let storyData = { category:'', length:'standard', themes:[], where:'Surprise me' };
 let selectedVoiceId = '';
 let fullStoryText = '';
+let lastStripeSessionId = '';
 
 // ===== CURATED VOICE LIBRARY =====
 // Each voice tagged with gender, accent, age, and recommended story types
@@ -1599,6 +1600,7 @@ async function handleStripeReturn() {
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
   if (!sessionId) return;
+  lastStripeSessionId = sessionId;
 
   // Clean the URL
   window.history.replaceState({}, '', window.location.pathname);
@@ -1652,7 +1654,7 @@ async function handleStripeReturn() {
 
     // Send purchase confirmation email (non-blocking)
     if (verifyData.customerEmail) {
-      sendPurchaseEmail(verifyData.customerEmail);
+      sendPurchaseEmail(verifyData.customerEmail, sessionId);
     }
 
     // Save story to Supabase (non-blocking) using the Supabase Storage URL
@@ -1670,7 +1672,17 @@ async function handleStripeReturn() {
     sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
   } catch(err) {
-    alert('Something went wrong: ' + err.message);
+    // Keep session data so user can retry if audio generation failed after payment
+    const canRetry = sessionStorage.getItem('storytold_story') && sessionId;
+    if (canRetry) {
+      const retry = confirm('Something went wrong generating your story audio, but your payment is confirmed. Would you like to try again? (Your payment is safe.)');
+      if (retry) {
+        // Re-add session_id to URL and reload to trigger handleStripeReturn again
+        window.location.href = window.location.pathname + '?session_id=' + sessionId;
+        return;
+      }
+    }
+    alert('Something went wrong: ' + err.message + '. If you have paid, please contact hello@storytold.ai and we will sort it out.');
     goTo('screenLanding');
   }
 }
@@ -1759,7 +1771,8 @@ async function sendGift() {
         to: storyData.giftEmail,
         childName: storyData.childName,
         giftFrom: storyData.giftFrom,
-        giftMessage: storyData.giftMessage
+        giftMessage: storyData.giftMessage,
+        sessionId: lastStripeSessionId
       })
     });
   } catch(e) { /* send silently, don't block the experience */ }
@@ -1768,7 +1781,7 @@ async function sendGift() {
 }
 
 // Send purchase confirmation email (called after successful payment)
-async function sendPurchaseEmail(email) {
+async function sendPurchaseEmail(email, stripeSessionId) {
   try {
     await fetch('/api/send-email', {
       method:'POST',
@@ -1778,7 +1791,8 @@ async function sendPurchaseEmail(email) {
         to: email,
         childName: storyData.childName,
         category: storyData.category,
-        length: storyData.length
+        length: storyData.length,
+        sessionId: stripeSessionId
       })
     });
   } catch(e) { /* silent */ }
