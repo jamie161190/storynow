@@ -16,6 +16,12 @@ const VOICES = {
     { id: 'g5CIjZEefAph4nQFvHAz', name: 'Ethan', desc: 'Fun science teacher', emoji: '🔬' },
     { id: 'oWAxZDx7w5VEj9dCyTzz', name: 'Grace', desc: 'Patient and clear', emoji: '📚' },
     { id: 'ZQe5CZNOzWyzPSCn5a3c', name: 'James', desc: 'Wise professor', emoji: '🎓' }
+  ],
+  custom: [
+    { id: 'EXAVITQu4vr4xnSDxMaL', name: 'Sarah', desc: 'Warm and reassuring', emoji: '👩' },
+    { id: 'onwK4e9ZLuTAKqWW03F9', name: 'Daniel', desc: 'Calm and friendly', emoji: '👨' },
+    { id: 'TxGEqnHWrfWFTfGW9XjX', name: 'Josh', desc: 'Upbeat and fun', emoji: '🧗' },
+    { id: 'ThT5KcBeYPX3keUQqHPh', name: 'Dorothy', desc: 'Gentle and kind', emoji: '👩' }
   ]
 };
 export default async (req) => {
