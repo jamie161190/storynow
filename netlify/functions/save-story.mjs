@@ -1,4 +1,4 @@
-// Saves a purchased story to Supabase (metadata + audio file)
+// Saves a purchased story metadata to Supabase
 
 export default async (req) => {
   try {
@@ -6,39 +6,15 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const { email, storyData, fullStoryText, audioBase64, voiceId, stripeSessionId } = await req.json();
+    const { email, storyData, fullStoryText, audioUrl, voiceId, stripeSessionId } = await req.json();
 
-    if (!email || !storyData || !audioBase64) {
+    if (!email || !storyData) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
-    // 1. Upload audio to Supabase Storage
-    const fileName = `${Date.now()}-${storyData.childName.replace(/\s+/g, '-').toLowerCase()}.mp3`;
-    const audioBuffer = Uint8Array.from(atob(audioBase64), c => c.charCodeAt(0));
-
-    const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${supabaseKey}`,
-        'apikey': supabaseKey,
-        'Content-Type': 'audio/mpeg',
-        'x-upsert': 'true'
-      },
-      body: audioBuffer
-    });
-
-    if (!uploadRes.ok) {
-      const err = await uploadRes.text();
-      console.error('Storage upload error:', err);
-      // Continue anyway, we still want to save the metadata
-    }
-
-    const audioUrl = `${supabaseUrl}/storage/v1/object/public/stories/${fileName}`;
-
-    // 2. Save story metadata to database
     const insertRes = await fetch(`${supabaseUrl}/rest/v1/stories`, {
       method: 'POST',
       headers: {
@@ -54,7 +30,7 @@ export default async (req) => {
         length: storyData.length,
         story_text: fullStoryText,
         voice_id: voiceId,
-        audio_url: audioUrl,
+        audio_url: audioUrl || null,
         stripe_session_id: stripeSessionId || null,
         is_gift: storyData.isGift || false,
         gift_email: storyData.giftEmail || null,

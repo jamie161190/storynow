@@ -1147,7 +1147,7 @@ async function handleStripeReturn() {
     const res = await fetch('/api/generate-full', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId })
+      body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId, childName: storyData.childName })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.error || 'Something went wrong');
@@ -1164,9 +1164,9 @@ async function handleStripeReturn() {
       sendPurchaseEmail(verifyData.customerEmail);
     }
 
-    // Save story to Supabase (non-blocking)
+    // Save story to Supabase (non-blocking) using the Supabase Storage URL
     if (verifyData.customerEmail) {
-      saveStoryToDb(verifyData.customerEmail, data.fullAudio, sessionId);
+      saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
     }
 
     // Clear saved session
@@ -1288,21 +1288,24 @@ async function sendPurchaseEmail(email) {
 }
 
 // Save story to Supabase after purchase (non-blocking)
-async function saveStoryToDb(email, audioBase64, stripeSessionId) {
+async function saveStoryToDb(email, audioUrl, stripeSessionId) {
   try {
-    await fetch('/api/save-story', {
+    const res = await fetch('/api/save-story', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         email,
         storyData,
         fullStoryText,
-        audioBase64,
+        audioUrl,
         voiceId: selectedVoiceId,
         stripeSessionId
       })
     });
-  } catch(e) { /* silent, don't block the experience */ }
+    const data = await res.json();
+    if (!data.success) console.error('Save story failed:', data.error);
+    else console.log('Story saved:', data.storyId);
+  } catch(e) { console.error('Save story error:', e); }
 }
 
 let loginEmailAddr = '';
