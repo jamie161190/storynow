@@ -6,8 +6,14 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const url = new URL(req.url);
-    const sessionId = url.searchParams.get('session_id');
+    let sessionId;
+    if (req.method === 'POST') {
+      const body = await req.json();
+      sessionId = body.session_id;
+    } else {
+      const url = new URL(req.url);
+      sessionId = url.searchParams.get('session_id');
+    }
 
     if (!sessionId) {
       return new Response(JSON.stringify({ error: 'Missing session_id parameter' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -27,7 +33,7 @@ export default async (req) => {
       success: isSuccessful,
       sessionId: session.id,
       paymentStatus: session.payment_status,
-      customerEmail: session.customer_email,
+      customerEmail: session.customer_details?.email || session.customer_email,
       metadata: session.metadata || {},
       amountTotal: session.amount_total,
       currency: session.currency

@@ -1013,6 +1013,11 @@ async function handleStripeReturn() {
     document.getElementById('giftSentMsg').style.display = 'none';
     document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
 
+    // Send purchase confirmation email (non-blocking)
+    if (verifyData.customerEmail) {
+      sendPurchaseEmail(verifyData.customerEmail);
+    }
+
     // Clear saved session
     sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
@@ -1072,10 +1077,42 @@ function downloadStory() {
   document.body.removeChild(a);
 }
 
-function sendGift() {
-  // For now, show confirmation. When email backend is built, this will actually send.
-  document.getElementById('sendGiftBtn').style.display = 'none';
+async function sendGift() {
+  const btn = document.getElementById('sendGiftBtn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+  try {
+    await fetch('/api/send-email', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        type: 'gift',
+        to: storyData.giftEmail,
+        childName: storyData.childName,
+        giftFrom: storyData.giftFrom,
+        giftMessage: storyData.giftMessage
+      })
+    });
+  } catch(e) { /* send silently, don't block the experience */ }
+  btn.style.display = 'none';
   document.getElementById('giftSentMsg').style.display = 'block';
+}
+
+// Send purchase confirmation email (called after successful payment)
+async function sendPurchaseEmail(email) {
+  try {
+    await fetch('/api/send-email', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        type: 'purchase',
+        to: email,
+        childName: storyData.childName,
+        category: storyData.category,
+        length: storyData.length
+      })
+    });
+  } catch(e) { /* silent */ }
 }
 </script>
 </body>
