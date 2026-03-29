@@ -42,7 +42,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .screen.active{display:flex}
 
 /* ===== LANDING ===== */
-.landing{justify-content:center;text-align:center;gap:1.5rem;padding-top:3rem}
+.landing{text-align:center;gap:1.2rem;padding-top:2.5rem;padding-bottom:4rem}
 .logo-wrap{position:relative;display:inline-block}
 .logo-mark{font-family:'Nunito',sans-serif;font-size:3.2rem;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1}
 .logo-mark span{color:var(--purple)}
@@ -77,6 +77,14 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .shape-3{width:60px;height:60px;background:var(--sky);bottom:25%;left:10%;animation:float 7s ease-in-out infinite 0.5s}
 .shape-4{width:100px;height:100px;background:var(--pink);bottom:10%;right:5%;animation:float 9s ease-in-out infinite 2s}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+/* ===== USE CASES ===== */
+.use-cases{display:flex;flex-direction:column;gap:0.7rem;width:100%;max-width:440px;margin-top:1.5rem}
+.use-case{display:flex;align-items:flex-start;gap:0.85rem;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;cursor:pointer;transition:all 0.25s;box-shadow:var(--shadow)}
+.use-case:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:var(--purple-soft)}
+.use-icon{font-size:1.5rem;width:46px;height:46px;display:flex;align-items:center;justify-content:center;border-radius:14px;flex-shrink:0}
+.use-content h4{font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin-bottom:0.15rem}
+.use-content p{font-size:0.8rem;color:var(--text-soft);line-height:1.45;font-weight:500}
 
 /* ===== EMOTIONAL HOOK ===== */
 .emotion-block{background:linear-gradient(135deg,var(--purple-light),#F5F0FF);border-radius:var(--radius-lg);padding:2rem 1.5rem;margin-top:1rem;width:100%;max-width:440px;text-align:center;position:relative;overflow:hidden}
@@ -234,26 +242,52 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="shape shape-3"></div>
     <div class="shape shape-4"></div>
   </div>
+
+  <!-- HERO -->
   <div class="logo-wrap">
     <div class="logo-mark">story<span>told</span></div>
     <div class="logo-sparkle">&#10024;</div>
   </div>
-  <div class="hero-badge">NEW: Personalised audio stories</div>
-  <h1 class="tagline">A story <span class="highlight">read aloud</span> where they are the hero.</h1>
-  <p class="hero-text">Tell us about your child. Pick a narrator voice. In seconds, hear a personalised audio story made just for them, with their name, their friends, and their world.</p>
+  <h1 class="tagline">Audio stories that know <span class="highlight">your child</span> by name.</h1>
+  <p class="hero-text">Their name. Their best friend. Their pet. Their world. Told by a narrator, in a story that could only ever exist for them. Ready in 30 seconds.</p>
   <div class="cta-group">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a story</button>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
   </div>
   <div class="trust-row">
-    <span class="trust-item"><span class="trust-icon">&#127911;</span> Audio story</span>
-    <span class="trust-item"><span class="trust-icon">&#9889;</span> Ready in 30 seconds</span>
-    <span class="trust-item"><span class="trust-icon">&#9654;&#65039;</span> Free preview</span>
+    <span class="trust-item"><span class="trust-icon">&#127911;</span> Narrated aloud</span>
+    <span class="trust-item"><span class="trust-icon">&#9889;</span> 30 seconds</span>
+    <span class="trust-item"><span class="trust-icon">&#9654;&#65039;</span> Preview free</span>
+  </div>
+
+  <!-- WHAT CAN IT DO -->
+  <div class="use-cases">
+    <div class="use-case" onclick="goTo('screenCategory')">
+      <div class="use-icon" style="background:linear-gradient(135deg,#E8E0FF,#D4C8FF)">&#127769;</div>
+      <div class="use-content">
+        <h4>Bedtime</h4>
+        <p>A soothing story that ends with them drifting off to sleep. Their name, their teddy, their world.</p>
+      </div>
+    </div>
+    <div class="use-case" onclick="goTo('screenCategory')">
+      <div class="use-icon" style="background:linear-gradient(135deg,#FFE5D0,#FFD0A8)">&#9992;&#65039;</div>
+      <div class="use-content">
+        <h4>Long journeys</h4>
+        <p>Gripping adventures with cliffhangers. They will not ask "are we there yet" once.</p>
+      </div>
+    </div>
+    <div class="use-case" onclick="goTo('screenCategory')">
+      <div class="use-icon" style="background:linear-gradient(135deg,#D4F1FF,#B8E6FF)">&#128218;</div>
+      <div class="use-content">
+        <h4>Learning</h4>
+        <p>The narrator asks them questions and waits for answers. Times tables, spelling, phonics, all disguised as an adventure.</p>
+      </div>
+    </div>
   </div>
 
   <!-- EMOTIONAL HOOK -->
   <div class="emotion-block">
     <p class="emotion-quote">"Mummy, that story knew my name!"</p>
-    <p class="emotion-text">That is the moment. Their eyes go wide. Their mouth drops open. Because this story knows their name, their best friend, their favourite thing in the world. It is not a book with a name swapped in. It is a story that could only ever exist for them, read aloud by a voice they will want to hear again and again.</p>
+    <p class="emotion-text">Their eyes go wide. Their mouth drops open. Because this is not a book with a name swapped in. The story mentions their best friend, their brother, their pet, their favourite teddy. It knows things only they would know. And it is read aloud by a voice they will want to hear again and again.</p>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -263,28 +297,34 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <div class="how-step">
         <div class="step-number" style="background:var(--purple-light);color:var(--purple)">1</div>
         <div class="step-content">
-          <h4>Tell us about them</h4>
-          <p>Their name, age, best friend, what they love. The details that make it theirs.</p>
+          <h4>Tell us everything</h4>
+          <p>Their name, age, best friend, pet, favourite teddy, family members, what they love. Every detail makes the story more magical.</p>
         </div>
       </div>
       <div class="how-step">
         <div class="step-number" style="background:var(--orange-light);color:var(--orange)">2</div>
         <div class="step-content">
-          <h4>Pick a narrator voice</h4>
-          <p>Choose who reads the story aloud. Warm and gentle for bedtime, bold and exciting for adventures.</p>
+          <h4>Choose a narrator</h4>
+          <p>Warm and gentle for bedtime. Bold and exciting for adventures. Patient and fun for learning. You pick the voice.</p>
         </div>
       </div>
       <div class="how-step">
         <div class="step-number" style="background:var(--green-light);color:var(--green)">3</div>
         <div class="step-content">
-          <h4>Listen to the magic</h4>
-          <p>In 30 seconds, hear a free preview. Love it? Unlock the full story, yours forever.</p>
+          <h4>Preview for free</h4>
+          <p>In 30 seconds, hear a preview of their story. Love it? Unlock the full version. Download it. Keep it forever.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <button class="btn btn-primary" style="width:100%;max-width:340px" onclick="goTo('screenCategory')">Create their story</button>
+  <!-- LEARNING CALLOUT -->
+  <div class="emotion-block" style="background:linear-gradient(135deg,var(--sky-light),#D4F1FF)">
+    <p class="emotion-quote" style="color:var(--sky)">"Seven times four... can you work it out?"</p>
+    <p class="emotion-text">Our learning stories do not feel like homework. The narrator pauses and asks your child to answer. Times tables, spelling, phonics, the alphabet, even languages. They shout the answer, the narrator confirms it, and the adventure continues. They are learning without realising it.</p>
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;max-width:340px" onclick="goTo('screenCategory')">Create a free preview</button>
 </div>
 
 <!-- CATEGORY -->
