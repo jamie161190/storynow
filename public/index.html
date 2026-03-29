@@ -351,7 +351,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 
   <div class="form-group" id="subjectGroup" style="display:none">
-    <label>Which subject?</label>
+    <label>What subject area?</label>
     <select id="subject">
       <option value="maths">Maths</option>
       <option value="science">Science</option>
@@ -359,6 +359,11 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <option value="history">History</option>
       <option value="reading">Reading &amp; Phonics</option>
     </select>
+  </div>
+  <div class="form-group" id="learningGoalGroup" style="display:none">
+    <label>What specifically are they working on?</label>
+    <textarea id="learningGoal" placeholder="e.g. Their 7 times table, dividing by 2 and 3, letter sounds like ch and sh, what volcanoes are, telling the time, counting in 10s..." style="height:80px"></textarea>
+    <p class="form-hint">Be as specific as you can. The story will have real practice built into the adventure so they learn without realising it.</p>
   </div>
 
   <div class="form-group" id="customScenarioGroup" style="display:none">
@@ -503,6 +508,7 @@ function selectCategory(cat, el) {
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('subjectGroup').style.display = cat === 'learning' ? 'block' : 'none';
+  document.getElementById('learningGoalGroup').style.display = cat === 'learning' ? 'block' : 'none';
   document.getElementById('customScenarioGroup').style.display = cat === 'custom' ? 'block' : 'none';
   setTimeout(() => goTo('screenDetails'), 300);
 }
@@ -529,6 +535,7 @@ function goToLength() {
   storyData.hasPet = document.getElementById('petToggle').classList.contains('on');
   storyData.petName = document.getElementById('petName').value.trim();
   storyData.subject = document.getElementById('subject').value;
+  storyData.learningGoal = document.getElementById('learningGoal').value.trim();
   storyData.customScenario = document.getElementById('customScenario').value.trim();
   storyData.extraDetails = document.getElementById('extraDetails').value.trim();
   storyData.personalMessage = document.getElementById('personalMessage').value.trim();

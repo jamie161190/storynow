@@ -108,7 +108,7 @@ ${getAgeBand(d.age)}
 Write the story now. Start immediately with action or intrigue.`,
 
   learning: (d) => `STORY TYPE: Learning Adventure
-TONE: Exciting and educational. The child is a superhero whose power is ${d.subject}. The learning must feel like part of the adventure, never like a lesson.
+TONE: Exciting, immersive, and secretly educational. The child should be so caught up in the adventure that they do not realise they are learning. They are the hero, and their knowledge is their power.
 
 THE CHILD:
 - Name: ${d.childName}
@@ -119,18 +119,40 @@ THE CHILD:
 ${d.hasPet && d.petName ? '- Pet: ' + d.petName + ' (the pet has a special ability that helps solve one challenge)' : ''}
 ${d.extraDetails ? '\nEXTRA DETAILS FROM THE PARENT (weave these in naturally, they are gold):\n' + d.extraDetails : ''}
 
-SUBJECT: ${d.subject}
-SUPERPOWER: ${d.childName}'s superpower is connected to ${d.subject}. Make the power feel genuinely cool, not nerdy.
+SUBJECT AREA: ${d.subject}
+${d.learningGoal ? 'SPECIFIC LEARNING GOAL: The parent says their child is working on: "' + d.learningGoal + '". This is the most important instruction in this entire prompt. The story MUST contain real, concrete practice of this specific skill built directly into the plot.' : ''}
 
-VILLAIN: A villain threatens something the child cares about. The only way to stop them is by solving ${d.subject} challenges that are genuinely educational and age-appropriate for a ${d.age} year old.
+THIS IS HOW LEARNING STORIES MUST WORK:
 
-EDUCATIONAL CONTENT: Include 2 to 3 real, age-appropriate ${d.subject} challenges woven into the plot as obstacles the hero must overcome. The challenges should be accurate and something a ${d.age} year old could engage with.
+The learning is not decoration. It is the engine of the story. Every obstacle, every locked door, every puzzle the hero faces requires the child to use the specific skill the parent described.
+
+Examples of how to do this brilliantly:
+- "7 times table" = A series of magic doors. The first needs 7x3 to open. The second needs 7x6. The third needs 7x8. ${d.childName} works each one out inside the story, thinking aloud, sometimes getting it wrong first, then figuring it out. By the end they have practiced at least 5 different 7-times calculations.
+- "Dividing by 2 and 3" = Treasure that must be split equally between characters. 12 gems between 3 friends. 18 coins between 2 teams. The story makes the division feel like a real decision with stakes.
+- "Letter sounds ch and sh" = A magic spell that only works when you say the right sound. "Was it 'ship' or 'chip'? ${d.childName} knew the difference." Words with ch and sh sounds appear throughout as power words.
+- "Telling the time" = A time travel adventure where knowing what the clock says determines where you land. "The big hand pointed to 6 and the little hand pointed to 3. That meant..."
+- "What volcanoes are" = An expedition into a volcano where real science explains what they are seeing. Magma, pressure, eruption, tectonic plates, all explained through wonder and discovery not textbook language.
+- "Counting in 10s" = Stepping stones that only appear in 10s. "10, 20, 30... ${d.childName} called out each number and another stone appeared."
+
+YOU MUST:
+1. Include at least ${d.length === 'epic' ? '6 to 8' : d.length === 'standard' ? '4 to 5' : '2 to 3'} distinct practice moments where the specific skill is used inside the plot
+2. Make the practice feel like heroism, not homework
+3. Show the child character thinking through the problem, not just magically knowing the answer
+4. Build difficulty gradually (start easy, get harder, end with a satisfying challenge)
+5. Have the friend or pet help with one of the easier challenges so the child feels supported
+6. End with the child mastering something they found hard, making them feel capable and proud
+
+YOU MUST NOT:
+- Make it feel like a worksheet wrapped in a story
+- Have a teacher character explain things
+- Use the phrase "let's practice" or anything that breaks the adventure
+- Make the child character perfect at the skill from the start (they should grow)
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
 ${getAgeBand(d.age)}
 
-Write the story now. Start immediately with the hero discovering their power or facing the threat.`,
+Write the story now. Start immediately with action or discovery.`,
 
   custom: (d) => `STORY TYPE: Custom / Parent Defined
 TONE: Warm, personalised, emotionally intelligent. The parent has described a specific situation they want this story to address.
