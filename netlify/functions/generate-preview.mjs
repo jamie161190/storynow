@@ -261,18 +261,28 @@ export default async (req) => {
     const tokenMap = { standard: 1800, long: 4000, epic: 5500 };
     const maxTokens = tokenMap[storyData.length] || 1800;
 
-    const storyResponse = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: maxTokens,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: promptFn(storyData) }]
-    });
+    console.log('Generating story:', { category: storyData.category, length: storyData.length, childName: storyData.childName });
+
+    let storyResponse;
+    try {
+      storyResponse = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: promptFn(storyData) }]
+      });
+    } catch(apiErr) {
+      console.error('Anthropic API error:', apiErr.message);
+      throw new Error('Story generation failed: ' + apiErr.message);
+    }
 
     const fullStory = storyResponse.content[0].text;
     const messageIntro = storyData.personalMessage ? `${storyData.personalMessage} ... ` : '';
     const fullStoryWithMessage = messageIntro + fullStory;
     const previewText = fullStoryWithMessage.split(' ').slice(0, 60).join(' ') + '...';
-    const useVoiceId = voiceId || 'EXAVITQu4vr4xnSDxMaL';
+    // Validate voice ID: must be alphanumeric, fallback to Sarah if invalid
+    const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
+    console.log('Using voice ID:', useVoiceId);
 
     const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
       method: 'POST',
@@ -287,7 +297,11 @@ export default async (req) => {
       })
     });
 
-    if (!ttsResponse.ok) throw new Error('ElevenLabs error: ' + await ttsResponse.text());
+    if (!ttsResponse.ok) {
+      const errText = await ttsResponse.text();
+      console.error('ElevenLabs error:', ttsResponse.status, errText);
+      throw new Error('Voice generation failed (voice: ' + useVoiceId + '): ' + errText);
+    }
     const audioBase64 = Buffer.from(await ttsResponse.arrayBuffer()).toString('base64');
 
     return new Response(JSON.stringify({

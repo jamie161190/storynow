@@ -1520,6 +1520,8 @@ function showVoices() {
 }
 
 async function generatePreview() {
+  // Make sure we have a valid voice selected
+  if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
   trackEvent('AddToCart', { content_name: storyData.category, value: 19.99, currency: 'GBP' });
   goTo('screenLoading');
   try {
@@ -1528,12 +1530,17 @@ async function generatePreview() {
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ storyData, voiceId: selectedVoiceId })
     });
-    const data = await res.json();
+    // Handle non-JSON responses (function crashes return HTML)
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch(e) {
+      console.error('Non-JSON response:', text.substring(0, 500));
+      throw new Error('Server error. Please try again.');
+    }
     if(!data.success) throw new Error(data.error || 'Something went wrong');
     fullStoryText = data.fullStory;
     const audio = document.getElementById('previewAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
-    // Price is now shown statically on the button
     goTo('screenPreview');
   } catch(err) {
     goTo('screenVoice');
