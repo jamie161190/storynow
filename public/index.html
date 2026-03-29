@@ -1131,10 +1131,16 @@ function playSample() {
   });
 })();
 
-function goTo(id) {
+function goTo(id, skipHistory) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+
+  // Push to browser history so back button works
+  if (!skipHistory) {
+    history.pushState({ screen: id }, '', '');
+  }
+
   if(id === 'screenVoice') showVoices();
   if(id === 'screenExtras') updateExtrasVisibility();
   if(id === 'screenCategory') restoreCategory();
@@ -1150,6 +1156,19 @@ function goTo(id) {
     }
   }
 }
+
+// Browser back button support
+window.addEventListener('popstate', (e) => {
+  if (e.state && e.state.screen) {
+    goTo(e.state.screen, true);
+  } else {
+    // No state means we're back at the landing page
+    goTo('screenLanding', true);
+  }
+});
+
+// Set initial state so first back press goes to landing
+history.replaceState({ screen: 'screenLanding' }, '', '');
 
 function restoreCategory() {
   if (!storyData.category) return;
