@@ -3,416 +3,421 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Storytold</title>
-<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<title>Storytold | A story made just for them</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Nunito',sans-serif;background:#0d0d0d;color:#f5f0e8;min-height:100vh}
-.screen{display:none;min-height:100vh;padding:2rem 1rem;max-width:600px;margin:0 auto;flex-direction:column;align-items:center;justify-content:center}
+:root{--cream:#FFF8F0;--warm:#F5E6D3;--gold:#C4956A;--deep:#2C1810;--text:#3D2B1F;--accent:#8B5E3C;--soft:#E8D5C4;--green:#4A7C59;--white:#FFFFFF}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;padding:2rem 1.5rem;max-width:560px;margin:0 auto;flex-direction:column;align-items:center}
 .screen.active{display:flex}
-.logo{font-size:2rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.25rem}
-.logo span{color:#c9a96e}
-.tagline{font-family:'Lora',serif;font-style:italic;font-size:1.1rem;color:#a09880;margin-bottom:3rem;text-align:center}
-.card{background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:16px;padding:2rem;width:100%}
-.card h2{font-size:1.3rem;font-weight:800;margin-bottom:0.5rem}
-.card p{font-size:0.9rem;color:#a09880;margin-bottom:1.5rem;line-height:1.6}
-.category-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
-.cat-btn{background:#111;border:0.5px solid #2a2a2a;border-radius:12px;padding:1.2rem 0.5rem;text-align:center;cursor:pointer;transition:all 0.2s}
-.cat-btn:hover,.cat-btn.selected{border-color:#c9a96e;background:#1f1a0f}
-.cat-btn .icon{font-size:1.8rem;margin-bottom:0.4rem}
-.cat-btn .label{font-size:0.8rem;font-weight:600;color:#f5f0e8}
-.cat-btn .desc{font-size:0.7rem;color:#a09880;margin-top:2px}
-.form-group{margin-bottom:1.2rem}
-.form-group label{display:block;font-size:0.8rem;font-weight:600;color:#a09880;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em}
-.form-group input,.form-group select{width:100%;background:#111;border:0.5px solid #2a2a2a;border-radius:8px;padding:0.75rem 1rem;color:#f5f0e8;font-family:'Nunito',sans-serif;font-size:0.95rem;outline:none;transition:border-color 0.2s}
-.form-group input:focus,.form-group select:focus{border-color:#c9a96e}
-.form-group select option{background:#1a1a1a}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:0.5px solid #2a2a2a}
-.toggle-label{font-size:0.9rem;color:#f5f0e8}
-.toggle{position:relative;width:44px;height:24px;cursor:pointer}
-.toggle input{opacity:0;width:0;height:0;position:absolute}
-.toggle-track{position:absolute;inset:0;background:#2a2a2a;border-radius:12px;transition:background 0.2s}
-.toggle input:checked + .toggle-track{background:#c9a96e}
-.toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform 0.2s;pointer-events:none}
-.toggle input:checked ~ .toggle-thumb{transform:translateX(20px)}
-.btn{width:100%;padding:1rem;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:all 0.2s;margin-top:1rem}
-.btn-primary{background:#c9a96e;color:#0d0d0d}
-.btn-primary:hover{background:#d4b97e}
-.btn-secondary{background:#1a1a1a;border:0.5px solid #2a2a2a;color:#f5f0e8}
-.btn-secondary:hover{border-color:#c9a96e}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
-.loading-screen{text-align:center}
-.spinner{width:48px;height:48px;border:2px solid #2a2a2a;border-top-color:#c9a96e;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1.5rem}
+
+.landing{justify-content:center;text-align:center;gap:2rem;padding-top:4rem}
+.logo-mark{font-family:'Playfair Display',serif;font-size:3rem;font-weight:700;color:var(--deep);letter-spacing:-1px}
+.logo-mark span{color:var(--gold)}
+.tagline{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--accent);font-style:italic;line-height:1.6;max-width:400px;margin:0 auto}
+.hero-text{font-size:0.95rem;color:var(--text);opacity:0.7;line-height:1.7;max-width:380px;margin:0 auto}
+.cta-group{display:flex;flex-direction:column;gap:1rem;width:100%;max-width:340px;margin:1rem auto 0}
+.btn{padding:1rem 2rem;border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.3s ease;text-align:center}
+.btn-primary{background:var(--deep);color:var(--cream);box-shadow:0 4px 20px rgba(44,24,16,0.2)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(44,24,16,0.3)}
+.btn-gift{background:transparent;color:var(--accent);border:2px solid var(--soft);border-radius:12px}
+.btn-gift:hover{border-color:var(--gold);background:var(--white)}
+.trust-line{font-size:0.8rem;color:var(--accent);opacity:0.6;margin-top:0.5rem}
+
+.section-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--deep);text-align:center;margin-bottom:0.5rem}
+.section-sub{font-size:0.9rem;color:var(--accent);text-align:center;margin-bottom:2rem;line-height:1.5}
+.category-cards{display:flex;flex-direction:column;gap:1rem;width:100%}
+.cat-card{background:var(--white);border:2px solid var(--soft);border-radius:16px;padding:1.5rem;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;gap:1rem}
+.cat-card:hover,.cat-card.selected{border-color:var(--gold);box-shadow:0 4px 20px rgba(196,149,106,0.15)}
+.cat-card.selected{background:linear-gradient(135deg,#FFF8F0,#F5E6D3)}
+.cat-icon{font-size:2rem;width:50px;height:50px;display:flex;align-items:center;justify-content:center;background:var(--warm);border-radius:12px;flex-shrink:0}
+.cat-info h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--deep);margin-bottom:0.25rem}
+.cat-info p{font-size:0.85rem;color:var(--accent);line-height:1.4}
+
+.form-group{width:100%;margin-bottom:1.25rem}
+.form-group label{display:block;font-size:0.85rem;font-weight:600;color:var(--deep);margin-bottom:0.5rem}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.9rem 1rem;border:2px solid var(--soft);border-radius:10px;font-family:'Inter',sans-serif;font-size:0.95rem;color:var(--text);background:var(--white);transition:border-color 0.3s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold)}
+.form-group textarea{resize:none;height:80px}
+.form-hint{font-size:0.78rem;color:var(--accent);opacity:0.7;margin-top:0.3rem}
+.toggle-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem}
+.toggle{width:48px;height:28px;border-radius:14px;background:var(--soft);cursor:pointer;position:relative;transition:background 0.3s;border:none;flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--white);transition:transform 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.toggle.on::after{transform:translateX(20px)}
+.toggle-label{font-size:0.9rem;color:var(--text)}
+
+.length-cards{display:flex;gap:0.75rem;width:100%;margin-bottom:1.5rem}
+.length-card{flex:1;background:var(--white);border:2px solid var(--soft);border-radius:12px;padding:1rem 0.5rem;cursor:pointer;text-align:center;transition:all 0.3s}
+.length-card:hover,.length-card.selected{border-color:var(--gold)}
+.length-card.selected{background:linear-gradient(135deg,#FFF8F0,#F5E6D3)}
+.length-card .len-emoji{font-size:1.5rem;margin-bottom:0.3rem}
+.length-card .len-name{font-size:0.85rem;font-weight:600;color:var(--deep)}
+.length-card .len-time{font-size:0.75rem;color:var(--accent)}
+
+.voice-cards{display:flex;flex-direction:column;gap:0.75rem;width:100%}
+.voice-card{background:var(--white);border:2px solid var(--soft);border-radius:14px;padding:1.25rem;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;gap:1rem}
+.voice-card:hover,.voice-card.selected{border-color:var(--gold);box-shadow:0 2px 12px rgba(196,149,106,0.1)}
+.voice-card.selected{background:linear-gradient(135deg,#FFF8F0,#F5E6D3)}
+.voice-emoji{font-size:1.8rem;width:44px;text-align:center}
+.voice-info h4{font-size:0.95rem;color:var(--deep);margin-bottom:0.15rem}
+.voice-info p{font-size:0.8rem;color:var(--accent)}
+
+.preview-container{width:100%;text-align:center;padding:2rem 0}
+.preview-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--deep);margin-bottom:0.5rem}
+.preview-sub{font-size:0.9rem;color:var(--accent);margin-bottom:2rem}
+.audio-circle{width:140px;height:140px;border-radius:50%;background:linear-gradient(135deg,var(--deep),var(--accent));display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;cursor:pointer;transition:transform 0.3s;box-shadow:0 8px 32px rgba(44,24,16,0.25)}
+.audio-circle:hover{transform:scale(1.05)}
+.audio-circle svg{width:48px;height:48px;fill:var(--cream)}
+.unlock-btn{width:100%;padding:1.2rem;background:var(--green);color:var(--white);border:none;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;box-shadow:0 4px 20px rgba(74,124,89,0.3);transition:all 0.3s}
+.unlock-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(74,124,89,0.4)}
+.unlock-price{font-size:0.85rem;color:var(--accent);margin-top:0.75rem}
+
+.loading-screen{justify-content:center;align-items:center;text-align:center;gap:1.5rem}
+.spinner{width:60px;height:60px;border:4px solid var(--soft);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-screen h2{font-size:1.4rem;margin-bottom:0.5rem}
-.loading-screen p{color:#a09880;font-size:0.9rem}
-.preview-player{background:#111;border:0.5px solid #c9a96e;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1.5rem}
-.play-btn{background:#c9a96e;border:none;border-radius:50%;width:64px;height:64px;font-size:1.5rem;cursor:pointer;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
-.play-btn:hover{background:#d4b97e;transform:scale(1.05)}
-.unlock-box{background:#1f1a0f;border:0.5px solid #c9a96e;border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:1rem}
-.unlock-box .price{font-size:2.5rem;font-weight:800;color:#c9a96e}
-.unlock-box .price-label{font-size:0.85rem;color:#a09880;margin-bottom:0.5rem}
-.unlock-box .includes{font-size:0.8rem;color:#a09880;margin-top:0.5rem;line-height:1.8}
-.full-player{text-align:center}
-.full-player h2{font-size:1.5rem;margin-bottom:0.5rem}
-.full-player p{color:#a09880;font-size:0.9rem;margin-bottom:1.5rem}
-.audio-player{width:100%;margin-bottom:1.5rem}
-.steps{display:flex;gap:8px;margin-bottom:2rem;width:100%}
-.step{flex:1;height:3px;background:#2a2a2a;border-radius:2px;transition:background 0.3s}
-.step.active{background:#c9a96e}
-.back-btn{background:none;border:none;color:#a09880;font-family:'Nunito',sans-serif;font-size:0.85rem;cursor:pointer;margin-bottom:1rem;padding:0}
-.back-btn:hover{color:#f5f0e8}
-.pet-fields{display:none}
-.pet-fields.visible{display:block}
-.voice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem}
-.voice-btn{background:#111;border:0.5px solid #2a2a2a;border-radius:12px;padding:1rem;cursor:pointer;transition:all 0.2s;text-align:center}
-.voice-btn:hover,.voice-btn.selected{border-color:#c9a96e;background:#1f1a0f}
-.voice-emoji{font-size:1.8rem;margin-bottom:0.4rem}
-.voice-name{font-size:0.9rem;font-weight:600;color:#f5f0e8}
-.voice-desc{font-size:0.75rem;color:#a09880;margin-top:2px}
-.voice-section-label{font-size:0.8rem;font-weight:600;color:#a09880;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.75rem}
+.loading-text{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--deep)}
+.loading-sub{font-size:0.85rem;color:var(--accent);font-style:italic}
+
+.full-player{width:100%;text-align:center;padding:3rem 0}
+.full-title{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--deep);margin-bottom:0.5rem}
+.full-for{font-size:0.95rem;color:var(--accent);margin-bottom:2rem;font-style:italic}
+
+.back-btn{background:none;border:none;color:var(--accent);font-size:0.9rem;cursor:pointer;padding:0.5rem 0;margin-bottom:1rem;align-self:flex-start;font-family:'Inter',sans-serif}
+.back-btn:hover{color:var(--deep)}
+
+.error-msg{background:#FFF0F0;border:1px solid #E8A0A0;color:#8B3030;padding:1rem;border-radius:10px;font-size:0.85rem;margin:1rem 0;width:100%;text-align:center}
+
+@media(max-width:400px){
+  .logo-mark{font-size:2.4rem}
+  .tagline{font-size:1.1rem}
+  .length-cards{flex-direction:column}
+}
 </style>
 </head>
 <body>
 
-<div id="screen-home" class="screen active">
-  <div style="text-align:center;margin-bottom:2rem">
-    <div class="logo">Story<span>told</span></div>
-    <div class="tagline">A story written just for them</div>
+<!-- LANDING -->
+<div class="screen landing active" id="screenLanding">
+  <div class="logo-mark">story<span>told</span></div>
+  <p class="tagline">A personalised story, read in a voice they will never forget.</p>
+  <p class="hero-text">Every child deserves a story made just for them. Choose a voice, tell us about them, and we will create something magical in seconds.</p>
+  <div class="cta-group">
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a story</button>
+    <button class="btn btn-gift" onclick="goTo('screenCategory')">Give as a gift</button>
   </div>
-  <div class="steps">
-    <div class="step active"></div>
-    <div class="step"></div>
-    <div class="step"></div>
-    <div class="step"></div>
-  </div>
-  <div class="card">
-    <h2>Choose your story</h2>
-    <p>Every story is written just for your child. Pick the moment.</p>
-    <div class="category-grid">
-      <div class="cat-btn" onclick="selectCategory('bedtime',this)">
-        <div class="icon">🌙</div>
-        <div class="label">Bedtime</div>
-        <div class="desc">Calm and warm</div>
-      </div>
-      <div class="cat-btn" onclick="selectCategory('journey',this)">
-        <div class="icon">✈️</div>
-        <div class="label">Journey</div>
-        <div class="desc">Car, plane, train</div>
-      </div>
-      <div class="cat-btn" onclick="selectCategory('learning',this)">
-        <div class="icon">🧠</div>
-        <div class="label">Learning</div>
-        <div class="desc">They are the hero</div>
+  <p class="trust-line">Takes 2 minutes. Delivered instantly.</p>
+</div>
+
+<!-- CATEGORY -->
+<div class="screen" id="screenCategory">
+  <button class="back-btn" onclick="goTo('screenLanding')">&larr; Back</button>
+  <h2 class="section-title">What kind of story?</h2>
+  <p class="section-sub">Each one is written from scratch, just for them.</p>
+  <div class="category-cards">
+    <div class="cat-card" onclick="selectCategory('bedtime',this)">
+      <div class="cat-icon">&#127769;</div>
+      <div class="cat-info">
+        <h3>Bedtime</h3>
+        <p>Warm, calming, and gentle. Ends with them drifting off to sleep feeling safe and loved.</p>
       </div>
     </div>
-    <button class="btn btn-primary" id="btn-next-1" disabled onclick="goTo('screen-child')">Continue</button>
+    <div class="cat-card" onclick="selectCategory('journey',this)">
+      <div class="cat-icon">&#9992;&#65039;</div>
+      <div class="cat-info">
+        <h3>Journey</h3>
+        <p>Exciting episodes with cliffhangers. Perfect for car rides, flights, and long trips.</p>
+      </div>
+    </div>
+    <div class="cat-card" onclick="selectCategory('learning',this)">
+      <div class="cat-icon">&#128218;</div>
+      <div class="cat-info">
+        <h3>Learning</h3>
+        <p>They become a superhero who saves the day using maths, science, or any subject you choose.</p>
+      </div>
+    </div>
   </div>
 </div>
 
-<div id="screen-child" class="screen">
-  <div style="text-align:center;margin-bottom:2rem">
-    <div class="logo">Story<span>told</span></div>
+<!-- DETAILS -->
+<div class="screen" id="screenDetails">
+  <button class="back-btn" onclick="goTo('screenCategory')">&larr; Back</button>
+  <h2 class="section-title">Tell us about them</h2>
+  <p class="section-sub">The more we know, the more magical the story.</p>
+
+  <div class="form-group">
+    <label>Their name</label>
+    <input type="text" id="childName" placeholder="e.g. Chase">
   </div>
-  <div class="steps">
-    <div class="step active"></div>
-    <div class="step active"></div>
-    <div class="step"></div>
-    <div class="step"></div>
+  <div class="form-group">
+    <label>Age</label>
+    <input type="number" id="age" min="2" max="14" placeholder="e.g. 7">
   </div>
-  <div class="card">
-    <button class="back-btn" onclick="goTo('screen-home')">← Back</button>
-    <h2>Tell us about them</h2>
-    <p>The more you tell us, the more personal the story feels.</p>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Child's name</label>
-        <input type="text" id="childName" placeholder="Chase">
-      </div>
-      <div class="form-group">
-        <label>Age</label>
-        <select id="age">
-          <option value="">Select</option>
-          <option>3</option><option>4</option><option>5</option><option>6</option>
-          <option>7</option><option>8</option><option>9</option><option>10</option>
-          <option>11</option><option>12</option>
-        </select>
-      </div>
+  <div class="form-group">
+    <label>Gender</label>
+    <select id="gender">
+      <option value="">Choose</option>
+      <option value="boy">Boy</option>
+      <option value="girl">Girl</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Best friend's name</label>
+    <input type="text" id="friendName" placeholder="e.g. Ellis">
+  </div>
+  <div class="form-group">
+    <label>What do they love?</label>
+    <input type="text" id="interest" placeholder="e.g. Space, dinosaurs, football">
+  </div>
+  <div class="form-group">
+    <label>Something they are proud of (optional)</label>
+    <input type="text" id="proudOf" placeholder="e.g. Scored a goal, learned to ride a bike">
+    <p class="form-hint">We will weave this into the story to celebrate them.</p>
+  </div>
+
+  <div class="toggle-row">
+    <button class="toggle" id="petToggle" onclick="togglePet()"></button>
+    <span class="toggle-label">Include a pet in the story</span>
+  </div>
+  <div class="form-group" id="petNameGroup" style="display:none">
+    <label>Pet's name</label>
+    <input type="text" id="petName" placeholder="e.g. Buddy">
+  </div>
+
+  <div class="form-group" id="subjectGroup" style="display:none">
+    <label>Which subject?</label>
+    <select id="subject">
+      <option value="maths">Maths</option>
+      <option value="science">Science</option>
+      <option value="geography">Geography</option>
+      <option value="history">History</option>
+      <option value="reading">Reading &amp; Phonics</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Add a personal message (optional)</label>
+    <textarea id="personalMessage" placeholder="e.g. Chase, this is from Daddy. I am so proud of you..."></textarea>
+    <p class="form-hint">This will be read aloud at the start of the story.</p>
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goToLength()">Continue</button>
+</div>
+
+<!-- LENGTH -->
+<div class="screen" id="screenLength">
+  <button class="back-btn" onclick="goTo('screenDetails')">&larr; Back</button>
+  <h2 class="section-title">How long?</h2>
+  <p class="section-sub">Choose the perfect length for the moment.</p>
+  <div class="length-cards">
+    <div class="length-card" onclick="selectLength('short',this)">
+      <div class="len-emoji">&#127769;</div>
+      <div class="len-name">Short</div>
+      <div class="len-time">~2 min</div>
     </div>
-    <div class="form-group">
-      <label>Boy or girl</label>
-      <select id="gender">
-        <option value="">Select</option>
-        <option value="boy">Boy</option>
-        <option value="girl">Girl</option>
-      </select>
+    <div class="length-card selected" onclick="selectLength('standard',this)">
+      <div class="len-emoji">&#128214;</div>
+      <div class="len-name">Standard</div>
+      <div class="len-time">~5 min</div>
     </div>
-    <div class="form-group">
-      <label>Best friend's name</label>
-      <input type="text" id="friendName" placeholder="Ellis">
+    <div class="length-card" onclick="selectLength('epic',this)">
+      <div class="len-emoji">&#128640;</div>
+      <div class="len-name">Epic</div>
+      <div class="len-time">~10 min</div>
     </div>
-    <div class="form-group">
-      <label>What do they love</label>
-      <input type="text" id="interest" placeholder="Space, football, dinosaurs...">
+  </div>
+  <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="goTo('screenVoice')">Continue</button>
+</div>
+
+<!-- VOICE -->
+<div class="screen" id="screenVoice">
+  <button class="back-btn" onclick="goTo('screenLength')">&larr; Back</button>
+  <h2 class="section-title">Choose a storyteller</h2>
+  <p class="section-sub" id="voiceSubtext">Pick the voice that feels right.</p>
+  <div class="voice-cards" id="voiceCards"></div>
+  <button class="btn btn-primary" style="width:100%;margin-top:1.5rem" onclick="generatePreview()">Create my preview</button>
+</div>
+
+<!-- LOADING -->
+<div class="screen loading-screen" id="screenLoading">
+  <div class="spinner"></div>
+  <p class="loading-text">Writing their story...</p>
+  <p class="loading-sub">This takes about 30 seconds. Something magical is happening.</p>
+</div>
+
+<!-- PREVIEW -->
+<div class="screen" id="screenPreview">
+  <div class="preview-container">
+    <p class="preview-title">Your preview is ready</p>
+    <p class="preview-sub">Listen to the first 30 seconds. If it feels right, unlock the full story.</p>
+    <div class="audio-circle" onclick="playPreview()">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
-    <div id="subject-group" class="form-group" style="display:none">
-      <label>Learning subject</label>
-      <select id="subject">
-        <option value="maths">Maths</option>
-        <option value="science">Science</option>
-        <option value="geography">Geography</option>
-        <option value="history">History</option>
-        <option value="phonics">Reading and phonics</option>
-      </select>
-    </div>
-    <div class="toggle-row">
-      <span class="toggle-label">Include a pet</span>
-      <label class="toggle">
-        <input type="checkbox" id="hasPet" onchange="togglePet(this)">
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
-      </label>
-    </div>
-    <div class="pet-fields" id="pet-fields">
-      <div class="form-group" style="margin-top:1rem">
-        <label>Pet's name</label>
-        <input type="text" id="petName" placeholder="Buddy">
-      </div>
-    </div>
-    <div class="form-group" style="margin-top:1.2rem">
-      <label>Personal message, optional</label>
-      <textarea id="personalMessage" placeholder="Chase, this is from Daddy to help with your maths..." style="width:100%;background:#111;border:0.5px solid #2a2a2a;border-radius:8px;padding:0.75rem 1rem;color:#f5f0e8;font-family:'Nunito',sans-serif;font-size:0.95rem;outline:none;transition:border-color 0.2s;resize:none;height:90px;line-height:1.5" onfocus="this.style.borderColor='#c9a96e'" onblur="this.style.borderColor='#2a2a2a'"></textarea>
-      <div style="font-size:0.75rem;color:#a09880;margin-top:4px">This will be read aloud at the start of the story in the narrator's voice</div>
-    </div>
-    <button class="btn btn-primary" onclick="goToVoice()">Continue</button>
+    <audio id="previewAudio"></audio>
+    <audio id="fullAudio"></audio>
+    <div id="previewError"></div>
+    <button class="unlock-btn" onclick="unlockFull()">Unlock the full story</button>
+    <p class="unlock-price">One time purchase. Yours forever.</p>
   </div>
 </div>
 
-<div id="screen-voice" class="screen">
-  <div style="text-align:center;margin-bottom:2rem">
-    <div class="logo">Story<span>told</span></div>
-  </div>
-  <div class="steps">
-    <div class="step active"></div>
-    <div class="step active"></div>
-    <div class="step active"></div>
-    <div class="step"></div>
-  </div>
-  <div class="card">
-    <button class="back-btn" onclick="goTo('screen-child')">← Back</button>
-    <h2>Choose your storyteller</h2>
-    <p>Pick the voice that tells the story. Each one has a different character.</p>
-    <div class="voice-section-label" id="voice-section-label">Choose a voice</div>
-    <div class="voice-grid" id="voice-grid"></div>
-    <button class="btn btn-primary" id="btn-next-voice" disabled onclick="goToPreview()">Create my preview</button>
-  </div>
-</div>
-
-<div id="screen-loading" class="screen">
-  <div class="loading-screen">
-    <div class="spinner"></div>
-    <h2 id="loading-title">Writing the story...</h2>
-    <p id="loading-sub">Creating something just for them</p>
-  </div>
-</div>
-
-<div id="screen-preview" class="screen">
-  <div style="text-align:center;margin-bottom:2rem">
-    <div class="logo">Story<span>told</span></div>
-  </div>
-  <div class="steps">
-    <div class="step active"></div>
-    <div class="step active"></div>
-    <div class="step active"></div>
-    <div class="step active"></div>
-  </div>
-  <div class="card">
-    <h2>Your preview is ready</h2>
-    <p>Listen to the first moment of the story. Then unlock the full thing.</p>
-    <div class="preview-player">
-      <div style="font-size:0.8rem;color:#a09880;margin-bottom:0.25rem">Preview</div>
-      <div style="font-size:1rem;font-weight:600;margin-bottom:1rem" id="preview-story-name"></div>
-      <button class="play-btn" id="playPreviewBtn" onclick="playPreview()">▶</button>
-      <div style="font-size:0.8rem;color:#a09880">First 20 seconds of the story</div>
+<!-- FULL STORY -->
+<div class="screen" id="screenFull">
+  <div class="full-player">
+    <p class="full-title">Their story is ready</p>
+    <p class="full-for" id="fullStoryFor"></p>
+    <div class="audio-circle" onclick="playFull()">
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
-    <div class="unlock-box">
-      <div class="price-label">Unlock the full story</div>
-      <div class="price">£19.99</div>
-      <div class="includes">Full story narrated just for them<br>Listen anytime, any device<br>Yours to keep forever</div>
-    </div>
-    <button class="btn btn-primary" onclick="unlockStory()">Unlock now</button>
-    <button class="btn btn-secondary" onclick="goTo('screen-home')" style="margin-top:8px">Start again</button>
-  </div>
-</div>
-
-<div id="screen-full" class="screen">
-  <div style="text-align:center;margin-bottom:2rem">
-    <div class="logo">Story<span>told</span></div>
-    <div class="tagline">Your story is ready</div>
-  </div>
-  <div class="card">
-    <div class="full-player">
-      <h2 id="full-story-title"></h2>
-      <p id="full-story-sub"></p>
-      <audio id="fullAudio" class="audio-player" controls></audio>
-      <button class="btn btn-secondary" onclick="goTo('screen-home')">Create another story</button>
-    </div>
+    <audio id="fullStoryAudio"></audio>
+    <button class="btn btn-primary" style="width:100%;margin-top:2rem" onclick="goTo('screenLanding')">Create another story</button>
   </div>
 </div>
 
 <script>
-let state = {
-  category: null,
-  selectedVoiceId: null,
-  previewAudio: null,
-  fullStory: null,
-  storyData: null
-};
+let storyData = { category:'', length:'standard' };
+let selectedVoiceId = '';
+let fullStoryText = '';
 
-const VOICE_LABELS = {
-  bedtime: 'Pick who tucks them in tonight',
-  journey: 'Pick your adventure narrator',
-  learning: 'Pick your storytelling teacher'
+const VOICES = {
+  bedtime: [
+    { id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Warm and gentle', emoji:'\u{1F469}' },
+    { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm and soothing', emoji:'\u{1F468}' },
+    { id:'XB0fDUnXU5powFXDhCwa', name:'Charlotte', desc:'Soft and kind', emoji:'\u{1F475}' },
+    { id:'IKne3meq5aSn9XLyUdCD', name:'Charlie', desc:'Gentle and warm', emoji:'\u{1F9D4}' }
+  ],
+  journey: [
+    { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh', desc:'Energetic adventurer', emoji:'\u{1F9D7}' },
+    { id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Bold and exciting', emoji:'\u{1F9B8}' },
+    { id:'VR6AewLTigWG4xSOukaG', name:'Arnold', desc:'Strong and brave', emoji:'\u{1F4AA}' },
+    { id:'pNInz6obpgDQGcFmaJgB', name:'Adam', desc:'Deep and dramatic', emoji:'\u{1F3AD}' }
+  ],
+  learning: [
+    { id:'ThT5KcBeYPX3keUQqHPh', name:'Dorothy', desc:'Encouraging teacher', emoji:'\u{1F469}\u{200D}\u{1F3EB}' },
+    { id:'g5CIjZEefAph4nQFvHAz', name:'Ethan', desc:'Fun science teacher', emoji:'\u{1F52C}' },
+    { id:'oWAxZDx7w5VEj9dCyTzz', name:'Grace', desc:'Patient and clear', emoji:'\u{1F4DA}' },
+    { id:'ZQe5CZNOzWyzPSCn5a3c', name:'James', desc:'Wise professor', emoji:'\u{1F393}' }
+  ]
 };
 
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  if(id === 'screenVoice') showVoices();
 }
 
 function selectCategory(cat, el) {
-  state.category = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  storyData.category = cat;
+  document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('btn-next-1').disabled = false;
-  document.getElementById('subject-group').style.display = cat === 'learning' ? 'block' : 'none';
+  document.getElementById('subjectGroup').style.display = cat === 'learning' ? 'block' : 'none';
+  setTimeout(() => goTo('screenDetails'), 300);
 }
 
-function togglePet(cb) {
-  document.getElementById('pet-fields').classList.toggle('visible', cb.checked);
+function togglePet() {
+  const t = document.getElementById('petToggle');
+  t.classList.toggle('on');
+  document.getElementById('petNameGroup').style.display = t.classList.contains('on') ? 'block' : 'none';
 }
 
-function goToVoice() {
-  const childName = document.getElementById('childName').value.trim();
+function goToLength() {
+  const name = document.getElementById('childName').value.trim();
   const age = document.getElementById('age').value;
   const gender = document.getElementById('gender').value;
-  const friendName = document.getElementById('friendName').value.trim();
+  const friend = document.getElementById('friendName').value.trim();
   const interest = document.getElementById('interest').value.trim();
-  if (!childName || !age || !gender || !friendName || !interest) {
-    alert('Please fill in all the fields so we can make the story personal.');
-    return;
-  }
-  loadVoices();
-  goTo('screen-voice');
+  if(!name || !age || !gender || !friend || !interest) { alert('Please fill in all required fields.'); return; }
+  storyData.childName = name;
+  storyData.age = age;
+  storyData.gender = gender;
+  storyData.friendName = friend;
+  storyData.interest = interest;
+  storyData.proudOf = document.getElementById('proudOf').value.trim();
+  storyData.hasPet = document.getElementById('petToggle').classList.contains('on');
+  storyData.petName = document.getElementById('petName').value.trim();
+  storyData.subject = document.getElementById('subject').value;
+  storyData.personalMessage = document.getElementById('personalMessage').value.trim();
+  goTo('screenLength');
 }
 
-async function loadVoices() {
-  const grid = document.getElementById('voice-grid');
-  const label = document.getElementById('voice-section-label');
-  grid.innerHTML = '<div style="color:#a09880;font-size:0.85rem">Loading voices...</div>';
-  label.textContent = VOICE_LABELS[state.category] || 'Choose a voice';
-
-  try {
-    const res = await fetch(`/api/voices/${state.category}`);
-    const data = await res.json();
-    state.selectedVoiceId = null;
-    document.getElementById('btn-next-voice').disabled = true;
-
-    grid.innerHTML = data.voices.map(v => `
-      <div class="voice-btn" onclick="selectVoice('${v.id}', this)">
-        <div class="voice-emoji">${v.emoji}</div>
-        <div class="voice-name">${v.name}</div>
-        <div class="voice-desc">${v.desc}</div>
-      </div>
-    `).join('');
-  } catch(e) {
-    grid.innerHTML = '<div style="color:#a09880">Could not load voices</div>';
-  }
-}
-
-function selectVoice(voiceId, el) {
-  state.selectedVoiceId = voiceId;
-  document.querySelectorAll('.voice-btn').forEach(b => b.classList.remove('selected'));
+function selectLength(len, el) {
+  storyData.length = len;
+  document.querySelectorAll('.length-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('btn-next-voice').disabled = false;
 }
 
-async function goToPreview() {
-  const childName = document.getElementById('childName').value.trim();
-  const age = document.getElementById('age').value;
-  const gender = document.getElementById('gender').value;
-  const friendName = document.getElementById('friendName').value.trim();
-  const interest = document.getElementById('interest').value.trim();
-  const hasPet = document.getElementById('hasPet').checked;
-  const petName = hasPet ? document.getElementById('petName').value.trim() : null;
-  const subject = document.getElementById('subject').value;
+function showVoices() {
+  const container = document.getElementById('voiceCards');
+  const voices = VOICES[storyData.category] || VOICES.bedtime;
+  container.innerHTML = '';
+  const subtexts = { bedtime:'Who tucks them in tonight?', journey:'Who leads the adventure?', learning:'Who teaches the lesson?' };
+  document.getElementById('voiceSubtext').textContent = subtexts[storyData.category] || 'Pick the voice that feels right.';
+  voices.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'voice-card' + (i===0?' selected':'');
+    card.innerHTML = '<div class="voice-emoji">'+v.emoji+'</div><div class="voice-info"><h4>'+v.name+'</h4><p>'+v.desc+'</p></div>';
+    card.onclick = () => {
+      document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedVoiceId = v.id;
+    };
+    container.appendChild(card);
+    if(i===0) selectedVoiceId = v.id;
+  });
+}
 
-  const personalMessage = document.getElementById('personalMessage').value.trim();
-  state.storyData = { category: state.category, childName, age, gender, friendName, interest, hasPet, petName, subject, personalMessage };
-
-  goTo('screen-loading');
-  document.getElementById('loading-title').textContent = 'Writing the story...';
-  document.getElementById('loading-sub').textContent = 'Creating something just for ' + childName;
-
-  setTimeout(() => {
-    document.getElementById('loading-title').textContent = 'Bringing it to life...';
-    document.getElementById('loading-sub').textContent = 'Almost ready';
-  }, 4000);
-
+async function generatePreview() {
+  goTo('screenLoading');
   try {
     const res = await fetch('/api/generate-preview', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ storyData: state.storyData, voiceId: state.selectedVoiceId })
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ storyData, voiceId: selectedVoiceId })
     });
-    const result = await res.json();
-    if (!result.success) throw new Error(result.error);
-
-    state.previewAudio = result.previewAudio;
-    state.fullStory = result.fullStory;
-
-    document.getElementById('preview-story-name').textContent = childName + "'s story";
-    goTo('screen-preview');
-
-  } catch(e) {
-    alert('Something went wrong: ' + e.message);
-    goTo('screen-voice');
+    const data = await res.json();
+    if(!data.success) throw new Error(data.error || 'Something went wrong');
+    fullStoryText = data.fullStory;
+    const audio = document.getElementById('previewAudio');
+    audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
+    goTo('screenPreview');
+  } catch(err) {
+    goTo('screenVoice');
+    alert('Something went wrong: ' + err.message);
   }
 }
 
 function playPreview() {
-  if (!state.previewAudio) return;
-  const audio = new Audio('data:audio/mpeg;base64,' + state.previewAudio);
-  audio.play();
-  document.getElementById('playPreviewBtn').textContent = '⏸';
-  audio.onended = () => { document.getElementById('playPreviewBtn').textContent = '▶'; };
+  const audio = document.getElementById('previewAudio');
+  if(audio.paused) audio.play(); else audio.pause();
 }
 
-async function unlockStory() {
-  goTo('screen-loading');
-  document.getElementById('loading-title').textContent = 'Generating your full story...';
-  document.getElementById('loading-sub').textContent = 'Worth the wait';
-
+async function unlockFull() {
+  goTo('screenLoading');
+  document.querySelector('.loading-text').textContent = 'Generating the full story...';
+  document.querySelector('.loading-sub').textContent = 'Almost there. This is going to be special.';
   try {
     const res = await fetch('/api/generate-full', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fullStory: state.fullStory, voiceId: state.selectedVoiceId })
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId })
     });
-    const result = await res.json();
-    if (!result.success) throw new Error(result.error);
-
-    document.getElementById('fullAudio').src = 'data:audio/mpeg;base64,' + result.fullAudio;
-    document.getElementById('full-story-title').textContent = state.storyData.childName + "'s Story";
-    document.getElementById('full-story-sub').textContent = 'Your personalised ' + state.category + ' story.';
-    goTo('screen-full');
-
-  } catch(e) {
-    alert('Something went wrong: ' + e.message);
-    goTo('screen-preview');
+    const data = await res.json();
+    if(!data.success) throw new Error(data.error || 'Something went wrong');
+    const audio = document.getElementById('fullStoryAudio');
+    audio.src = 'data:audio/mpeg;base64,' + data.fullAudio;
+    document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
+    goTo('screenFull');
+  } catch(err) {
+    goTo('screenPreview');
+    alert('Something went wrong: ' + err.message);
   }
+}
+
+function playFull() {
+  const audio = document.getElementById('fullStoryAudio');
+  if(audio.paused) audio.play(); else audio.pause();
 }
 </script>
 </body>
