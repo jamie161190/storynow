@@ -154,8 +154,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 /* ===== TESTIMONIAL ===== */
 .testimonial-block{width:100%;max-width:440px;margin-top:1.5rem}
 .testimonial-inner{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:1.25rem;text-align:center}
-.testimonial-photo{width:90px;height:90px;border-radius:50%;overflow:hidden;border:3px solid var(--purple-light);flex-shrink:0}
-.testimonial-img{width:100%;height:100%;object-fit:cover}
+.testimonial-photo{width:110px;height:110px;border-radius:50%;overflow:hidden;border:3px solid var(--purple-light);flex-shrink:0}
+.testimonial-img{width:100%;height:100%;object-fit:cover;object-position:center 15%}
 .testimonial-quote{font-size:0.9rem;color:var(--text-soft);line-height:1.7;font-weight:500;font-style:italic}
 .testimonial-author{font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin-top:0.5rem}
 .testimonial-tag{font-size:0.8rem;color:var(--purple);font-weight:700;margin-top:0.1rem}
@@ -359,7 +359,6 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">your child</span> by name.</h1>
-  <p class="hero-text">Their name. Their best friend. Their pet. Their world. Told by a narrator, in a story that could only ever exist for them.</p>
 
   <!-- AUDIO SAMPLE -->
   <div class="sample-player" id="samplePlayer">
@@ -383,43 +382,6 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
     <a class="my-stories-link" onclick="goTo('screenLogin')">&#127911; My Stories</a>
   </div>
-  <div class="trust-row">
-    <span class="trust-item"><span class="trust-icon">&#127911;</span> Narrated aloud</span>
-    <span class="trust-item"><span class="trust-icon">&#9889;</span> 30 seconds</span>
-    <span class="trust-item"><span class="trust-icon">&#9654;&#65039;</span> Preview free</span>
-  </div>
-
-  <!-- WHAT CAN IT DO -->
-  <div class="use-cases">
-    <div class="use-case" onclick="goTo('screenCategory')">
-      <div class="use-icon" style="background:linear-gradient(135deg,#E8E0FF,#D4C8FF)">&#127769;</div>
-      <div class="use-content">
-        <h4>Bedtime</h4>
-        <p>A soothing story that ends with them drifting off to sleep. Their name, their teddy, their world.</p>
-      </div>
-    </div>
-    <div class="use-case" onclick="goTo('screenCategory')">
-      <div class="use-icon" style="background:linear-gradient(135deg,#FFE5D0,#FFD0A8)">&#9992;&#65039;</div>
-      <div class="use-content">
-        <h4>Long journeys</h4>
-        <p>Gripping adventures with cliffhangers. They will not ask "are we there yet" once.</p>
-      </div>
-    </div>
-    <div class="use-case" onclick="goTo('screenCategory')">
-      <div class="use-icon" style="background:linear-gradient(135deg,#D4F1FF,#B8E6FF)">&#128218;</div>
-      <div class="use-content">
-        <h4>Learning</h4>
-        <p>The narrator asks them questions and waits for answers. Times tables, spelling, phonics, all disguised as an adventure.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- EMOTIONAL HOOK -->
-  <div class="emotion-block">
-    <p class="emotion-quote">"Mummy, that story knew my name!"</p>
-    <p class="emotion-text">Their eyes go wide. Their mouth drops open. Because this is not a book with a name swapped in. The story mentions their best friend, their brother, their pet, their favourite teddy. It knows things only they would know. And it is read aloud by a voice they will want to hear again and again.</p>
-  </div>
-
   <!-- TESTIMONIAL -->
   <div class="testimonial-block">
     <div class="testimonial-inner">
@@ -460,12 +422,6 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- LEARNING CALLOUT -->
-  <div class="emotion-block" style="background:linear-gradient(135deg,var(--sky-light),#D4F1FF)">
-    <p class="emotion-quote" style="color:var(--sky)">"Seven times four... can you work it out?"</p>
-    <p class="emotion-text">Our learning stories do not feel like homework. The narrator pauses and asks your child to answer. Times tables, spelling, phonics, the alphabet, even languages. They shout the answer, the narrator confirms it, and the adventure continues. They are learning without realising it.</p>
   </div>
 
   <button class="btn btn-primary" style="width:100%;max-width:340px" onclick="goTo('screenCategory')">Create a free preview</button>
