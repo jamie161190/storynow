@@ -115,6 +115,10 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .cat-info h3{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:0.2rem}
 .cat-info p{font-size:0.82rem;color:var(--text-soft);line-height:1.4;font-weight:500}
 
+/* ===== GIFT SECTION ===== */
+.gift-section{width:100%;margin-top:0.5rem;padding-top:1rem;border-top:2px solid var(--border)}
+#giftFields{margin-top:1rem}
+
 /* ===== THEME GRID ===== */
 .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;width:100%}
 .theme-tile{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:0.9rem 0.5rem;cursor:pointer;text-align:center;transition:all 0.2s;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:0.3rem}
@@ -195,6 +199,15 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .full-celebration{font-size:2.5rem;margin-bottom:1rem;animation:celebrate 1s ease-out}
 @keyframes celebrate{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
 
+.audio-progress{width:100%;max-width:320px;margin:0 auto 2rem}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:3px;width:0%;transition:width 0.3s}
+.progress-times{display:flex;justify-content:space-between;margin-top:0.4rem;font-size:0.75rem;color:var(--text-muted);font-weight:600}
+
+.post-actions{display:flex;flex-direction:column;gap:0.6rem;width:100%;margin-top:0.5rem}
+
+.gift-sent-msg{background:var(--green-light);color:var(--green);padding:1rem;border-radius:12px;font-size:0.9rem;font-weight:700;text-align:center;margin-top:1rem}
+
 /* ===== ERROR ===== */
 .error-msg{background:var(--pink-light);border:2px solid #FFB8CF;color:#C43B6B;padding:1rem;border-radius:12px;font-size:0.85rem;margin:1rem 0;width:100%;text-align:center;font-weight:600}
 
@@ -229,8 +242,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <h1 class="tagline">A story <span class="highlight">read aloud</span> where they are the hero.</h1>
   <p class="hero-text">Tell us about your child. Pick a narrator voice. In seconds, hear a personalised audio story made just for them, with their name, their friends, and their world.</p>
   <div class="cta-group">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create their story</button>
-    <button class="btn btn-gift" onclick="goTo('screenCategory')"><span class="gift-icon">&#127873;</span> Give as a gift</button>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a story</button>
   </div>
   <div class="trust-row">
     <span class="trust-item"><span class="trust-icon">&#127911;</span> Audio story</span>
@@ -497,6 +509,39 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p class="form-hint">This will be read aloud at the start of the story.</p>
   </div>
 
+  <div class="gift-section">
+    <div class="toggle-row">
+      <button class="toggle" id="giftToggle" onclick="toggleGift()"></button>
+      <span class="toggle-label">This is a gift for someone else</span>
+    </div>
+    <div id="giftFields" style="display:none">
+      <div class="form-group">
+        <label>Recipient's email</label>
+        <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
+        <p class="form-hint">We will send them a beautiful email with the story inside.</p>
+      </div>
+      <div class="form-group">
+        <label>Your name (the gift giver)</label>
+        <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
+      </div>
+      <div class="form-group">
+        <label>Gift message</label>
+        <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
+      </div>
+      <div class="form-group">
+        <label>When should it arrive?</label>
+        <select id="giftDelivery" onchange="document.getElementById('giftDateGroup').style.display=this.value==='scheduled'?'block':'none'">
+          <option value="now">Send immediately</option>
+          <option value="scheduled">Pick a date</option>
+        </select>
+      </div>
+      <div class="form-group" id="giftDateGroup" style="display:none">
+        <label>Delivery date</label>
+        <input type="date" id="giftDate">
+      </div>
+    </div>
+  </div>
+
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goToLength()">Continue</button>
 </div>
 
@@ -567,13 +612,32 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <div class="screen" id="screenFull">
   <div class="full-player">
     <div class="full-celebration">&#127881;</div>
-    <p class="full-title">Their story is ready</p>
+    <p class="full-title" id="fullTitle">Their story is ready</p>
     <p class="full-for" id="fullStoryFor"></p>
-    <div class="audio-player" onclick="playFull()">
-      <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <div class="audio-player" id="fullPlayBtn" onclick="playFull()">
+      <svg class="play-icon" id="fullPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
     <audio id="fullStoryAudio"></audio>
-    <button class="btn btn-primary" style="width:100%;margin-top:2rem" onclick="goTo('screenLanding')">Create another story</button>
+
+    <!-- PROGRESS BAR -->
+    <div class="audio-progress">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-times">
+        <span id="currentTime">0:00</span>
+        <span id="totalTime">0:00</span>
+      </div>
+    </div>
+
+    <!-- POST PURCHASE ACTIONS -->
+    <div class="post-actions">
+      <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">Download MP3</button>
+      <button class="btn btn-gift" style="width:100%" id="sendGiftBtn" onclick="sendGift()">Send to recipient</button>
+      <button class="btn btn-gift" style="width:100%" onclick="goTo('screenLanding')">Create another story</button>
+    </div>
+
+    <div id="giftSentMsg" class="gift-sent-msg" style="display:none">
+      <span>&#10003;</span> Gift sent! They will receive a beautiful email with the story.
+    </div>
   </div>
 </div>
 
@@ -628,6 +692,12 @@ function updateExtrasVisibility() {
   document.getElementById('subjectGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
   document.getElementById('learningGoalGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
   document.getElementById('customScenarioGroup').style.display = storyData.category === 'custom' ? 'block' : 'none';
+}
+
+function toggleGift() {
+  const t = document.getElementById('giftToggle');
+  t.classList.toggle('on');
+  document.getElementById('giftFields').style.display = t.classList.contains('on') ? 'block' : 'none';
 }
 
 function togglePet() {
@@ -687,6 +757,14 @@ function goToLength() {
   storyData.customScenario = document.getElementById('customScenario').value.trim();
   storyData.extraDetails = document.getElementById('extraDetails').value.trim();
   storyData.personalMessage = document.getElementById('personalMessage').value.trim();
+  storyData.isGift = document.getElementById('giftToggle').classList.contains('on');
+  if(storyData.isGift) {
+    storyData.giftEmail = document.getElementById('giftEmail').value.trim();
+    storyData.giftFrom = document.getElementById('giftFrom').value.trim();
+    storyData.giftMessage = document.getElementById('giftMessage').value.trim();
+    storyData.giftDelivery = document.getElementById('giftDelivery').value;
+    storyData.giftDate = document.getElementById('giftDate').value;
+  }
   goTo('screenLength');
 }
 
@@ -756,6 +834,9 @@ async function unlockFull() {
     const audio = document.getElementById('fullStoryAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.fullAudio;
     document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
+    document.getElementById('sendGiftBtn').style.display = storyData.isGift ? 'block' : 'none';
+    document.getElementById('giftSentMsg').style.display = 'none';
+    document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
     goTo('screenFull');
   } catch(err) {
     goTo('screenPreview');
@@ -765,7 +846,56 @@ async function unlockFull() {
 
 function playFull() {
   const audio = document.getElementById('fullStoryAudio');
-  if(audio.paused) audio.play(); else audio.pause();
+  const icon = document.getElementById('fullPlayIcon');
+  if(audio.paused) {
+    audio.play();
+    icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  } else {
+    audio.pause();
+    icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  }
+}
+
+// Progress bar
+setInterval(() => {
+  const audio = document.getElementById('fullStoryAudio');
+  if(audio && audio.duration) {
+    const pct = (audio.currentTime / audio.duration) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+    document.getElementById('totalTime').textContent = formatTime(audio.duration);
+  }
+}, 300);
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+// Reset icon when audio ends
+document.addEventListener('DOMContentLoaded', () => {
+  const audio = document.getElementById('fullStoryAudio');
+  if(audio) audio.addEventListener('ended', () => {
+    document.getElementById('fullPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+  });
+});
+
+function downloadStory() {
+  const audio = document.getElementById('fullStoryAudio');
+  if(!audio.src) return;
+  const a = document.createElement('a');
+  a.href = audio.src;
+  a.download = (storyData.childName || 'story') + ' - Storytold.mp3';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function sendGift() {
+  // For now, show confirmation. When email backend is built, this will actually send.
+  document.getElementById('sendGiftBtn').style.display = 'none';
+  document.getElementById('giftSentMsg').style.display = 'block';
 }
 </script>
 </body>
