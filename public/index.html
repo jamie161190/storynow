@@ -138,6 +138,15 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .emotion-quote{font-family:'Nunito',sans-serif;font-size:1.35rem;font-weight:900;color:var(--purple);margin-bottom:0.75rem;line-height:1.3}
 .emotion-text{font-size:0.88rem;color:var(--text-soft);line-height:1.7;font-weight:500}
 
+/* ===== TESTIMONIAL ===== */
+.testimonial-block{width:100%;max-width:440px;margin-top:1.5rem}
+.testimonial-inner{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:1.25rem;text-align:center}
+.testimonial-photo{width:90px;height:90px;border-radius:50%;overflow:hidden;border:3px solid var(--purple-light);flex-shrink:0}
+.testimonial-img{width:100%;height:100%;object-fit:cover}
+.testimonial-quote{font-size:0.9rem;color:var(--text-soft);line-height:1.7;font-weight:500;font-style:italic}
+.testimonial-author{font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin-top:0.5rem}
+.testimonial-tag{font-size:0.8rem;color:var(--purple);font-weight:700;margin-top:0.1rem}
+
 /* ===== HOW IT WORKS ===== */
 .how-it-works{width:100%;max-width:440px;margin-top:1.5rem}
 .how-title{font-family:'Nunito',sans-serif;font-size:1.2rem;font-weight:900;color:var(--text);text-align:center;margin-bottom:1.25rem}
@@ -377,6 +386,20 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="emotion-block">
     <p class="emotion-quote">"Mummy, that story knew my name!"</p>
     <p class="emotion-text">Their eyes go wide. Their mouth drops open. Because this is not a book with a name swapped in. The story mentions their best friend, their brother, their pet, their favourite teddy. It knows things only they would know. And it is read aloud by a voice they will want to hear again and again.</p>
+  </div>
+
+  <!-- TESTIMONIAL -->
+  <div class="testimonial-block">
+    <div class="testimonial-inner">
+      <div class="testimonial-photo">
+        <img src="/jamie-chase.jpg" alt="Jamie and Chase" class="testimonial-img">
+      </div>
+      <div class="testimonial-content">
+        <p class="testimonial-quote">"I watched my son Jamie build this and test it on his little boy Chase. When I heard my grandson's name in the story, I couldn't believe what I was listening to. It knew his best friend, his favourite things, everything. I had goosebumps. I hope every family gets to experience this the way we have."</p>
+        <p class="testimonial-author">Maxine, Jamie's mum</p>
+        <p class="testimonial-tag">Storytold's very first customer</p>
+      </div>
+    </div>
   </div>
 
   <!-- HOW IT WORKS -->
