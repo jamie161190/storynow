@@ -42,13 +42,16 @@ This story will be read aloud by a narrator. Write for how it sounds, not how it
 - No chapter titles or headings unless specifically requested.
 - No "Chapter 1" labels. If you need to separate sections, use a natural transition in the prose.
 
-7. NO GENERIC PHRASES
+7. NEVER INVENT WHAT THE PARENT ALREADY DESCRIBED
+If the parent told you something is yellow, it is yellow. If they said the pet is a golden retriever, it is a golden retriever, not a Labrador. If they described a toy, blanket, or object, use their exact description. NEVER add colours, sizes, breeds, or details the parent did not provide. When no description was given, keep it vague ("the blanket", "the teddy") rather than inventing details that could be wrong. A child who sees their blue blanket described as red will lose all trust in the story instantly.
+
+8. NO GENERIC PHRASES
 Never write anything that could apply to any child. No "they were so brave" without showing WHY. No "it was the best day ever" without earning it. Every sentence should feel like it could only exist in THIS child's story.
 
-8. START IMMEDIATELY
+9. START IMMEDIATELY
 No preamble. No "Once upon a time" unless it genuinely serves the story. Drop the listener straight into a moment. The first sentence should make a parent lean in.
 
-9. PACING BY LENGTH
+10. PACING BY LENGTH
 Short stories (~5 min, ~750 words): One clear arc. Setup, one complication, resolution. Tight and satisfying.
 
 Medium stories (~10 min, ~1500 words): Three act structure with ESCALATION.
@@ -107,8 +110,8 @@ The pet must do something memorable. Not "wagged his tail." Something the child 
   }
 
   if (d.favTeddy) {
-    block += `\n\nFAVOURITE TOY/TEDDY: ${d.favTeddy}
-This toy should appear as a character or a special object in the story. Give it a role, a moment, a reason to matter.`;
+    block += `\n\nFAVOURITE TOY/TEDDY/COMFORT ITEM: ${d.favTeddy}
+This item should appear in the story. Give it a role, a moment, a reason to matter. CRITICAL: Use ONLY the description the parent gave. If they said "yellow blanket," it is yellow. If they said "small white bunny," it is small and white. NEVER invent colours, sizes, or details the parent did not mention. If no colour or description was given, describe it without visual details (e.g. "the blanket" not "the soft blue blanket").`;
   }
 
   if (d.extraDetails) {
