@@ -775,6 +775,39 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 </div>
 
+<!-- SHARED STORY LISTENER -->
+<div class="screen" id="screenShared">
+  <div class="full-player">
+    <div class="full-celebration">&#127911;</div>
+    <p class="full-title" id="sharedTitle">A story just for you</p>
+    <p class="full-for" id="sharedFor"></p>
+    <div class="audio-player" id="sharedPlayBtn" onclick="playShared()">
+      <svg class="play-icon" id="sharedPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <audio id="sharedAudio"></audio>
+    <div class="audio-progress">
+      <div class="progress-bar"><div class="progress-fill" id="sharedProgressFill"></div></div>
+      <div class="progress-times">
+        <span id="sharedCurrentTime">0:00</span>
+        <span id="sharedTotalTime">0:00</span>
+      </div>
+    </div>
+    <div class="post-actions" style="margin-top:1.5rem">
+      <p style="text-align:center;color:var(--text-muted);font-size:0.95rem;margin-bottom:1rem">Want to create a personalised story for a child in your life?</p>
+      <button class="btn btn-primary" style="width:100%" onclick="goTo('screenLanding')">Create your own story</button>
+    </div>
+  </div>
+  <div id="sharedLoading" style="text-align:center;padding:3rem;display:none">
+    <div class="spinner"></div>
+    <p style="margin-top:1rem;color:var(--text-muted)">Loading story...</p>
+  </div>
+  <div id="sharedError" style="text-align:center;padding:3rem;display:none">
+    <p style="font-size:1.5rem;margin-bottom:0.5rem">&#128533;</p>
+    <p style="color:var(--text-muted)">This story could not be found. It may have been removed.</p>
+    <button class="btn btn-primary" style="margin-top:1rem" onclick="goTo('screenLanding')">Create a story</button>
+  </div>
+</div>
+
 <!-- SHARE MODAL -->
 <div class="share-overlay" id="shareOverlay" onclick="if(event.target===this)closeShareModal()">
   <div class="share-modal">
@@ -1151,8 +1184,29 @@ document.addEventListener('DOMContentLoaded', () => {
   if(audio) audio.addEventListener('ended', () => {
     document.getElementById('fullPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
   });
+  // Check for shared story link
+  const listenId = new URLSearchParams(window.location.search).get('listen');
+  if (listenId) {
+    loadSharedStory(listenId);
+    return;
+  }
   // Check if returning from Stripe checkout
   handleStripeReturn();
+
+  // Shared audio progress
+  const sharedAudio = document.getElementById('sharedAudio');
+  if (sharedAudio) {
+    sharedAudio.addEventListener('timeupdate', () => {
+      if (sharedAudio.duration) {
+        document.getElementById('sharedProgressFill').style.width = (sharedAudio.currentTime / sharedAudio.duration * 100) + '%';
+        document.getElementById('sharedCurrentTime').textContent = fmtTime(sharedAudio.currentTime);
+        document.getElementById('sharedTotalTime').textContent = fmtTime(sharedAudio.duration);
+      }
+    });
+    sharedAudio.addEventListener('ended', () => {
+      document.getElementById('sharedPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    });
+  }
 });
 
 function downloadStory() {
@@ -1344,6 +1398,44 @@ function renderLibrary(stories) {
   });
 }
 
+// Shared story listener
+async function loadSharedStory(storyId) {
+  goTo('screenShared');
+  document.querySelector('#screenShared .full-player').style.display = 'none';
+  document.getElementById('sharedError').style.display = 'none';
+  document.getElementById('sharedLoading').style.display = 'block';
+
+  try {
+    const res = await fetch(`/api/shared-story?id=${encodeURIComponent(storyId)}`);
+    const data = await res.json();
+
+    if (!data.success) throw new Error(data.error);
+
+    const s = data.story;
+    const catLabel = { bedtime:'Bedtime Story', journey:'Journey Story', learning:'Learning Adventure', custom:'Custom Story' };
+
+    document.getElementById('sharedTitle').textContent = s.childName + "'s story";
+    document.getElementById('sharedFor').textContent = catLabel[s.category] || 'A personalised story';
+    document.getElementById('sharedAudio').src = s.audioUrl;
+    document.getElementById('sharedLoading').style.display = 'none';
+    document.querySelector('#screenShared .full-player').style.display = 'block';
+  } catch (err) {
+    document.getElementById('sharedLoading').style.display = 'none';
+    document.getElementById('sharedError').style.display = 'block';
+  }
+}
+
+function playShared() {
+  const audio = document.getElementById('sharedAudio');
+  if (audio.paused) {
+    audio.play();
+    document.getElementById('sharedPlayIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  } else {
+    audio.pause();
+    document.getElementById('sharedPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+  }
+}
+
 // Share story via email
 let shareStory = null;
 
@@ -1387,7 +1479,8 @@ async function sendShareEmail() {
         to: email,
         childName: shareStory.childName,
         giftFrom: fromName,
-        giftMessage: message || null
+        giftMessage: message || null,
+        storyId: shareStory.id
       })
     });
     const data = await res.json();

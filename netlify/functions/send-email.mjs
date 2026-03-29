@@ -7,7 +7,7 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const { type, to, childName, giftFrom, giftMessage, category, length } = await req.json();
+    const { type, to, childName, giftFrom, giftMessage, category, length, storyId } = await req.json();
 
     if (!type || !to) {
       return new Response(JSON.stringify({ error: 'Missing type or recipient email' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -28,8 +28,8 @@ export default async (req) => {
       subject = `${giftFrom} made something special for ${childName} 🎁`;
       html = giftEmail(childName, giftFrom, giftMessage);
     } else if (type === 'share') {
-      subject = `Someone shared ${childName}'s story with you 🎧`;
-      html = shareEmail(childName, giftFrom, giftMessage);
+      subject = `${giftFrom} shared ${childName}'s story with you 🎧`;
+      html = shareEmail(childName, giftFrom, giftMessage, storyId);
     } else {
       return new Response(JSON.stringify({ error: 'Invalid email type' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
@@ -135,7 +135,8 @@ function giftEmail(childName, giftFrom, giftMessage) {
 </html>`;
 }
 
-function shareEmail(childName, fromName, message) {
+function shareEmail(childName, fromName, message, storyId) {
+  const listenUrl = storyId ? `https://storytold.ai?listen=${storyId}` : 'https://storytold.ai';
   return `
 <!DOCTYPE html>
 <html>
@@ -156,11 +157,14 @@ function shareEmail(childName, fromName, message) {
         <p style="margin:0 0 4px;font-size:13px;color:#999;">Message from ${fromName}:</p>
         <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${message}"</p>
       </div>` : ''}
-      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        Want to create a personalised story for a child in your life? Every child deserves to be the hero of their own adventure.
+      <div style="text-align:center;margin:24px 0;">
+        <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen now</a>
+      </div>
+      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;text-align:center;">
+        Want to create a personalised story for a child in your life?
       </p>
       <div style="text-align:center;">
-        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Create a story</a>
+        <a href="https://storytold.ai" style="color:#7C5CFC;font-size:14px;font-weight:600;text-decoration:none;">Create your own story &rarr;</a>
       </div>
     </div>
     <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
