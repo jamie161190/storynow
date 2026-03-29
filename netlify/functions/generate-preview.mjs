@@ -139,13 +139,23 @@ ${getAgeBand(d.age)}
 Write the story now. Start immediately, no preamble.`,
 
   journey: (d) => `STORY TYPE: Journey / Adventure
-TONE: Exciting, fast paced, gripping. This story is designed to be listened to on a long car ride, flight, or train journey. The child must be hooked from the first sentence.
+TONE: Exciting, gripping, but with emotional range. This story is designed to be listened to on a long car ride, flight, or train journey. The child cannot look at anything else, so the story IS their entire world for the next ${d.length === 'epic' ? '15' : d.length === 'long' ? '10' : '5'} minutes. It must hold them completely.
 
 ${characterBlock(d)}
 
 STRUCTURE: ${d.length === 'epic' ? '4 acts with 5 to 6 distinct scenes, at least 2 twists, and a subplot involving the best friend or a new character' : d.length === 'long' ? '3 acts with 3 to 4 distinct scenes and a midpoint twist that changes everything' : '1 clear arc with a complication and resolution'}. Scene transitions should be sharp. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
 
-PACING: Quick. Dialogue heavy. Short action beats. Minimal description, just enough to set the scene. Think movie, not novel.
+PACING: Not just fast. VARIED. This is the most important word for journey stories.
+- Alternate between high energy action and quieter character moments. A chase scene, then a funny conversation between ${d.childName} and ${d.friendName}. A discovery, then a moment of doubt. Tension, then a joke that breaks it.
+- The ear gets tired of constant excitement. Every 2 to 3 minutes of narration, shift the energy. High, low, high, higher, low, highest.
+- Dialogue should make up at least 50% of the story. Two characters disagreeing, joking, planning, or arguing is far more engaging than narration describing what happened.
+${d.length !== 'standard' ? `
+ENGAGEMENT TECHNIQUES FOR LONGER JOURNEYS:
+- THE TICKING CLOCK: Give the adventure a time pressure. They have to reach somewhere, solve something, or save something before it is too late. This creates forward momentum the child can feel.
+- THE RUNNING GAG: Give ${d.friendName} a funny recurring habit, phrase, or reaction that appears 3 to 4 times throughout. Kids love repetition they can predict.
+- THE IMPOSSIBLE CHOICE: At around the 60% mark, ${d.childName} faces a decision where both options have consequences. This is where the story gets personal and the child leans in.
+- SENSORY WORLD BUILDING: Since the child is stuck in a car or plane, the story must paint vivid sensory pictures. Not "they entered a cave" but "The air turned cold. Water dripped somewhere in the dark. And then, from deep inside the cave, a sound. A low rumble. Like breathing."
+- END WITH A DOOR OPEN: The final line should hint that there could be another adventure. Not a cliffhanger, but a promise. The child should turn to their parent and say "Can I get another one?"` : ''}
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
@@ -154,16 +164,17 @@ ${getAgeBand(d.age)}
 Write the story now. Start immediately with action or intrigue.`,
 
   learning: (d) => `STORY TYPE: Learning Adventure
-TONE: Exciting, immersive, and secretly educational. The child should be so caught up in the adventure that they do not realise they are learning.
+TONE: Exciting, immersive, and secretly educational. The child should be so caught up in the adventure that they do not realise they are learning. This is NOT a quiz with a story wrapper. It is a real adventure where knowledge happens to be the superpower.
 
 ${characterBlock(d)}
 
 SUBJECT AREA: ${d.subject}
 ${d.learningGoal ? 'SPECIFIC LEARNING GOAL: The parent says their child is working on: "' + d.learningGoal + '". This is the most important instruction in this entire prompt.' : ''}
 
-THIS IS HOW LEARNING STORIES WORK:
+CONFIDENCE LEVEL: ${d.confidence === 'starting' ? 'JUST STARTING. The child is new to this. Keep challenges very simple. Celebrate small wins enthusiastically. Use lots of scaffolding (e.g. give multiple choice rather than open questions). Make them feel clever for getting easy things right. Build confidence above all else.' : d.confidence === 'nearly' ? 'NEARLY MASTERED. The child is close to owning this. Push them. Include tricky variations, edge cases, and combinations. The final challenge should genuinely stretch them. They should feel proud because it was hard and they still got it.' : 'PRACTISING. The child knows the basics but needs repetition. Mix easy wins with moderate challenges. Start simple to build momentum, then gradually raise difficulty. The child should feel the satisfaction of getting faster and more confident.'}
 
-The learning is the engine of the story. Every obstacle, every locked door, every puzzle requires the child to use the specific skill.
+THE GOLDEN RULE OF LEARNING STORIES:
+The learning must feel like a SUPERPOWER, not a test. ${d.childName} is not answering questions. ${d.childName} is using knowledge to save the day, unlock doors, defeat villains, crack codes, and rescue friends. The difference is everything. A child who feels tested switches off. A child who feels powerful leans in.
 
 CRITICAL: INTERACTIVE AUDIO PAUSES
 This story is read aloud by a narrator. At each learning moment, the narrator must PAUSE and invite the child to answer before revealing the answer. Write these pauses directly into the text like this:
@@ -191,6 +202,8 @@ THE PATTERN FOR EVERY CHALLENGE:
 
 The child listening at home shouts the answer during the pause. The narrator then confirms it. The child feels like the story is talking directly to them.
 
+VARY THE PROMPT PHRASES. Do not use "Can you work it out?" every time. Rotate between: "What do you think?", "Do you know?", "Quick, what is it?", "Can you help?", "Shout it out!", "What comes next?", "${d.friendName} looked at ${d.childName}. Do you know this one?"
+
 YOU MUST:
 1. Include at least ${d.length === 'epic' ? '8 to 10' : d.length === 'long' ? '5 to 7' : '4 to 5'} interactive pause moments
 2. Build difficulty gradually (start easy, get harder)
@@ -198,6 +211,22 @@ YOU MUST:
 4. Have the friend or pet help with one of the easier challenges
 5. End with the child mastering something hard, feeling proud and capable
 6. NEVER break the adventure. No "let us practice" or teacher explaining. The learning IS the adventure.
+${d.length !== 'standard' ? `
+PACING FOR LONGER LEARNING STORIES:
+The biggest risk with a longer learning story is it feeling like a relentless quiz. You MUST break up the challenges with story moments that have nothing to do with learning. For every 2 to 3 challenges, include one of these breathing moments:
+
+- A FUNNY MOMENT: ${d.friendName} does something silly, the pet causes chaos, something unexpected happens that makes the child laugh. Humour resets attention.
+- A STORY TWIST: Something changes. A new character appears. The setting shifts. What they thought was happening turns out to be something else. The child re-engages because the story surprised them.
+- AN EMOTIONAL BEAT: A quiet moment between ${d.childName} and ${d.friendName}. A moment of doubt followed by encouragement. A callback to something personal the parent shared. This is what separates a great story from a flashcard app.
+- A CELEBRATION: After a hard challenge, do not rush to the next one. Let ${d.childName} feel the win. The crowd cheers. The door explodes with light. ${d.friendName} high fives them. The pet goes wild. Make the child feel like a hero.
+
+DIFFICULTY CURVE FOR MEDIUM AND LONG:
+- First 30%: Easy wins. Build confidence. The child thinks "I can do this!"
+- Middle 40%: Getting harder. Some challenges need a second think. ${d.friendName} helps with one. The stakes are rising.
+- Final 30%: The hardest challenges, but the child is ready. The final challenge should combine two things they have learned earlier in the story. When they get it right, it should feel like the most triumphant moment in the story.
+
+THE VILLAIN OR OBSTACLE:
+For medium and long stories, there should be an antagonist or major obstacle that can ONLY be defeated through the child's knowledge. Not a scary villain, but a compelling one. A trickster who thinks ${d.childName} cannot solve the puzzles. A locked kingdom that has been waiting for someone smart enough. A machine that is broken and only the right answers can fix it. This gives the challenges STAKES beyond "answer the question."` : ''}
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 

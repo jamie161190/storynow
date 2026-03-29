@@ -429,8 +429,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     </div>
     <div class="story-type" style="background:linear-gradient(to bottom,#FFF0E5,var(--card))">
       <span class="st-emoji">&#9992;&#65039;</span>
-      <span class="st-label">Journeys</span>
-      <span class="st-desc">Adventures for long trips</span>
+      <span class="st-label">Adventure</span>
+      <span class="st-desc">Action, twists, and thrills</span>
     </div>
     <div class="story-type" style="background:linear-gradient(to bottom,#E1F5FE,var(--card))">
       <span class="st-emoji">&#128218;</span>
@@ -499,8 +499,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="cat-card cat-journey" onclick="selectCategory('journey',this)">
       <div class="cat-icon">&#9992;&#65039;</div>
       <div class="cat-info">
-        <h3>Journey</h3>
-        <p>Exciting episodes with cliffhangers. Perfect for car rides, flights, and long trips.</p>
+        <h3>Adventure</h3>
+        <p>Action packed with twists, humour, and cliffhangers. The kind of story they will ask to hear again.</p>
       </div>
     </div>
     <div class="cat-card cat-learning" onclick="selectCategory('learning',this)">
@@ -523,9 +523,60 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 </div>
 
+<!-- LEARNING SETUP (only shown for Learning category) -->
+<div class="screen" id="screenLearningSetup">
+  <button class="back-btn" onclick="goTo('screenCategory')">&#8592; Back</button>
+  <h2 class="section-title">What should they learn?</h2>
+  <p class="section-sub">This is the most important part. The whole story will be built around this.</p>
+
+  <div class="form-group">
+    <label>Subject</label>
+    <div class="theme-grid" id="subjectGrid" style="grid-template-columns:repeat(2,1fr)">
+      <div class="theme-tile" onclick="selectSubject('maths',this)" data-subject="maths"><span class="theme-icon">&#129518;</span><span class="theme-label">Maths</span></div>
+      <div class="theme-tile" onclick="selectSubject('reading',this)" data-subject="reading"><span class="theme-icon">&#128214;</span><span class="theme-label">Reading &amp; Phonics</span></div>
+      <div class="theme-tile" onclick="selectSubject('spelling',this)" data-subject="spelling"><span class="theme-icon">&#9999;&#65039;</span><span class="theme-label">Spelling</span></div>
+      <div class="theme-tile" onclick="selectSubject('science',this)" data-subject="science"><span class="theme-icon">&#128300;</span><span class="theme-label">Science</span></div>
+      <div class="theme-tile" onclick="selectSubject('geography',this)" data-subject="geography"><span class="theme-icon">&#127757;</span><span class="theme-label">Geography</span></div>
+      <div class="theme-tile" onclick="selectSubject('history',this)" data-subject="history"><span class="theme-icon">&#127984;</span><span class="theme-label">History</span></div>
+      <div class="theme-tile" onclick="selectSubject('languages',this)" data-subject="languages"><span class="theme-icon">&#127760;</span><span class="theme-label">Languages</span></div>
+    </div>
+  </div>
+
+  <div id="learningDetailFields" style="display:none">
+    <div class="form-group">
+      <label id="learningGoalLabel2">What specifically are they working on?</label>
+      <textarea id="learningGoal2" placeholder="" style="height:80px"></textarea>
+      <p class="form-hint" id="learningGoalHint2">The more specific you are, the better the story targets what they need.</p>
+    </div>
+
+    <div class="form-group">
+      <label>How confident are they with this?</label>
+      <div class="length-cards" style="margin-bottom:0">
+        <div class="length-card" onclick="selectConfidence('starting',this)">
+          <div class="len-emoji">&#127793;</div>
+          <div class="len-name">Just starting</div>
+          <div class="len-time" style="font-size:0.7rem">Keep it simple and encouraging</div>
+        </div>
+        <div class="length-card selected" onclick="selectConfidence('practising',this)">
+          <div class="len-emoji">&#128170;</div>
+          <div class="len-name">Practising</div>
+          <div class="len-time" style="font-size:0.7rem">They know the basics, need reps</div>
+        </div>
+        <div class="length-card" onclick="selectConfidence('nearly',this)">
+          <div class="len-emoji">&#11088;</div>
+          <div class="len-name">Nearly there</div>
+          <div class="len-time" style="font-size:0.7rem">Challenge them, push a little</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenDetails')">Continue</button>
+  </div>
+</div>
+
 <!-- DETAILS: MAIN CHARACTER -->
 <div class="screen" id="screenDetails">
-  <button class="back-btn" onclick="goTo('screenCategory')">&#8592; Back</button>
+  <button class="back-btn" onclick="goTo(storyData.category==='learning'?'screenLearningSetup':'screenCategory')">&#8592; Back</button>
   <h2 class="section-title">The main character</h2>
   <p class="section-sub">This is who the story is all about.</p>
 
@@ -583,7 +634,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <div class="screen" id="screenTheme">
   <button class="back-btn" onclick="goTo('screenPeople')">&#8592; Back</button>
   <h2 class="section-title">What are they into?</h2>
-  <p class="section-sub">Pick as many as you like. These shape the whole story.</p>
+  <p class="section-sub" id="themeSubtext">Pick as many as you like. These shape the whole story.</p>
 
   <div class="theme-grid" id="themeGrid">
     <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Dinosaurs"><span class="theme-icon">&#129430;</span><span class="theme-label">Dinosaurs</span></div>
@@ -1089,6 +1140,15 @@ function goTo(id) {
   if(id === 'screenCategory') restoreCategory();
   if(id === 'screenDetails') restoreDetails();
   if(id === 'screenLength') restoreLength();
+  if(id === 'screenLearningSetup') restoreLearningSetup();
+  if(id === 'screenTheme') {
+    const sub = document.getElementById('themeSubtext');
+    if (storyData.category === 'learning') {
+      sub.textContent = 'These set the world for the adventure. The learning happens inside it.';
+    } else {
+      sub.textContent = 'Pick as many as you like. These shape the whole story.';
+    }
+  }
 }
 
 function restoreCategory() {
@@ -1155,17 +1215,84 @@ function restoreLength() {
   });
 }
 
+function restoreLearningSetup() {
+  if (!selectedSubject) return;
+  document.querySelectorAll('#subjectGrid .theme-tile').forEach(t => {
+    t.classList.toggle('selected', t.dataset.subject === selectedSubject);
+  });
+  document.getElementById('learningDetailFields').style.display = 'block';
+  document.getElementById('learningGoal2').placeholder = SUBJECT_PLACEHOLDERS[selectedSubject] || '';
+  document.getElementById('learningGoalHint2').textContent = SUBJECT_HINTS[selectedSubject] || '';
+  if (storyData.learningGoal) document.getElementById('learningGoal2').value = storyData.learningGoal;
+  // Restore confidence
+  const confLabels = { starting: 'Just starting', practising: 'Practising', nearly: 'Nearly there' };
+  document.querySelectorAll('#screenLearningSetup .length-card').forEach(c => {
+    const name = c.querySelector('.len-name');
+    if (name) c.classList.toggle('selected', name.textContent === confLabels[selectedConfidence]);
+  });
+}
+
 function selectCategory(cat, el) {
   storyData.category = cat;
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   trackEvent('ViewContent', { content_name: cat, content_category: 'story_type' });
-  setTimeout(() => goTo('screenDetails'), 300);
+  // Learning goes to its own setup screen first
+  setTimeout(() => goTo(cat === 'learning' ? 'screenLearningSetup' : 'screenDetails'), 300);
+}
+
+// ===== LEARNING SETUP =====
+let selectedSubject = '';
+let selectedConfidence = 'practising';
+
+const SUBJECT_PLACEHOLDERS = {
+  maths: 'e.g. Their 7 times table, counting in 2s and 5s, adding two digit numbers, halving and doubling, telling the time, fractions...',
+  reading: 'e.g. Letter sounds like ch, sh, th, blending CVC words, reading short sentences, sight words like "the" and "said"...',
+  spelling: 'e.g. Spelling "because" and "together", words with double letters, silent letters, tricky words from their homework...',
+  science: 'e.g. The solar system and planets, how plants grow, states of matter (solids, liquids, gases), the human body, magnets...',
+  geography: 'e.g. The continents and oceans, where different animals live, countries and capitals, rivers and mountains, the water cycle...',
+  history: 'e.g. The Great Fire of London, Ancient Egypt, the Romans, World War 2, the Tudors, the Stone Age...',
+  languages: 'e.g. Basic French greetings and colours, Spanish numbers 1 to 20, common phrases like "my name is" and "how are you"...'
+};
+
+const SUBJECT_HINTS = {
+  maths: 'Tell us exactly what they are practising. "Times tables" is good, "their 6 and 7 times tables" is even better.',
+  reading: 'What reading level are they at? What sounds or words are they working on right now?',
+  spelling: 'List the actual words if you can. We will build puzzles around them in the story.',
+  science: 'What topic are they covering at school right now? The story will teach it through adventure.',
+  geography: 'What part of the world or what concept? The more specific, the more they will learn.',
+  history: 'What period or event? The child will travel back in time and live through it.',
+  languages: 'What language and what are they learning? We will weave the words into the story naturally.'
+};
+
+function selectSubject(subj, el) {
+  selectedSubject = subj;
+  storyData.subject = subj;
+  document.querySelectorAll('#subjectGrid .theme-tile').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+
+  // Show the detail fields
+  document.getElementById('learningDetailFields').style.display = 'block';
+
+  // Update placeholder and hint
+  document.getElementById('learningGoal2').placeholder = SUBJECT_PLACEHOLDERS[subj] || '';
+  document.getElementById('learningGoalHint2').textContent = SUBJECT_HINTS[subj] || 'The more specific you are, the better the story targets what they need.';
+
+  // Scroll to the fields
+  document.getElementById('learningDetailFields').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function selectConfidence(level, el) {
+  selectedConfidence = level;
+  storyData.confidence = level;
+  el.parentElement.querySelectorAll('.length-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
 }
 
 function updateExtrasVisibility() {
-  document.getElementById('subjectGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
-  document.getElementById('learningGoalGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
+  // Learning subject/goal are now collected on screenLearningSetup, so hide them on Extras
+  document.getElementById('subjectGroup').style.display = 'none';
+  document.getElementById('learningGoalGroup').style.display = 'none';
   document.getElementById('customScenarioGroup').style.display = storyData.category === 'custom' ? 'block' : 'none';
 }
 
@@ -1227,8 +1354,15 @@ function goToLength() {
   storyData.favTeddy = document.getElementById('favTeddy').value.trim();
   storyData.customWhere = document.getElementById('customWhere').value.trim();
   storyData.setting = storyData.customWhere || storyData.where;
-  storyData.subject = document.getElementById('subject').value;
-  storyData.learningGoal = document.getElementById('learningGoal').value.trim();
+  // Learning subject and goal come from screenLearningSetup (if learning category)
+  if (storyData.category === 'learning') {
+    storyData.subject = selectedSubject || document.getElementById('subject').value;
+    storyData.learningGoal = document.getElementById('learningGoal2').value.trim() || document.getElementById('learningGoal').value.trim();
+    storyData.confidence = selectedConfidence || 'practising';
+  } else {
+    storyData.subject = document.getElementById('subject').value;
+    storyData.learningGoal = document.getElementById('learningGoal').value.trim();
+  }
   storyData.customScenario = document.getElementById('customScenario').value.trim();
   storyData.extraDetails = document.getElementById('extraDetails').value.trim();
   storyData.personalMessage = document.getElementById('personalMessage').value.trim();
