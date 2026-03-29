@@ -21,7 +21,6 @@ export default async (req) => {
     const siteUrl = req.headers.get('origin') || process.env.URL || 'https://storytold.ai';
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {

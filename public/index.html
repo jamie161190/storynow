@@ -111,6 +111,19 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .btn-gift:hover{border-color:var(--purple-soft);background:var(--purple-light)}
 .btn-gift .gift-icon{margin-right:0.4rem}
 
+/* ===== SAMPLE PLAYER ===== */
+.sample-player{width:100%;max-width:380px;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;box-shadow:var(--shadow);margin:0.25rem auto 0}
+.sample-label{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem}
+.sample-row{display:flex;align-items:center;gap:0.85rem}
+.sample-play-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--purple),#9B7CFF);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(124,92,252,0.3);transition:transform 0.2s}
+.sample-play-btn:hover{transform:scale(1.08)}
+.sample-wave{flex:1;min-width:0}
+.sample-progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.sample-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--orange));border-radius:3px;transition:width 0.1s linear}
+.sample-meta{display:flex;justify-content:space-between;align-items:center;margin-top:0.4rem}
+.sample-name{font-size:0.78rem;font-weight:700;color:var(--text);font-family:'Nunito',sans-serif}
+.sample-time{font-size:0.72rem;color:var(--text-muted);font-weight:600}
+
 .trust-row{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:0.5rem}
 .trust-item{display:flex;align-items:center;gap:0.3rem;font-size:0.78rem;color:var(--text-muted);font-weight:600}
 .trust-icon{font-size:0.9rem}
@@ -346,7 +359,26 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">your child</span> by name.</h1>
-  <p class="hero-text">Their name. Their best friend. Their pet. Their world. Told by a narrator, in a story that could only ever exist for them. Ready in 30 seconds.</p>
+  <p class="hero-text">Their name. Their best friend. Their pet. Their world. Told by a narrator, in a story that could only ever exist for them.</p>
+
+  <!-- AUDIO SAMPLE -->
+  <div class="sample-player" id="samplePlayer">
+    <div class="sample-label">Hear an example</div>
+    <div class="sample-row">
+      <button class="sample-play-btn" id="samplePlayBtn" onclick="playSample()">
+        <svg id="sampleIcon" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <div class="sample-wave">
+        <div class="sample-progress-bar"><div class="sample-progress-fill" id="sampleFill"></div></div>
+        <div class="sample-meta">
+          <span class="sample-name">Chase's Space Adventure</span>
+          <span class="sample-time" id="sampleTime">0:00</span>
+        </div>
+      </div>
+    </div>
+    <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
+  </div>
+
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
     <a class="my-stories-link" onclick="goTo('screenLogin')">&#127911; My Stories</a>
@@ -395,7 +427,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         <img src="/jamie-chase.jpg" alt="Jamie and Chase" class="testimonial-img">
       </div>
       <div class="testimonial-content">
-        <p class="testimonial-quote">"I watched my son Jamie build this and test it on his little boy Chase. When I heard my grandson's name in the story, I couldn't believe what I was listening to. It knew his best friend, his favourite things, everything. I had goosebumps. I hope every family gets to experience this the way we have."</p>
+        <p class="testimonial-quote">"I watched my son Jamie build this and test it on his little boy Chase. When I heard my grandson's name in a story about space, I couldn't believe what I was listening to. It knew his best friend, his favourite things, everything. I had goosebumps. I hope every family gets to experience this the way we have."</p>
         <p class="testimonial-author">Maxine, Jamie's mum</p>
         <p class="testimonial-tag">Storytold's very first customer</p>
       </div>
@@ -959,6 +991,35 @@ function trackEvent(eventName, params) {
     if(window.dataLayer) window.dataLayer.push({ event: eventName, ...params });
   } catch(e) { /* silent */ }
 }
+
+// Landing page sample player
+function playSample() {
+  const audio = document.getElementById('sampleAudio');
+  const icon = document.getElementById('sampleIcon');
+  if (audio.paused) {
+    audio.play();
+    icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
+  } else {
+    audio.pause();
+    icon.innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
+  }
+}
+(function() {
+  const sa = document.getElementById('sampleAudio');
+  if (!sa) return;
+  sa.addEventListener('timeupdate', () => {
+    if (sa.duration) {
+      document.getElementById('sampleFill').style.width = (sa.currentTime / sa.duration * 100) + '%';
+      const t = Math.floor(sa.currentTime);
+      document.getElementById('sampleTime').textContent = Math.floor(t/60) + ':' + (t%60 < 10 ? '0' : '') + (t%60);
+    }
+  });
+  sa.addEventListener('ended', () => {
+    document.getElementById('sampleIcon').innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
+    document.getElementById('sampleFill').style.width = '0%';
+    document.getElementById('sampleTime').textContent = '0:00';
+  });
+})();
 
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
