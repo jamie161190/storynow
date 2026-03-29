@@ -23,7 +23,7 @@ export default async (req) => {
 
     if (type === 'purchase') {
       subject = `${childName}'s story is ready! 🎧`;
-      html = purchaseEmail(childName, category, length);
+      html = purchaseEmail(childName, category, length, to);
     } else if (type === 'gift') {
       subject = `${giftFrom} made something special for ${childName} 🎁`;
       html = giftEmail(childName, giftFrom, giftMessage);
@@ -63,7 +63,7 @@ export default async (req) => {
   }
 };
 
-function purchaseEmail(childName, category, length) {
+function purchaseEmail(childName, category, length, customerEmail) {
   const lengthLabel = length === 'epic' ? 'Epic (~30 min)' : length === 'long' ? 'Extended (~15 min)' : 'Classic (~5 min)';
   const categoryLabel = category === 'learning' ? 'Learning Adventure' : category === 'journey' ? 'Journey Story' : 'Bedtime Story';
 
@@ -88,8 +88,14 @@ function purchaseEmail(childName, category, length) {
         <p style="margin:0 0 4px;font-size:13px;color:#999;">Length</p>
         <p style="margin:0;font-size:15px;color:#2D2844;font-weight:600;">${lengthLabel}</p>
       </div>
+      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
+        You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email:
+      </p>
+      <div style="background:#F8F5FF;border-radius:10px;padding:12px;text-align:center;margin:0 0 20px;">
+        <p style="margin:0;font-size:16px;font-weight:700;color:#7C5CFC;">${customerEmail}</p>
+      </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        You can replay and download the story any time from the page where you created it. We hope ${childName} loves every second of it.
+        We hope ${childName} loves every second of it.
       </p>
       <div style="text-align:center;">
         <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
