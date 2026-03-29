@@ -27,6 +27,9 @@ export default async (req) => {
     } else if (type === 'gift') {
       subject = `${giftFrom} made something special for ${childName} 🎁`;
       html = giftEmail(childName, giftFrom, giftMessage);
+    } else if (type === 'share') {
+      subject = `Someone shared ${childName}'s story with you 🎧`;
+      html = shareEmail(childName, giftFrom, giftMessage);
     } else {
       return new Response(JSON.stringify({ error: 'Invalid email type' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
@@ -125,6 +128,40 @@ function giftEmail(childName, giftFrom, giftMessage) {
       <p style="color:#999;font-size:13px;text-align:center;line-height:1.5;margin:0;">
         This story was made with love using Storytold, where every child becomes the hero of their own audio adventure.
       </p>
+    </div>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
+  </div>
+</body>
+</html>`;
+}
+
+function shareEmail(childName, fromName, message) {
+  return `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <h1 style="color:#7C5CFC;font-size:28px;margin:0;">Storytold</h1>
+    </div>
+    <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+      <p style="font-size:32px;text-align:center;margin:0 0 8px;">🎧</p>
+      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">Listen to ${childName}'s story!</h2>
+      <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
+        ${fromName} shared a personalised audio story made for ${childName}. It is a one of a kind story where ${childName} is the star of the adventure.
+      </p>
+      ${message ? `
+      <div style="background:#F8F5FF;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #7C5CFC;">
+        <p style="margin:0 0 4px;font-size:13px;color:#999;">Message from ${fromName}:</p>
+        <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${message}"</p>
+      </div>` : ''}
+      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
+        Want to create a personalised story for a child in your life? Every child deserves to be the hero of their own adventure.
+      </p>
+      <div style="text-align:center;">
+        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Create a story</a>
+      </div>
     </div>
     <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
   </div>
