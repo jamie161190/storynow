@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
+  <defs>
+    <linearGradient id="bookGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7C5CFC"/>
+      <stop offset="100%" style="stop-color:#9B7FFF"/>
+    </linearGradient>
+    <linearGradient id="sparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF8C42"/>
+      <stop offset="100%" style="stop-color:#FFB347"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Book icon with headphone arc -->
+  <g transform="translate(10, 10)">
+    <!-- Open book -->
+    <path d="M12 70 Q12 30 40 25 L40 65 Q12 70 12 70Z" fill="url(#bookGrad)" opacity="0.85"/>
+    <path d="M68 70 Q68 30 40 25 L40 65 Q68 70 68 70Z" fill="url(#bookGrad)"/>
+
+    <!-- Headphone arc over the book -->
+    <path d="M8 52 Q8 18 40 12 Q72 18 72 52" fill="none" stroke="url(#sparkGrad)" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Headphone ear pieces -->
+    <rect x="3" y="48" width="12" height="18" rx="6" fill="url(#sparkGrad)"/>
+    <rect x="65" y="48" width="12" height="18" rx="6" fill="url(#sparkGrad)"/>
+
+    <!-- Sound waves from book -->
+    <path d="M52 38 Q58 35 52 30" fill="none" stroke="#FFB347" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    <path d="M56 42 Q64 37 56 28" fill="none" stroke="#FFB347" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="95" y="67" font-family="'Nunito', 'Quicksand', 'Rounded Mplus 1c', sans-serif" font-size="52" font-weight="800" letter-spacing="-1">
+    <tspan fill="#2D2844">Story</tspan><tspan fill="#7C5CFC">told</tspan>
+  </text>
+
+  <!-- Decorative dot -->
+  <circle cx="355" cy="62" r="5" fill="#FF8C42"/>
+</svg>

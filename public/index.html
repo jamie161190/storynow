@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Storytold | A story made just for them</title>
 <meta name="description" content="Personalised audio stories that know your child by name. Bedtime stories, learning adventures, and journey tales created just for them.">
+<link rel="icon" type="image/png" href="/favicon.png">
 
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -89,10 +90,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
 /* ===== LANDING ===== */
 .landing{text-align:center;gap:1.2rem;padding-top:2.5rem;padding-bottom:4rem}
-.logo-wrap{position:relative;display:inline-block}
-.logo-mark{font-family:'Nunito',sans-serif;font-size:3.2rem;font-weight:900;color:var(--text);letter-spacing:-1px;line-height:1}
-.logo-mark span{color:var(--purple)}
-.logo-sparkle{position:absolute;top:-8px;right:-16px;font-size:1.4rem;animation:sparkle 2s ease-in-out infinite}
+.logo-wrap{position:relative;display:inline-block;margin-bottom:0.5rem}
+.logo-img{width:260px;height:auto}
 @keyframes sparkle{0%,100%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.2) rotate(15deg);opacity:0.7}}
 
 .hero-badge{display:inline-flex;align-items:center;gap:0.4rem;background:var(--purple-light);color:var(--purple);font-size:0.8rem;font-weight:700;padding:0.4rem 1rem;border-radius:var(--radius-full);letter-spacing:0.02em}
@@ -272,7 +271,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
-  .logo-mark{font-size:2.6rem}
+  .logo-img{width:220px}
   .tagline{font-size:1.25rem}
   .length-cards{flex-direction:column}
   .trust-row{flex-direction:column;gap:0.5rem}
@@ -295,8 +294,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
   <!-- HERO -->
   <div class="logo-wrap">
-    <div class="logo-mark">story<span>told</span></div>
-    <div class="logo-sparkle">&#10024;</div>
+    <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">your child</span> by name.</h1>
   <p class="hero-text">Their name. Their best friend. Their pet. Their world. Told by a narrator, in a story that could only ever exist for them. Ready in 30 seconds.</p>
