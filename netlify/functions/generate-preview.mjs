@@ -46,7 +46,28 @@ This story will be read aloud by a narrator. Write for how it sounds, not how it
 Never write anything that could apply to any child. No "they were so brave" without showing WHY. No "it was the best day ever" without earning it. Every sentence should feel like it could only exist in THIS child's story.
 
 8. START IMMEDIATELY
-No preamble. No "Once upon a time" unless it genuinely serves the story. Drop the listener straight into a moment. The first sentence should make a parent lean in.`;
+No preamble. No "Once upon a time" unless it genuinely serves the story. Drop the listener straight into a moment. The first sentence should make a parent lean in.
+
+9. PACING BY LENGTH
+Short stories (~5 min, ~750 words): One clear arc. Setup, one complication, resolution. Tight and satisfying.
+
+Medium stories (~10 min, ~1500 words): Three act structure with ESCALATION.
+- Act 1 (first 25%): Drop straight into the world. Establish the child, the friend, the situation. End act 1 with a problem or discovery.
+- Act 2 (middle 50%): The heart of the story. Must contain AT LEAST two distinct scenes in different locations or situations. Include a "wait, what?" twist at roughly the midpoint that changes what the child thought was happening. Dialogue should dominate this section, not narration. Shift emotions: funny then tense, exciting then tender.
+- Act 3 (final 25%): The payoff. A callback to something from earlier in the story. The child solves the final challenge using something they learned along the way. For bedtime stories, this act slows down gradually into warmth and sleep.
+
+Long stories (~15 min, ~2200 words): Four act structure with SUBPLOTS and SURPRISES.
+- Act 1 (first 20%): Immediate hook. The child and friend are dropped into a situation that demands action.
+- Act 2 (20% to 50%): The adventure deepens. Introduce a secondary character or subplot (a quirky helper, a rival, a mystery within the mystery). At least THREE distinct scenes with location or situation changes. Every 300 words, something new must happen: a new character speaks, the setting shifts, a discovery is made, or an obstacle appears.
+- Act 3 (50% to 80%): The twist. What the child thought was the problem is not the real problem. The real challenge is bigger, more personal, more meaningful. The friend or pet has a standout moment here. Dialogue is at its peak. Include a moment of doubt or setback that the child must push through.
+- Act 4 (final 20%): Resolution with emotional depth. The child succeeds but not through luck. A callback to an earlier detail pays off ("Remember when..."). For bedtime, wind down slowly. For adventures, end on a high with a hint that more adventures are possible.
+
+CRITICAL FOR ALL STORIES LONGER THAN 5 MINUTES:
+- Change the scene or setting at least once every 2 to 3 minutes of narration (~300 words). New room, new landscape, new situation. The ear craves fresh stimulus.
+- At least 40% of the story should be dialogue, not narration. Kids zone out during long descriptive passages. Characters talking to each other is what holds attention.
+- Plant something early that pays off later. A throwaway detail in act 1 becomes the key to solving the problem in act 3. This makes the child feel like the story was designed just for them (because it was).
+- Vary sentence rhythm deliberately. Three short punchy sentences. Then one long flowing one that carries them forward. Then a one word sentence. Boom. This creates a natural audio rhythm that holds attention.
+- Include at least one moment where a character says the child's name directly in dialogue ("Come on, Chase, we have got this!"). This snaps the child's attention back every time.`;
 
 // ============================================================
 // AGE BAND INSTRUCTIONS: appended to each prompt
@@ -109,6 +130,8 @@ ${characterBlock(d)}
 
 SENSORY LANGUAGE: Use warmth, soft light, gentle sounds, cosiness. Stars, blankets, rain on windows, a cat purring. Make the listener feel sleepy.
 
+${d.length !== 'standard' ? 'LONGER BEDTIME PACING: For medium and long bedtime stories, the first half can be a gentle journey or discovery with soft excitement. But the energy must drop steadily from the midpoint onwards. The final third should feel like sinking into a warm bath. Sentences get shorter. The world gets quieter. Sounds become softer. By the last few paragraphs, the child should already be drifting.' : ''}
+
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
 ${getAgeBand(d.age)}
@@ -120,7 +143,7 @@ TONE: Exciting, fast paced, gripping. This story is designed to be listened to o
 
 ${characterBlock(d)}
 
-STRUCTURE: ${d.length === 'epic' ? '8 to 10 chapters with rich cliffhangers and subplots' : d.length === 'long' ? '5 to 6 chapters with strong cliffhangers' : '3 short chapters with 2 cliffhangers'}. Each chapter ends at a moment of maximum tension. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
+STRUCTURE: ${d.length === 'epic' ? '4 acts with 5 to 6 distinct scenes, at least 2 twists, and a subplot involving the best friend or a new character' : d.length === 'long' ? '3 acts with 3 to 4 distinct scenes and a midpoint twist that changes everything' : '1 clear arc with a complication and resolution'}. Scene transitions should be sharp. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
 
 PACING: Quick. Dialogue heavy. Short action beats. Minimal description, just enough to set the scene. Think movie, not novel.
 
@@ -169,7 +192,7 @@ THE PATTERN FOR EVERY CHALLENGE:
 The child listening at home shouts the answer during the pause. The narrator then confirms it. The child feels like the story is talking directly to them.
 
 YOU MUST:
-1. Include at least ${d.length === 'epic' ? '12 to 15' : d.length === 'long' ? '7 to 9' : '4 to 5'} interactive pause moments
+1. Include at least ${d.length === 'epic' ? '8 to 10' : d.length === 'long' ? '5 to 7' : '4 to 5'} interactive pause moments
 2. Build difficulty gradually (start easy, get harder)
 3. The challenges must be genuinely age-appropriate for a ${d.age} year old
 4. Have the friend or pet help with one of the easier challenges
@@ -206,7 +229,7 @@ export default async (req) => {
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const tokenMap = { standard: 1800, long: 5000, epic: 8000 };
+    const tokenMap = { standard: 1800, long: 4000, epic: 5500 };
     const maxTokens = tokenMap[storyData.length] || 1800;
 
     const storyResponse = await anthropic.messages.create({
