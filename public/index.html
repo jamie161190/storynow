@@ -1027,6 +1027,73 @@ function goTo(id) {
   window.scrollTo(0,0);
   if(id === 'screenVoice') showVoices();
   if(id === 'screenExtras') updateExtrasVisibility();
+  if(id === 'screenCategory') restoreCategory();
+  if(id === 'screenDetails') restoreDetails();
+  if(id === 'screenLength') restoreLength();
+}
+
+function restoreCategory() {
+  if (!storyData.category) return;
+  document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
+  const map = { bedtime: '.cat-bedtime', journey: '.cat-journey', learning: '.cat-learning', custom: '.cat-custom' };
+  const el = document.querySelector(map[storyData.category]);
+  if (el) el.classList.add('selected');
+}
+
+function restoreDetails() {
+  if (storyData.childName) document.getElementById('childName').value = storyData.childName;
+  if (storyData.age) document.getElementById('age').value = storyData.age;
+  if (storyData.gender) document.getElementById('gender').value = storyData.gender;
+  if (storyData.friendName) document.getElementById('friendName').value = storyData.friendName;
+  if (storyData.proudOf) document.getElementById('proudOf').value = storyData.proudOf;
+  if (storyData.familyMembers) document.getElementById('familyMembers').value = storyData.familyMembers;
+  if (storyData.teacherName) document.getElementById('teacherName').value = storyData.teacherName;
+  if (storyData.petName) document.getElementById('petName').value = storyData.petName;
+  if (storyData.petType) document.getElementById('petType').value = storyData.petType;
+  if (storyData.favTeddy) document.getElementById('favTeddy').value = storyData.favTeddy;
+  if (storyData.customWhere) document.getElementById('customWhere').value = storyData.customWhere;
+  if (storyData.subject) document.getElementById('subject').value = storyData.subject;
+  if (storyData.learningGoal) document.getElementById('learningGoal').value = storyData.learningGoal;
+  if (storyData.customScenario) document.getElementById('customScenario').value = storyData.customScenario;
+  if (storyData.extraDetails) document.getElementById('extraDetails').value = storyData.extraDetails;
+  if (storyData.personalMessage) document.getElementById('personalMessage').value = storyData.personalMessage;
+  if (storyData.hasPet) {
+    const pt = document.getElementById('petToggle');
+    if (pt && !pt.classList.contains('on')) pt.classList.add('on');
+    const pf = document.getElementById('petFields');
+    if (pf) pf.style.display = 'block';
+  }
+  if (storyData.isGift) {
+    const gt = document.getElementById('giftToggle');
+    if (gt && !gt.classList.contains('on')) gt.classList.add('on');
+    const gf = document.getElementById('giftFields');
+    if (gf) gf.style.display = 'block';
+    if (storyData.giftEmail) document.getElementById('giftEmail').value = storyData.giftEmail;
+    if (storyData.giftFrom) document.getElementById('giftFrom').value = storyData.giftFrom;
+    if (storyData.giftMessage) document.getElementById('giftMessage').value = storyData.giftMessage;
+  }
+  // Restore theme selections
+  if (storyData.themes && storyData.themes.length) {
+    document.querySelectorAll('.theme-tile').forEach(t => {
+      if (storyData.themes.includes(t.dataset.theme)) t.classList.add('selected');
+    });
+  }
+  // Restore where selection
+  if (storyData.where) {
+    document.querySelectorAll('.where-tile').forEach(t => {
+      if (t.dataset.where === storyData.where) t.classList.add('selected');
+    });
+  }
+}
+
+function restoreLength() {
+  if (!storyData.length) return;
+  document.querySelectorAll('.length-card').forEach(c => c.classList.remove('selected'));
+  const labels = { standard: 'Classic', long: 'Extended', epic: 'Epic' };
+  document.querySelectorAll('.length-card').forEach(c => {
+    const name = c.querySelector('.len-name');
+    if (name && name.textContent === labels[storyData.length]) c.classList.add('selected');
+  });
 }
 
 function selectCategory(cat, el) {
