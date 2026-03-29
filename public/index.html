@@ -4,6 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Storytold | A story made just for them</title>
+<meta name="description" content="Personalised audio stories that know your child by name. Bedtime stories, learning adventures, and journey tales created just for them.">
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+<!-- End Google Tag Manager -->
+
+<!-- Google Analytics (GA4) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XXXXXXXXXX');
+</script>
+<!-- End Google Analytics -->
+
+<!-- Meta Pixel -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', 'XXXXXXXXXXXXXXXXX');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=XXXXXXXXXXXXXXXXX&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel -->
+
+<!-- TikTok Pixel -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+  ttq.load('XXXXXXXXXXXXXXXXX');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- End TikTok Pixel -->
+
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -161,6 +207,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .length-card .len-emoji{font-size:1.8rem;margin-bottom:0.4rem}
 .length-card .len-name{font-size:0.88rem;font-weight:800;color:var(--text);font-family:'Nunito',sans-serif}
 .length-card .len-time{font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:0.15rem}
+.length-card .len-price{font-size:0.95rem;font-weight:800;color:var(--purple);margin-top:0.35rem;font-family:'Nunito',sans-serif}
 
 /* ===== VOICE CARDS ===== */
 .voice-cards{display:flex;flex-direction:column;gap:0.75rem;width:100%}
@@ -233,6 +280,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <!-- LANDING -->
 <div class="screen landing active" id="screenLanding">
@@ -595,16 +645,19 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <div class="len-emoji">&#127769;</div>
       <div class="len-name">Classic</div>
       <div class="len-time">~5 min</div>
+      <div class="len-price">£2.99</div>
     </div>
     <div class="length-card" onclick="selectLength('long',this)">
       <div class="len-emoji">&#128214;</div>
       <div class="len-name">Extended</div>
       <div class="len-time">~15 min</div>
+      <div class="len-price">£4.99</div>
     </div>
     <div class="length-card" onclick="selectLength('epic',this)">
       <div class="len-emoji">&#128640;</div>
       <div class="len-name">Epic</div>
       <div class="len-time">~30 min</div>
+      <div class="len-price">£7.99</div>
     </div>
   </div>
   <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="goTo('screenVoice')">Continue</button>
@@ -643,7 +696,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <audio id="previewAudio"></audio>
     <audio id="fullAudio"></audio>
     <div id="previewError"></div>
-    <button class="unlock-btn" onclick="unlockFull()">&#128275; Unlock the full story</button>
+    <button class="unlock-btn" onclick="unlockFull()">&#128275; Unlock the full story <span id="unlockPriceTag"></span></button>
     <p class="unlock-price">One time purchase. Yours forever.</p>
   </div>
 </div>
@@ -713,6 +766,20 @@ const VOICES = {
   ]
 };
 
+// Tracking helper: fires events to all pixels
+function trackEvent(eventName, params) {
+  try {
+    // GA4
+    if(typeof gtag === 'function') gtag('event', eventName, params || {});
+    // Meta Pixel
+    if(typeof fbq === 'function') fbq('track', eventName, params || {});
+    // TikTok
+    if(typeof ttq !== 'undefined' && ttq.track) ttq.track(eventName, params || {});
+    // GTM dataLayer
+    if(window.dataLayer) window.dataLayer.push({ event: eventName, ...params });
+  } catch(e) { /* silent */ }
+}
+
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -725,6 +792,7 @@ function selectCategory(cat, el) {
   storyData.category = cat;
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+  trackEvent('ViewContent', { content_name: cat, content_category: 'story_type' });
   setTimeout(() => goTo('screenDetails'), 300);
 }
 
@@ -835,6 +903,7 @@ function showVoices() {
 }
 
 async function generatePreview() {
+  trackEvent('AddToCart', { content_name: storyData.category, value: storyData.length === 'epic' ? 7.99 : storyData.length === 'long' ? 4.99 : 2.99, currency: 'GBP' });
   goTo('screenLoading');
   try {
     const res = await fetch('/api/generate-preview', {
@@ -847,6 +916,9 @@ async function generatePreview() {
     fullStoryText = data.fullStory;
     const audio = document.getElementById('previewAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
+    // Show price on unlock button
+    const priceTag = document.getElementById('unlockPriceTag');
+    if(priceTag) priceTag.textContent = PRICES[storyData.length] || '£2.99';
     goTo('screenPreview');
   } catch(err) {
     goTo('screenVoice');
@@ -859,11 +931,73 @@ function playPreview() {
   if(audio.paused) audio.play(); else audio.pause();
 }
 
+const PRICES = { standard: '£2.99', long: '£4.99', epic: '£7.99' };
+
 async function unlockFull() {
+  trackEvent('InitiateCheckout', { value: storyData.length === 'epic' ? 7.99 : storyData.length === 'long' ? 4.99 : 2.99, currency: 'GBP', content_name: storyData.category });
   goTo('screenLoading');
-  document.querySelector('.loading-text').textContent = 'Generating the full story...';
-  document.querySelector('.loading-sub').textContent = 'Almost there. This is going to be special.';
+  document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
+  document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';
   try {
+    // Save story data so we can retrieve it after Stripe redirect
+    sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, fullStoryText, selectedVoiceId }));
+
+    const res = await fetch('/api/create-checkout', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ storyData, priceTier: storyData.length })
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.error || 'Something went wrong');
+    // Redirect to Stripe Checkout
+    window.location.href = data.checkoutUrl;
+  } catch(err) {
+    goTo('screenPreview');
+    alert('Something went wrong: ' + err.message);
+  }
+}
+
+// Handle return from Stripe checkout
+async function handleStripeReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+  if (!sessionId) return;
+
+  // Clean the URL
+  window.history.replaceState({}, '', window.location.pathname);
+
+  // Restore saved story data
+  const saved = sessionStorage.getItem('storytold_story');
+  if (!saved) {
+    alert('Session expired. Please create your story again.');
+    return;
+  }
+  const { storyData: savedData, fullStoryText: savedStory, selectedVoiceId: savedVoice } = JSON.parse(saved);
+  Object.assign(storyData, savedData);
+  fullStoryText = savedStory;
+  selectedVoiceId = savedVoice;
+
+  // Verify payment
+  goTo('screenLoading');
+  document.querySelector('.loading-text').textContent = 'Confirming your payment...';
+  document.querySelector('.loading-sub').textContent = 'Just a moment while we verify everything.';
+
+  try {
+    const verifyRes = await fetch('/api/verify-payment', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ session_id: sessionId })
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyData.success) throw new Error('Payment not confirmed. Please contact support.');
+
+    // Fire Purchase event across all pixels
+    trackEvent('Purchase', { value: storyData.length === 'epic' ? 7.99 : storyData.length === 'long' ? 4.99 : 2.99, currency: 'GBP', content_name: storyData.category });
+
+    // Payment confirmed, now generate full audio
+    document.querySelector('.loading-text').textContent = 'Generating the full story...';
+    document.querySelector('.loading-sub').textContent = 'Almost there. This is going to be special.';
+
     const res = await fetch('/api/generate-full', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -871,16 +1005,20 @@ async function unlockFull() {
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.error || 'Something went wrong');
+
     const audio = document.getElementById('fullStoryAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.fullAudio;
     document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
     document.getElementById('sendGiftBtn').style.display = storyData.isGift ? 'block' : 'none';
     document.getElementById('giftSentMsg').style.display = 'none';
     document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
+
+    // Clear saved session
+    sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
   } catch(err) {
-    goTo('screenPreview');
     alert('Something went wrong: ' + err.message);
+    goTo('screenLanding');
   }
 }
 
@@ -913,12 +1051,14 @@ function formatTime(s) {
   return m + ':' + (sec < 10 ? '0' : '') + sec;
 }
 
-// Reset icon when audio ends
+// Reset icon when audio ends + handle Stripe return
 document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('fullStoryAudio');
   if(audio) audio.addEventListener('ended', () => {
     document.getElementById('fullPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
   });
+  // Check if returning from Stripe checkout
+  handleStripeReturn();
 });
 
 function downloadStory() {
