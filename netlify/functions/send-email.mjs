@@ -13,7 +13,7 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Missing type or recipient email' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const apiKey = typeof Netlify !== 'undefined' ? Netlify.env.get('RESEND_API_KEY') : process.env.RESEND_API_KEY;
+    const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.error('RESEND_API_KEY not set');
       return new Response(JSON.stringify({ error: 'Email service not configured' }), { status: 500, headers: { 'Content-Type': 'application/json' } });

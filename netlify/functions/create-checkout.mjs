@@ -1,39 +1,36 @@
 import Stripe from 'stripe';
 
-const PRICING = {
-  standard: { duration: 'standard (5 min)', price: 299, currency: 'gbp' },
-  long: { duration: 'long (15 min)', price: 499, currency: 'gbp' },
-  epic: { duration: 'epic (30 min)', price: 799, currency: 'gbp' }
-};
-
 export default async (req) => {
   try {
     if (req.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const { storyData, priceTier } = await req.json();
+    const body = await req.json();
+    const storyData = body.storyData || {};
+    const childName = storyData.childName || body.childName || 'your child';
 
-    if (!storyData || !priceTier || !PRICING[priceTier]) {
-      return new Response(JSON.stringify({ error: 'Invalid storyData or priceTier' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    console.log('Stripe key exists:', !!stripeKey, 'Length:', stripeKey ? stripeKey.length : 0);
+
+    if (!stripeKey) {
+      return new Response(JSON.stringify({ error: 'Stripe not configured' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const stripe = new Stripe(typeof Netlify !== 'undefined' ? Netlify.env.get('STRIPE_SECRET_KEY') : process.env.STRIPE_SECRET_KEY);
-    const siteUrl = req.headers.get('origin') || process.env.URL || 'https://storytold.netlify.app';
-    const pricing = PRICING[priceTier];
+    const stripe = new Stripe(stripeKey);
+    const siteUrl = req.headers.get('origin') || process.env.URL || 'https://storytold.ai';
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
-            currency: pricing.currency,
+            currency: 'gbp',
             product_data: {
-              name: `Storytold - ${pricing.duration} story`,
-              description: `Personalized story for ${storyData.childName}`,
-              images: [] // Add image URL if available
+              name: 'Storytold: Personalised Audio Story',
+              description: `A personalised story for ${childName}`
             },
-            unit_amount: pricing.price
+            unit_amount: 1999
           },
           quantity: 1
         }
@@ -42,10 +39,9 @@ export default async (req) => {
       success_url: `${siteUrl}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: siteUrl,
       metadata: {
-        childName: storyData.childName,
-        priceTier: priceTier,
-        category: storyData.category,
-        length: storyData.length
+        childName: childName,
+        category: storyData.category || '',
+        length: storyData.length || ''
       }
     });
 

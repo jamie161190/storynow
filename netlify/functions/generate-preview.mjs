@@ -205,7 +205,7 @@ export default async (req) => {
     const promptFn = STORY_PROMPTS[storyData.category];
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
-    const anthropic = new Anthropic({ apiKey: typeof Netlify !== 'undefined' ? Netlify.env.get('ANTHROPIC_API_KEY') : process.env.ANTHROPIC_API_KEY });
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const tokenMap = { standard: 1800, long: 5000, epic: 8000 };
     const maxTokens = tokenMap[storyData.length] || 1800;
 
@@ -225,7 +225,7 @@ export default async (req) => {
     const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
       method: 'POST',
       headers: {
-        'xi-api-key': typeof Netlify !== 'undefined' ? Netlify.env.get('ELEVENLABS_API_KEY') : process.env.ELEVENLABS_API_KEY,
+        'xi-api-key': process.env.ELEVENLABS_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
