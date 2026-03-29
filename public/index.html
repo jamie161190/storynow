@@ -78,6 +78,22 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .shape-4{width:100px;height:100px;background:var(--pink);bottom:10%;right:5%;animation:float 9s ease-in-out infinite 2s}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
 
+/* ===== EMOTIONAL HOOK ===== */
+.emotion-block{background:linear-gradient(135deg,var(--purple-light),#F5F0FF);border-radius:var(--radius-lg);padding:2rem 1.5rem;margin-top:1rem;width:100%;max-width:440px;text-align:center;position:relative;overflow:hidden}
+.emotion-block::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(124,92,252,0.06)}
+.emotion-block::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,140,66,0.06)}
+.emotion-quote{font-family:'Nunito',sans-serif;font-size:1.35rem;font-weight:900;color:var(--purple);margin-bottom:0.75rem;line-height:1.3}
+.emotion-text{font-size:0.88rem;color:var(--text-soft);line-height:1.7;font-weight:500}
+
+/* ===== HOW IT WORKS ===== */
+.how-it-works{width:100%;max-width:440px;margin-top:1.5rem}
+.how-title{font-family:'Nunito',sans-serif;font-size:1.2rem;font-weight:900;color:var(--text);text-align:center;margin-bottom:1.25rem}
+.how-steps{display:flex;flex-direction:column;gap:1rem}
+.how-step{display:flex;align-items:flex-start;gap:0.85rem}
+.step-number{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;flex-shrink:0}
+.step-content h4{font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin-bottom:0.15rem}
+.step-content p{font-size:0.82rem;color:var(--text-soft);line-height:1.5;font-weight:500}
+
 /* ===== BACK BUTTON ===== */
 .back-btn{background:var(--purple-light);border:none;color:var(--purple);font-size:0.85rem;font-weight:700;cursor:pointer;padding:0.5rem 1rem;margin-bottom:1.5rem;align-self:flex-start;font-family:'Quicksand',sans-serif;border-radius:var(--radius-full);transition:all 0.2s}
 .back-btn:hover{background:var(--purple);color:#fff}
@@ -211,6 +227,42 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <span class="trust-item"><span class="trust-icon">&#9889;</span> Ready in 30 seconds</span>
     <span class="trust-item"><span class="trust-icon">&#9654;&#65039;</span> Free preview</span>
   </div>
+
+  <!-- EMOTIONAL HOOK -->
+  <div class="emotion-block">
+    <p class="emotion-quote">"Mummy, that story knew my name!"</p>
+    <p class="emotion-text">That is the moment. Their eyes go wide. Their mouth drops open. Because this story knows their name, their best friend, their favourite thing in the world. It is not a book with a name swapped in. It is a story that could only ever exist for them, read aloud by a voice they will want to hear again and again.</p>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-it-works">
+    <h3 class="how-title">How it works</h3>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-number" style="background:var(--purple-light);color:var(--purple)">1</div>
+        <div class="step-content">
+          <h4>Tell us about them</h4>
+          <p>Their name, age, best friend, what they love. The details that make it theirs.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-number" style="background:var(--orange-light);color:var(--orange)">2</div>
+        <div class="step-content">
+          <h4>Pick a narrator voice</h4>
+          <p>Choose who reads the story aloud. Warm and gentle for bedtime, bold and exciting for adventures.</p>
+        </div>
+      </div>
+      <div class="how-step">
+        <div class="step-number" style="background:var(--green-light);color:var(--green)">3</div>
+        <div class="step-content">
+          <h4>Listen to the magic</h4>
+          <p>In 30 seconds, hear a free preview. Love it? Unlock the full story, yours forever.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;max-width:340px" onclick="goTo('screenCategory')">Create their story</button>
 </div>
 
 <!-- CATEGORY -->
