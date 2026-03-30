@@ -498,8 +498,8 @@ export default async (req) => {
     return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
   } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    console.error('Generate preview error:', err.message, err.stack);
+    return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.', debug: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
 
