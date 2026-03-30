@@ -2021,7 +2021,7 @@ async function unlockFull() {
     }
     if (!data || !data.success) throw new Error('Audio generation failed. Please try again.');
     const audio = document.getElementById('fullStoryAudio');
-    audio.src = 'data:audio/mpeg;base64,' + data.fullAudio;
+    audio.src = data.audioUrl || ('data:audio/mpeg;base64,' + data.fullAudio);
     document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
     document.getElementById('fullTitle').textContent = storyData.childName + "'s story is ready";
     document.getElementById('sendGiftBtn').style.display = 'none';
@@ -2128,7 +2128,7 @@ async function handleStripeReturn() {
     if (!data || !data.success) throw new Error('Audio generation timed out. Your payment is safe. Please contact hello@storytold.ai');
 
     const audio = document.getElementById('fullStoryAudio');
-    audio.src = 'data:audio/mpeg;base64,' + data.fullAudio;
+    audio.src = data.audioUrl || ('data:audio/mpeg;base64,' + data.fullAudio);
     document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
     document.getElementById('sendGiftBtn').style.display = storyData.isGift ? 'block' : 'none';
     document.getElementById('giftSentMsg').style.display = 'none';

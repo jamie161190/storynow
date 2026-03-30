@@ -55,6 +55,15 @@ export default async (req) => {
       });
     }
 
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      return new Response(JSON.stringify({ error: 'Storage not configured' }), {
+        status: 503, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
 
     const startTime = Date.now();
@@ -98,48 +107,37 @@ export default async (req) => {
       offset += buf.byteLength;
     }
 
-    const audioBase64 = Buffer.from(combined).toString('base64');
-    console.log('Total full audio time:', Date.now() - startTime, 'ms, size:', Math.round(audioBase64.length / 1024), 'KB');
+    console.log('Total full audio time:', Date.now() - startTime, 'ms, size:', Math.round(totalLength / 1024), 'KB');
 
-    // Upload to Supabase Storage
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-    let audioUrl = null;
+    // Upload audio to Supabase Storage (always use URL, never inline base64 for full stories)
+    const safeName = (childName || 'story').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+    const fileName = `${Date.now()}-${safeName}.mp3`;
 
-    if (supabaseUrl && supabaseKey) {
-      const safeName = (childName || 'story').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-      const fileName = `${Date.now()}-${safeName}.mp3`;
+    const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseKey}`,
+        'apikey': supabaseKey,
+        'Content-Type': 'audio/mpeg',
+        'x-upsert': 'true'
+      },
+      body: combined
+    });
 
-      try {
-        const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
-            'Content-Type': 'audio/mpeg',
-            'x-upsert': 'true'
-          },
-          body: combined
-        });
-
-        if (uploadRes.ok) {
-          audioUrl = `${supabaseUrl}/storage/v1/object/public/stories/${fileName}`;
-        } else {
-          console.error('Storage upload error:', await uploadRes.text());
-        }
-      } catch (uploadErr) {
-        console.error('Storage upload failed:', uploadErr.message);
-      }
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text();
+      console.error('Storage upload error:', errText);
+      throw new Error('Failed to save audio file');
     }
 
-    const result = {
-      success: true,
-      fullAudio: audioBase64,
-      audioUrl: audioUrl
-    };
+    const audioUrl = `${supabaseUrl}/storage/v1/object/public/stories/${fileName}`;
+    console.log('Audio uploaded:', audioUrl);
+
+    // Small response: just the URL (no base64, which would exceed Netlify's 6MB response limit)
+    const result = { success: true, audioUrl };
 
     // Save result to Supabase so frontend can retrieve it if HTTP connection timed out
-    if (jobId && supabaseUrl && supabaseKey) {
+    if (jobId) {
       try {
         await fetch(`${supabaseUrl}/storage/v1/object/stories/full-jobs/${jobId}.json`, {
           method: 'POST',
