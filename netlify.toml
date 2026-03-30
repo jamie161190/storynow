@@ -15,6 +15,9 @@
 [functions."generate-full"]
   external_node_modules = ["stripe"]
 
+[functions."create-discount"]
+  external_node_modules = ["stripe"]
+
 
 [[edge_functions]]
   path = "/"

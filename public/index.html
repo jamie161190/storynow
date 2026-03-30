@@ -2574,7 +2574,7 @@ async function unlockFull() {
       // (Normal flow saves via handleStripeReturn and gets a real DB ID)
       lastSavedStoryId = fakeSessionId;
       goTo('screenFull');
-      showNextStoryBanner();
+      showNextStoryBanner(previewEmail);
     } catch(err) {
       alert('Something went wrong: ' + err.message);
       goTo('screenPreview');
@@ -2753,7 +2753,7 @@ async function handleStripeReturn() {
     window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
-    showNextStoryBanner();
+    showNextStoryBanner(verifyData.customerEmail);
   } catch(err) {
     // Always offer retry after payment failure. The session_id is still in the URL
     // (we no longer clean it early), so a reload will re-trigger handleStripeReturn.
@@ -2872,9 +2872,25 @@ function copyDiscountCode() {
   }).catch(() => {});
 }
 
-function showNextStoryBanner() {
+async function showNextStoryBanner(email) {
   const banner = document.getElementById('nextStoryBanner');
-  if (banner) banner.style.display = 'block';
+  if (!banner) return;
+  try {
+    const res = await fetch('/api/create-discount', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customerEmail: email || '' })
+    });
+    const data = await res.json();
+    if (data.success && data.code) {
+      document.getElementById('nsbCode').textContent = data.code;
+      document.querySelector('.nsb-sub').textContent = `Use this code at checkout for ${data.percentOff}% off your next story`;
+      banner.style.display = 'block';
+    }
+  } catch (e) {
+    console.error('Failed to generate discount code:', e);
+    // Don't show the banner if we couldn't generate a code
+  }
 }
 
 async function downloadStory() {
