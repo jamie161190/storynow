@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const WORD_COUNTS = { standard: 750, long: 1500, epic: 2200 };
+const WORD_COUNTS = { standard: 750, long: 2200, epic: 2200 };
 
 // ============================================================
 // SYSTEM PROMPT: This is the single most important piece of
@@ -142,11 +142,11 @@ ${getAgeBand(d.age)}
 Write the story now. Start immediately, no preamble.`,
 
   journey: (d) => `STORY TYPE: Journey / Adventure
-TONE: Exciting, gripping, but with emotional range. This story is designed to be listened to on a long car ride, flight, or train journey. The child cannot look at anything else, so the story IS their entire world for the next ${d.length === 'epic' ? '15' : d.length === 'long' ? '10' : '5'} minutes. It must hold them completely.
+TONE: Exciting, gripping, but with emotional range. This story is designed to be listened to on a long car ride, flight, or train journey. The child cannot look at anything else, so the story IS their entire world for the next ${d.length === 'standard' ? '5' : '15'} minutes. It must hold them completely.
 
 ${characterBlock(d)}
 
-STRUCTURE: ${d.length === 'epic' ? '4 acts with 5 to 6 distinct scenes, at least 2 twists, and a subplot involving the best friend or a new character' : d.length === 'long' ? '3 acts with 3 to 4 distinct scenes and a midpoint twist that changes everything' : '1 clear arc with a complication and resolution'}. Scene transitions should be sharp. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
+STRUCTURE: ${d.length === 'standard' ? '1 clear arc with a complication and resolution' : '4 acts with 5 to 6 distinct scenes, at least 2 twists, and a subplot involving the best friend or a new character'}. Scene transitions should be sharp. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
 
 PACING: Not just fast. VARIED. This is the most important word for journey stories.
 - Alternate between high energy action and quieter character moments. A chase scene, then a funny conversation between ${d.childName} and ${d.friendName}. A discovery, then a moment of doubt. Tension, then a joke that breaks it.
@@ -208,7 +208,7 @@ The child listening at home shouts the answer during the pause. The narrator the
 VARY THE PROMPT PHRASES. Do not use "Can you work it out?" every time. Rotate between: "What do you think?", "Do you know?", "Quick, what is it?", "Can you help?", "Shout it out!", "What comes next?", "${d.friendName} looked at ${d.childName}. Do you know this one?"
 
 YOU MUST:
-1. Include at least ${d.length === 'epic' ? '8 to 10' : d.length === 'long' ? '5 to 7' : '4 to 5'} interactive pause moments
+1. Include at least ${d.length === 'standard' ? '4 to 5' : '8 to 10'} interactive pause moments
 2. Build difficulty gradually (start easy, get harder)
 3. The challenges must be genuinely age-appropriate for a ${d.age} year old
 4. Have the friend or pet help with one of the easier challenges
@@ -271,7 +271,7 @@ export default async (req) => {
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const tokenMap = { standard: 1800, long: 4000, epic: 5500 };
+    const tokenMap = { standard: 1800, long: 5500, epic: 5500 };
     const maxTokens = tokenMap[storyData.length] || 1800;
 
     const startTime = Date.now();
@@ -279,8 +279,9 @@ export default async (req) => {
 
     let storyResponse;
     try {
+      // Use Haiku for speed: stories generate 3-5x faster with similar quality
       storyResponse = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: maxTokens,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: promptFn(storyData) }]
@@ -310,7 +311,7 @@ export default async (req) => {
       },
       body: JSON.stringify({
         text: previewText,
-        model_id: 'eleven_turbo_v2_5',
+        model_id: 'eleven_flash_v2_5',
         voice_settings: { stability: 0.5, similarity_boost: 0.75 }
       })
     });
