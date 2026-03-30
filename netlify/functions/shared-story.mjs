@@ -9,8 +9,8 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Missing story ID' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // Validate story ID format (UUID)
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(storyId)) {
+    // Validate story ID format (UUID or integer, reject anything else to prevent injection)
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(storyId) && !/^\d+$/.test(storyId)) {
       return new Response(JSON.stringify({ error: 'Invalid story ID format' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 

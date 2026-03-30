@@ -360,6 +360,11 @@ export default async (req) => {
         status: 400, headers: { 'Content-Type': 'application/json' }
       });
     }
+    if (storyData?.personalMessage && storyData.personalMessage.length > 500) {
+      return new Response(JSON.stringify({ error: 'Personal message too long' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     const promptFn = STORY_PROMPTS[storyData.category];
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
