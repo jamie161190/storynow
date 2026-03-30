@@ -2222,10 +2222,11 @@ function showReview() {
 
 async function pollForPreview(jobId) {
   const maxAttempts = 40; // 40 x 3s = 120s max wait (Opus + thinking can take a while)
+  const vId = selectedVoiceId || '';
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, 3000));
     try {
-      const res = await fetch('/api/check-preview?jobId=' + jobId);
+      const res = await fetch('/api/check-preview?jobId=' + jobId + '&voiceId=' + encodeURIComponent(vId));
       const data = await res.json();
       if (data.ready && data.success) return data;
     } catch(e) { /* keep polling */ }

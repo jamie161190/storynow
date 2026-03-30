@@ -3,6 +3,15 @@
   publish = "public"
   functions = "netlify/functions"
 
+[functions]
+  node_bundler = "esbuild"
+
+[functions."generate-preview"]
+  external_node_modules = ["@anthropic-ai/sdk"]
+
+[functions."generate-full"]
+  external_node_modules = ["stripe"]
+
 
 [[edge_functions]]
   path = "/"

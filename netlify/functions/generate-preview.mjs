@@ -333,7 +333,7 @@ export default async (req) => {
       );
       if (rlCheck.ok) {
         const recent = await rlCheck.json();
-        if (recent.length >= 5) {
+        if (recent.length >= 20) {
           console.log('Rate limited:', clientIP, recent.length, 'requests in last hour');
           return new Response(JSON.stringify({ error: 'You have reached the preview limit. Please try again later.' }), {
             status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' }
@@ -472,6 +472,28 @@ export default async (req) => {
       storyPreview = storyPreview.substring(0, lastSentenceEnd + 1);
     }
     const previewText = messageIntro + storyPreview + ' ... To hear what happens next, unlock the full story.';
+
+    // STAGE 1: Save story text to Supabase IMMEDIATELY so polling can find it
+    // even if the function gets killed during TTS generation
+    if (jobId && process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY) {
+      try {
+        const partialResult = { success: true, fullStory: fullStoryWithMessage, storyData, status: 'generating_audio' };
+        await fetch(`${process.env.SUPABASE_URL}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.SUPABASE_SECRET_KEY}`,
+            'apikey': process.env.SUPABASE_SECRET_KEY,
+            'Content-Type': 'application/json',
+            'x-upsert': 'true'
+          },
+          body: JSON.stringify(partialResult)
+        });
+        console.log('Saved partial result (story text) for job:', jobId);
+      } catch (saveErr) {
+        console.error('Failed to save partial result:', saveErr.message);
+      }
+    }
+
     // Validate voice ID: must be alphanumeric, fallback to Sarah if invalid
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
     console.log('Using voice ID:', useVoiceId);
@@ -501,7 +523,7 @@ export default async (req) => {
 
     const result = { success: true, previewAudio: audioBase64, fullStory: fullStoryWithMessage, storyData };
 
-    // Save result to Supabase so frontend can retrieve it if the HTTP connection timed out
+    // STAGE 2: Update Supabase with the complete result (story + audio)
     if (jobId && process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY) {
       try {
         await fetch(`${process.env.SUPABASE_URL}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
@@ -514,9 +536,9 @@ export default async (req) => {
           },
           body: JSON.stringify(result)
         });
-        console.log('Saved preview result for job:', jobId);
+        console.log('Saved complete result for job:', jobId);
       } catch (saveErr) {
-        console.error('Failed to save preview result:', saveErr.message);
+        console.error('Failed to save complete result:', saveErr.message);
       }
     }
 
