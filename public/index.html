@@ -1715,25 +1715,35 @@ async function previewVoice(voiceId, btn) {
   if (!voicePreviewUrls[voiceId]) {
     btn.innerHTML = '<span style="font-size:0.6rem;color:var(--purple)">...</span>';
     try {
-      const res = await fetch(`/api/voice-preview?id=${voiceId}`);
+      const res = await fetch('/api/voice-preview?id=' + voiceId);
       const data = await res.json();
       if (data.success) voicePreviewUrls[voiceId] = data.preview_url;
-    } catch(e) { /* silent */ }
+      else console.warn('Voice preview API error:', data.error);
+    } catch(e) { console.warn('Voice preview fetch failed:', e.message); }
   }
 
   if (voicePreviewUrls[voiceId]) {
     audio.src = voicePreviewUrls[voiceId];
-    audio.play();
-    btn.classList.add('playing');
-    btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>';
-    currentPreviewBtn = btn;
-
     audio.onended = () => {
       btn.classList.remove('playing');
       btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
       currentPreviewBtn = null;
     };
+    audio.onerror = () => {
+      console.warn('Audio playback error for voice:', voiceId);
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    };
+    try {
+      await audio.play();
+      btn.classList.add('playing');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="currentColor"/><rect x="14" y="4" width="4" height="16" fill="currentColor"/></svg>';
+      currentPreviewBtn = btn;
+    } catch(playErr) {
+      console.warn('Play failed:', playErr);
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    }
   } else {
+    console.warn('No preview URL for voice:', voiceId);
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   }
 }
@@ -1754,6 +1764,16 @@ function showVoices() {
   currentPreviewBtn = null;
 
   renderFilteredVoices();
+
+  // Preload all voice preview URLs in background so taps are instant
+  if (Object.keys(voicePreviewUrls).length === 0) {
+    ALL_VOICES.forEach(v => {
+      fetch('/api/voice-preview?id=' + v.id)
+        .then(r => r.json())
+        .then(d => { if (d.success) voicePreviewUrls[v.id] = d.preview_url; })
+        .catch(() => {});
+    });
+  }
 }
 
 function showReview() {
