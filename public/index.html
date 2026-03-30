@@ -427,32 +427,61 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .unlock-price{font-size:0.82rem;color:var(--text-muted);margin-top:0.75rem;font-weight:600}
 
 /* ===== FULL STORY ===== */
-.full-player{width:100%;text-align:center;padding:3rem 0}
-.full-title{font-family:'Nunito',sans-serif;font-size:1.8rem;font-weight:900;color:var(--text);margin-bottom:0.5rem}
-.full-for{font-size:1rem;color:var(--text-soft);margin-bottom:2rem;font-weight:600}
-.full-celebration{font-size:2.5rem;margin-bottom:1rem;animation:celebrate 1s ease-out}
+/* ===== FULL STORY PLAYER ===== */
+.full-player{width:100%;text-align:center;padding:2rem 0 3rem}
+.full-hero{background:linear-gradient(135deg, var(--cat-accent-light, #F8F5FF), var(--cat-glow, rgba(139,92,246,0.08)));border-radius:24px;padding:2rem 1.5rem 1.75rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.full-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:var(--cat-accent, var(--purple));opacity:0.06;border-radius:50%}
+.full-hero::after{content:'';position:absolute;bottom:-30px;left:-30px;width:80px;height:80px;background:var(--cat-accent-dark, var(--pink));opacity:0.06;border-radius:50%}
+.full-celebration{font-size:3rem;margin-bottom:0.75rem;animation:celebrate 1s ease-out;position:relative;z-index:1}
 @keyframes celebrate{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.full-title{font-family:'Nunito',sans-serif;font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:0.35rem;position:relative;z-index:1}
+.full-for{font-size:0.95rem;color:var(--text-soft);margin-bottom:0;font-weight:600;position:relative;z-index:1}
 
-.audio-progress{width:100%;max-width:320px;margin:0 auto 2rem}
+/* Player controls area */
+.full-controls{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.audio-progress{width:100%;max-width:320px;margin:0 auto 1.5rem}
 .progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;cursor:pointer}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,var(--pink)));border-radius:3px;width:0%;transition:width 0.3s}
 .progress-times{display:flex;justify-content:space-between;margin-top:0.4rem;font-size:0.75rem;color:var(--text-muted);font-weight:600}
 
-.post-actions{display:flex;flex-direction:column;gap:0.6rem;width:100%;margin-top:0.5rem}
+/* Action buttons */
+.post-actions{display:flex;flex-direction:column;gap:0.6rem;width:100%;margin-top:1rem}
+.post-actions .btn-primary{box-shadow:0 4px 14px rgba(139,92,246,0.3)}
+.post-actions-row{display:flex;gap:0.6rem;width:100%}
+.post-actions-row .btn-gift{flex:1}
+
+/* Discount banner */
+.next-story-banner{background:linear-gradient(135deg, #FFF3E0, #FFF8F0);border:2px solid #FFE0B2;border-radius:16px;padding:1.15rem;margin-top:1.25rem;text-align:center;position:relative;overflow:hidden}
+.next-story-banner::before{content:'\u2728';position:absolute;top:8px;right:12px;font-size:1.2rem;opacity:0.5}
+.next-story-banner .nsb-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;color:#E65100;margin:0 0 0.25rem}
+.next-story-banner .nsb-code{display:inline-block;background:#E65100;color:white;font-family:'Quicksand',sans-serif;font-weight:800;font-size:0.85rem;padding:0.3rem 1rem;border-radius:50px;margin:0.4rem 0;letter-spacing:1px;cursor:pointer;transition:transform 0.2s}
+.next-story-banner .nsb-code:hover{transform:scale(1.05)}
+.next-story-banner .nsb-sub{font-size:0.78rem;color:#BF360C;margin:0.2rem 0 0;font-weight:600}
 
 .gift-sent-msg{background:var(--green-light);color:var(--green);padding:1rem;border-radius:12px;font-size:0.9rem;font-weight:700;text-align:center;margin-top:1rem}
 .my-stories-link{display:inline-block;width:100%;padding:0.75rem 1.5rem;background:transparent;border:2px solid var(--purple);color:var(--purple);border-radius:50px;font-size:1rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;text-decoration:none;text-align:center;transition:all 0.2s;box-sizing:border-box}
 .my-stories-link:hover{background:var(--purple);color:white}
-.library-list{display:flex;flex-direction:column;gap:1rem;margin-top:1rem}
-.library-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1.25rem;display:flex;align-items:center;gap:1rem;cursor:pointer;transition:all 0.2s}
-.library-card:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.library-card .lib-icon{font-size:2rem;flex-shrink:0}
-.library-card .lib-info{flex:1}
-.library-card .lib-name{font-weight:800;color:var(--text);font-size:1rem}
-.library-card .lib-meta{font-size:0.8rem;color:var(--text-muted);margin-top:0.2rem}
-.library-card .lib-play{width:40px;height:40px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ===== LIBRARY / MY STORIES ===== */
+.library-header{text-align:center;padding:1rem 0 0.5rem}
+.library-header .lib-count{display:inline-block;background:var(--purple);color:white;font-size:0.75rem;font-weight:800;padding:0.2rem 0.75rem;border-radius:50px;margin-top:0.35rem}
+.library-list{display:flex;flex-direction:column;gap:0.75rem;margin-top:1rem}
+.library-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:1rem 1.15rem;display:flex;align-items:center;gap:0.85rem;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden}
+.library-card:hover{border-color:var(--cat-accent, var(--purple));transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.library-card .lib-cat-stripe{position:absolute;left:0;top:0;bottom:0;width:4px}
+.library-card .lib-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0}
+.library-card .lib-info{flex:1;text-align:left}
+.library-card .lib-name{font-weight:800;color:var(--text);font-size:0.95rem}
+.library-card .lib-meta{font-size:0.78rem;color:var(--text-muted);margin-top:0.15rem}
+.library-card .lib-badge{font-size:0.65rem;font-weight:800;color:white;padding:0.15rem 0.5rem;border-radius:50px;display:inline-block;margin-top:0.3rem}
+.library-card .lib-play{width:42px;height:42px;background:var(--cat-accent, var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(139,92,246,0.25);transition:transform 0.2s}
+.library-card .lib-play:hover{transform:scale(1.1)}
 .library-card .lib-play svg{width:18px;height:18px;fill:white}
 .library-card .lib-actions{display:flex;gap:0.5rem;align-items:center;flex-shrink:0}
+.library-empty{text-align:center;padding:3rem 1rem}
+.library-empty-art{font-size:4rem;margin-bottom:1rem;opacity:0.7}
+.library-cta{background:linear-gradient(135deg, #F8F5FF, #FFF0F5);border:2px dashed var(--purple-soft);border-radius:16px;padding:1.5rem;margin-top:1.25rem;text-align:center;cursor:pointer;transition:all 0.25s}
+.library-cta:hover{border-color:var(--purple);transform:translateY(-2px);box-shadow:var(--shadow)}
 .lib-share-btn{width:36px;height:36px;background:var(--orange);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform 0.2s}
 .lib-share-btn:hover{transform:scale(1.1)}
 .lib-share-btn svg{width:16px;height:16px;fill:white}
@@ -1144,58 +1173,72 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- FULL STORY -->
 <div class="screen" id="screenFull">
   <div class="full-player">
-    <div class="full-celebration">&#127881;</div>
-    <p class="full-title" id="fullTitle">Their story is ready</p>
-    <p class="full-for" id="fullStoryFor"></p>
-    <div style="display:flex;align-items:center;gap:1.2rem;justify-content:center">
-      <button onclick="seekAudio('fullStoryAudio',-15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.5 3c-4.65 0-8.58 3.03-9.96 7.22L1 9.5l1.5 5.5 4.5-4-2.1-.68C5.98 6.83 8.93 4.5 12.5 4.5c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5c-2.07 0-3.95-.84-5.3-2.2l-1.06 1.06C7.82 20.04 10.06 21 12.5 21c5.25 0 9.5-4.25 9.5-9.5S17.75 3 12.5 3z"/></svg>15s</button>
-      <div class="audio-player" id="fullPlayBtn" onclick="playFull()">
-        <svg class="play-icon" id="fullPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <!-- Hero section with gradient background -->
+    <div class="full-hero">
+      <div class="full-celebration">&#127881;</div>
+      <p class="full-title" id="fullTitle">Their story is ready</p>
+      <p class="full-for" id="fullStoryFor"></p>
+    </div>
+
+    <!-- Player controls card -->
+    <div class="full-controls">
+      <div style="display:flex;align-items:center;gap:1.2rem;justify-content:center">
+        <button onclick="seekAudio('fullStoryAudio',-15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.5 3c-4.65 0-8.58 3.03-9.96 7.22L1 9.5l1.5 5.5 4.5-4-2.1-.68C5.98 6.83 8.93 4.5 12.5 4.5c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5c-2.07 0-3.95-.84-5.3-2.2l-1.06 1.06C7.82 20.04 10.06 21 12.5 21c5.25 0 9.5-4.25 9.5-9.5S17.75 3 12.5 3z"/></svg>15s</button>
+        <div class="audio-player" id="fullPlayBtn" onclick="playFull()">
+          <svg class="play-icon" id="fullPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <button onclick="seekAudio('fullStoryAudio',15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11.5 3c4.65 0 8.58 3.03 9.96 7.22L23 9.5l-1.5 5.5-4.5-4 2.1-.68C18.02 6.83 15.07 4.5 11.5 4.5 7.36 4.5 4 7.86 4 12s3.36 7.5 7.5 7.5c2.07 0 3.95-.84 5.3-2.2l1.06 1.06C16.18 20.04 13.94 21 11.5 21 6.25 21 2 16.75 2 11.5S6.25 3 11.5 3z"/></svg>15s</button>
       </div>
-      <button onclick="seekAudio('fullStoryAudio',15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11.5 3c4.65 0 8.58 3.03 9.96 7.22L23 9.5l-1.5 5.5-4.5-4 2.1-.68C18.02 6.83 15.07 4.5 11.5 4.5 7.36 4.5 4 7.86 4 12s3.36 7.5 7.5 7.5c2.07 0 3.95-.84 5.3-2.2l1.06 1.06C16.18 20.04 13.94 21 11.5 21 6.25 21 2 16.75 2 11.5S6.25 3 11.5 3z"/></svg>15s</button>
-    </div>
-    <audio id="fullStoryAudio"></audio>
+      <audio id="fullStoryAudio"></audio>
 
-    <!-- PROGRESS BAR -->
-    <div class="audio-progress">
-      <div class="progress-bar" onclick="seekBar(event,'fullStoryAudio','progressFill')"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-times">
-        <span id="currentTime">0:00</span>
-        <span id="totalTime">0:00</span>
+      <div class="audio-progress">
+        <div class="progress-bar" onclick="seekBar(event,'fullStoryAudio','progressFill')"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-times">
+          <span id="currentTime">0:00</span>
+          <span id="totalTime">0:00</span>
+        </div>
+      </div>
+
+      <div style="text-align:center">
+        <button id="musicToggleBtn" onclick="toggleBgMusic()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:0.35rem 0.9rem;cursor:pointer;font-size:0.75rem;color:var(--text-muted);display:inline-flex;align-items:center;gap:0.35rem">
+          <span id="musicToggleIcon">&#9834;</span> <span id="musicToggleLabel">Music on</span>
+        </button>
       </div>
     </div>
 
-    <!-- MUSIC TOGGLE -->
-    <div style="text-align:center;margin-bottom:1rem">
-      <button id="musicToggleBtn" onclick="toggleBgMusic()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:0.35rem 0.9rem;cursor:pointer;font-size:0.75rem;color:var(--text-muted);display:inline-flex;align-items:center;gap:0.35rem">
-        <span id="musicToggleIcon">&#9834;</span> <span id="musicToggleLabel">Music on</span>
-      </button>
-    </div>
-
-    <!-- POST PURCHASE ACTIONS -->
+    <!-- Post purchase actions -->
     <div class="post-actions">
-      <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">Download MP3</button>
-      <button class="btn btn-gift" style="width:100%" onclick="shareFromFullScreen()">Share with family</button>
-      <button class="btn btn-gift" style="width:100%" id="sendGiftBtn" onclick="sendGift()">Send to recipient</button>
-      <button class="btn btn-gift" style="width:100%" onclick="goTo('screenLanding')">Create another story</button>
+      <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">&#127911; Download MP3</button>
+      <div class="post-actions-row">
+        <button class="btn btn-gift" onclick="shareFromFullScreen()">Share with family</button>
+        <button class="btn btn-gift" id="sendGiftBtn" onclick="sendGift()">Send to recipient</button>
+      </div>
     </div>
 
     <div id="giftSentMsg" class="gift-sent-msg" style="display:none">
       <span>&#10003;</span> Gift sent! They will receive a beautiful email with the story.
     </div>
 
-    <div id="savedEmailNote" style="display:none;background:#F8F5FF;border-radius:12px;padding:1rem;margin-top:1rem;text-align:center">
-      <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 0.25rem">Your story is saved under</p>
-      <p style="font-size:1rem;font-weight:800;color:var(--purple);margin:0" id="savedEmailAddr"></p>
-      <p style="font-size:0.8rem;color:var(--text-muted);margin:0.35rem 0 0">Use this email to access your stories anytime</p>
+    <div id="savedEmailNote" style="display:none;background:#F8F5FF;border:2px solid var(--border);border-radius:16px;padding:1rem 1.25rem;margin-top:1rem;text-align:center">
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0 0 0.2rem;font-weight:600">Saved under</p>
+      <p style="font-size:0.95rem;font-weight:800;color:var(--purple);margin:0" id="savedEmailAddr"></p>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin:0.25rem 0 0">Log in with this email to listen again anytime</p>
     </div>
 
-    <!-- How did it go? feedback prompt -->
-    <div id="feedbackPrompt" style="display:none;background:linear-gradient(135deg,#FFF0E5,#F8F5FF);border-radius:16px;padding:1.25rem;margin-top:1.25rem;text-align:center">
+    <!-- Next story discount banner -->
+    <div class="next-story-banner" id="nextStoryBanner" style="display:none">
+      <p class="nsb-title">Loved it? Their next story is cheaper.</p>
+      <div class="nsb-code" id="nsbCode" onclick="copyDiscountCode()" title="Tap to copy">NEXTONE</div>
+      <p class="nsb-sub">Use this code at checkout for 25% off your next story</p>
+      <p id="nsbCopied" style="font-size:0.7rem;color:#E65100;margin:0.3rem 0 0;display:none;font-weight:700">Copied!</p>
+    </div>
+
+    <!-- How did it go? -->
+    <div id="feedbackPrompt" style="display:none;background:linear-gradient(135deg,#FFF0E5,#F8F5FF);border:2px solid var(--border);border-radius:16px;padding:1.25rem;margin-top:1rem;text-align:center">
       <p style="font-size:1rem;font-weight:800;color:var(--text);margin:0 0 0.3rem">How did it go?</p>
       <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 0.75rem">We would love to know what you thought.</p>
       <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap">
-        <button onclick="submitFeedback('loved')" style="background:var(--purple);color:#fff;border:none;border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">They loved it!</button>
+        <button onclick="submitFeedback('loved')" style="background:var(--cat-accent,var(--purple));color:#fff;border:none;border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">They loved it!</button>
         <button onclick="submitFeedback('ok')" style="background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">It was okay</button>
         <button onclick="submitFeedback('improve')" style="background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">Could be better</button>
       </div>
@@ -1203,19 +1246,38 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         <p style="font-size:0.85rem;color:var(--green);font-weight:700;margin:0">Thank you! Your feedback helps us make better stories.</p>
       </div>
     </div>
+
+    <!-- Create another -->
+    <div class="library-cta" onclick="goTo('screenLanding')" style="margin-top:1rem">
+      <p style="font-size:1.3rem;margin:0 0 0.3rem">&#10024;</p>
+      <p style="font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;color:var(--text);margin:0 0 0.15rem">Create another story</p>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin:0;font-weight:600">A new adventure, a bedtime story, or a learning quest</p>
+    </div>
   </div>
 </div>
 
 <!-- MY STORIES (Library) -->
 <div class="screen" id="screenLibrary">
   <button class="back-btn" onclick="goTo('screenLanding')">&#8592; Back</button>
-  <h2 class="section-title">My Stories</h2>
-  <p class="section-sub">All the stories you have created.</p>
+  <div class="library-header">
+    <h2 class="section-title" style="margin-bottom:0.25rem">Your Story Collection</h2>
+    <p class="section-sub" style="margin-bottom:0.5rem" id="librarySubtext">Every story, ready to play again.</p>
+    <span class="lib-count" id="libCount" style="display:none">0 stories</span>
+  </div>
   <div id="libraryList" class="library-list"></div>
+
+  <!-- Create another CTA at bottom of library -->
+  <div class="library-cta" id="libraryCta" onclick="goTo('screenLanding')" style="display:none;margin-top:1.25rem">
+    <p style="font-size:1.3rem;margin:0 0 0.3rem">&#10024;</p>
+    <p style="font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;color:var(--text);margin:0 0 0.15rem">Create another story</p>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin:0;font-weight:600">Every one is completely unique</p>
+  </div>
+
   <div id="libraryEmpty" class="library-empty" style="display:none">
-    <p style="font-size:1.2rem;margin-bottom:0.5rem">No stories yet</p>
-    <p style="color:var(--text-muted)">Once you create and purchase a story, it will appear here.</p>
-    <button class="btn btn-primary" style="margin-top:1rem" onclick="goTo('screenLanding')">Create your first story</button>
+    <div class="library-empty-art">&#128218;</div>
+    <p style="font-size:1.2rem;margin-bottom:0.5rem;font-weight:800;color:var(--text)">No stories yet</p>
+    <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6">Once you create and purchase a story, it will appear here. Each one is saved forever.</p>
+    <button class="btn btn-primary" style="margin-top:1.25rem" onclick="goTo('screenLanding')">Create your first story</button>
   </div>
   <div id="libraryLoading" style="text-align:center;padding:2rem;display:none">
     <div class="spinner"></div>
@@ -2512,6 +2574,7 @@ async function unlockFull() {
       // (Normal flow saves via handleStripeReturn and gets a real DB ID)
       lastSavedStoryId = fakeSessionId;
       goTo('screenFull');
+      showNextStoryBanner();
     } catch(err) {
       alert('Something went wrong: ' + err.message);
       goTo('screenPreview');
@@ -2690,6 +2753,7 @@ async function handleStripeReturn() {
     window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
+    showNextStoryBanner();
   } catch(err) {
     // Always offer retry after payment failure. The session_id is still in the URL
     // (we no longer clean it early), so a reload will re-trigger handleStripeReturn.
@@ -2798,6 +2862,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+function copyDiscountCode() {
+  const code = document.getElementById('nsbCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const copied = document.getElementById('nsbCopied');
+    copied.style.display = 'block';
+    setTimeout(() => { copied.style.display = 'none'; }, 2000);
+  }).catch(() => {});
+}
+
+function showNextStoryBanner() {
+  const banner = document.getElementById('nextStoryBanner');
+  if (banner) banner.style.display = 'block';
+}
 
 async function downloadStory() {
   const audio = document.getElementById('fullStoryAudio');
@@ -2994,32 +3072,43 @@ function renderLibrary(stories) {
 
   if (!stories || !stories.length) {
     document.getElementById('libraryEmpty').style.display = 'block';
+    document.getElementById('libCount').style.display = 'none';
+    document.getElementById('libraryCta').style.display = 'none';
     return;
   }
 
   document.getElementById('libraryEmpty').style.display = 'none';
-  const catEmoji = { bedtime:'\u{1F319}', journey:'\u{1F697}', learning:'\u{1F4DA}', custom:'\u{2728}' };
+  document.getElementById('libCount').style.display = 'inline-block';
+  document.getElementById('libCount').textContent = stories.length + (stories.length === 1 ? ' story' : ' stories');
+  document.getElementById('libraryCta').style.display = 'block';
+
+  const catEmoji = { bedtime:'\u{1F319}', journey:'\u{2728}', learning:'\u{1F4DA}', custom:'\u{2728}' };
   const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure', custom:'Custom Story' };
-  const lenLabel = { standard:'~5 min', long:'~10 min', epic:'~15 min' };
+  const catColor = { bedtime:'#7C6BC4', journey:'#FF8C42', learning:'#00B4A0', custom:'#9B59B6' };
+  const catBg = { bedtime:'#F0ECFF', journey:'#FFF3E8', learning:'#E8F8F5', custom:'#F5EEFF' };
 
   const list = document.getElementById('libraryList');
   list.innerHTML = '';
   stories.forEach(s => {
     const date = new Date(s.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
     const giftUnsent = s.isGift && !s.giftSent;
-    const giftLabel = s.isGift ? (s.giftSent ? ' &middot; Gift sent' : ' &middot; Gift (not sent yet)') : '';
+    const color = catColor[s.category] || '#9B59B6';
+    const bg = catBg[s.category] || '#F5EEFF';
     const card = document.createElement('div');
     card.className = 'library-card';
     card.innerHTML = `
-      <div class="lib-icon">${catEmoji[s.category] || '\u{2728}'}</div>
+      <div class="lib-cat-stripe" style="background:${color}"></div>
+      <div class="lib-icon" style="background:${bg}">${catEmoji[s.category] || '\u{2728}'}</div>
       <div class="lib-info">
         <div class="lib-name">${escHtml(s.childName)}'s ${catLabel[s.category] || 'Story'}</div>
-        <div class="lib-meta">${lenLabel[s.length] || s.length} &middot; ${date}${giftLabel}</div>
+        <div class="lib-meta">${date}</div>
+        ${giftUnsent ? '<span class="lib-badge" style="background:#FF8C42">Gift: not sent yet</span>' : ''}
+        ${s.isGift && s.giftSent ? '<span class="lib-badge" style="background:#00B4A0">Gift sent</span>' : ''}
       </div>
       <div class="lib-actions">
         ${giftUnsent ? '<button class="lib-gift-btn" title="Send this gift" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0.25rem">&#127873;</button>' : ''}
         <button class="lib-share-btn" title="Share this story"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button>
-        <div class="lib-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="lib-play" style="background:${color}"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
       </div>
     `;
     if (giftUnsent) {

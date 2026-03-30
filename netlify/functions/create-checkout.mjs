@@ -37,6 +37,7 @@ export default async (req) => {
         }
       ],
       mode: 'payment',
+      allow_promotion_codes: true,
       ...(customerEmail ? { customer_email: customerEmail } : {}),
       success_url: `${siteUrl}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: siteUrl,
