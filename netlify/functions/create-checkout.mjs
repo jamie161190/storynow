@@ -28,7 +28,7 @@ export default async (req) => {
               name: 'Storytold: Personalised Audio Story',
               description: `A personalised story for ${childName}`
             },
-            unit_amount: 1999
+            unit_amount: 999
           },
           quantity: 1
         }
