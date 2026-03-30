@@ -2232,7 +2232,10 @@ async function generatePreview() {
         console.log('Direct response timed out, polling for result...');
         data = null;
       }
-      if (data && !data.success) throw new Error(data.error || 'Something went wrong');
+      if (data && !data.success) {
+        console.error('API error detail:', data.debug || 'no debug info');
+        throw new Error(data.error || 'Something went wrong');
+      }
     } catch(fetchErr) {
       if (fetchErr.message && !fetchErr.message.includes('Something went wrong')) {
         console.log('Fetch error, will poll:', fetchErr.message);
