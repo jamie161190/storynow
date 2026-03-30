@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const WORD_COUNTS = { standard: 750, long: 2200, epic: 2200 };
+const WORD_COUNTS = { standard: 2200, long: 2200, epic: 2200 };
 
 // ============================================================
 // SYSTEM PROMPT: This is the single most important piece of
@@ -26,7 +26,7 @@ If there is a pet, it must do something the child would retell. Not just "Buddy 
 5. AGE IS EVERYTHING
 You must write differently for every age. This is non-negotiable:
 
-Ages 2 to 4: Very short sentences. Simple words. Repetition is magic ("And they walked, and they walked, and they walked"). Sound effects and onomatopoeia ("Splish splash! Whoooosh!"). Everything is safe and gentle. No real danger. Familiar things: colours, animals, home, family.
+Ages 2 to 4: Very short sentences. Simple words. Repetition is magic ("And they walked, and they walked, and they walked"). Sound effects and onomatopoeia ("Splish splash! Whoooosh!"). Everything is safe and gentle. ABSOLUTELY NO danger, scary moments, villains, darkness, or anything threatening. No one gets lost, hurt, or scared. Everything resolves quickly and happily. Familiar things: colours, animals, home, family. The child should feel held by the story like a warm hug. Even the "problem" should be gentle (e.g. a lost teddy, not a lost child).
 
 Ages 5 to 7: Clear beginning, middle, end. The child is brave but the world is kind. Simple moral woven in naturally, never stated. Dialogue brings characters alive. Relatable challenges: trying something new, being brave, making a friend smile.
 
@@ -52,7 +52,7 @@ Never write anything that could apply to any child. No "they were so brave" with
 No preamble. No "Once upon a time" unless it genuinely serves the story. Drop the listener straight into a moment. The first sentence should make a parent lean in.
 
 10. PACING
-Every story is ~15 minutes (~2200 words). Four act structure with SUBPLOTS and SURPRISES.
+Every story is ~15 minutes (~2200 words). For adventure and learning stories, use a four act structure with SUBPLOTS and SURPRISES. For bedtime stories, follow the specific bedtime structure in the story type instructions instead.
 - Act 1 (first 20%): Immediate hook. The child and friend are dropped into a situation that demands action.
 - Act 2 (20% to 50%): The adventure deepens. Introduce a secondary character or subplot (a quirky helper, a rival, a mystery within the mystery). At least THREE distinct scenes with location or situation changes. Every 300 words, something new must happen: a new character speaks, the setting shifts, a discovery is made, or an obstacle appears.
 - Act 3 (50% to 80%): The twist. What the child thought was the problem is not the real problem. The real challenge is bigger, more personal, more meaningful. The friend or pet has a standout moment here. Dialogue is at its peak. Include a moment of doubt or setback that the child must push through.
@@ -66,26 +66,34 @@ CRITICAL FOR ALL STORIES LONGER THAN 5 MINUTES:
 - Include at least one moment where a character says the child's name directly in dialogue ("Come on, Chase, we have got this!"). This snaps the child's attention back every time.
 
 11. BEFORE YOU WRITE
-Think carefully before you begin. Plan the full story arc first. Decide:
-- What is the opening hook? (First sentence must grab attention.)
-- Where does each personal detail land? (Name, friend, pet, interests, family, proud-of moment, extra details.)
-- What is the callback? (Plant something in act 1 that pays off in act 3.)
-- What is the twist? (What the child thought was the problem is not the real problem.)
-- Where are the scene changes? (At least every 300 words.)
-- Where is the emotional peak?
+Think carefully before you begin. Use your thinking time to plan the full story arc. This is the most important step. A planned story is 10x better than an improvised one. Decide:
+- What is the opening hook? (First sentence must grab attention. Not just "It was a normal day." Something happens, something is discovered, something changes.)
+- THE PERSONAL DETAIL MAP: Go through every single detail the parent gave you (name, friend, pet, interests, family, proud-of moment, teddy, extra details, setting) and decide WHERE in the story each one lands. Every detail must appear. No detail should be wasted or forgotten. If you cannot find a natural place for a detail, make a place for it.
+- What is the callback? (Plant something in act 1 that pays off in act 3. This is what separates a good story from a magical one. The child will feel like the story was DESIGNED for them.)
+- What is the twist? (For adventure/learning: what the child thought was the problem is not the real problem. For bedtime: what seemed like a mystery turns out to be something gentle and beautiful.)
+- Where are the scene changes? (At least every 300 words for adventure/learning.)
+- Where is the emotional peak? (The moment that makes the parent cry and the child feel seen.)
 - How does the friend shine? (Three distinct moments minimum.)
+- THE FINAL LINE: Plan your ending before you start. The last line of the story is the one they will remember. Make it beautiful.
 - For learning stories: map out the difficulty curve. Plan which challenges go where, which ones the friend helps with, and where the breathing moments (humour, twists, celebrations) break up the learning. The themes and interests should BUILD THE WORLD, and the subject knowledge should be THE KEY that unlocks that world.
-Then write. The story must feel inevitable, like every detail was placed with intention, because it was.`;
+Then write. The story must feel inevitable, like every detail was placed with intention, because it was.
+
+12. DIALOGUE IS KING
+Children lose interest during long descriptive passages. Characters talking to each other is what holds attention. Make sure:
+- Every character has a distinct voice. The friend sounds different from the child who sounds different from any adults.
+- Characters call each other by name in dialogue regularly. Hearing their own name in a character's mouth snaps the child's attention back.
+- Use short, punchy dialogue exchanges. Not long speeches. Back and forth, like real kids talk.
+- Include at least one line the child will want to repeat. A catchphrase, a funny exclamation, a brave declaration.`;
 
 // ============================================================
 // AGE BAND INSTRUCTIONS: appended to each prompt
 // ============================================================
 function getAgeBand(age) {
   const a = parseInt(age);
-  if (a <= 4) return 'This child is very young (age ' + a + '). Use very simple vocabulary, short sentences, gentle repetition, sound effects, and keep everything safe, warm, and familiar. Think CBeebies bedtime hour.';
-  if (a <= 7) return 'This child is ' + a + ' years old. Use clear story structure with a beginning, middle, and end. Keep language accessible but not babyish. Dialogue and action keep them engaged. The world is kind and the child is brave.';
-  if (a <= 10) return 'This child is ' + a + ' years old. Write with real narrative tension, humour, and clever problem solving. Richer vocabulary is welcome. The friend should have their own personality. The child is the hero because they are smart, not lucky.';
-  return 'This child is ' + a + ' years old. Write at a young adult level. Complex emotions, genuine depth, themes of identity and belonging. Respect their intelligence completely. The friendship should feel real and layered.';
+  if (a <= 4) return `This child is very young (age ${a}). Use very simple vocabulary, short sentences, gentle repetition, sound effects, and keep everything safe, warm, and familiar. Think CBeebies bedtime hour. Sentences should rarely exceed 12 words. Use lots of "And then..." and repeated patterns. Name things the child knows: colours, animals, family, food, bath time, bedtime. For age 2 to 3, keep the TOTAL word count closer to 1200 words (shorter attention span). The story should feel like being read to by a loving parent.`;
+  if (a <= 7) return `This child is ${a} years old. Use clear story structure with a beginning, middle, and end. Keep language accessible but not babyish. Dialogue and action keep them engaged. The world is kind and the child is brave. Use vocabulary that stretches them slightly (one or two words they might not know but can figure out from context). The friend should talk like a real kid their age. Include at least one moment that makes the child giggle or gasp.`;
+  if (a <= 10) return `This child is ${a} years old. Write with real narrative tension, humour, and clever problem solving. Richer vocabulary is welcome. The friend should have their own personality and opinions. The child is the hero because they are smart, not lucky. Include wordplay, wit, and at least one genuinely funny moment. The characters can disagree, make mistakes, and learn. The story should feel like the best book they have ever read, not like something written for a younger kid.`;
+  return `This child is ${a} years old. Write at a young adult level. Complex emotions, genuine depth, themes of identity and belonging. Respect their intelligence completely. The friendship should feel real and layered, with moments of tension and reconciliation. Do not shy away from ambiguity or nuance. The humour should be smart, not silly. The stakes should feel real. The ending can be hopeful without being neat. Write as if you are writing for someone who reads real novels.`;
 }
 
 // ============================================================
@@ -135,7 +143,7 @@ THIS STORY IS A GIFT from ${d.giftFrom} to ${d.childName}. ${d.giftFrom} MUST ap
 ${themesSection}
 
 SETTING: ${d.setting || 'Surprise me'}
-${d.setting === 'Surprise me' ? 'Choose a setting that fits the themes and category perfectly.' : 'Set the story in or around this place.'}`;
+${!d.setting || d.setting === 'Surprise me' ? 'Choose a setting that fits the themes and category perfectly. Be creative and unexpected.' : 'Set the story in or around this place. If the parent has given extra detail (e.g. "A castle (made of ice on a mountaintop)"), use ALL of that detail to make the setting specific and vivid. The setting is not just a backdrop. It is a character. Describe how it looks, smells, sounds, and feels.'}`;
 
   if (d.hasPet && d.petName) {
     block += `\n\nPET: ${d.petName}${d.petType ? ' (a ' + d.petType + ')' : ''}
@@ -167,17 +175,28 @@ You do NOT need to include this message in the story text. It will be read separ
 // ============================================================
 const STORY_PROMPTS = {
   bedtime: (d) => `STORY TYPE: Bedtime
-TONE: Warm, calming, soothing. The story should wind down gradually. The first half can have gentle discovery or a small journey, but the second half must slow. The final quarter should feel drowsy. End with the child feeling safe, warm, and sleepy. The last two sentences should be rhythmic and slow, almost like a lullaby in prose.
+TONE: Warm, calming, soothing. This story exists to help a child fall asleep. Every creative decision you make should serve that goal. The story should wind down gradually. The first half can have gentle discovery or a small journey, but the second half must slow. The final quarter should feel drowsy. The last two sentences should be rhythmic and slow, almost like a lullaby in prose.
 
 ${characterBlock(d)}
 
-SENSORY LANGUAGE: Use warmth, soft light, gentle sounds, cosiness. Stars, blankets, rain on windows, a cat purring. Make the listener feel sleepy.
+SENSORY LANGUAGE: Use warmth, soft light, gentle sounds, cosiness. Stars, blankets, rain on windows, a cat purring, warm milk, the smell of toast, fairy lights in a treehouse, the hum of crickets outside. Make the listener FEEL sleepy through the words. Every paragraph after the midpoint should contain at least one sensory detail that evokes warmth, softness, or comfort.
 ${d.sidekickName ? `
 SIDEKICK IN BEDTIME: ${d.sidekickName} is with ${d.childName} throughout this story. In a bedtime story, the sidekick plays a comforting role: they might walk alongside ${d.childName} on a gentle adventure, say something reassuring at a quiet moment, or be the one who tucks ${d.childName} in at the end. If the sidekick is a parent or family member, make the ending especially warm and intimate, as if the listener can feel that person right there with them.` : ''}
 
-BEDTIME PACING: The first half can be a gentle journey or discovery with soft excitement. But the energy must drop steadily from the midpoint onwards. The final third should feel like sinking into a warm bath. Sentences get shorter. The world gets quieter. Sounds become softer. By the last few paragraphs, the child should already be drifting.
+BEDTIME STRUCTURE (NOT the same as adventure):
+This is NOT a 4-act adventure. Do NOT use twists, villains, or high tension. Instead use a JOURNEY HOME structure:
+- Opening (first 20%): ${d.childName} discovers something gentle but intriguing. A glowing path, a whispered invitation, a door that wasn't there before. Curiosity, not urgency.
+- Gentle adventure (20% to 50%): A slow, wondrous journey through beautiful, safe places. Every location is more magical and calming than the last. The friend is there, the sidekick is there, and the mood is wonder, not danger. Include one moment of gentle humour or warmth. The themes and interests shape the world they explore.
+- Winding down (50% to 80%): The energy drops noticeably. Sentences get shorter. Dialogue becomes quieter, more reflective. Characters start yawning, sitting down, resting. Sounds become softer. Descriptions become slower and more rhythmic. The world dims like a sunset.
+- Sleep (final 20%): ${d.childName} is home, or somewhere that feels like home. The final paragraphs should read like a lullaby. Short, rhythmic sentences. Repetition is welcome ("And the stars blinked. And the moon smiled. And ${d.childName} closed their eyes."). End with the child feeling safe, warm, surrounded by the people who love them. The very last line should feel like a blanket being pulled up.
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
+CRITICAL BEDTIME RULES:
+- NO danger, villains, scary moments, chase scenes, or high stakes. Not even mild ones. Nothing that raises a heartbeat.
+- NO cliffhangers or sequel hooks. The story must CLOSE completely. The child should feel that everything is resolved and safe.
+- Dialogue should be warm and quiet after the midpoint. Whispers, gentle questions, "Goodnight" exchanges.
+- For ages 2 to 4: heavy repetition, simple sound patterns, and a very clear "going to bed" ending. Think: "And they walked, and they walked, and the stars followed them all the way home."
+
+LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
 
 ${getAgeBand(d.age)}
 
@@ -202,7 +221,11 @@ ENGAGEMENT TECHNIQUES:
 - SENSORY WORLD BUILDING: Since the child is stuck in a car or plane, the story must paint vivid sensory pictures. Not "they entered a cave" but "The air turned cold. Water dripped somewhere in the dark. And then, from deep inside the cave, a sound. A low rumble. Like breathing."
 - END WITH A DOOR OPEN: The final line should hint that there could be another adventure. Not a cliffhanger, but a promise. The child should turn to their parent and say "Can I get another one?"
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
+EMOTIONAL CORE: Every great adventure story needs a heart. Somewhere in the middle, there should be a quiet moment between ${d.childName} and ${d.friendName}. A moment of honesty, doubt, encouragement, or laughter. This is what the child will remember even more than the action. It makes the adventure feel real.
+
+THE ENDING: The adventure resolves with ${d.childName} doing something brave, clever, or kind. Not through luck or magic, but through something they did, said, or figured out. Then the final line should leave a door open: a wink, a mysterious clue, a whispered "see you next time." The child should look up and say "can I get another one?"
+
+LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
 
 ${getAgeBand(d.age)}
 
@@ -280,7 +303,7 @@ DIFFICULTY CURVE FOR MEDIUM AND LONG:
 THE VILLAIN OR OBSTACLE:
 There should be an antagonist or major obstacle that can ONLY be defeated through the child's knowledge. Not a scary villain, but a compelling one. A trickster who thinks ${d.childName} cannot solve the puzzles. A locked kingdom that has been waiting for someone smart enough. A machine that is broken and only the right answers can fix it. This gives the challenges STAKES beyond "answer the question."
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
+LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
 
 ${getAgeBand(d.age)}
 
@@ -304,7 +327,7 @@ HOW TO STRUCTURE THIS:
 - ${d.friendName} must have at least 3 distinct moments and should help ${d.childName} through the emotional core of the story.
 - The scenario should be addressed through METAPHOR and ADVENTURE, not directly. If the child is nervous about the dentist, the story might involve a brave explorer who has to enter a mysterious cave where a friendly giant checks everyone's teeth. The child should see themselves in the character without feeling like they are being lectured.
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
+LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
 
 ${getAgeBand(d.age)}
 
