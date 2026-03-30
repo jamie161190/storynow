@@ -280,7 +280,9 @@ export default async (req) => {
     }
 
     const fullStory = storyResponse.content[0].text;
-    const messageIntro = storyData.personalMessage ? `${storyData.personalMessage} ... ` : '';
+    const messageIntro = storyData.personalMessage
+      ? `${storyData.personalMessage} ...... ...... `
+      : '';
     const fullStoryWithMessage = messageIntro + fullStory;
     const previewText = fullStoryWithMessage.split(' ').slice(0, 60).join(' ') + '...';
     // Validate voice ID: must be alphanumeric, fallback to Sarah if invalid
