@@ -49,13 +49,14 @@ export default async (req) => {
       }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
 
+    // Use upsert on stripe_session_id to prevent race condition duplicates
     const insertRes = await fetch(`${supabaseUrl}/rest/v1/stories`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${supabaseKey}`,
         'apikey': supabaseKey,
         'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
+        'Prefer': 'return=representation,resolution=merge-duplicates'
       },
       body: JSON.stringify({
         email: email,
@@ -80,7 +81,8 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Failed to save story' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const [saved] = await insertRes.json();
+    const insertData = await insertRes.json();
+    const saved = Array.isArray(insertData) ? insertData[0] : insertData;
 
     return new Response(JSON.stringify({
       success: true,

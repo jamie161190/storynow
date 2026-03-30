@@ -16,22 +16,42 @@ function splitIntoChunks(text, maxChars = 4000) {
   return chunks;
 }
 
-// Fetch with retry for TTS calls
-async function fetchWithRetry(url, options, retries = 2) {
+// Strip ID3v2 tags from MP3 data (ElevenLabs adds these to each chunk)
+// Without stripping, concatenated chunks have headers mid-file causing pops/glitches
+function stripID3(buffer) {
+  const bytes = new Uint8Array(buffer);
+  // ID3v2 header: starts with "ID3" (0x49, 0x44, 0x33)
+  if (bytes.length >= 10 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33) {
+    // ID3v2 size is stored in 4 bytes (synchsafe integer) at offset 6-9
+    const size = (bytes[6] << 21) | (bytes[7] << 14) | (bytes[8] << 7) | bytes[9];
+    const headerSize = 10 + size; // 10 byte header + tag data
+    if (headerSize < bytes.length) {
+      return bytes.slice(headerSize);
+    }
+  }
+  return bytes;
+}
+
+// Fetch with retry and rate limit handling for TTS calls
+async function fetchWithRetry(url, options, retries = 3) {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const res = await fetch(url, options);
       if (res.ok) return res;
-      if (attempt < retries && res.status >= 500) {
-        console.log(`TTS retry ${attempt + 1} after status ${res.status}`);
-        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+
+      // Rate limited (429) or server error (5xx): wait and retry
+      if (attempt < retries && (res.status === 429 || res.status >= 500)) {
+        const retryAfter = res.headers.get('retry-after');
+        const waitMs = retryAfter ? parseInt(retryAfter) * 1000 : 2000 * (attempt + 1);
+        console.log(`TTS retry ${attempt + 1} after status ${res.status}, waiting ${waitMs}ms`);
+        await new Promise(r => setTimeout(r, waitMs));
         continue;
       }
       return res;
     } catch (err) {
       if (attempt < retries) {
         console.log(`TTS retry ${attempt + 1} after error: ${err.message}`);
-        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
         continue;
       }
       throw err;
@@ -73,37 +93,50 @@ export default async (req) => {
     const chunks = splitIntoChunks(fullStory);
     console.log(`Split story into ${chunks.length} chunks`);
 
+    // Generate TTS for all chunks (2 at a time to stay within rate limits)
     const audioBuffers = [];
-    for (let i = 0; i < chunks.length; i++) {
-      const ttsStart = Date.now();
-      const ttsResponse = await fetchWithRetry(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
-        method: 'POST',
-        headers: {
-          'xi-api-key': process.env.ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          text: chunks[i],
-          model_id: 'eleven_turbo_v2_5',
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-        })
-      });
+    const BATCH_SIZE = 2;
 
-      if (!ttsResponse.ok) {
-        const errText = await ttsResponse.text();
-        console.error(`TTS chunk ${i + 1}/${chunks.length} failed:`, ttsResponse.status, errText);
-        throw new Error('Audio generation failed on chunk ' + (i + 1));
-      }
-      console.log(`TTS chunk ${i + 1}/${chunks.length} done in ${Date.now() - ttsStart}ms`);
-      audioBuffers.push(await ttsResponse.arrayBuffer());
+    for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
+      const batch = chunks.slice(i, i + BATCH_SIZE);
+      const batchStart = Date.now();
+
+      const results = await Promise.all(batch.map((chunk, batchIdx) =>
+        fetchWithRetry(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
+          method: 'POST',
+          headers: {
+            'xi-api-key': process.env.ELEVENLABS_API_KEY,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: chunk,
+            model_id: 'eleven_turbo_v2_5',
+            voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+          })
+        }).then(async (res) => {
+          if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`TTS chunk ${i + batchIdx + 1} failed (${res.status}): ${errText}`);
+          }
+          return res.arrayBuffer();
+        })
+      ));
+
+      console.log(`TTS batch ${Math.floor(i / BATCH_SIZE) + 1} (chunks ${i + 1}-${i + batch.length}) done in ${Date.now() - batchStart}ms`);
+      audioBuffers.push(...results);
     }
 
-    // Combine all audio chunks into a single buffer
-    const totalLength = audioBuffers.reduce((sum, buf) => sum + buf.byteLength, 0);
+    // Combine chunks: strip ID3 headers from all but the first chunk to avoid audio glitches
+    const processedBuffers = audioBuffers.map((buf, idx) => {
+      if (idx === 0) return new Uint8Array(buf); // keep first chunk's header
+      return stripID3(buf); // strip headers from subsequent chunks
+    });
+
+    const totalLength = processedBuffers.reduce((sum, buf) => sum + buf.byteLength, 0);
     const combined = new Uint8Array(totalLength);
     let offset = 0;
-    for (const buf of audioBuffers) {
-      combined.set(new Uint8Array(buf), offset);
+    for (const buf of processedBuffers) {
+      combined.set(buf, offset);
       offset += buf.byteLength;
     }
 
@@ -111,7 +144,7 @@ export default async (req) => {
 
     // Upload audio to Supabase Storage (always use URL, never inline base64 for full stories)
     const safeName = (childName || 'story').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-    const fileName = `${Date.now()}-${safeName}.mp3`;
+    const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${safeName}.mp3`;
 
     const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {
       method: 'POST',
