@@ -102,7 +102,7 @@ export default async (req) => {
       method: 'POST',
       headers: {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'anthropic-version': '2025-04-15',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -121,7 +121,7 @@ export default async (req) => {
     if (!apiResponse.ok) {
       const errBody = await apiResponse.text();
       console.error('Anthropic API error:', apiResponse.status, errBody);
-      return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.' }), {
+      return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.', debug: 'Anthropic ' + apiResponse.status + ': ' + errBody.substring(0, 200) }), {
         status: 500, headers: { 'Content-Type': 'application/json' }
       });
     }
