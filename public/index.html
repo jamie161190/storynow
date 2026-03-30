@@ -1110,6 +1110,13 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </div>
     </div>
 
+    <!-- MUSIC TOGGLE -->
+    <div style="text-align:center;margin-bottom:1rem">
+      <button id="musicToggleBtn" onclick="toggleBgMusic()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:0.35rem 0.9rem;cursor:pointer;font-size:0.75rem;color:var(--text-muted);display:inline-flex;align-items:center;gap:0.35rem">
+        <span id="musicToggleIcon">&#9834;</span> <span id="musicToggleLabel">Music on</span>
+      </button>
+    </div>
+
     <!-- POST PURCHASE ACTIONS -->
     <div class="post-actions">
       <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">Download MP3</button>
@@ -1181,6 +1188,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         <span id="sharedCurrentTime">0:00</span>
         <span id="sharedTotalTime">0:00</span>
       </div>
+    </div>
+    <!-- MUSIC TOGGLE (shared) -->
+    <div style="text-align:center;margin-top:0.75rem">
+      <button id="sharedMusicToggleBtn" onclick="toggleBgMusic()" style="background:none;border:1px solid var(--border);border-radius:20px;padding:0.35rem 0.9rem;cursor:pointer;font-size:0.75rem;color:var(--text-muted);display:inline-flex;align-items:center;gap:0.35rem">
+        <span>&#9834;</span> <span class="music-toggle-label">Music on</span>
+      </button>
     </div>
     <div class="post-actions" style="margin-top:1.5rem">
       <p style="text-align:center;color:var(--text-muted);font-size:0.95rem;margin-bottom:1rem">Want to create a personalised story for a child in your life?</p>
@@ -1268,6 +1281,7 @@ let storyData = { category:'', length:'long', themes:[], where:'Surprise me' };
 let selectedVoiceId = '';
 let fullStoryText = '';
 let lastStripeSessionId = '';
+let currentPlayingCategory = '';
 
 // ===== CURATED VOICE LIBRARY =====
 // Each voice tagged with gender, accent, age, and recommended story types
@@ -1354,6 +1368,123 @@ function playSample() {
 function escHtml(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ============================================================
+// BACKGROUND MUSIC MANAGER
+// Plays ambient music underneath narration at low volume.
+// Uses a separate Audio element that syncs with the narration.
+// ============================================================
+const bgMusic = {
+  audio: new Audio(),
+  fadeInterval: null,
+  targetVolume: 0.15,
+  currentNarration: null,
+
+  // Track URLs per category (hosted in Supabase storage)
+  // These should be ambient loops: soft piano, gentle pads, nature textures
+  // Replace placeholder paths once tracks are uploaded
+  tracks: {
+    bedtime:  '/music/bedtime-ambient.mp3',
+    journey:  '/music/adventure-ambient.mp3',
+    learning: '/music/learning-ambient.mp3',
+    custom:   '/music/adventure-ambient.mp3'
+  },
+
+  init() {
+    this.audio.loop = true;
+    this.audio.volume = 0;
+    this.audio.preload = 'none';
+  },
+
+  // Fade volume smoothly over ~1.5 seconds
+  fadeTo(target, duration) {
+    if (this.fadeInterval) clearInterval(this.fadeInterval);
+    const steps = 30;
+    const stepTime = (duration || 1500) / steps;
+    const diff = (target - this.audio.volume) / steps;
+    let step = 0;
+    this.fadeInterval = setInterval(() => {
+      step++;
+      this.audio.volume = Math.max(0, Math.min(1, this.audio.volume + diff));
+      if (step >= steps) {
+        clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
+        this.audio.volume = Math.max(0, Math.min(1, target));
+        if (target === 0) this.audio.pause();
+      }
+    }, stepTime);
+  },
+
+  // Start background music for a given category, synced to a narration element
+  play(category, narrationEl) {
+    if (!bgMusicEnabled) return;
+    const trackUrl = this.tracks[category] || this.tracks.journey;
+    this.currentNarration = narrationEl;
+
+    // Only change source if different track
+    if (this.audio.src !== new URL(trackUrl, location.origin).href) {
+      this.audio.src = trackUrl;
+    }
+
+    this.audio.volume = 0;
+    this.audio.play().then(() => {
+      this.fadeTo(this.targetVolume);
+    }).catch(e => {
+      // Autoplay blocked or file not found, narration plays fine without music
+      console.log('Background music skipped:', e.message);
+    });
+  },
+
+  // Pause music (fade out)
+  pause() {
+    if (!this.audio.paused) {
+      this.fadeTo(0, 800);
+    }
+  },
+
+  // Resume music (fade in)
+  resume() {
+    if (this.audio.paused && this.audio.src) {
+      this.audio.play().then(() => {
+        this.fadeTo(this.targetVolume, 800);
+      }).catch(() => {});
+    }
+  },
+
+  // Stop completely
+  stop() {
+    if (this.fadeInterval) clearInterval(this.fadeInterval);
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.audio.volume = 0;
+    this.currentNarration = null;
+  }
+};
+bgMusic.init();
+
+let bgMusicEnabled = true;
+function toggleBgMusic() {
+  bgMusicEnabled = !bgMusicEnabled;
+  // Update all toggle labels
+  const label = bgMusicEnabled ? 'Music on' : 'Music off';
+  const el1 = document.getElementById('musicToggleLabel');
+  if (el1) el1.textContent = label;
+  document.querySelectorAll('.music-toggle-label').forEach(el => el.textContent = label);
+
+  if (bgMusicEnabled) {
+    // If narration is currently playing, start music
+    const narrations = ['fullStoryAudio', 'sharedAudio', 'previewAudio'];
+    for (const id of narrations) {
+      const a = document.getElementById(id);
+      if (a && !a.paused) {
+        bgMusic.resume();
+        break;
+      }
+    }
+  } else {
+    bgMusic.pause();
+  }
 }
 
 function goTo(id, skipHistory) {
@@ -2102,6 +2233,7 @@ async function generatePreview() {
     });
     audio.addEventListener('ended', function() {
       document.getElementById('previewPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+      bgMusic.stop();
     });
 
     // Personalise unlock button with child's name
@@ -2144,9 +2276,11 @@ function playPreview() {
   const icon = document.getElementById('previewPlayIcon');
   if(audio.paused) {
     audio.play();
+    bgMusic.play(storyData.category, audio);
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
   } else {
     audio.pause();
+    bgMusic.pause();
     icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
   }
 }
@@ -2386,9 +2520,11 @@ function playFull() {
   const icon = document.getElementById('fullPlayIcon');
   if(audio.paused) {
     audio.play();
+    bgMusic.play(storyData.category || currentPlayingCategory || 'journey', audio);
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
   } else {
     audio.pause();
+    bgMusic.pause();
     icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
   }
 }
@@ -2416,6 +2552,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('fullStoryAudio');
   if(audio) audio.addEventListener('ended', () => {
     document.getElementById('fullPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    bgMusic.stop();
     // Show feedback prompt after story finishes
     const fp = document.getElementById('feedbackPrompt');
     if (fp) fp.style.display = 'block';
@@ -2441,6 +2578,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     sharedAudio.addEventListener('ended', () => {
       document.getElementById('sharedPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+      bgMusic.stop();
     });
   }
 });
@@ -2696,6 +2834,7 @@ async function loadSharedStory(storyId) {
 
     document.getElementById('sharedTitle').textContent = s.childName + "'s story";
     document.getElementById('sharedFor').textContent = catLabel[s.category] || 'A personalised story';
+    currentPlayingCategory = s.category || 'journey';
     document.getElementById('sharedAudio').src = s.audioUrl;
     document.getElementById('sharedLoading').style.display = 'none';
     document.querySelector('#screenShared .full-player').style.display = 'block';
@@ -2709,9 +2848,11 @@ function playShared() {
   const audio = document.getElementById('sharedAudio');
   if (audio.paused) {
     audio.play();
+    bgMusic.play(currentPlayingCategory || 'journey', audio);
     document.getElementById('sharedPlayIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
   } else {
     audio.pause();
+    bgMusic.pause();
     document.getElementById('sharedPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
   }
 }
@@ -2911,12 +3052,14 @@ async function sendShareEmail() {
 function playLibraryStory(story) {
   const audio = document.getElementById('fullStoryAudio');
   audio.src = story.audioUrl;
+  currentPlayingCategory = story.category || 'journey';
   document.getElementById('fullStoryFor').textContent = 'A story for ' + story.childName;
   document.getElementById('sendGiftBtn').style.display = 'none';
   document.getElementById('giftSentMsg').style.display = 'none';
   document.getElementById('fullTitle').textContent = story.childName + "'s story";
   goTo('screenFull');
   audio.play();
+  bgMusic.play(currentPlayingCategory, audio);
   document.getElementById('fullPlayIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
 }
 
