@@ -10,7 +10,7 @@
   external_node_modules = []
 
 [functions."story-worker-background"]
-  external_node_modules = ["@anthropic-ai/sdk"]
+  external_node_modules = []
 
 [functions."generate-full"]
   external_node_modules = ["stripe"]

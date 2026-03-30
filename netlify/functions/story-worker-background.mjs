@@ -1,7 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk';
-
-// Inline the shared prompts to avoid any bundling issues with Netlify v1 background functions.
-// The full versions of these are in ./lib/story-prompts.mjs for use by other functions.
+// Story Worker Background Function
+// Uses direct fetch() calls to Anthropic API and ElevenLabs API.
+// ZERO external dependencies - no SDK imports, no bundling issues.
 
 const SYSTEM_PROMPT = `You are the world's greatest children's storyteller. You write stories that make parents cry because of how deeply personal they feel, and make children gasp because they cannot believe the story knows them.
 
@@ -139,6 +138,20 @@ Do NOT wrap up or resolve anything. Stop at a cliffhanger.
 Write ONLY the opening now. No more than 200 words.`;
 }
 
+// Helper to save result to Supabase
+async function saveResult(supabaseUrl, supabaseKey, jobId, data) {
+  await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${supabaseKey}`,
+      'apikey': supabaseKey,
+      'Content-Type': 'application/json',
+      'x-upsert': 'true'
+    },
+    body: JSON.stringify(data)
+  });
+}
+
 // ============================================================
 // BACKGROUND FUNCTION HANDLER
 // ============================================================
@@ -150,81 +163,53 @@ export const handler = async (event) => {
 
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+    const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
     console.log('[BG] Starting preview generation for job:', jobId, 'category:', storyData.category);
 
-    // DIAGNOSTIC: write a "started" marker so we know the function was invoked
-    if (jobId && supabaseUrl && supabaseKey) {
-      try {
-        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
-            'Content-Type': 'application/json',
-            'x-upsert': 'true'
-          },
-          body: JSON.stringify({ success: false, status: 'started', error: 'Story is being generated...' })
-        });
-        console.log('[BG] Wrote started marker for job:', jobId);
-      } catch (e) { console.error('[BG] Failed to write started marker:', e.message); }
-    }
-
-    // ── Generate preview opening with Anthropic ──
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
+    // ── Generate preview opening with Anthropic (direct fetch, no SDK) ──
     const startTime = Date.now();
     let previewStory;
     try {
-      console.log('[BG] About to call Anthropic API...');
-      // DIAGNOSTIC: update marker to show we reached the API call
-      if (jobId && supabaseUrl && supabaseKey) {
-        try {
-          await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey, 'Content-Type': 'application/json', 'x-upsert': 'true' },
-            body: JSON.stringify({ success: false, status: 'calling_anthropic', error: 'Calling AI to write your story...' })
-          });
-        } catch (e) { /* best effort */ }
-      }
-      const stream = await anthropic.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        temperature: 1,
-        thinking: {
-          type: 'enabled',
-          budget_tokens: 500
+      console.log('[BG] Calling Anthropic API via fetch...');
+      const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicKey,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json'
         },
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }],
-        stream: true
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          temperature: 1,
+          thinking: {
+            type: 'enabled',
+            budget_tokens: 500
+          },
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
+        })
       });
 
-      let storyText = '';
-      for await (const ev of stream) {
-        if (ev.type === 'content_block_delta') {
-          if (ev.delta.type === 'text_delta') {
-            storyText += ev.delta.text;
-          }
+      if (!apiResponse.ok) {
+        const errBody = await apiResponse.text();
+        throw new Error('Anthropic API ' + apiResponse.status + ': ' + errBody);
+      }
+
+      const apiResult = await apiResponse.json();
+      // Extract text from content blocks (skip thinking blocks)
+      previewStory = '';
+      for (const block of apiResult.content) {
+        if (block.type === 'text') {
+          previewStory += block.text;
         }
       }
-      previewStory = storyText;
       console.log('[BG] Preview generated in', Date.now() - startTime, 'ms, words:', previewStory.split(' ').length);
     } catch (apiErr) {
       console.error('[BG] Anthropic API error after', Date.now() - startTime, 'ms:', apiErr.message);
       if (jobId && supabaseUrl && supabaseKey) {
-        try {
-          await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${supabaseKey}`,
-              'apikey': supabaseKey,
-              'Content-Type': 'application/json',
-              'x-upsert': 'true'
-            },
-            body: JSON.stringify({ success: false, error: 'Story generation failed: ' + apiErr.message })
-          });
-        } catch (e) { /* best effort */ }
+        try { await saveResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Story generation failed: ' + apiErr.message }); } catch (e) { /* best effort */ }
       }
       return { statusCode: 200 };
     }
@@ -242,7 +227,6 @@ export const handler = async (event) => {
       messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
     }
 
-    // Use the full preview text for TTS (all ~200 words for ~30s of audio)
     const previewText = messageIntro + previewStory + ' ... ... To hear what happens next, unlock the full story.';
 
     // ── Generate TTS ──
@@ -267,18 +251,7 @@ export const handler = async (event) => {
       const errText = await ttsResponse.text();
       console.error('[BG] ElevenLabs error after', Date.now() - ttsStart, 'ms:', ttsResponse.status, errText);
       if (jobId && supabaseUrl && supabaseKey) {
-        try {
-          await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${supabaseKey}`,
-              'apikey': supabaseKey,
-              'Content-Type': 'application/json',
-              'x-upsert': 'true'
-            },
-            body: JSON.stringify({ success: false, error: 'Voice generation failed. Please try again.' })
-          });
-        } catch (e) { /* best effort */ }
+        try { await saveResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Voice generation failed. Please try again.' }); } catch (e) { /* best effort */ }
       }
       return { statusCode: 200 };
     }
@@ -290,16 +263,7 @@ export const handler = async (event) => {
     const result = { success: true, previewAudio: audioBase64, previewStory, storyData };
     if (jobId && supabaseUrl && supabaseKey) {
       try {
-        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
-            'Content-Type': 'application/json',
-            'x-upsert': 'true'
-          },
-          body: JSON.stringify(result)
-        });
+        await saveResult(supabaseUrl, supabaseKey, jobId, result);
         console.log('[BG] Saved complete result for job:', jobId);
       } catch (saveErr) {
         console.error('[BG] Failed to save complete result:', saveErr.message);
@@ -312,18 +276,7 @@ export const handler = async (event) => {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     if (jobId && supabaseUrl && supabaseKey) {
-      try {
-        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
-            'Content-Type': 'application/json',
-            'x-upsert': 'true'
-          },
-          body: JSON.stringify({ success: false, error: err.message })
-        });
-      } catch (e) { /* best effort */ }
+      try { await saveResult(supabaseUrl, supabaseKey, jobId, { success: false, error: err.message }); } catch (e) { /* best effort */ }
     }
     return { statusCode: 200 };
   }
