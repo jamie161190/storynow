@@ -494,6 +494,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then just £9.99 for the full story</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? We'll rewrite it for free.</p>
   </div>
 
   <!-- AUDIO SAMPLE -->
@@ -551,11 +552,53 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     </div>
   </div>
 
+  <!-- REAL PARENT TESTIMONIAL -->
+  <div style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
+    <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.6rem">Real messages from real parents</p>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.75rem;font-weight:500">We don't do fake reviews. Here's what Lisa sent the morning after her daughter Livvie heard her first story.</p>
+    <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);border:2px solid var(--border)">
+      <img src="/lisa-testimonial.png" alt="WhatsApp message from Lisa: Livvie's woken up asking me for another story, I blame you. It really is brilliant though." style="width:100%;display:block">
+    </div>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;font-weight:600;font-style:italic">Lisa, mum to Livvie (age 4)</p>
+  </div>
+
   <!-- SECOND CTA -->
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then just £9.99 for the full story</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? We'll rewrite it for free.</p>
     <a class="my-stories-link" onclick="goTo('screenLogin')">&#128274; Log in / My Stories</a>
+  </div>
+
+  <!-- FAQ -->
+  <div style="width:100%;max-width:440px;margin-top:1.5rem">
+    <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.75rem;text-align:center">Common questions</p>
+    <div style="display:flex;flex-direction:column;gap:0.5rem">
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is it safe? What do you do with my child's details?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">We only use your child's details to create their story. Nothing is shared, sold, or stored beyond what's needed. The story is yours. We take child safety seriously.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I hear it before I pay?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. You get a free preview of the opening of your child's story before you spend anything. Only pay if you love it.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long is the full story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Around 15 minutes of narrated audio. Long enough for bedtime, a car journey, or quiet time. Every story is unique and written from scratch.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I share it with family?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Share it with grandparents, aunties, uncles, anyone, via WhatsApp or email. No extra cost, no limit. You can also download the audio to keep forever.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if my child doesn't like it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">We'll rewrite it for free. No questions asked. We want every child to love their story.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is £9.99 for one story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. One completely unique, 15 minute personalised audio story with your choice of narrator. No subscription, no hidden costs. You own it forever.</p>
+      </details>
+    </div>
   </div>
 
   <!-- CONTACT -->
