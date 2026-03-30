@@ -2204,7 +2204,7 @@ async function submitReview() {
     await fetch('/api/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'review', to: 'hello@storytold.ai', reviewName: name, reviewChildName: childName, reviewText: text })
+      body: JSON.stringify({ type: 'review', to: 'jamie@builtsmarter.co.uk', reviewName: name, reviewChildName: childName, reviewText: text })
     });
   } catch(e) {}
   document.getElementById('reviewForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Thank you! We really appreciate it.</p>';
