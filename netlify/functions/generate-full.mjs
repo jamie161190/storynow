@@ -1,5 +1,3 @@
-import Stripe from 'stripe';
-
 // TTS chunk helper: splits text into chunks at sentence boundaries
 function splitIntoChunks(text, maxChars = 4000) {
   const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
@@ -45,44 +43,17 @@ export default async (req) => {
   try {
     const { fullStory, voiceId, childName, sessionId, jobId } = await req.json();
 
-    // ── Payment verification (server-side) ──────────────────
-    if (!sessionId) {
-      return new Response(JSON.stringify({ error: 'Missing payment session' }), {
-        status: 403, headers: { 'Content-Type': 'application/json' }
+    if (!fullStory) {
+      return new Response(JSON.stringify({ error: 'Missing story text' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
       });
     }
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-    if (!session || session.payment_status !== 'paid') {
-      return new Response(JSON.stringify({ error: 'Payment not confirmed' }), {
-        status: 403, headers: { 'Content-Type': 'application/json' }
+    if (!process.env.ELEVENLABS_API_KEY) {
+      console.error('ELEVENLABS_API_KEY not set');
+      return new Response(JSON.stringify({ error: 'Voice service not configured' }), {
+        status: 503, headers: { 'Content-Type': 'application/json' }
       });
     }
-
-    // ── Prevent session reuse (one payment = one generation) ──
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-
-    if (supabaseUrl && supabaseKey) {
-      const checkRes = await fetch(
-        `${supabaseUrl}/rest/v1/stories?stripe_session_id=eq.${encodeURIComponent(sessionId)}&select=id&limit=1`,
-        {
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey
-          }
-        }
-      );
-      const existing = await checkRes.json();
-      if (existing && existing.length > 0) {
-        return new Response(JSON.stringify({ error: 'This payment has already been used to generate a story. Check My Stories to find it.' }), {
-          status: 403, headers: { 'Content-Type': 'application/json' }
-        });
-      }
-    }
-    // ─────────────────────────────────────────────────────────
 
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
 
@@ -131,6 +102,8 @@ export default async (req) => {
     console.log('Total full audio time:', Date.now() - startTime, 'ms, size:', Math.round(audioBase64.length / 1024), 'KB');
 
     // Upload to Supabase Storage
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     let audioUrl = null;
 
     if (supabaseUrl && supabaseKey) {
