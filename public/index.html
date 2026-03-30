@@ -1819,6 +1819,19 @@ function showReview() {
   goTo('screenReview');
 }
 
+async function pollForPreview(jobId) {
+  const maxAttempts = 20; // 20 x 3s = 60s max wait
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const res = await fetch('/api/check-preview?jobId=' + jobId);
+      const data = await res.json();
+      if (data.ready && data.success) return data;
+    } catch(e) { /* keep polling */ }
+  }
+  return null;
+}
+
 async function generatePreview() {
   // Make sure we have a valid voice selected
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
@@ -1848,36 +1861,35 @@ async function generatePreview() {
   }, 4000);
 
   try {
-    // Retry logic: the AI story generation can be slow, so retry once on failure
+    // Generate a job ID so we can recover the result if the connection times out
+    const jobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     let data;
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        const res = await fetch('/api/generate-preview', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ storyData, voiceId: selectedVoiceId })
-        });
-        const text = await res.text();
-        try { data = JSON.parse(text); } catch(e) {
-          console.error('Non-JSON response (attempt ' + attempt + '):', text.substring(0, 500));
-          if (attempt < 2) {
-            loadingText.textContent = 'Hmm, that took a bit long. Trying again...';
-            continue;
-          }
-          throw new Error('Our story writer is busy right now. Please try again in a moment.');
-        }
-        if (!data.success) {
-          if (attempt < 2 && (data.error || '').toLowerCase().includes('timeout')) {
-            loadingText.textContent = 'Almost there, giving it one more go...';
-            continue;
-          }
-          throw new Error(data.error || 'Something went wrong');
-        }
-        break; // success
-      } catch(retryErr) {
-        if (attempt >= 2) throw retryErr;
-        loadingText.textContent = 'Hmm, that took a bit long. Trying again...';
+
+    try {
+      const res = await fetch('/api/generate-preview', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ storyData, voiceId: selectedVoiceId, jobId })
+      });
+      const text = await res.text();
+      try { data = JSON.parse(text); } catch(e) {
+        console.log('Direct response timed out, polling for result...');
+        data = null;
       }
+      if (data && !data.success) throw new Error(data.error || 'Something went wrong');
+    } catch(fetchErr) {
+      if (fetchErr.message && !fetchErr.message.includes('Something went wrong')) {
+        console.log('Fetch error, will poll:', fetchErr.message);
+        data = null;
+      } else {
+        throw fetchErr;
+      }
+    }
+
+    // If direct response failed (timeout), poll for the result
+    if (!data || !data.success) {
+      loadingText.textContent = 'Almost there, just finishing up...';
+      data = await pollForPreview(jobId);
     }
     if (!data || !data.success) throw new Error('Story generation failed. Please try again.');
     fullStoryText = data.fullStory;

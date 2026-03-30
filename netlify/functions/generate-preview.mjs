@@ -259,7 +259,7 @@ export default async (req) => {
   }
 
   try {
-    const { storyData, voiceId } = await req.json();
+    const { storyData, voiceId, jobId } = await req.json();
     const promptFn = STORY_PROMPTS[storyData.category];
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
@@ -318,12 +318,28 @@ export default async (req) => {
     const audioBase64 = Buffer.from(await ttsResponse.arrayBuffer()).toString('base64');
     console.log('Total time:', Date.now() - startTime, 'ms, response size:', Math.round(audioBase64.length / 1024), 'KB');
 
-    return new Response(JSON.stringify({
-      success: true,
-      previewAudio: audioBase64,
-      fullStory: fullStoryWithMessage,
-      storyData
-    }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    const result = { success: true, previewAudio: audioBase64, fullStory: fullStoryWithMessage, storyData };
+
+    // Save result to Supabase so frontend can retrieve it if the HTTP connection timed out
+    if (jobId && process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY) {
+      try {
+        await fetch(`${process.env.SUPABASE_URL}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.SUPABASE_SECRET_KEY}`,
+            'apikey': process.env.SUPABASE_SECRET_KEY,
+            'Content-Type': 'application/json',
+            'x-upsert': 'true'
+          },
+          body: JSON.stringify(result)
+        });
+        console.log('Saved preview result for job:', jobId);
+      } catch (saveErr) {
+        console.error('Failed to save preview result:', saveErr.message);
+      }
+    }
+
+    return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
   } catch (err) {
     console.error(err);
