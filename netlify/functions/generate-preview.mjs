@@ -403,10 +403,10 @@ export default async (req) => {
     // Use Opus with extended thinking for the highest quality stories.
     // Extended thinking lets Claude plan the story arc, place personal details
     // strategically, and craft callbacks before writing a single word.
-    let storyResponse;
+    let fullStory;
     try {
-      // Use streaming to handle long-running Opus + extended thinking requests
-      const stream = anthropic.messages.stream({
+      // Use streaming with stream: true to handle long-running Opus + extended thinking
+      const stream = await anthropic.messages.create({
         model: 'claude-opus-4-20250514',
         max_tokens: 16000,
         temperature: 1, // required to be 1 when using extended thinking
@@ -415,18 +415,25 @@ export default async (req) => {
           budget_tokens: 4000 // think for ~4k tokens before writing
         },
         system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: promptFn(storyData) }]
+        messages: [{ role: 'user', content: promptFn(storyData) }],
+        stream: true
       });
-      storyResponse = await stream.finalMessage();
+
+      // Collect text from streaming events
+      let storyText = '';
+      for await (const event of stream) {
+        if (event.type === 'content_block_delta') {
+          if (event.delta.type === 'text_delta') {
+            storyText += event.delta.text;
+          }
+        }
+      }
+      fullStory = storyText;
       console.log('Story generated in', Date.now() - startTime, 'ms');
     } catch(apiErr) {
       console.error('Anthropic API error after', Date.now() - startTime, 'ms:', apiErr.message);
       throw new Error('Story generation failed: ' + apiErr.message);
     }
-
-    // With extended thinking, response has thinking blocks then text blocks
-    const textBlock = storyResponse.content.find(b => b.type === 'text');
-    const fullStory = textBlock ? textBlock.text : storyResponse.content[0].text;
     // Frame the intro: gift stories get a warm gift intro, otherwise use personal message
     let messageIntro = '';
     if (storyData.isGift && storyData.giftFrom) {
