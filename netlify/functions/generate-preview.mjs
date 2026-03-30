@@ -255,6 +255,16 @@ Write the story now. Start immediately.`
 };
 
 export default async (req) => {
+  // Guard: check env vars immediately
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.error('ANTHROPIC_API_KEY not set');
+    return new Response(JSON.stringify({ error: 'Story service not configured (missing AI key)' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+  }
+  if (!process.env.ELEVENLABS_API_KEY) {
+    console.error('ELEVENLABS_API_KEY not set');
+    return new Response(JSON.stringify({ error: 'Voice service not configured' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+  }
+
   try {
     const { storyData, voiceId } = await req.json();
     const promptFn = STORY_PROMPTS[storyData.category];
@@ -264,6 +274,7 @@ export default async (req) => {
     const tokenMap = { standard: 1800, long: 4000, epic: 5500 };
     const maxTokens = tokenMap[storyData.length] || 1800;
 
+    const startTime = Date.now();
     console.log('Generating story:', { category: storyData.category, length: storyData.length, childName: storyData.childName });
 
     let storyResponse;
@@ -274,8 +285,9 @@ export default async (req) => {
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: promptFn(storyData) }]
       });
+      console.log('Story generated in', Date.now() - startTime, 'ms');
     } catch(apiErr) {
-      console.error('Anthropic API error:', apiErr.message);
+      console.error('Anthropic API error after', Date.now() - startTime, 'ms:', apiErr.message);
       throw new Error('Story generation failed: ' + apiErr.message);
     }
 
@@ -289,6 +301,7 @@ export default async (req) => {
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
     console.log('Using voice ID:', useVoiceId);
 
+    const ttsStart = Date.now();
     const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
       method: 'POST',
       headers: {
@@ -304,10 +317,12 @@ export default async (req) => {
 
     if (!ttsResponse.ok) {
       const errText = await ttsResponse.text();
-      console.error('ElevenLabs error:', ttsResponse.status, errText);
+      console.error('ElevenLabs error after', Date.now() - ttsStart, 'ms:', ttsResponse.status, errText);
       throw new Error('Voice generation failed (voice: ' + useVoiceId + '): ' + errText);
     }
+    console.log('TTS generated in', Date.now() - ttsStart, 'ms');
     const audioBase64 = Buffer.from(await ttsResponse.arrayBuffer()).toString('base64');
+    console.log('Total time:', Date.now() - startTime, 'ms, response size:', Math.round(audioBase64.length / 1024), 'KB');
 
     return new Response(JSON.stringify({
       success: true,
@@ -322,4 +337,4 @@ export default async (req) => {
   }
 };
 
-export const config = { path: '/api/generate-preview' };
+export const config = { path: '/api/generate-preview', method: 'POST' };
