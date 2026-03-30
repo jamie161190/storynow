@@ -104,6 +104,20 @@ export const handler = async (event) => {
     if (!ttsResponse.ok) {
       const errText = await ttsResponse.text();
       console.error('[BG] ElevenLabs error after', Date.now() - ttsStart, 'ms:', ttsResponse.status, errText);
+      if (jobId && supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${supabaseKey}`,
+              'apikey': supabaseKey,
+              'Content-Type': 'application/json',
+              'x-upsert': 'true'
+            },
+            body: JSON.stringify({ success: false, error: 'Voice generation failed. Please try again.' })
+          });
+        } catch (e) { /* best effort */ }
+      }
       return { statusCode: 200 };
     }
     console.log('[BG] TTS generated in', Date.now() - ttsStart, 'ms');

@@ -2636,7 +2636,7 @@ async function unlockFull() {
     // TEMPORARY: skip Stripe, go straight to full audio generation
     goTo('screenLoading');
     document.querySelector('.loading-text').textContent = 'Writing the full story...';
-    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. We're writing the complete story and recording every word.';
+    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. We are writing the complete story and recording every word.';
     const fakeSessionId = 'bypass-' + Date.now();
     const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     try {
@@ -2767,7 +2767,7 @@ async function handleStripeReturn() {
 
     // Payment confirmed, now generate full audio
     document.querySelector('.loading-text').textContent = 'Writing the full story...';
-    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. We're writing the complete story and recording every word.';
+    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. We are writing the complete story and recording every word.';
 
     const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     let data;
