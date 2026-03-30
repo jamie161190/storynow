@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 export default async (req) => {
   try {
     const apiKey = process.env.ELEVENLABS_API_KEY;
