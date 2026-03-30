@@ -1993,24 +1993,39 @@ async function unlockFull() {
   }
   emailErr.style.display = 'none';
 
-  trackEvent('InitiateCheckout', { value: 9.99, currency: 'GBP', content_name: storyData.category });
+  // TEMPORARY FREE BYPASS - REMOVE AFTER TESTING
+  trackEvent('InitiateCheckout', { value: 0, currency: 'GBP', content_name: storyData.category });
   goTo('screenLoading');
-  document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
-  document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';
+  document.querySelector('.loading-text').textContent = 'Generating the full story...';
+  document.querySelector('.loading-sub').textContent = 'This takes a couple of minutes. Your story is being crafted.';
   try {
-
-    // Save story data so we can retrieve it after Stripe redirect
-    sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, fullStoryText, selectedVoiceId }));
-
-    const res = await fetch('/api/create-checkout', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, fullStoryText, selectedVoiceId })
-    });
-    const data = await res.json();
-    if(!data.success) throw new Error(data.error || 'Something went wrong');
-    // Redirect to Stripe Checkout
-    window.location.href = data.checkoutUrl;
+    const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    let data;
+    try {
+      const res = await fetch('/api/generate-full', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId: 'free-test', jobId: fullJobId })
+      });
+      const text = await res.text();
+      try { data = JSON.parse(text); } catch(e) { data = null; }
+      if (data && !data.success) throw new Error(data.error || 'Something went wrong');
+    } catch(fetchErr) {
+      if (fetchErr.message && !fetchErr.message.includes('Something went wrong')) {
+        data = null;
+      } else { throw fetchErr; }
+    }
+    if (!data || !data.success) {
+      document.querySelector('.loading-text').textContent = 'Almost there, just finishing up...';
+      data = await pollForFull(fullJobId);
+    }
+    if (!data || !data.success) throw new Error('Audio generation failed. Please try again.');
+    const audio = document.getElementById('fullStoryAudio');
+    audio.src = 'data:audio/mpeg;base64,' + data.fullAudio;
+    document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
+    document.getElementById('fullTitle').textContent = storyData.childName + "'s story is ready";
+    document.getElementById('sendGiftBtn').style.display = 'none';
+    goTo('screenFull');
   } catch(err) {
     goTo('screenPreview');
     alert('Something went wrong: ' + err.message);
