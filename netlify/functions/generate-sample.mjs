@@ -5,29 +5,16 @@ export default async (req) => {
   // Daniel - calm, deep, British male voice
   const voiceId = 'onwK4e9ZLuTAKqWW03F9';
 
-  const storyText = `This story was made just for you, Chase.
+  // ~130 words = roughly 40-45 seconds of audio
+  const storyText = `Tonight's story is just for you, Chase. Are you ready? Then let's go.
 
-Chase lay in bed, staring at the glow-in-the-dark stars on his ceiling. But tonight, something was different. One of the stars was getting brighter. And brighter. And brighter.
+Chase was lying in bed when something outside the window caught his eye. A star, brighter than all the others, getting closer, and closer, until it wasn't a star at all. It was a rocket. And painted on the side, in big silver letters, was his name. Chase.
 
-He sat up. The light filled his whole room, warm and golden, and then, with a gentle whoooosh, the ceiling opened up like a hatch, and a small silver rocket floated down and hovered right above his bed.
+A hatch swung open. "We've been waiting for you, Chase."
 
-A voice crackled from inside. "Chase? Are you ready? We've been waiting for you."
+He climbed inside. The engines hummed. And then, whoooosh, up through the clouds, up past the birds, up past the planes, until the whole world was just a little blue marble far below.
 
-Chase grinned. He grabbed his favourite teddy, climbed aboard, and before he could even buckle in, the rocket shot upwards, through the roof, through the clouds, through the sky, until the whole of Earth was just a little blue marble behind him.
-
-"First stop," the voice said, "the Moon."
-
-The Moon was quiet. Chase's boots left footprints in the silver dust, and he bounced with every step, higher and higher, laughing as he floated back down. He found a crater filled with moonflowers that glowed pale blue, and he picked one to bring home.
-
-"Next stop," the voice said, "Saturn."
-
-Saturn's rings were made of ice crystals that chimed like tiny bells when Chase ran his fingers through them. He slid down the biggest ring like the longest slide in the universe, spinning and laughing, his teddy tucked under one arm.
-
-And then Chase looked out into the distance, at all the stars he hadn't visited yet, at all the adventures still waiting for him. He smiled, closed his eyes, and whispered, "I'll be back tomorrow."
-
-The rocket knew. It always knew. It carried him gently home, back through the clouds, back through the ceiling, back into his warm bed. The glow-in-the-dark stars on his ceiling twinkled, just a little brighter than before.
-
-Goodnight, Chase. The stars will be there whenever you're ready.`;
+Chase pressed his face against the window and smiled. He was going to space. And this was only the beginning.`;
 
   try {
     const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
