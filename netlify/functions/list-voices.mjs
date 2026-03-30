@@ -5,6 +5,13 @@ export default async (req) => {
     });
     const data = await res.json();
 
+    if (!res.ok || !data.voices) {
+      console.error('ElevenLabs error:', res.status, JSON.stringify(data));
+      return new Response(JSON.stringify({ success: false, error: 'ElevenLabs API error: ' + (data.detail?.message || data.detail || res.status) }), {
+        status: 502, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Return voice details we care about
     const voices = data.voices.map(v => ({
       id: v.voice_id,
