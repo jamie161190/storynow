@@ -400,8 +400,9 @@ export default async (req) => {
     const startTime = Date.now();
     console.log('Generating story:', { category: storyData.category, length: storyData.length, childName: storyData.childName });
 
-    // Use Sonnet 4 with extended thinking for high-quality stories
-    // that complete within Netlify's function timeout.
+    // Use Sonnet 4 with extended thinking for highest quality stories.
+    // The direct HTTP response may 504 on Netlify, but the result is saved
+    // to Supabase and the frontend polls for it automatically.
     let fullStory;
     try {
       const stream = await anthropic.messages.create({
@@ -444,12 +445,12 @@ export default async (req) => {
       messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
     }
     const fullStoryWithMessage = messageIntro + fullStory;
-    // Use ~150 words for a ~60 second preview, end at a sentence boundary
+    // Use ~75 words for a ~30 second preview, end at a sentence boundary
     const words = fullStoryWithMessage.split(' ');
-    let previewText = words.slice(0, 150).join(' ');
+    let previewText = words.slice(0, 75).join(' ');
     // Try to end at the last complete sentence
     const lastSentenceEnd = previewText.search(/[.!?][^.!?]*$/);
-    if (lastSentenceEnd > 80) {
+    if (lastSentenceEnd > 40) {
       previewText = previewText.substring(0, lastSentenceEnd + 1);
     }
     previewText += ' ... To hear what happens next, unlock the full story.';
