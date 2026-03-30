@@ -31,17 +31,14 @@ export default async (req) => {
 
     return new Response(JSON.stringify({
       success: isSuccessful,
-      sessionId: session.id,
       paymentStatus: session.payment_status,
-      customerEmail: session.customer_details?.email || session.customer_email,
-      metadata: session.metadata || {},
-      amountTotal: session.amount_total,
-      currency: session.currency
+      customerEmail: isSuccessful ? (session.customer_details?.email || session.customer_email) : undefined,
+      metadata: isSuccessful ? (session.metadata || {}) : undefined
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
   } catch (err) {
     console.error('Payment verification error:', err);
-    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ success: false, error: 'Payment verification failed' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
 

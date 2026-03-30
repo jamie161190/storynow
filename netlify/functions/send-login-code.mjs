@@ -1,5 +1,7 @@
 // Sends a 6-digit login code to the user's email
 
+import { randomInt } from 'crypto';
+
 export default async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -35,8 +37,28 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'No stories found for this email. Create a story first!' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
     }
 
+    // Rate limit: max 3 code requests per email per hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const rlCheck = await fetch(
+      `${supabaseUrl}/rest/v1/login_codes?email=eq.${encodeURIComponent(email)}&created_at=gte.${oneHourAgo}&select=id`,
+      {
+        headers: {
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': supabaseKey
+        }
+      }
+    );
+    if (rlCheck.ok) {
+      const recentCodes = await rlCheck.json();
+      if (recentCodes.length >= 3) {
+        return new Response(JSON.stringify({ error: 'Too many code requests. Please wait and try again.' }), {
+          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' }
+        });
+      }
+    }
+
     // Generate a 6-digit code
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = String(randomInt(100000, 999999));
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
 
     // Store the code in a login_codes table
@@ -88,7 +110,7 @@ export default async (req) => {
 
   } catch (err) {
     console.error('Login code error:', err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ error: 'Login service temporarily unavailable. Please try again.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
 

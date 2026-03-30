@@ -8,6 +8,13 @@ export default async (req) => {
     });
   }
 
+  // Validate jobId format to prevent path traversal
+  if (!/^[a-zA-Z0-9_-]+$/.test(jobId)) {
+    return new Response(JSON.stringify({ ready: false, error: 'Invalid job ID' }), {
+      status: 400, headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 

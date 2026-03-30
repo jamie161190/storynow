@@ -286,6 +286,49 @@ Write the story now. Start immediately.`
 };
 
 export default async (req) => {
+  // ── Rate limiting: max 5 previews per IP per hour ──
+  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-nf-client-connection-ip') || 'unknown';
+  const rateLimitKey = `preview_${clientIP}`;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (supabaseUrl && supabaseKey) {
+    try {
+      // Check recent requests from this IP
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const rlCheck = await fetch(
+        `${supabaseUrl}/rest/v1/rate_limits?key=eq.${encodeURIComponent(rateLimitKey)}&created_at=gte.${oneHourAgo}&select=id`,
+        {
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey
+          }
+        }
+      );
+      if (rlCheck.ok) {
+        const recent = await rlCheck.json();
+        if (recent.length >= 5) {
+          console.log('Rate limited:', clientIP, recent.length, 'requests in last hour');
+          return new Response(JSON.stringify({ error: 'You have reached the preview limit. Please try again later.' }), {
+            status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' }
+          });
+        }
+      }
+      // Record this request
+      await fetch(`${supabaseUrl}/rest/v1/rate_limits`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': supabaseKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ key: rateLimitKey, created_at: new Date().toISOString() })
+      });
+    } catch (rlErr) {
+      console.error('Rate limit check failed (allowing request):', rlErr.message);
+    }
+  }
+
   // Guard: check env vars immediately
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error('ANTHROPIC_API_KEY not set');
@@ -298,6 +341,26 @@ export default async (req) => {
 
   try {
     const { storyData, voiceId, jobId } = await req.json();
+
+    // Validate jobId to prevent path traversal
+    if (jobId && !/^[a-zA-Z0-9_-]+$/.test(jobId)) {
+      return new Response(JSON.stringify({ error: 'Invalid job ID' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Input size limits
+    if (storyData?.extraDetails && storyData.extraDetails.length > 1000) {
+      return new Response(JSON.stringify({ error: 'Extra details too long' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    if (storyData?.customScenario && storyData.customScenario.length > 2000) {
+      return new Response(JSON.stringify({ error: 'Custom scenario too long' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const promptFn = STORY_PROMPTS[storyData.category];
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
@@ -399,7 +462,7 @@ export default async (req) => {
 
   } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
 

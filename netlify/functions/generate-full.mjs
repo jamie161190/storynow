@@ -71,6 +71,20 @@ export default async (req) => {
       });
     }
 
+    // Validate jobId to prevent path traversal
+    if (jobId && !/^[a-zA-Z0-9_-]+$/.test(jobId)) {
+      return new Response(JSON.stringify({ error: 'Invalid job ID' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Input size validation
+    if (fullStory && fullStory.length > 50000) {
+      return new Response(JSON.stringify({ error: 'Story text too long' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Payment verification: this endpoint must only work for paid sessions
     if (!sessionId) {
       return new Response(JSON.stringify({ error: 'Missing payment session' }), {
@@ -91,18 +105,39 @@ export default async (req) => {
       });
     }
 
-    if (!process.env.ELEVENLABS_API_KEY) {
-      console.error('ELEVENLABS_API_KEY not set');
-      return new Response(JSON.stringify({ error: 'Voice service not configured' }), {
-        status: 503, headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
+    // Prevent session replay: one payment = one full audio generation
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
       return new Response(JSON.stringify({ error: 'Storage not configured' }), {
+        status: 503, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Check if this session already generated audio
+    const existingCheck = await fetch(
+      `${supabaseUrl}/rest/v1/stories?stripe_session_id=eq.${encodeURIComponent(sessionId)}&select=id,audio_url&limit=1`,
+      {
+        headers: {
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': supabaseKey
+        }
+      }
+    );
+    if (existingCheck.ok) {
+      const existing = await existingCheck.json();
+      if (existing.length > 0 && existing[0].audio_url) {
+        console.log('Session already used, returning existing audio:', sessionId);
+        return new Response(JSON.stringify({ success: true, audioUrl: existing[0].audio_url }), {
+          status: 200, headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    if (!process.env.ELEVENLABS_API_KEY) {
+      console.error('ELEVENLABS_API_KEY not set');
+      return new Response(JSON.stringify({ error: 'Voice service not configured' }), {
         status: 503, headers: { 'Content-Type': 'application/json' }
       });
     }
@@ -217,7 +252,7 @@ export default async (req) => {
 
   } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ error: 'Audio generation failed. Your payment is confirmed, please try again or contact hello@storytold.ai' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
 

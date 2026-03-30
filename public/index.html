@@ -2350,6 +2350,7 @@ async function saveStoryToDb(email, audioUrl, stripeSessionId) {
 }
 
 let loginEmailAddr = '';
+let loginAuthToken = '';
 
 // Step 1: Send login code
 async function sendLoginCode() {
@@ -2416,6 +2417,13 @@ async function verifyLoginCode() {
     if (!res.ok || !data.success) {
       showCodeError(data.error || 'Invalid code');
       return;
+    }
+
+    // Store auth token for future get-stories requests
+    if (data.token) {
+      loginAuthToken = data.token;
+      try { sessionStorage.setItem('storytold_auth_token', data.token); } catch(e) {}
+      try { sessionStorage.setItem('storytold_auth_email', loginEmailAddr); } catch(e) {}
     }
 
     // Show stories

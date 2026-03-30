@@ -9,6 +9,11 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Missing story ID' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
+    // Validate story ID format (UUID)
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(storyId)) {
+      return new Response(JSON.stringify({ error: 'Invalid story ID format' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
@@ -50,7 +55,7 @@ export default async (req) => {
 
   } catch (err) {
     console.error('Shared story error:', err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify({ error: 'Failed to load story' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 };
 
