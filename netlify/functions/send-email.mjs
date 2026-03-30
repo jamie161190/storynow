@@ -96,7 +96,7 @@ export default async (req) => {
 };
 
 function purchaseEmail(childName, category, length, customerEmail) {
-  const lengthLabel = length === 'epic' ? 'Long (~15 min)' : length === 'long' ? 'Medium (~10 min)' : 'Short (~5 min)';
+  const lengthLabel = '~15 min';
   const categoryLabel = category === 'learning' ? 'Learning Adventure' : category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
 
   return `

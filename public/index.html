@@ -809,7 +809,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
 <!-- VOICE -->
 <div class="screen" id="screenVoice">
-  <button class="back-btn" onclick="goTo('screenLength')">&#8592; Back</button>
+  <button class="back-btn" onclick="goTo('screenExtras')">&#8592; Back</button>
   <h2 class="section-title">Choose a storyteller</h2>
   <p class="section-sub" id="voiceSubtext">Pick the voice that feels right.</p>
 
@@ -1036,7 +1036,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 </div>
 
 <script>
-let storyData = { category:'', length:'standard', themes:[], where:'Surprise me' };
+let storyData = { category:'', length:'epic', themes:[], where:'Surprise me' };
 let selectedVoiceId = '';
 let fullStoryText = '';
 let lastStripeSessionId = '';
@@ -1384,7 +1384,7 @@ function goToLength() {
     storyData.giftDelivery = document.getElementById('giftDelivery').value;
     storyData.giftDate = document.getElementById('giftDate').value;
   }
-  goTo('screenLength');
+  goTo('screenVoice');
 }
 
 function selectLength(len, el) {
@@ -1907,7 +1907,7 @@ function renderLibrary(stories) {
   document.getElementById('libraryEmpty').style.display = 'none';
   const catEmoji = { bedtime:'\u{1F319}', journey:'\u{1F697}', learning:'\u{1F4DA}', custom:'\u{2728}' };
   const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure', custom:'Custom Story' };
-  const lenLabel = { standard:'Short (~5 min)', long:'Medium (~10 min)', epic:'Long (~15 min)' };
+  const lenLabel = { standard:'~5 min', long:'~10 min', epic:'~15 min' };
 
   const list = document.getElementById('libraryList');
   list.innerHTML = '';
