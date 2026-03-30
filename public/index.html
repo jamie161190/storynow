@@ -768,7 +768,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </select>
     </div>
   </div>
-  <div class="form-group" id="proudOfGroup">
+  <div class="form-group" id="proudOfGroup" style="display:none">
     <label id="proudOfLabel">What is the occasion? (optional)</label>
     <input type="text" id="proudOf" placeholder="e.g. Their birthday, just scored a goal, learned to ride a bike">
     <p class="form-hint" id="proudOfHint">We will weave this into the story to make it feel extra special.</p>
@@ -794,6 +794,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <label>Other people in the story (optional)</label>
     <input type="text" id="familyMembers" placeholder="e.g. Mum, Dad, Nanny Rose, sister Isla, Mrs Thompson">
     <p class="form-hint">Family, teachers, anyone you like. They will each get a real role, not just a mention.</p>
+  </div>
+
+  <div class="form-group" id="teacherGroup" style="display:none">
+    <label>Their teacher's name (optional)</label>
+    <input type="text" id="teacherName" placeholder="e.g. Mrs Thompson, Mr Davies">
+    <p class="form-hint">If you include their real teacher, we will weave them into the learning story.</p>
   </div>
 
   <div class="toggle-row" style="margin-top:0.75rem">
@@ -990,10 +996,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <div class="screen" id="screenReview">
   <button class="back-btn" onclick="goTo('screenVoice')">&#8592; Back</button>
   <h2 class="section-title">Check your details</h2>
-  <p class="section-sub">Make sure everything looks right before we create the story.</p>
+  <p class="section-sub">Make sure everything looks right. Tap &#9998; to edit anything.</p>
   <div id="reviewContent" style="width:100%;max-width:440px"></div>
   <button class="btn btn-primary" style="width:100%;margin-top:1.2rem" onclick="generatePreview()">Looks good, create my preview!</button>
-  <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:0.5rem">You can go back and change anything</p>
 </div>
 
 <!-- LOADING -->
@@ -1341,6 +1346,9 @@ function goTo(id, skipHistory) {
   if(id === 'screenExtras') updateExtrasVisibility();
   if(id === 'screenCategory') restoreCategory();
   if(id === 'screenDetails') restoreDetails();
+  if(id === 'screenPeople') {
+    document.getElementById('teacherGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
+  }
   if(id === 'screenLength') restoreLength();
   if(id === 'screenLearningSetup') restoreLearningSetup();
   if(id === 'screenTheme') {
@@ -1381,6 +1389,7 @@ function restoreDetails() {
   if (storyData.friendName) document.getElementById('friendName').value = storyData.friendName;
   if (storyData.proudOf) document.getElementById('proudOf').value = storyData.proudOf;
   if (storyData.familyMembers) document.getElementById('familyMembers').value = storyData.familyMembers;
+  if (storyData.teacherName) document.getElementById('teacherName').value = storyData.teacherName;
   if (storyData.petName) document.getElementById('petName').value = storyData.petName;
   if (storyData.petType) document.getElementById('petType').value = storyData.petType;
   if (storyData.favTeddy) document.getElementById('favTeddy').value = storyData.favTeddy;
@@ -1404,6 +1413,8 @@ function restoreDetails() {
     if (storyData.giftEmail) document.getElementById('giftEmail').value = storyData.giftEmail;
     if (storyData.giftFrom) document.getElementById('giftFrom').value = storyData.giftFrom;
     if (storyData.giftMessage) document.getElementById('giftMessage').value = storyData.giftMessage;
+    // Show occasion field when gift is active
+    document.getElementById('proudOfGroup').style.display = 'block';
     // Hide personal message field when gift is active
     const pmg = document.getElementById('personalMessageGroup');
     if (pmg) pmg.style.display = 'none';
@@ -1521,6 +1532,8 @@ function toggleGift() {
   t.classList.toggle('on');
   const isOn = t.classList.contains('on');
   document.getElementById('giftFields').style.display = isOn ? 'block' : 'none';
+  // Show "occasion" only when gift is on
+  document.getElementById('proudOfGroup').style.display = isOn ? 'block' : 'none';
   // Hide personal message when gift is on (gift message serves the same purpose)
   const pmg = document.getElementById('personalMessageGroup');
   if (pmg) pmg.style.display = isOn ? 'none' : 'block';
@@ -1613,6 +1626,7 @@ function goToLength() {
   storyData.proudOf = document.getElementById('proudOf').value.trim();
   storyData.friendName = friend;
   storyData.familyMembers = document.getElementById('familyMembers').value.trim();
+  storyData.teacherName = (storyData.category === 'learning') ? document.getElementById('teacherName').value.trim() : '';
   storyData.themes = themes;
   storyData.interest = themes.join(', ');
   storyData.hasPet = document.getElementById('petToggle').classList.contains('on');
@@ -1840,33 +1854,36 @@ function showReview() {
   const d = storyData;
   const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
   let html = '<div style="display:flex;flex-direction:column;gap:0.6rem">';
-  const row = (label, val) => val ? `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem"><span style="font-size:0.72rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.03em">${escHtml(label)}</span><p style="margin:0.2rem 0 0;font-size:0.88rem;color:var(--text);font-weight:600">${escHtml(val)}</p></div>` : '';
-  html += row('Story type', catLabel[d.category] || d.category);
-  html += row('Child\'s name', d.childName);
-  html += row('Age', d.age);
-  html += row('Gender', d.gender);
-  html += row('Best friend / sidekick', d.friendName);
-  if (d.familyMembers) html += row('Other people', d.familyMembers);
-  if (d.hasPet && d.petName) html += row('Pet', `${d.petName}${d.petType ? ' (' + d.petType + ')' : ''}`);
-  if (d.favTeddy) html += row('Favourite teddy', d.favTeddy);
-  html += row('Interests', d.themes.join(', '));
-  html += row('Setting', d.setting || 'Surprise me');
+  const pencil = (screen) => `<span onclick="goTo('${screen}')" style="cursor:pointer;float:right;font-size:0.82rem;opacity:0.5;margin-top:-0.1rem" title="Edit">&#9998;</span>`;
+  const row = (label, val, screen) => val ? `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem">${screen ? pencil(screen) : ''}<span style="font-size:0.72rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.03em">${escHtml(label)}</span><p style="margin:0.2rem 0 0;font-size:0.88rem;color:var(--text);font-weight:600">${escHtml(val)}</p></div>` : '';
+  html += row('Story type', catLabel[d.category] || d.category, 'screenCategory');
+  html += row('Child\'s name', d.childName, 'screenDetails');
+  html += row('Age', d.age, 'screenDetails');
+  html += row('Gender', d.gender, 'screenDetails');
+  if (d.proudOf) html += row('Occasion', d.proudOf, 'screenDetails');
+  html += row('Best friend / sidekick', d.friendName, 'screenPeople');
+  if (d.familyMembers) html += row('Other people', d.familyMembers, 'screenPeople');
+  if (d.category === 'learning' && d.teacherName) html += row('Teacher', d.teacherName, 'screenPeople');
+  if (d.hasPet && d.petName) html += row('Pet', `${d.petName}${d.petType ? ' (' + d.petType + ')' : ''}`, 'screenPeople');
+  html += row('Interests', d.themes.join(', '), 'screenTheme');
+  if (d.favTeddy) html += row('Favourite teddy', d.favTeddy, 'screenMemorables');
+  html += row('Setting', d.setting || 'Surprise me', 'screenWhere');
   if (d.category === 'learning') {
-    if (d.subject) html += row('Subject', d.subject);
-    if (d.learningGoal) html += row('Learning goal', d.learningGoal);
+    if (d.subject) html += row('Subject', d.subject, 'screenLearningSetup');
+    if (d.learningGoal) html += row('Learning goal', d.learningGoal, 'screenLearningSetup');
   }
-  if (d.proudOf) html += row('Occasion', d.proudOf);
-  if (d.customScenario) html += row('Story idea', d.customScenario);
-  if (d.extraDetails) html += row('Extra details', d.extraDetails);
-  if (d.personalMessage) html += row('Personal message', d.personalMessage);
+  if (d.customScenario) html += row('Story idea', d.customScenario, 'screenExtras');
+  if (d.extraDetails) html += row('Extra details', d.extraDetails, 'screenExtras');
   if (d.isGift) {
-    html += row('Gift for', d.giftEmail);
-    if (d.giftFrom) html += row('Gift from', d.giftFrom);
-    if (d.giftMessage) html += row('Gift message', d.giftMessage);
+    if (d.giftFrom) html += row('Gift from', d.giftFrom, 'screenDetails');
+    if (d.giftMessage) html += row('Gift message', d.giftMessage, 'screenDetails');
+    html += row('Gift recipient', d.giftEmail, 'screenDetails');
+  } else if (d.personalMessage) {
+    html += row('Personal message', d.personalMessage, 'screenExtras');
   }
   // Find selected voice name
   const voiceCard = document.querySelector('.voice-card.selected .vc-name');
-  if (voiceCard) html += row('Storyteller', voiceCard.textContent);
+  if (voiceCard) html += row('Storyteller', voiceCard.textContent, 'screenVoice');
   html += '</div>';
   document.getElementById('reviewContent').innerHTML = html;
   goTo('screenReview');
