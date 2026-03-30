@@ -1,0 +1,79 @@
+diff --git a/netlify/functions/generate-preview.mjs b/netlify/functions/generate-preview.mjs
+index 5746421..f896915 100644
+--- a/netlify/functions/generate-preview.mjs
++++ b/netlify/functions/generate-preview.mjs
+@@ -100,27 +100,17 @@ export default async (req) => {
+ 
+     console.log('Triggering background worker for job:', jobId, 'category:', storyData.category);
+ 
+-    // Trigger the background worker and verify it accepted the job.
+-    // Background functions return 202 instantly; the real work runs asynchronously.
+-    try {
+-      const bgRes = await fetch(`${siteUrl}/.netlify/functions/story-worker-background`, {
+-        method: 'POST',
+-        headers: { 'Content-Type': 'application/json' },
+-        body: bgPayload
+-      });
+-      console.log('Background worker response:', bgRes.status);
+-      if (bgRes.status >= 400) {
+-        console.error('Background worker rejected job:', bgRes.status);
+-        return new Response(JSON.stringify({ error: 'Story service is temporarily unavailable. Please try again in a moment.' }), {
+-          status: 503, headers: { 'Content-Type': 'application/json' }
+-        });
+-      }
+-    } catch (bgErr) {
+-      console.error('Failed to invoke background worker:', bgErr.message);
+-      return new Response(JSON.stringify({ error: 'Could not start story generation. Please try again.' }), {
+-        status: 503, headers: { 'Content-Type': 'application/json' }
+-      });
+-    }
++    // Fire and forget: background functions return 202 instantly.
++    // Don't await to avoid eating into this function's 10s timeout.
++    fetch(`${siteUrl}/.netlify/functions/story-worker-background`, {
++      method: 'POST',
++      headers: { 'Content-Type': 'application/json' },
++      body: bgPayload
++    }).then(r => {
++      console.log('Background worker response:', r.status);
++    }).catch(err => {
++      console.error('Failed to invoke background worker:', err.message);
++    });
+ 
+     // Return immediately so the frontend starts polling
+     return new Response(JSON.stringify({ polling: true, jobId }), {
+diff --git a/netlify/functions/story-worker-background.mjs b/netlify/functions/story-worker-background.mjs
+index 48a6a81..22bfa6a 100644
+--- a/netlify/functions/story-worker-background.mjs
++++ b/netlify/functions/story-worker-background.mjs
+@@ -346,11 +346,11 @@ export const handler = async (event) => {
+     try {
+       const stream = await anthropic.messages.create({
+         model: 'claude-sonnet-4-6',
+-        max_tokens: 16000,
++        max_tokens: 8000,
+         temperature: 1,
+         thinking: {
+           type: 'enabled',
+-          budget_tokens: 4000
++          budget_tokens: 1000
+         },
+         system: SYSTEM_PROMPT,
+         messages: [{ role: 'user', content: promptFn(storyData) }],
+diff --git a/public/index.html b/public/index.html
+index 1ef0db5..ecb3163 100644
+--- a/public/index.html
++++ b/public/index.html
+@@ -2413,10 +2413,11 @@ function showReview() {
+ }
+ 
+ async function pollForPreview(jobId) {
+-  const maxAttempts = 60; // 60 x 3s = 180s max wait (background worker needs time)
++  const maxAttempts = 45; // ~90s max wait
+   const vId = selectedVoiceId || '';
+   for (let i = 0; i < maxAttempts; i++) {
+-    await new Promise(r => setTimeout(r, 3000));
++    // Poll faster in the first 30s (every 2s), then every 3s
++    await new Promise(r => setTimeout(r, i < 15 ? 2000 : 3000));
+     try {
+       const res = await fetch('/api/check-preview?jobId=' + jobId + '&voiceId=' + encodeURIComponent(vId));
+       const data = await res.json();

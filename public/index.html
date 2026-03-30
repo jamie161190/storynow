@@ -2413,10 +2413,11 @@ function showReview() {
 }
 
 async function pollForPreview(jobId) {
-  const maxAttempts = 60; // 60 x 3s = 180s max wait (background worker needs time)
+  const maxAttempts = 45; // ~90s max wait
   const vId = selectedVoiceId || '';
   for (let i = 0; i < maxAttempts; i++) {
-    await new Promise(r => setTimeout(r, 3000));
+    // Poll faster in the first 30s (every 2s), then every 3s
+    await new Promise(r => setTimeout(r, i < 15 ? 2000 : 3000));
     try {
       const res = await fetch('/api/check-preview?jobId=' + jobId + '&voiceId=' + encodeURIComponent(vId));
       const data = await res.json();

@@ -100,27 +100,17 @@ export default async (req) => {
 
     console.log('Triggering background worker for job:', jobId, 'category:', storyData.category);
 
-    // Trigger the background worker and verify it accepted the job.
-    // Background functions return 202 instantly; the real work runs asynchronously.
-    try {
-      const bgRes = await fetch(`${siteUrl}/.netlify/functions/story-worker-background`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: bgPayload
-      });
-      console.log('Background worker response:', bgRes.status);
-      if (bgRes.status >= 400) {
-        console.error('Background worker rejected job:', bgRes.status);
-        return new Response(JSON.stringify({ error: 'Story service is temporarily unavailable. Please try again in a moment.' }), {
-          status: 503, headers: { 'Content-Type': 'application/json' }
-        });
-      }
-    } catch (bgErr) {
-      console.error('Failed to invoke background worker:', bgErr.message);
-      return new Response(JSON.stringify({ error: 'Could not start story generation. Please try again.' }), {
-        status: 503, headers: { 'Content-Type': 'application/json' }
-      });
-    }
+    // Fire and forget: background functions return 202 instantly.
+    // Don't await to avoid eating into this function's 10s timeout.
+    fetch(`${siteUrl}/.netlify/functions/story-worker-background`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: bgPayload
+    }).then(r => {
+      console.log('Background worker response:', r.status);
+    }).catch(err => {
+      console.error('Failed to invoke background worker:', err.message);
+    });
 
     // Return immediately so the frontend starts polling
     return new Response(JSON.stringify({ polling: true, jobId }), {
