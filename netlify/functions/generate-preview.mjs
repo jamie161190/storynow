@@ -102,17 +102,13 @@ export default async (req) => {
       method: 'POST',
       headers: {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2025-04-15',
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         temperature: 1,
-        thinking: {
-          type: 'enabled',
-          budget_tokens: 500
-        },
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
       })
