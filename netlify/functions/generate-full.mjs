@@ -59,6 +59,8 @@ async function fetchWithRetry(url, options, retries = 3) {
   }
 }
 
+import Stripe from 'stripe';
+
 export default async (req) => {
   try {
     const { fullStory, voiceId, childName, sessionId, jobId } = await req.json();
@@ -68,6 +70,27 @@ export default async (req) => {
         status: 400, headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    // Payment verification: this endpoint must only work for paid sessions
+    if (!sessionId) {
+      return new Response(JSON.stringify({ error: 'Missing payment session' }), {
+        status: 403, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return new Response(JSON.stringify({ error: 'Payment service not configured' }), {
+        status: 503, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (!session || session.payment_status !== 'paid') {
+      return new Response(JSON.stringify({ error: 'Payment not confirmed' }), {
+        status: 403, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     if (!process.env.ELEVENLABS_API_KEY) {
       console.error('ELEVENLABS_API_KEY not set');
       return new Response(JSON.stringify({ error: 'Voice service not configured' }), {

@@ -1838,14 +1838,29 @@ async function pollForPreview(jobId) {
 
 async function pollForFull(jobId) {
   const maxAttempts = 40; // 40 x 3s = 120s max wait (full audio takes longer)
+  const loadingText = document.querySelector('.loading-text');
+  const pollingMsgs = [
+    'Recording the narration now...',
+    'Adding emotion and expression to every line...',
+    'Making sure every detail sounds perfect...',
+    'Nearly there, just polishing the final moments...'
+  ];
+  let msgIdx = 0;
+  const msgTimer = setInterval(() => {
+    msgIdx++;
+    if (msgIdx < pollingMsgs.length) loadingText.textContent = pollingMsgs[msgIdx];
+    else clearInterval(msgTimer);
+  }, 10000);
+
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, 3000));
     try {
       const res = await fetch('/api/check-full?jobId=' + jobId);
       const data = await res.json();
-      if (data.ready && data.success) return data;
+      if (data.ready && data.success) { clearInterval(msgTimer); return data; }
     } catch(e) { /* keep polling */ }
   }
+  clearInterval(msgTimer);
   return null;
 }
 
@@ -2119,9 +2134,14 @@ async function handleStripeReturn() {
     document.getElementById('giftSentMsg').style.display = 'none';
     document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
 
-    // Save story to Supabase first, then send email with share link
+    // Save story to Supabase, then send email with share link
+    // If save fails, still send the email (just without a direct listen link)
     if (verifyData.customerEmail) {
-      await saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
+      try {
+        await saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
+      } catch(saveErr) {
+        console.error('Story save failed, sending email without listen link:', saveErr);
+      }
       sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId);
     }
 
@@ -2239,15 +2259,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function downloadStory() {
+async function downloadStory() {
   const audio = document.getElementById('fullStoryAudio');
   if(!audio.src) return;
-  const a = document.createElement('a');
-  a.href = audio.src;
-  a.download = (storyData.childName || 'story') + ' - Storytold.mp3';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  try {
+    // For Supabase URLs (cross-origin), fetch the file and create a blob download
+    const res = await fetch(audio.src);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (storyData.childName || 'story') + ' - Storytold.mp3';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e) {
+    // Fallback: open in new tab
+    window.open(audio.src, '_blank');
+  }
 }
 
 async function sendGift() {
