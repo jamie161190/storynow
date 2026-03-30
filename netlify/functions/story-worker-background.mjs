@@ -1,12 +1,146 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, buildPreviewPrompt } from './story-prompts.mjs';
+
+// Inline the shared prompts to avoid any bundling issues with Netlify v1 background functions.
+// The full versions of these are in ./lib/story-prompts.mjs for use by other functions.
+
+const SYSTEM_PROMPT = `You are the world's greatest children's storyteller. You write stories that make parents cry because of how deeply personal they feel, and make children gasp because they cannot believe the story knows them.
+
+YOUR RULES:
+
+1. EVERY DETAIL IS SACRED
+The parent has told you things about their child. Their name, their friend, their interests, their pet, things they are proud of, extra details. You must treat every single one as a gift. Do not mention a detail once and move on. Weave it into the fabric of the story. If the child loves dinosaurs, dinosaurs are the world. If they carry a stuffed rabbit called Mr Flopsy, Mr Flopsy is a character with a role. If they just learned to ride a bike, that achievement gives them courage at the story's turning point.
+
+2. THE CHILD'S NAME IS MUSIC
+Use their name at least 8 times in a standard length story, more in longer ones. Use it the way a loving storyteller would: at moments of wonder, in dialogue from their friend, in quiet reflective beats, at the climax. Never use it twice in the same sentence. Never use it so much it feels forced.
+
+3. THE BEST FRIEND IS REAL
+The best friend must have personality. They speak, they act, they react. Give them at least 3 distinct moments: a line of dialogue, an action that matters to the plot, and a moment of connection with the child. The friend is not a prop.
+
+4. THE PET IS MEMORABLE
+If there is a pet, it must do something the child would retell. Not just "Buddy wagged his tail." More like "Buddy grabbed the map in his teeth and ran, and Chase had no choice but to chase him right into the heart of the adventure." One memorable pet moment is worth ten generic mentions.
+
+5. AGE IS EVERYTHING
+You must write differently for every age. This is non-negotiable:
+
+Ages 2 to 4: Very short sentences. Simple words. Repetition is magic. Sound effects and onomatopoeia. Everything is safe and gentle. ABSOLUTELY NO danger, scary moments, villains, darkness, or anything threatening.
+
+Ages 5 to 7: Clear beginning, middle, end. The child is brave but the world is kind. Simple moral woven in naturally, never stated. Dialogue brings characters alive.
+
+Ages 8 to 10: Real narrative tension. The child is clever and capable. Humour works brilliantly. The friend has their own personality and opinions.
+
+Ages 11 to 14: Young adult tone. Complex emotions alongside the adventure. Themes of identity, belonging, growing up.
+
+6. WRITTEN FOR THE EAR, NOT THE EYE
+This story will be read aloud by a text to speech narrator. Write for how it sounds, not how it looks.
+
+PACING AND PAUSES (critical for audio):
+- Use three dots ( ... ) to create a breath pause. Place them at moments of suspense, wonder, scene transitions, and before emotional reveals.
+- Aim for at least one pause ( ... ) every 100 to 150 words.
+- After a big emotional moment or scene change, use a double pause: "... ... "
+- Vary sentence length. Short punchy beats. Then a longer, flowing sentence that carries the listener forward before landing softly.
+- Avoid parentheses, asterisks, em dashes, or any visual formatting.
+- No chapter titles or headings unless specifically requested.
+
+7. NEVER INVENT WHAT THE PARENT ALREADY DESCRIBED
+If the parent told you something is yellow, it is yellow. NEVER add colours, sizes, breeds, or details the parent did not provide.
+
+8. NO GENERIC PHRASES
+Never write anything that could apply to any child.
+
+9. START IMMEDIATELY
+No preamble. Drop the listener straight into a moment.
+
+10. PACING
+Every story is ~15 minutes (~2200 words). Use a four act structure with SUBPLOTS and SURPRISES.
+
+11. BEFORE YOU WRITE
+Think carefully before you begin. Plan the full story arc.
+
+12. DIALOGUE IS KING
+Children lose interest during long descriptive passages. Characters talking to each other is what holds attention.`;
+
+function getAgeBand(age) {
+  const a = parseInt(age);
+  if (a <= 4) return `This child is very young (age ${a}). Use very simple vocabulary, short sentences, gentle repetition, sound effects, and keep everything safe, warm, and familiar.`;
+  if (a <= 7) return `This child is ${a} years old. Use clear story structure with a beginning, middle, and end. Keep language accessible but not babyish.`;
+  if (a <= 10) return `This child is ${a} years old. Write with real narrative tension, humour, and clever problem solving.`;
+  return `This child is ${a} years old. Write at a young adult level. Complex emotions, genuine depth, themes of identity and belonging.`;
+}
+
+function characterBlock(d) {
+  const genderLabel = (d.gender || '').toLowerCase();
+  const pronounLine = genderLabel === 'boy' ? 'Use he/him/his pronouns for ' + d.childName + '.'
+    : genderLabel === 'girl' ? 'Use she/her/hers pronouns for ' + d.childName + '.'
+    : 'Use they/them/their pronouns for ' + d.childName + '.';
+
+  let themesSection = '';
+  if (d.interest) {
+    const themes = d.interest.split(',').map(t => t.trim()).filter(Boolean);
+    if (themes.length > 1) {
+      themesSection = `PRIMARY THEME: ${themes[0]}\nSECONDARY THEMES: ${themes.slice(1).join(', ')}`;
+    } else {
+      themesSection = `THEMES AND INTERESTS: ${d.interest}`;
+    }
+    if (d.themeDetail) {
+      themesSection += `\nSPECIFIC DETAILS FROM THE PARENT: "${d.themeDetail}"`;
+    }
+  }
+
+  let block = `THE MAIN CHARACTER:\n- Name: ${d.childName} (${d.gender || 'child'})\n- Age: ${d.age}\n- ${pronounLine}`;
+  if (d.proudOf) block += `\n- Occasion: ${d.proudOf}`;
+  block += `\n\nPEOPLE IN THE STORY:\n- Best friend: ${d.friendName}`;
+  if (d.sidekickName) block += `\n- Sidekick: ${d.sidekickName}`;
+  if (d.familyMembers) block += `\n- Family: ${d.familyMembers}`;
+  if (d.teacherName) block += `\n- Teacher: ${d.teacherName}`;
+  if (d.isGift && d.giftFrom && d.giftInStory) block += `\n- Gift giver: ${d.giftFrom} (MUST appear as a character)`;
+  block += `\n\n${themesSection}\n\nSETTING: ${d.setting || 'Surprise me'}`;
+
+  if (d.hasPet && d.petName) {
+    block += `\n\nPET: ${d.petName}${d.petType ? ' (a ' + d.petType + ')' : ''}`;
+  }
+  if (d.favTeddy) {
+    block += `\n\nFAVOURITE TOY/TEDDY: ${d.favTeddy}`;
+  }
+  if (d.extraDetails) {
+    block += `\n\nEXTRA DETAILS: ${d.extraDetails}`;
+  }
+  if (d.personalMessage) {
+    block += `\n\nPERSONAL MESSAGE (read separately, be aware of its tone): "${d.personalMessage}"`;
+  }
+  return block;
+}
+
+const WORD_COUNTS = { standard: 2200, long: 2200, epic: 2200 };
+
+const STORY_PROMPTS = {
+  bedtime: (d) => `STORY TYPE: Bedtime\nTONE: Warm, calming, soothing.\n\n${characterBlock(d)}\n\nBEDTIME STRUCTURE: Journey home, winding down, sleep.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`,
+  journey: (d) => `STORY TYPE: Journey / Adventure\nTONE: Exciting, gripping, with emotional range.\n\n${characterBlock(d)}\n\nSTRUCTURE: 4 acts, 5-6 scenes, at least 2 twists.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`,
+  learning: (d) => `STORY TYPE: Learning Adventure\nTONE: Exciting, immersive, secretly educational.\nSUBJECT: ${d.subject}\n${d.learningGoal ? 'LEARNING GOAL: ' + d.learningGoal : ''}\n${d.confidence ? 'CONFIDENCE: ' + d.confidence : ''}\n\n${characterBlock(d)}\n\nInclude 8-10 interactive pause moments. Build difficulty gradually.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`,
+  custom: (d) => `STORY TYPE: Custom\nTONE: Warm, personalised, emotionally intelligent.\nSCENARIO: "${d.customScenario}"\n\n${characterBlock(d)}\n\nAddress the scenario through metaphor and adventure.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`
+};
+
+function buildPreviewPrompt(storyData) {
+  const promptFn = STORY_PROMPTS[storyData.category];
+  if (!promptFn) throw new Error('Invalid category: ' + storyData.category);
+  const fullPrompt = promptFn(storyData);
+
+  return fullPrompt + `
+
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening of the story, approximately 150 to 200 words. This should be the gripping, personalised opening that hooks the listener instantly. It must:
+- Start immediately with action, discovery, or wonder
+- Use the child's name at least twice
+- Mention the best friend by name
+- Reference at least one personal detail (pet, interest, setting)
+- End mid-scene at a moment of suspense or wonder
+- Include at least one or two natural pauses ( ... )
+
+Do NOT wrap up or resolve anything. Stop at a cliffhanger.
+
+Write ONLY the opening now. No more than 200 words.`;
+}
 
 // ============================================================
 // BACKGROUND FUNCTION HANDLER
-// This runs with a 15-minute timeout (Netlify background function).
-// It generates a short preview opening, generates TTS for it,
-// then saves the result for polling to pick up.
-// Full story generation happens after purchase in generate-full.
 // ============================================================
 export const handler = async (event) => {
   let jobId;
@@ -39,10 +173,10 @@ export const handler = async (event) => {
       });
 
       let storyText = '';
-      for await (const event of stream) {
-        if (event.type === 'content_block_delta') {
-          if (event.delta.type === 'text_delta') {
-            storyText += event.delta.text;
+      for await (const ev of stream) {
+        if (ev.type === 'content_block_delta') {
+          if (ev.delta.type === 'text_delta') {
+            storyText += ev.delta.text;
           }
         }
       }
@@ -125,7 +259,6 @@ export const handler = async (event) => {
     console.log('[BG] Total time:', Date.now() - startTime, 'ms, audio size:', Math.round(audioBase64.length / 1024), 'KB');
 
     // ── Save preview result (opening text + audio) ──
-    // Full story generation happens after purchase in generate-full.mjs
     const result = { success: true, previewAudio: audioBase64, previewStory, storyData };
     if (jobId && supabaseUrl && supabaseKey) {
       try {

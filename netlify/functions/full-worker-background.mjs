@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, buildFullStoryPrompt } from './story-prompts.mjs';
+import { SYSTEM_PROMPT, buildFullStoryPrompt } from './lib/story-prompts.mjs';
 
 // TTS chunk helper: splits text into chunks at sentence boundaries
 function splitIntoChunks(text, maxChars = 4000) {
