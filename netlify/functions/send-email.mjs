@@ -28,7 +28,7 @@ export default async (req) => {
 
     // Rate limit unauthenticated email types (review, contact, share)
     if (type === 'review' || type === 'contact' || type === 'share') {
-      const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-nf-client-connection-ip') || 'unknown';
+      const clientIP = req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
       const supabaseUrl = process.env.SUPABASE_URL;
       const supabaseKey = process.env.SUPABASE_SECRET_KEY;
       if (supabaseUrl && supabaseKey) {
@@ -220,7 +220,9 @@ function purchaseEmail(childName, category, length, customerEmail, storyId) {
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
         We hope ${safeChild} loves every second of it.
       </p>
-      <div style="text-align:center;">
+      <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
+        <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Your next story: 25% off</p>
+        <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Because you are part of the Storytold family. Use code <strong style="color:#7C5CFC">NEXTONE</strong> at checkout.</p>
         <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
       </div>
     </div>

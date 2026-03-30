@@ -26,28 +26,24 @@ export default async (req) => {
       });
     }
 
-    const BYPASS_PAYMENT = false;
+    // Payment verification: this endpoint must only work for paid sessions
+    if (!sessionId) {
+      return new Response(JSON.stringify({ error: 'Missing payment session' }), {
+        status: 403, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return new Response(JSON.stringify({ error: 'Payment service not configured' }), {
+        status: 503, headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
-    if (!BYPASS_PAYMENT) {
-      // Payment verification: this endpoint must only work for paid sessions
-      if (!sessionId) {
-        return new Response(JSON.stringify({ error: 'Missing payment session' }), {
-          status: 403, headers: { 'Content-Type': 'application/json' }
-        });
-      }
-      if (!process.env.STRIPE_SECRET_KEY) {
-        return new Response(JSON.stringify({ error: 'Payment service not configured' }), {
-          status: 503, headers: { 'Content-Type': 'application/json' }
-        });
-      }
-
-      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-      const session = await stripe.checkout.sessions.retrieve(sessionId);
-      if (!session || session.payment_status !== 'paid') {
-        return new Response(JSON.stringify({ error: 'Payment not confirmed' }), {
-          status: 403, headers: { 'Content-Type': 'application/json' }
-        });
-      }
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    if (!session || session.payment_status !== 'paid') {
+      return new Response(JSON.stringify({ error: 'Payment not confirmed' }), {
+        status: 403, headers: { 'Content-Type': 'application/json' }
+      });
     }
 
     const supabaseUrl = process.env.SUPABASE_URL;

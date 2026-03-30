@@ -167,7 +167,7 @@ fbq('track', 'PageView');
   --card:#FFFFFF;
   --text:#2D2844;
   --text-soft:#6B6490;
-  --text-muted:#9B95B5;
+  --text-muted:#7A7285;
   --border:#EDE8FF;
   --shadow:0 4px 24px rgba(124,92,252,0.08);
   --shadow-lg:0 8px 40px rgba(124,92,252,0.12);
@@ -179,8 +179,16 @@ body{font-family:'Quicksand',sans-serif;background:var(--bg);color:var(--text);m
 body::before{content:'';position:fixed;top:-200px;right:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,252,0.06) 0%,transparent 70%);pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,140,66,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
 
-.screen{display:none;min-height:100vh;padding:2rem 1.5rem 3rem;max-width:540px;margin:0 auto;flex-direction:column;align-items:center;position:relative;z-index:1}
+.screen{display:none;min-height:100vh;padding:2rem 1.5rem 3rem;max-width:540px;margin:0 auto;flex-direction:column;align-items:center;position:relative;z-index:1;animation:fadeIn 0.3s ease}
 .screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Accessibility: focus visible */
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.cat-card:focus-visible,.theme-tile:focus-visible,.voice-card:focus-visible{outline:3px solid var(--purple);outline-offset:2px;border-radius:8px}
+/* Disabled button state */
+.btn:disabled,.btn[disabled]{opacity:0.55;cursor:not-allowed;transform:none !important;box-shadow:none !important}
+/* Minimum touch targets */
+.voice-preview-btn{min-width:44px;min-height:44px}
 
 /* ===== LANDING ===== */
 .landing{text-align:center;gap:1.2rem;padding-top:2.5rem;padding-bottom:4rem}
@@ -585,8 +593,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <!-- FIRST CTA (after the proof) -->
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then £19.99 for the full story</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free. No questions asked.</p>
     <p style="font-size:0.72rem;color:var(--orange);font-weight:600;text-align:center;margin:0.3rem 0 0">&#127873; Also makes the perfect gift.</p>
   </div>
 
@@ -615,7 +623,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <!-- SECOND CTA -->
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then £19.99 for the full story</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
+    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.3rem 0 0">&#128274; Secure payment via Stripe. No subscription. You own it forever.</p>
     <a class="my-stories-link" onclick="goTo('screenLogin')">&#128274; Log in / My Stories</a>
   </div>
 
@@ -642,6 +651,10 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is £19.99 for one story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
         <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. One completely unique, 15 minute personalised audio story with your choice of narrator. No subscription, no hidden costs. You own it forever.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is my child's information safe?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Completely. Your child's details are only used to write their story. Nothing is shared, sold, or used for advertising. Payment is processed securely by Stripe. I take this seriously.</p>
       </details>
     </div>
   </div>
@@ -862,6 +875,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
   <p class="inline-error" id="detailsError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateDetails()">Continue</button>
+  <p style="font-size:0.62rem;color:var(--text-muted);text-align:center;margin-top:0.6rem">&#128274; Your child's details are only used to write their story. Nothing is shared or sold. Ever.</p>
 </div>
 
 <!-- DETAILS: WHO'S IN THE STORY -->
@@ -874,7 +888,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="form-group">
     <label>Best friend or favourite person</label>
     <input type="text" id="friendName" placeholder="e.g. Ellis, cousin Amara, big brother Jake">
-    <p class="form-hint">This is the person who goes on the adventure with them. They will have their own lines and moments in the story.</p>
+    <p class="form-hint">This person goes on the adventure with them. Don't know? Just type a first name and we will make it work.</p>
   </div>
   <div class="form-group">
     <label>Sidekick (optional)</label>
@@ -1149,6 +1163,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()">&#128275; Unlock the full story for £19.99</button>
     <p class="unlock-price" id="unlockSub">15 minutes long. Download, share with family, keep forever.</p>
     <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
+    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.5rem 0 0">&#128274; Secure payment via Stripe. No subscription. Your data is safe.</p>
     <a onclick="goTo('screenReview')" style="font-size:0.78rem;color:var(--purple);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">Want to change something? Go back</a>
   </div>
 </div>
@@ -1445,6 +1460,7 @@ function playSample() {
   const icon = document.getElementById('sampleIcon');
   if (audio.paused) {
     audio.play();
+    trackEvent('SamplePlay', { content_name: 'homepage_sample' });
     // Always play music on the homepage demo regardless of toggle state
     const wasEnabled = bgMusicEnabled;
     bgMusicEnabled = true;
@@ -1624,6 +1640,9 @@ function goTo(id, skipHistory) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+
+  // Track screen views for funnel analysis
+  trackEvent('ScreenView', { screen_name: id, content_name: storyData.category || '' });
 
   // Push to browser history so back button works
   if (!skipHistory) {
@@ -2200,6 +2219,7 @@ function renderFilteredVoices() {
       document.querySelectorAll('.voice-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       selectedVoiceId = v.id;
+      trackEvent('VoiceSelected', { voice_name: v.name, voice_id: v.id, content_name: storyData.category });
     };
     container.appendChild(card);
   });
@@ -2432,7 +2452,7 @@ async function pollForPreview(jobId) {
 }
 
 async function pollForFull(jobId) {
-  const maxAttempts = 60; // 60 x 3s = 180s max wait (story generation + TTS)
+  const maxAttempts = 200; // 200 x 3s = 600s (10 min) max wait for story generation + TTS
   const loadingText = document.querySelector('.loading-text');
   const pollingMsgs = [
     'Writing the full story now...',
@@ -2547,6 +2567,7 @@ async function generatePreview() {
 
     previewStoryText = data.previewStory || '';
     fullStoryText = data.fullStory || previewStoryText;
+    trackEvent('PreviewGenerated', { content_name: storyData.category, child_age: storyData.childAge });
     const audio = document.getElementById('previewAudio');
     audio.volume = 0.75;
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
@@ -2622,7 +2643,10 @@ function playPreview() {
   }
 }
 
+let isCheckingOut = false;
 async function unlockFull() {
+  if (isCheckingOut) return;
+  isCheckingOut = true;
   // Validate email before proceeding
   const previewEmail = document.getElementById('previewEmail').value.trim();
   const emailErr = document.getElementById('emailError');
@@ -2630,12 +2654,14 @@ async function unlockFull() {
     emailErr.textContent = 'Please enter your email so I can send you the story.';
     emailErr.style.display = 'block';
     document.getElementById('previewEmail').focus();
+    isCheckingOut = false;
     return;
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(previewEmail)) {
     emailErr.textContent = 'That doesn\'t look like a valid email. Please check and try again.';
     emailErr.style.display = 'block';
     document.getElementById('previewEmail').focus();
+    isCheckingOut = false;
     return;
   }
   emailErr.style.display = 'none';
@@ -2679,6 +2705,7 @@ async function unlockFull() {
     } catch(err) {
       alert('Something went wrong: ' + err.message);
       goTo('screenPreview');
+      isCheckingOut = false;
     }
     return;
   }
@@ -2702,6 +2729,7 @@ async function unlockFull() {
     window.location.href = data.checkoutUrl;
   } catch(err) {
     goTo('screenPreview');
+    isCheckingOut = false;
     alert('Something went wrong: ' + err.message);
   }
 }
@@ -2802,12 +2830,19 @@ async function handleStripeReturn() {
       try {
         await saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
       } catch(saveErr) {
-        console.error('Story save failed, sending email without listen link:', saveErr);
+        console.error('Story save failed:', saveErr);
+        // Retry once after a short delay
+        try {
+          await new Promise(r => setTimeout(r, 2000));
+          await saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
+        } catch(retryErr) {
+          console.error('Story save retry also failed:', retryErr);
+        }
       }
       sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId);
 
-      // If it's a gift and they provided an email, auto-send the gift too
-      if (storyData.isGift && storyData.giftEmail && lastSavedStoryId) {
+      // If it's a gift and they provided an email, send regardless of DB save
+      if (storyData.isGift && storyData.giftEmail) {
         try {
           await fetch('/api/send-email', {
             method: 'POST',

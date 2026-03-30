@@ -9,7 +9,7 @@ import { SYSTEM_PROMPT, buildPreviewPrompt } from './lib/story-prompts.mjs';
 
 export default async (req) => {
   // ── Rate limiting: max 5 previews per IP per hour ──
-  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-nf-client-connection-ip') || 'unknown';
+  const clientIP = req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const rateLimitKey = `preview_${clientIP}`;
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SECRET_KEY;
@@ -121,7 +121,7 @@ export default async (req) => {
     if (!apiResponse.ok) {
       const errBody = await apiResponse.text();
       console.error('Anthropic API error:', apiResponse.status, errBody);
-      return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.', debug: 'Anthropic ' + apiResponse.status + ': ' + errBody.substring(0, 200) }), {
+      return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.' }), {
         status: 500, headers: { 'Content-Type': 'application/json' }
       });
     }
