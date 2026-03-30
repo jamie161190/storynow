@@ -8,7 +8,7 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText } = await req.json();
+    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText, contactName, contactEmail, contactText } = await req.json();
 
     if (!type || !to) {
       return new Response(JSON.stringify({ error: 'Missing type or recipient email' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -29,6 +29,11 @@ export default async (req) => {
       // Reviews just need basic content, no auth required
       if (!reviewText || !reviewName) {
         return new Response(JSON.stringify({ error: 'Missing review content' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+      }
+    } else if (type === 'contact') {
+      // Contact form just needs basic fields
+      if (!contactName || !contactEmail || !contactText) {
+        return new Response(JSON.stringify({ error: 'Missing contact form fields' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
       }
     } else if (type === 'share') {
       // Share emails require a valid story ID that exists in the database
@@ -67,6 +72,9 @@ export default async (req) => {
     } else if (type === 'review') {
       subject = `New review from ${reviewName}`;
       html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>New Review Submitted</h2><p><strong>From:</strong> ${reviewName}</p>${reviewChildName ? `<p><strong>Child:</strong> ${reviewChildName}</p>` : ''}<p><strong>Review:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${reviewText}</blockquote></div>`;
+    } else if (type === 'contact') {
+      subject = `Storytold contact from ${contactName}`;
+      html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>Contact Form Message</h2><p><strong>Name:</strong> ${contactName}</p><p><strong>Email:</strong> ${contactEmail}</p><p><strong>Message:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${contactText}</blockquote><p style="color:#666;font-size:13px">Reply directly to ${contactEmail}</p></div>`;
     } else if (type === 'share') {
       subject = `${giftFrom} shared ${childName}'s story with you 🎧`;
       html = shareEmail(childName, giftFrom, giftMessage, storyId);

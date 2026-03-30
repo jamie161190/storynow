@@ -385,8 +385,15 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="logo-wrap">
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
-  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);padding:1.1rem 1.2rem;margin-bottom:0.6rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
-    <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">I built this because my son Chase asked why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I made it happen.</p>
+  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);padding:1.3rem 1.2rem;margin-bottom:0.6rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.7rem">
+      <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--purple-light);flex-shrink:0">
+      <div>
+        <p style="margin:0;font-size:0.85rem;font-weight:800;color:var(--text);font-family:'Nunito',sans-serif">Jamie</p>
+        <p style="margin:0;font-size:0.72rem;color:var(--text-muted);font-weight:600">Chase's dad. Built Storytold.</p>
+      </div>
+    </div>
+    <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I built something where he could. Now every child can have the same thing.</p>
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">your child</span> by name.</h1>
   <p class="hero-text">Tell us about your child and we'll create a one of a kind audio story just for them. Their name, their world, woven into every scene.</p>
@@ -441,7 +448,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
   <!-- AUDIO SAMPLE -->
   <div class="sample-player" id="samplePlayer">
-    <div class="sample-label">Hear a snippet from a real story</div>
+    <div class="sample-label">The first story Jamie ever made for Chase</div>
     <div class="sample-row">
       <button class="sample-play-btn" id="samplePlayBtn" onclick="playSample()">
         <svg id="sampleIcon" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
@@ -449,12 +456,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <div class="sample-wave">
         <div class="sample-progress-bar"><div class="sample-progress-fill" id="sampleFill"></div></div>
         <div class="sample-meta">
-          <span class="sample-name">A bedtime story for Chase</span>
+          <span class="sample-name">Chase Goes to Space</span>
           <span class="sample-time" id="sampleTime">0:00</span>
         </div>
       </div>
     </div>
-    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;text-align:center">Full stories are 5 to 15 minutes long</p>
+    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;text-align:center">Full stories are around 15 minutes long</p>
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
 
@@ -470,13 +477,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div id="reviewsList" style="display:flex;flex-direction:column;gap:0.6rem"></div>
   </div>
 
-  <!-- FOUNDER NOTE -->
+  <!-- REVIEW ASK -->
   <div style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
-    <div style="margin-bottom:0.75rem">
-      <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid var(--purple-light)">
-    </div>
-    <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.7;font-weight:500">Built by a dad in the UK for his 9 year old. Now available for every child.</p>
-    <p style="font-size:0.8rem;color:var(--purple);margin-top:0.5rem;cursor:pointer;font-weight:600" onclick="document.getElementById('reviewForm').style.display='block';this.style.display='none'">Loved your child's reaction? Tell us about it</p>
+    <p style="font-size:0.8rem;color:var(--purple);cursor:pointer;font-weight:600" onclick="document.getElementById('reviewForm').style.display='block';this.style.display='none'">Loved your child's reaction? Tell us about it</p>
     <div id="reviewForm" style="display:none;margin-top:0.75rem;text-align:left">
       <input id="reviewName" type="text" placeholder="Your first name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
       <input id="reviewChildName" type="text" placeholder="Your child's name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
@@ -485,7 +488,17 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     </div>
   </div>
 
-  <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;text-align:center;margin-top:0.75rem">hello@storytold.ai</p>
+  <!-- CONTACT -->
+  <div style="width:100%;max-width:440px;margin-top:1.2rem;text-align:center">
+    <p style="font-size:0.8rem;color:var(--text-muted);cursor:pointer;font-weight:600" onclick="document.getElementById('contactForm').style.display='block';this.style.display='none'">Questions? Get in touch</p>
+    <div id="contactForm" style="display:none;margin-top:0.75rem;text-align:left">
+      <input id="contactName" type="text" placeholder="Your name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
+      <input id="contactEmail" type="email" placeholder="Your email" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
+      <textarea id="contactText" placeholder="How can we help?" rows="3" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.5rem;font-family:'Nunito',sans-serif;resize:vertical;background:var(--card)"></textarea>
+      <button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:0.65rem" onclick="submitContact()">Send</button>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.6rem">hello@storytold.ai</p>
+  </div>
 </div>
 
 <!-- CATEGORY -->
@@ -2208,6 +2221,21 @@ async function submitReview() {
     });
   } catch(e) {}
   document.getElementById('reviewForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Thank you! We really appreciate it.</p>';
+}
+
+async function submitContact() {
+  const name = document.getElementById('contactName').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const text = document.getElementById('contactText').value.trim();
+  if (!name || !email || !text) { alert('Please fill in all fields.'); return; }
+  try {
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'contact', to: 'jamie@builtsmarter.co.uk', contactName: name, contactEmail: email, contactText: text })
+    });
+  } catch(e) {}
+  document.getElementById('contactForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Sent! We\'ll get back to you soon.</p>';
 }
 </script>
 </body>
