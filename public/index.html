@@ -560,16 +560,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     </div>
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">them</span> by name.</h1>
-  <p class="hero-text">For your child, grandchild, niece, nephew, or anyone you love. Pick a story type, tell us about them, and we create something completely unique. Their name, their world, woven into every scene.</p>
+  <p class="hero-text">A bedtime story where they are the hero. Their name, their friends, their favourite things, woven into every scene. Narrated by a voice you choose, ready in minutes.</p>
 
-  <!-- FIRST CTA -->
-  <div class="cta-group">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then just £19.99 for the full story</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? We'll rewrite it for free.</p>
-  </div>
-
-  <!-- AUDIO SAMPLE -->
+  <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer">
     <div class="sample-label">This is the first story Jamie made for Chase. Press play.</div>
     <div class="sample-row">
@@ -586,17 +579,19 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     </div>
     <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Now imagine one with their child's name, their best friend, their world.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.2rem;text-align:center">This is just a snippet. Full stories are around 15 minutes.</p>
-    <p style="font-size:0.72rem;color:var(--purple);margin-top:0.3rem;text-align:center;font-weight:600">You choose the voice. 20+ narrators, male and female, different accents.</p>
+    <p style="font-size:0.72rem;color:var(--purple);margin-top:0.3rem;text-align:center;font-weight:600">20+ voices to choose from. Warm, gentle, playful, whatever feels right.</p>
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
 
-  <!-- GIFT / SHARING HIGHLIGHT -->
-  <div style="width:100%;max-width:440px;margin-top:1rem;background:linear-gradient(135deg,var(--orange-light),#FFF8F0);border:2px solid #FFD9B8;border-radius:var(--radius);padding:1.15rem 1.25rem;text-align:center">
-    <p style="font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;color:var(--text);margin:0 0 0.35rem">The perfect gift</p>
-    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.6;margin:0;font-weight:500">Grandparents, aunties, uncles, godparents, family friends: make a story for a child you love, and you can even appear in it yourself. Send it by WhatsApp or email in one tap.</p>
+  <!-- FIRST CTA (after the proof) -->
+  <div class="cta-group">
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then £19.99 for the full story</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? We'll rewrite it for free.</p>
+    <p style="font-size:0.72rem;color:var(--orange);font-weight:600;text-align:center;margin:0.3rem 0 0">&#127873; Also makes the perfect gift.</p>
   </div>
 
-  <!-- HOW IT WORKS -->
+  <!-- HOW IT WORKS (concrete example only, no numbered steps) -->
   <div class="how-it-works">
     <p class="how-title">Here is what happens</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
@@ -607,37 +602,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         We write a story where Chase and Ellis ride a T-Rex through a glowing volcano, face their fear of the dark together, and come home heroes. Narrated in the voice you choose. Ready in about a minute.
       </p>
     </div>
-    <div class="how-steps" style="margin-top:0.75rem">
-      <div class="how-step">
-        <div class="step-number" style="background:var(--purple-light);color:var(--purple)">1</div>
-        <div class="step-content">
-          <h4>Share the details</h4>
-          <p>Name, age, friends, interests, little quirks. Takes about two minutes.</p>
-        </div>
-      </div>
-      <div class="how-step">
-        <div class="step-number" style="background:var(--orange-light);color:var(--orange)">2</div>
-        <div class="step-content">
-          <h4>Hear a free preview</h4>
-          <p>Pick a narrator and listen to a taste of their story before you spend anything.</p>
-        </div>
-      </div>
-      <div class="how-step">
-        <div class="step-number" style="background:var(--green-light);color:var(--green)">3</div>
-        <div class="step-content">
-          <h4>Unlock and share</h4>
-          <p>Get the full 15 minute story. Send it to grandparents, family, anyone. Keep it forever.</p>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- REAL PARENT TESTIMONIAL -->
   <div style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
-    <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.6rem">Real messages from real families</p>
-    <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.75rem;font-weight:500">Our friend Lisa was one of the first to try Storytold before we launched. This is what she sent the morning after her daughter Livvie heard her story.</p>
     <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);border:2px solid var(--border)">
-      <img src="/lisa-testimonial.png" alt="WhatsApp message from Lisa: Livvie's woken up asking me for another story, I blame you. It really is brilliant though." style="width:100%;display:block">
+      <img src="/lisa-testimonial.png" alt="WhatsApp message from Lisa about her daughter Livvie's reaction to her personalised story" style="width:100%;display:block">
     </div>
     <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;font-weight:600;font-style:italic">Lisa, mum to Livvie (age 4)</p>
   </div>
@@ -645,8 +615,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <!-- SECOND CTA -->
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then just £19.99 for the full story</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? We'll rewrite it for free.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Free preview, then £19.99 for the full story</p>
     <a class="my-stories-link" onclick="goTo('screenLogin')">&#128274; Log in / My Stories</a>
   </div>
 
@@ -656,7 +625,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div style="display:flex;flex-direction:column;gap:0.5rem">
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I hear it before I pay?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. You get a free preview of the opening of your story before you spend anything. Only pay if you love it. Lots of parents make them as gifts too.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. You get a free preview of the opening of your story before you spend anything. Only pay if you love it.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long is the full story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
@@ -664,15 +633,11 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I share it with family?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">We built sharing right in. Once your story is ready, tap share and send it by email or WhatsApp in seconds. Grandparents, aunties, uncles, whoever you like. You can also save the audio straight to your phone. No extra cost, no fuss.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Tap share and send it by email or WhatsApp in seconds. You can also save the audio straight to your phone.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if I don't like the full version?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let us know and we will generate you a brand new one. No hassle, no questions. We want you to love it as much as they will.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I gift this to someone?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. After you choose the story type, we ask if this is a gift. Tell us who it is from, add a message, and we will send them a beautifully designed email with the story inside. Perfect for birthdays, Christmas, or just because.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let us know and we will generate you a brand new one. No hassle, no questions.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is £19.99 for one story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
