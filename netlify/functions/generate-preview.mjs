@@ -405,7 +405,8 @@ export default async (req) => {
     // strategically, and craft callbacks before writing a single word.
     let storyResponse;
     try {
-      storyResponse = await anthropic.messages.create({
+      // Use streaming to handle long-running Opus + extended thinking requests
+      const stream = anthropic.messages.stream({
         model: 'claude-opus-4-20250514',
         max_tokens: 16000,
         temperature: 1, // required to be 1 when using extended thinking
@@ -416,6 +417,7 @@ export default async (req) => {
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: promptFn(storyData) }]
       });
+      storyResponse = await stream.finalMessage();
       console.log('Story generated in', Date.now() - startTime, 'ms');
     } catch(apiErr) {
       console.error('Anthropic API error after', Date.now() - startTime, 'ms:', apiErr.message);
