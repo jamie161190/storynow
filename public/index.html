@@ -1037,6 +1037,16 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <h2 class="section-title">Check your details</h2>
   <p class="section-sub">Make sure everything looks right. Tap &#9998; to edit anything.</p>
   <div id="reviewContent" style="width:100%;max-width:440px"></div>
+
+  <!-- Background music option -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin-top:1rem;max-width:440px;width:100%">
+    <div class="toggle-row" style="margin-bottom:0">
+      <button class="toggle on" id="musicOptionToggle" onclick="toggleMusicOption()"></button>
+      <span class="toggle-label" style="font-weight:600">Background music</span>
+    </div>
+    <p class="form-hint" id="musicOptionHint" style="margin-top:0.3rem">Soft ambient music will play underneath the narration, matching the mood of the story.</p>
+  </div>
+
   <button class="btn btn-primary" style="width:100%;margin-top:1.2rem" onclick="generatePreview()">Looks good, create my preview!</button>
 </div>
 
@@ -1464,6 +1474,22 @@ const bgMusic = {
 bgMusic.init();
 
 let bgMusicEnabled = true;
+
+function toggleMusicOption() {
+  const t = document.getElementById('musicOptionToggle');
+  t.classList.toggle('on');
+  bgMusicEnabled = t.classList.contains('on');
+  document.getElementById('musicOptionHint').textContent = bgMusicEnabled
+    ? 'Soft ambient music will play underneath the narration, matching the mood of the story.'
+    : 'The story will play with narration only, no background music.';
+  // Sync playback toggles
+  const label = bgMusicEnabled ? 'Music on' : 'Music off';
+  const el1 = document.getElementById('musicToggleLabel');
+  if (el1) el1.textContent = label;
+  document.querySelectorAll('.music-toggle-label').forEach(el => el.textContent = label);
+  if (!bgMusicEnabled) bgMusic.pause();
+}
+
 function toggleBgMusic() {
   bgMusicEnabled = !bgMusicEnabled;
   // Update all toggle labels
@@ -1471,6 +1497,12 @@ function toggleBgMusic() {
   const el1 = document.getElementById('musicToggleLabel');
   if (el1) el1.textContent = label;
   document.querySelectorAll('.music-toggle-label').forEach(el => el.textContent = label);
+  // Sync review screen toggle
+  const reviewToggle = document.getElementById('musicOptionToggle');
+  if (reviewToggle) {
+    if (bgMusicEnabled) reviewToggle.classList.add('on');
+    else reviewToggle.classList.remove('on');
+  }
 
   if (bgMusicEnabled) {
     // If narration is currently playing, start music
