@@ -80,7 +80,7 @@ export default async (req) => {
       html = purchaseEmail(childName, category, length, to, storyId);
     } else if (type === 'gift') {
       subject = `${esc(giftFrom)} made something special for ${esc(childName)} 🎁`;
-      html = giftEmail(childName, giftFrom, giftMessage);
+      html = giftEmail(childName, giftFrom, giftMessage, storyId);
     } else if (type === 'review') {
       subject = `New review from ${esc(reviewName)}`;
       html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>New Review Submitted</h2><p><strong>From:</strong> ${esc(reviewName)}</p>${reviewChildName ? `<p><strong>Child:</strong> ${esc(reviewChildName)}</p>` : ''}<p><strong>Review:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${esc(reviewText)}</blockquote></div>`;
@@ -174,10 +174,11 @@ function purchaseEmail(childName, category, length, customerEmail, storyId) {
 </html>`;
 }
 
-function giftEmail(childName, giftFrom, giftMessage) {
+function giftEmail(childName, giftFrom, giftMessage, storyId) {
   const safeChild = esc(childName);
   const safeFrom = esc(giftFrom);
   const safeMsg = esc(giftMessage);
+  const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}` : 'https://storytold.ai';
   return `
 <!DOCTYPE html>
 <html>
@@ -199,7 +200,7 @@ function giftEmail(childName, giftFrom, giftMessage) {
         <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${safeMsg}"</p>
       </div>` : ''}
       <div style="text-align:center;margin:24px 0;">
-        <a href="https://storytold.ai" style="display:inline-block;background:#FF8C42;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
+        <a href="${listenUrl}" style="display:inline-block;background:#FF8C42;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
       </div>
       <p style="color:#999;font-size:13px;text-align:center;line-height:1.5;margin:0;">
         This story was made with love using Storytold, where every child becomes the hero of their own audio adventure.

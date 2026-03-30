@@ -524,6 +524,11 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.6;margin:0;font-weight:500">Share your child's story with grandparents, aunties, uncles, anyone. Send it on WhatsApp or email in one tap. No extra cost, no limit. One story, the whole family gets to hear it.</p>
   </div>
 
+  <!-- OCCASION HOOKS -->
+  <div style="width:100%;max-width:440px;margin-top:1rem;text-align:center">
+    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.7;font-weight:600;margin:0">Perfect for birthdays, Christmas, bedtime routines, long car journeys, first day at school, a new sibling arriving, or just because they deserve something magical.</p>
+  </div>
+
   <!-- HOW IT WORKS -->
   <div class="how-it-works">
     <p class="how-title">How it works</p>
@@ -737,7 +742,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p class="form-hint">We will weave this into the story to celebrate them.</p>
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenPeople')">Continue</button>
+  <p class="inline-error" id="detailsError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateDetails()">Continue</button>
 </div>
 
 <!-- DETAILS: WHO'S IN THE STORY -->
@@ -761,7 +767,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <input type="text" id="teacherName" placeholder="e.g. Mrs Thompson">
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenTheme')">Continue</button>
+  <p class="inline-error" id="peopleError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validatePeople()">Continue</button>
 </div>
 
 <!-- DETAILS: THEME -->
@@ -790,7 +797,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <input type="text" id="customTheme" placeholder="e.g. Minecraft, ballet, cooking, trains">
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenMemorables')">Continue</button>
+  <p class="inline-error" id="themeError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateTheme()">Continue</button>
 </div>
 
 <!-- DETAILS: MEMORABLE THINGS -->
@@ -823,7 +831,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p class="form-hint">Include the colour and what it looks like. This will appear in the story exactly as you describe it.</p>
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenWhere')">Continue</button>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep5_Memorables');goTo('screenWhere')">Continue</button>
 </div>
 
 <!-- DETAILS: WHERE -->
@@ -847,7 +855,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <input type="text" id="customWhere" placeholder="e.g. Grandma's garden, the park on Elm Street, Disneyland">
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenExtras')">Continue</button>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep6_Where');goTo('screenExtras')">Continue</button>
 </div>
 
 <!-- DETAILS: LEARNING + EXTRAS + MESSAGE -->
@@ -913,47 +921,14 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         <label>Gift message</label>
         <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
       </div>
-      <div class="form-group">
-        <label>When should it arrive?</label>
-        <select id="giftDelivery" onchange="document.getElementById('giftDateGroup').style.display=this.value==='scheduled'?'block':'none'">
-          <option value="now">Send immediately</option>
-          <option value="scheduled">Pick a date</option>
-        </select>
-      </div>
-      <div class="form-group" id="giftDateGroup" style="display:none">
-        <label>Delivery date</label>
-        <input type="date" id="giftDate">
-      </div>
+      <p class="form-hint" style="margin-top:0.5rem">The gift email will be sent as soon as the story is ready.</p>
     </div>
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goToLength()">Continue</button>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep7_Extras');goToLength()">Continue</button>
 </div>
 
-<!-- LENGTH -->
-<div class="screen" id="screenLength">
-  <button class="back-btn" onclick="goTo('screenExtras')">&#8592; Back</button>
-  <h2 class="section-title">How long?</h2>
-  <p class="section-sub">Choose the perfect length for the moment.</p>
-  <div class="length-cards">
-    <div class="length-card selected" onclick="selectLength('standard',this)">
-      <div class="len-emoji">&#127769;</div>
-      <div class="len-name">Short</div>
-      <div class="len-time">~5 min</div>
-    </div>
-    <div class="length-card" onclick="selectLength('long',this)">
-      <div class="len-emoji">&#128214;</div>
-      <div class="len-name">Medium</div>
-      <div class="len-time">~10 min</div>
-    </div>
-    <div class="length-card" onclick="selectLength('epic',this)">
-      <div class="len-emoji">&#128640;</div>
-      <div class="len-name">Long</div>
-      <div class="len-time">~15 min</div>
-    </div>
-  </div>
-  <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="goTo('screenVoice')">Continue</button>
-</div>
+<!-- LENGTH screen removed: all stories are 15 min at £9.99 -->
 
 <!-- VOICE -->
 <div class="screen" id="screenVoice">
@@ -1031,18 +1006,25 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p class="preview-sub" id="previewSub">Here is a taste of their story. If it feels right, unlock the full version.</p>
     <div id="previewSummary" style="background:var(--purple-light);border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.5rem;text-align:left;max-width:340px;width:100%"></div>
     <div class="audio-player" onclick="playPreview()">
-      <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <svg class="play-icon" id="previewPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    </div>
+    <div style="width:100%;max-width:340px;margin:0.5rem auto 0">
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="previewProgress" style="height:100%;background:var(--purple);width:0%;transition:width 0.3s"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:0.2rem"><span id="previewTime" style="font-size:0.7rem;color:var(--text-muted)">0:00</span><span id="previewDuration" style="font-size:0.7rem;color:var(--text-muted)">0:00</span></div>
     </div>
     <audio id="previewAudio"></audio>
     <audio id="fullAudio"></audio>
     <div id="previewError"></div>
-    <div style="width:100%;max-width:340px;margin:0 auto 1rem">
-      <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email (to save the story to your account)</label>
-      <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box">
-      <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">We will email you a link to access your story anytime. No account needed.</p>
+    <div style="width:100%;max-width:340px;margin:0.75rem auto 1rem">
+      <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email (so we can send you the story)</label>
+      <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
+      <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">We will email you a link to listen anytime. No account needed.</p>
+      <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
     </div>
-    <button class="unlock-btn" onclick="unlockFull()">&#128275; Unlock the full story for £9.99</button>
-    <p class="unlock-price">15 minutes long. Download, share with family, keep forever.</p>
+    <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()">&#128275; Unlock the full story for £9.99</button>
+    <p class="unlock-price" id="unlockSub">15 minutes long. Download, share with family, keep forever.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? We'll rewrite it for free.</p>
+    <a onclick="goTo('screenReview')" style="font-size:0.78rem;color:var(--purple);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">Want to change something? Go back</a>
   </div>
 </div>
 
@@ -1531,18 +1513,54 @@ function getSelectedThemes() {
   return themes;
 }
 
-function goToLength() {
-  // Main character
+// --- Per-screen validation ---
+function showInlineError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+function hideInlineError(id) {
+  const el = document.getElementById(id);
+  if (el) { el.style.display = 'none'; }
+}
+
+function validateDetails() {
+  hideInlineError('detailsError');
   const name = document.getElementById('childName').value.trim();
   const age = document.getElementById('age').value;
   const gender = document.getElementById('gender').value;
-  if(!name || !age || !gender) { alert('Please fill in the name, age, and gender.'); return; }
-  // People
+  if (!name) { showInlineError('detailsError', 'Please tell us their name.'); return; }
+  if (!age) { showInlineError('detailsError', 'Please tell us their age.'); return; }
+  if (!gender) { showInlineError('detailsError', 'Please select boy or girl.'); return; }
+  trackEvent('FormStep2_Details');
+  goTo('screenPeople');
+}
+
+function validatePeople() {
+  hideInlineError('peopleError');
   const friend = document.getElementById('friendName').value.trim();
-  if(!friend) { alert('Please tell us their best friend\'s name.'); return; }
-  // Themes
+  if (!friend) { showInlineError('peopleError', 'Please tell us their best friend or favourite person\'s name. A sibling or cousin works too!'); return; }
+  trackEvent('FormStep3_People');
+  goTo('screenTheme');
+}
+
+function validateTheme() {
+  hideInlineError('themeError');
   const themes = getSelectedThemes();
-  if(themes.length === 0) { alert('Please pick at least one theme or tell us what they love.'); return; }
+  if (themes.length === 0) { showInlineError('themeError', 'Please pick at least one thing they love, or type something in.'); return; }
+  trackEvent('FormStep4_Theme');
+  goTo('screenMemorables');
+}
+
+function goToLength() {
+  // Validation already done per screen, just collect all data
+  const name = document.getElementById('childName').value.trim();
+  const age = document.getElementById('age').value;
+  const gender = document.getElementById('gender').value;
+  if(!name || !age || !gender) { goTo('screenDetails'); return; }
+  const friend = document.getElementById('friendName').value.trim();
+  if(!friend) { goTo('screenPeople'); return; }
+  const themes = getSelectedThemes();
+  if(themes.length === 0) { goTo('screenTheme'); return; }
 
   storyData.childName = name;
   storyData.age = age;
@@ -1807,6 +1825,25 @@ async function generatePreview() {
     fullStoryText = data.fullStory;
     const audio = document.getElementById('previewAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
+
+    // Wire up progress bar
+    audio.addEventListener('loadedmetadata', function() {
+      document.getElementById('previewDuration').textContent = formatTime(audio.duration);
+    });
+    audio.addEventListener('timeupdate', function() {
+      if (audio.duration) {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        document.getElementById('previewProgress').style.width = pct + '%';
+        document.getElementById('previewTime').textContent = formatTime(audio.currentTime);
+      }
+    });
+    audio.addEventListener('ended', function() {
+      document.getElementById('previewPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    });
+
+    // Personalise unlock button with child's name
+    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story for £9.99';
+
     clearInterval(msgInterval);
 
     // Populate preview screen with story summary
@@ -1831,19 +1868,48 @@ async function generatePreview() {
   }
 }
 
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
 function playPreview() {
   const audio = document.getElementById('previewAudio');
-  if(audio.paused) audio.play(); else audio.pause();
+  const icon = document.getElementById('previewPlayIcon');
+  if(audio.paused) {
+    audio.play();
+    icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  } else {
+    audio.pause();
+    icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  }
 }
 
 async function unlockFull() {
+  // Validate email before proceeding
+  const previewEmail = document.getElementById('previewEmail').value.trim();
+  const emailErr = document.getElementById('emailError');
+  if (!previewEmail) {
+    emailErr.textContent = 'Please enter your email so we can send you the story.';
+    emailErr.style.display = 'block';
+    document.getElementById('previewEmail').focus();
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(previewEmail)) {
+    emailErr.textContent = 'That doesn\'t look like a valid email. Please check and try again.';
+    emailErr.style.display = 'block';
+    document.getElementById('previewEmail').focus();
+    return;
+  }
+  emailErr.style.display = 'none';
+
   trackEvent('InitiateCheckout', { value: 9.99, currency: 'GBP', content_name: storyData.category });
   goTo('screenLoading');
   document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
   document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';
   try {
-    // Capture email for Stripe pre-fill and abandoned cart
-    const previewEmail = document.getElementById('previewEmail').value.trim();
 
     // Save story data so we can retrieve it after Stripe redirect
     sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, fullStoryText, selectedVoiceId }));
@@ -2070,6 +2136,7 @@ async function sendGift() {
         childName: storyData.childName,
         giftFrom: storyData.giftFrom,
         giftMessage: storyData.giftMessage,
+        storyId: lastSavedStoryId,
         sessionId: lastStripeSessionId
       })
     });
