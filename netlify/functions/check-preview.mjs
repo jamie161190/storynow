@@ -41,6 +41,13 @@ export default async (req) => {
 
     const result = await res.json();
 
+    // If the background worker is still in progress (diagnostic markers), keep polling
+    if (result.status === 'started' || result.status === 'calling_anthropic') {
+      return new Response(JSON.stringify({ ready: false, status: result.status }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // If the background worker saved an error, pass it through
     if (result.success === false && result.error) {
       return new Response(JSON.stringify({ ready: true, success: false, error: result.error }), {

@@ -153,12 +153,40 @@ export const handler = async (event) => {
 
     console.log('[BG] Starting preview generation for job:', jobId, 'category:', storyData.category);
 
+    // DIAGNOSTIC: write a "started" marker so we know the function was invoked
+    if (jobId && supabaseUrl && supabaseKey) {
+      try {
+        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
+            'Content-Type': 'application/json',
+            'x-upsert': 'true'
+          },
+          body: JSON.stringify({ success: false, status: 'started', error: 'Story is being generated...' })
+        });
+        console.log('[BG] Wrote started marker for job:', jobId);
+      } catch (e) { console.error('[BG] Failed to write started marker:', e.message); }
+    }
+
     // ── Generate preview opening with Anthropic ──
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
     const startTime = Date.now();
     let previewStory;
     try {
+      console.log('[BG] About to call Anthropic API...');
+      // DIAGNOSTIC: update marker to show we reached the API call
+      if (jobId && supabaseUrl && supabaseKey) {
+        try {
+          await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey, 'Content-Type': 'application/json', 'x-upsert': 'true' },
+            body: JSON.stringify({ success: false, status: 'calling_anthropic', error: 'Calling AI to write your story...' })
+          });
+        } catch (e) { /* best effort */ }
+      }
       const stream = await anthropic.messages.create({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
