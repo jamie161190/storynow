@@ -818,8 +818,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
   <div class="form-group">
     <label>Sidekick (optional)</label>
-    <input type="text" id="sidekickName" placeholder="e.g. a robot called Sparky, a talking fox, Captain Brave">
-    <p class="form-hint">A sidekick can be anyone or anything: a superhero partner, a magical creature, an imaginary friend. They will be by their side for the whole adventure.</p>
+    <input type="text" id="sidekickName" placeholder="e.g. Mum, Daddy, Grandma, a robot called Sparky, Captain Brave">
+    <p class="form-hint">A sidekick can be anyone: Mum, Dad, a grandparent, the person giving this as a gift, a superhero partner, a magical creature. They will be by their side for the whole adventure.</p>
   </div>
   <div class="form-group">
     <label>Other people in the story (optional)</label>
@@ -1059,7 +1059,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="loader-dot"></div>
   </div>
   <p class="loading-text">Writing their story...</p>
-  <p class="loading-sub">Our best AI is crafting every detail. Usually about a minute.</p>
+  <p class="loading-sub">Every detail you shared is being woven in. This usually takes about a minute.</p>
 </div>
 
 <!-- PREVIEW -->
@@ -1351,9 +1351,15 @@ function playSample() {
   const icon = document.getElementById('sampleIcon');
   if (audio.paused) {
     audio.play();
+    // Always play music on the homepage demo regardless of toggle state
+    const wasEnabled = bgMusicEnabled;
+    bgMusicEnabled = true;
+    bgMusic.play('journey', audio);
+    bgMusicEnabled = wasEnabled;
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
   } else {
     audio.pause();
+    bgMusic.pause();
     icon.innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
   }
 }
@@ -1371,6 +1377,7 @@ function playSample() {
     document.getElementById('sampleIcon').innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
     document.getElementById('sampleFill').style.width = '0%';
     document.getElementById('sampleTime').textContent = '0:00';
+    bgMusic.stop();
   });
 })();
 
@@ -1788,13 +1795,20 @@ function toggleTheme(el) {
 function updateThemeFollowUp() {
   const selected = Array.from(document.querySelectorAll('#themeGrid .theme-tile.selected')).map(t => t.dataset.theme);
   const followUp = document.getElementById('themeFollowUp');
-  // Find the first selected theme that has a follow-up
-  const match = selected.find(t => THEME_FOLLOWUPS[t]);
-  if (match) {
-    const cfg = THEME_FOLLOWUPS[match];
+  // Find which selected themes have a follow-up config
+  const matches = selected.filter(t => THEME_FOLLOWUPS[t]);
+  if (matches.length === 1) {
+    // Exactly one theme with a follow-up: show the specific question
+    const cfg = THEME_FOLLOWUPS[matches[0]];
     document.getElementById('themeFollowUpLabel').textContent = cfg.label;
     document.getElementById('themeDetail').placeholder = cfg.placeholder;
     document.getElementById('themeFollowUpHint').textContent = cfg.hint;
+    followUp.style.display = 'block';
+  } else if (selected.length > 1) {
+    // Multiple themes selected: show a generic prompt
+    document.getElementById('themeFollowUpLabel').textContent = 'Tell us a bit more about what they love';
+    document.getElementById('themeDetail').placeholder = 'e.g. favourite characters, teams, anything specific';
+    document.getElementById('themeFollowUpHint').textContent = 'The more specific you are, the more personal the story feels.';
     followUp.style.display = 'block';
   } else {
     followUp.style.display = 'none';
@@ -2201,20 +2215,22 @@ async function generatePreview() {
     `Weaving ${d.childName}'s name into every scene...`,
   ];
   if (d.friendName) msgs.push(`Giving ${d.friendName} a starring role...`);
-  if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} is part of the adventure...`);
+  if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} does something unforgettable...`);
+  if (d.sidekickName) msgs.push(`Writing ${d.sidekickName} into the adventure...`);
   if (d.themes && d.themes.length) msgs.push(`Building a world around ${d.themes[0].toLowerCase()}...`);
   if (d.familyMembers) msgs.push(`Writing in the people ${d.childName} loves most...`);
+  msgs.push('Choosing the perfect opening line...');
   msgs.push('Almost there, something special is taking shape...');
   let msgIdx = 0;
   const loadingText = document.querySelector('.loading-text');
   const loadingSub = document.querySelector('.loading-sub');
   loadingText.textContent = msgs[0];
-  loadingSub.textContent = 'Our best AI is crafting every detail. Usually about a minute.';
+  loadingSub.textContent = 'Every detail you shared is being woven in. This usually takes about a minute.';
   const msgInterval = setInterval(() => {
     msgIdx++;
     if (msgIdx < msgs.length) loadingText.textContent = msgs[msgIdx];
     else clearInterval(msgInterval);
-  }, 8000);
+  }, 5000);
 
   try {
     // Generate a job ID so we can recover the result if the connection times out
