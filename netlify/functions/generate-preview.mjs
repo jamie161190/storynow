@@ -400,26 +400,23 @@ export default async (req) => {
     const startTime = Date.now();
     console.log('Generating story:', { category: storyData.category, length: storyData.length, childName: storyData.childName });
 
-    // Use Opus with extended thinking for the highest quality stories.
-    // Extended thinking lets Claude plan the story arc, place personal details
-    // strategically, and craft callbacks before writing a single word.
+    // Use Sonnet 4 with extended thinking for high-quality stories
+    // that complete within Netlify's function timeout.
     let fullStory;
     try {
-      // Use streaming with stream: true to handle long-running Opus + extended thinking
       const stream = await anthropic.messages.create({
-        model: 'claude-opus-4-20250514',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 16000,
-        temperature: 1, // required to be 1 when using extended thinking
+        temperature: 1,
         thinking: {
           type: 'enabled',
-          budget_tokens: 4000 // think for ~4k tokens before writing
+          budget_tokens: 4000
         },
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: promptFn(storyData) }],
         stream: true
       });
 
-      // Collect text from streaming events
       let storyText = '';
       for await (const event of stream) {
         if (event.type === 'content_block_delta') {
