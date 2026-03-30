@@ -41,6 +41,13 @@ export default async (req) => {
 
     const result = await res.json();
 
+    // If the background worker saved an error, pass it through
+    if (result.success === false && result.error) {
+      return new Response(JSON.stringify({ ready: true, success: false, error: result.error }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // If result already has audio, return it immediately
     if (result.previewAudio) {
       return new Response(JSON.stringify({ ready: true, ...result }), {

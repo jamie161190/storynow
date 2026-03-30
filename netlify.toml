@@ -7,6 +7,9 @@
   node_bundler = "esbuild"
 
 [functions."generate-preview"]
+  external_node_modules = []
+
+[functions."story-worker-background"]
   external_node_modules = ["@anthropic-ai/sdk"]
 
 [functions."generate-full"]

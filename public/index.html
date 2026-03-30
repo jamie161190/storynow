@@ -569,7 +569,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
   <!-- OCCASION HOOKS -->
   <div style="width:100%;max-width:440px;margin-top:1rem;text-align:center">
-    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.7;font-weight:600;margin:0">Perfect for birthdays, Christmas, bedtime routines, long car journeys, first day at school, a new sibling arriving, or just because they deserve something magical.</p>
+    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.7;font-weight:600;margin:0">Perfect for birthdays, Christmas, bedtime, rainy afternoons, first day at school, a new sibling arriving, or just because they deserve something magical.</p>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -628,7 +628,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long is the full story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Around 15 minutes of narrated audio. Long enough for bedtime, a car journey, or quiet time. Every story is unique and written from scratch.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Around 15 minutes of narrated audio. Long enough for bedtime, a rainy afternoon, or quiet time. Every story is unique and written from scratch.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I share it with family?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
@@ -682,7 +682,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <div class="cat-info">
         <h3>Adventure</h3>
         <p>Action packed with twists, humour, and cliffhangers. The kind of story they beg to hear again.</p>
-        <span class="cat-tag">Great for car journeys</span>
+        <span class="cat-tag">The one they beg to replay</span>
       </div>
     </div>
     <div class="cat-card cat-learning" onclick="selectCategory('learning',this)">
@@ -2264,7 +2264,7 @@ function showReview() {
 }
 
 async function pollForPreview(jobId) {
-  const maxAttempts = 40; // 40 x 3s = 120s max wait (Opus + thinking can take a while)
+  const maxAttempts = 60; // 60 x 3s = 180s max wait (background worker needs time)
   const vId = selectedVoiceId || '';
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, 3000));
@@ -2272,6 +2272,10 @@ async function pollForPreview(jobId) {
       const res = await fetch('/api/check-preview?jobId=' + jobId + '&voiceId=' + encodeURIComponent(vId));
       const data = await res.json();
       if (data.ready && data.success) return data;
+      // If background worker reported an error, stop polling and surface it
+      if (data.ready && data.success === false && data.error) {
+        return { success: false, error: data.error };
+      }
     } catch(e) { /* keep polling */ }
   }
   return null;
@@ -2352,7 +2356,13 @@ async function generatePreview() {
         console.log('Direct response timed out, polling for result...');
         data = null;
       }
-      if (data && !data.success) {
+      // Background worker returns { polling: true } — go straight to polling
+      if (data && data.polling) {
+        console.log('Background worker triggered, polling for result...');
+        data = null;
+      }
+      // Real error from the gateway (not a timeout, not polling)
+      if (data && !data.success && !data.polling) {
         console.error('API error detail:', data.debug || 'no debug info');
         throw new Error(data.error || 'Something went wrong');
       }
