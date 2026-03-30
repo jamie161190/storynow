@@ -1765,14 +1765,19 @@ function showVoices() {
 
   renderFilteredVoices();
 
-  // Preload all voice preview URLs in background so taps are instant
+  // Preload all voice preview URLs in one batch call
   if (Object.keys(voicePreviewUrls).length === 0) {
-    ALL_VOICES.forEach(v => {
-      fetch('/api/voice-preview?id=' + v.id)
-        .then(r => r.json())
-        .then(d => { if (d.success) voicePreviewUrls[v.id] = d.preview_url; })
-        .catch(() => {});
-    });
+    fetch('/api/list-voices')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.voices) {
+          d.voices.forEach(v => {
+            if (v.preview_url) voicePreviewUrls[v.id] = v.preview_url;
+          });
+          console.log('Preloaded', Object.keys(voicePreviewUrls).length, 'voice previews');
+        }
+      })
+      .catch(e => console.warn('Voice preload failed:', e));
   }
 }
 

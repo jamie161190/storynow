@@ -51,15 +51,8 @@ Never write anything that could apply to any child. No "they were so brave" with
 9. START IMMEDIATELY
 No preamble. No "Once upon a time" unless it genuinely serves the story. Drop the listener straight into a moment. The first sentence should make a parent lean in.
 
-10. PACING BY LENGTH
-Short stories (~5 min, ~750 words): One clear arc. Setup, one complication, resolution. Tight and satisfying.
-
-Medium stories (~10 min, ~1500 words): Three act structure with ESCALATION.
-- Act 1 (first 25%): Drop straight into the world. Establish the child, the friend, the situation. End act 1 with a problem or discovery.
-- Act 2 (middle 50%): The heart of the story. Must contain AT LEAST two distinct scenes in different locations or situations. Include a "wait, what?" twist at roughly the midpoint that changes what the child thought was happening. Dialogue should dominate this section, not narration. Shift emotions: funny then tense, exciting then tender.
-- Act 3 (final 25%): The payoff. A callback to something from earlier in the story. The child solves the final challenge using something they learned along the way. For bedtime stories, this act slows down gradually into warmth and sleep.
-
-Long stories (~15 min, ~2200 words): Four act structure with SUBPLOTS and SURPRISES.
+10. PACING
+Every story is ~15 minutes (~2200 words). Four act structure with SUBPLOTS and SURPRISES.
 - Act 1 (first 20%): Immediate hook. The child and friend are dropped into a situation that demands action.
 - Act 2 (20% to 50%): The adventure deepens. Introduce a secondary character or subplot (a quirky helper, a rival, a mystery within the mystery). At least THREE distinct scenes with location or situation changes. Every 300 words, something new must happen: a new character speaks, the setting shifts, a discovery is made, or an obstacle appears.
 - Act 3 (50% to 80%): The twist. What the child thought was the problem is not the real problem. The real challenge is bigger, more personal, more meaningful. The friend or pet has a standout moment here. Dialogue is at its peak. Include a moment of doubt or setback that the child must push through.
@@ -133,7 +126,7 @@ ${characterBlock(d)}
 
 SENSORY LANGUAGE: Use warmth, soft light, gentle sounds, cosiness. Stars, blankets, rain on windows, a cat purring. Make the listener feel sleepy.
 
-${d.length !== 'standard' ? 'LONGER BEDTIME PACING: For medium and long bedtime stories, the first half can be a gentle journey or discovery with soft excitement. But the energy must drop steadily from the midpoint onwards. The final third should feel like sinking into a warm bath. Sentences get shorter. The world gets quieter. Sounds become softer. By the last few paragraphs, the child should already be drifting.' : ''}
+BEDTIME PACING: The first half can be a gentle journey or discovery with soft excitement. But the energy must drop steadily from the midpoint onwards. The final third should feel like sinking into a warm bath. Sentences get shorter. The world gets quieter. Sounds become softer. By the last few paragraphs, the child should already be drifting.
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
@@ -142,23 +135,23 @@ ${getAgeBand(d.age)}
 Write the story now. Start immediately, no preamble.`,
 
   journey: (d) => `STORY TYPE: Journey / Adventure
-TONE: Exciting, gripping, but with emotional range. This story is designed to be listened to on a long car ride, flight, or train journey. The child cannot look at anything else, so the story IS their entire world for the next ${d.length === 'standard' ? '5' : '15'} minutes. It must hold them completely.
+TONE: Exciting, gripping, but with emotional range. This story is designed to be listened to on a long car ride, flight, or train journey. The child cannot look at anything else, so the story IS their entire world for the next 15 minutes. It must hold them completely.
 
 ${characterBlock(d)}
 
-STRUCTURE: ${d.length === 'standard' ? '1 clear arc with a complication and resolution' : '4 acts with 5 to 6 distinct scenes, at least 2 twists, and a subplot involving the best friend or a new character'}. Scene transitions should be sharp. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
+STRUCTURE: 4 acts with 5 to 6 distinct scenes, at least 2 twists, and a subplot involving the best friend or a new character. Scene transitions should be sharp. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
 
 PACING: Not just fast. VARIED. This is the most important word for journey stories.
 - Alternate between high energy action and quieter character moments. A chase scene, then a funny conversation between ${d.childName} and ${d.friendName}. A discovery, then a moment of doubt. Tension, then a joke that breaks it.
 - The ear gets tired of constant excitement. Every 2 to 3 minutes of narration, shift the energy. High, low, high, higher, low, highest.
 - Dialogue should make up at least 50% of the story. Two characters disagreeing, joking, planning, or arguing is far more engaging than narration describing what happened.
-${d.length !== 'standard' ? `
-ENGAGEMENT TECHNIQUES FOR LONGER JOURNEYS:
+
+ENGAGEMENT TECHNIQUES:
 - THE TICKING CLOCK: Give the adventure a time pressure. They have to reach somewhere, solve something, or save something before it is too late. This creates forward momentum the child can feel.
 - THE RUNNING GAG: Give ${d.friendName} a funny recurring habit, phrase, or reaction that appears 3 to 4 times throughout. Kids love repetition they can predict.
 - THE IMPOSSIBLE CHOICE: At around the 60% mark, ${d.childName} faces a decision where both options have consequences. This is where the story gets personal and the child leans in.
 - SENSORY WORLD BUILDING: Since the child is stuck in a car or plane, the story must paint vivid sensory pictures. Not "they entered a cave" but "The air turned cold. Water dripped somewhere in the dark. And then, from deep inside the cave, a sound. A low rumble. Like breathing."
-- END WITH A DOOR OPEN: The final line should hint that there could be another adventure. Not a cliffhanger, but a promise. The child should turn to their parent and say "Can I get another one?"` : ''}
+- END WITH A DOOR OPEN: The final line should hint that there could be another adventure. Not a cliffhanger, but a promise. The child should turn to their parent and say "Can I get another one?"
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
@@ -208,14 +201,14 @@ The child listening at home shouts the answer during the pause. The narrator the
 VARY THE PROMPT PHRASES. Do not use "Can you work it out?" every time. Rotate between: "What do you think?", "Do you know?", "Quick, what is it?", "Can you help?", "Shout it out!", "What comes next?", "${d.friendName} looked at ${d.childName}. Do you know this one?"
 
 YOU MUST:
-1. Include at least ${d.length === 'standard' ? '4 to 5' : '8 to 10'} interactive pause moments
+1. Include at least 8 to 10 interactive pause moments
 2. Build difficulty gradually (start easy, get harder)
 3. The challenges must be genuinely age-appropriate for a ${d.age} year old
 4. Have the friend or pet help with one of the easier challenges
 5. End with the child mastering something hard, feeling proud and capable
 6. NEVER break the adventure. No "let us practice" or teacher explaining. The learning IS the adventure.
-${d.length !== 'standard' ? `
-PACING FOR LONGER LEARNING STORIES:
+
+PACING FOR LEARNING STORIES:
 The biggest risk with a longer learning story is it feeling like a relentless quiz. You MUST break up the challenges with story moments that have nothing to do with learning. For every 2 to 3 challenges, include one of these breathing moments:
 
 - A FUNNY MOMENT: ${d.friendName} does something silly, the pet causes chaos, something unexpected happens that makes the child laugh. Humour resets attention.
@@ -229,7 +222,7 @@ DIFFICULTY CURVE FOR MEDIUM AND LONG:
 - Final 30%: The hardest challenges, but the child is ready. The final challenge should combine two things they have learned earlier in the story. When they get it right, it should feel like the most triumphant moment in the story.
 
 THE VILLAIN OR OBSTACLE:
-For medium and long stories, there should be an antagonist or major obstacle that can ONLY be defeated through the child's knowledge. Not a scary villain, but a compelling one. A trickster who thinks ${d.childName} cannot solve the puzzles. A locked kingdom that has been waiting for someone smart enough. A machine that is broken and only the right answers can fix it. This gives the challenges STAKES beyond "answer the question."` : ''}
+There should be an antagonist or major obstacle that can ONLY be defeated through the child's knowledge. Not a scary villain, but a compelling one. A trickster who thinks ${d.childName} cannot solve the puzzles. A locked kingdom that has been waiting for someone smart enough. A machine that is broken and only the right answers can fix it. This gives the challenges STAKES beyond "answer the question."
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
@@ -271,7 +264,7 @@ export default async (req) => {
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const tokenMap = { standard: 1800, long: 5500, epic: 5500 };
+    const tokenMap = { standard: 1800, long: 3200, epic: 3200 };
     const maxTokens = tokenMap[storyData.length] || 1800;
 
     const startTime = Date.now();
