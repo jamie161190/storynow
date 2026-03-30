@@ -9,6 +9,7 @@ export default async (req) => {
     const body = await req.json();
     const storyData = body.storyData || {};
     const childName = storyData.childName || body.childName || 'your child';
+    const customerEmail = body.customerEmail || null;
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
 
@@ -34,6 +35,7 @@ export default async (req) => {
         }
       ],
       mode: 'payment',
+      ...(customerEmail ? { customer_email: customerEmail } : {}),
       success_url: `${siteUrl}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: siteUrl,
       metadata: {

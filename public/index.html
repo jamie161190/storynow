@@ -446,6 +446,14 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .screen.active{animation:screenIn 0.35s ease-out}
 @keyframes screenIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
+/* ===== PROGRESS BAR ===== */
+.progress-steps{width:100%;max-width:440px;margin-bottom:1.5rem}
+.progress-steps-bar{display:flex;align-items:center;gap:0.25rem}
+.progress-dot{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background 0.3s}
+.progress-dot.done{background:var(--purple)}
+.progress-dot.active{background:var(--purple)}
+.progress-step-label{font-size:0.72rem;color:var(--text-muted);font-weight:600;text-align:center;margin-top:0.4rem}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
   .logo-img{width:220px}
@@ -566,6 +574,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- CATEGORY -->
 <div class="screen" id="screenCategory">
   <button class="back-btn" onclick="goTo('screenLanding')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressCategory"></div><p class="progress-step-label">Step 1 of 8</p></div>
   <h2 class="section-title">What kind of story?</h2>
   <p class="section-sub">Each one is written from scratch, just for them.</p>
   <div class="category-cards">
@@ -657,6 +666,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: MAIN CHARACTER -->
 <div class="screen" id="screenDetails">
   <button class="back-btn" onclick="goTo(storyData.category==='learning'?'screenLearningSetup':'screenCategory')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressDetails"></div><p class="progress-step-label">Step 2 of 8</p></div>
   <h2 class="section-title">The main character</h2>
   <p class="section-sub">This is who the story is all about.</p>
 
@@ -690,6 +700,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: WHO'S IN THE STORY -->
 <div class="screen" id="screenPeople">
   <button class="back-btn" onclick="goTo('screenDetails')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressPeople"></div><p class="progress-step-label">Step 3 of 8</p></div>
   <h2 class="section-title">Who else is in the story?</h2>
   <p class="section-sub">Friends, family, the people they love most.</p>
 
@@ -713,6 +724,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: THEME -->
 <div class="screen" id="screenTheme">
   <button class="back-btn" onclick="goTo('screenPeople')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressTheme"></div><p class="progress-step-label">Step 4 of 8</p></div>
   <h2 class="section-title">What are they into?</h2>
   <p class="section-sub" id="themeSubtext">Pick as many as you like. These shape the whole story.</p>
 
@@ -741,6 +753,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: MEMORABLE THINGS -->
 <div class="screen" id="screenMemorables">
   <button class="back-btn" onclick="goTo('screenTheme')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressMemorables"></div><p class="progress-step-label">Step 5 of 8</p></div>
   <h2 class="section-title">The special things</h2>
   <p class="section-sub">Pets, teddies, toys. The things they can not live without.</p>
 
@@ -773,6 +786,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: WHERE -->
 <div class="screen" id="screenWhere">
   <button class="back-btn" onclick="goTo('screenMemorables')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressWhere"></div><p class="progress-step-label">Step 6 of 8</p></div>
   <h2 class="section-title">Where does the story happen?</h2>
   <p class="section-sub">Pick a setting or let us surprise them.</p>
 
@@ -796,6 +810,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: LEARNING + EXTRAS + MESSAGE -->
 <div class="screen" id="screenExtras">
   <button class="back-btn" onclick="goTo('screenWhere')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressExtras"></div><p class="progress-step-label">Step 7 of 8</p></div>
   <h2 class="section-title">Final touches</h2>
   <p class="section-sub">Almost there. These are the details that make it unforgettable.</p>
 
@@ -900,6 +915,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- VOICE -->
 <div class="screen" id="screenVoice">
   <button class="back-btn" onclick="goTo('screenExtras')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressVoice"></div><p class="progress-step-label">Last step!</p></div>
   <h2 class="section-title">Choose a storyteller</h2>
   <p class="section-sub" id="voiceSubtext">Pick the voice that feels right.</p>
 
@@ -968,16 +984,22 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <div class="screen" id="screenPreview">
   <div class="preview-container">
     <div class="preview-badge">&#10003; Preview ready</div>
-    <p class="preview-title">Have a listen</p>
-    <p class="preview-sub">Here is a taste of their story. If it feels right, unlock the full version.</p>
+    <p class="preview-title" id="previewTitle">Have a listen</p>
+    <p class="preview-sub" id="previewSub">Here is a taste of their story. If it feels right, unlock the full version.</p>
+    <div id="previewSummary" style="background:var(--purple-light);border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.5rem;text-align:left;max-width:340px;width:100%"></div>
     <div class="audio-player" onclick="playPreview()">
       <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
     <audio id="previewAudio"></audio>
     <audio id="fullAudio"></audio>
     <div id="previewError"></div>
+    <div style="width:100%;max-width:340px;margin:0 auto 1rem">
+      <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email (to save the story to your account)</label>
+      <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box">
+      <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">We will email you a link to access your story anytime. No account needed.</p>
+    </div>
     <button class="unlock-btn" onclick="unlockFull()">&#128275; Unlock the full story for £9.99</button>
-    <p class="unlock-price">One time purchase. Yours forever.</p>
+    <p class="unlock-price">15 minutes long. Download, share with family, keep forever.</p>
   </div>
 </div>
 
@@ -1008,6 +1030,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <!-- POST PURCHASE ACTIONS -->
     <div class="post-actions">
       <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">Download MP3</button>
+      <button class="btn btn-gift" style="width:100%" onclick="shareFromFullScreen()">Share with family</button>
       <button class="btn btn-gift" style="width:100%" id="sendGiftBtn" onclick="sendGift()">Send to recipient</button>
       <button class="btn btn-gift" style="width:100%" onclick="goTo('screenLanding')">Create another story</button>
     </div>
@@ -1238,6 +1261,21 @@ function goTo(id, skipHistory) {
   // Push to browser history so back button works
   if (!skipHistory) {
     history.pushState({ screen: id }, '', '');
+  }
+
+  // Update progress bar
+  const progressMap = {screenCategory:1,screenDetails:2,screenPeople:3,screenTheme:4,screenMemorables:5,screenWhere:6,screenExtras:7,screenVoice:8};
+  const stepNum = progressMap[id];
+  if (stepNum) {
+    const barId = 'progress' + id.replace('screen','');
+    const bar = document.getElementById(barId);
+    if (bar) {
+      let dots = '';
+      for (let i = 1; i <= 8; i++) {
+        dots += `<div class="progress-dot ${i < stepNum ? 'done' : ''} ${i === stepNum ? 'active' : ''}"></div>`;
+      }
+      bar.innerHTML = dots;
+    }
   }
 
   if(id === 'screenVoice') showVoices();
@@ -1680,6 +1718,29 @@ async function generatePreview() {
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
   trackEvent('AddToCart', { content_name: storyData.category, value: 9.99, currency: 'GBP' });
   goTo('screenLoading');
+
+  // Personalised loading messages
+  const d = storyData;
+  const msgs = [
+    `Writing ${d.childName}'s story from scratch...`,
+    `Weaving ${d.childName}'s name into every scene...`,
+  ];
+  if (d.friendName) msgs.push(`Giving ${d.friendName} a starring role...`);
+  if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} is part of the adventure...`);
+  if (d.themes && d.themes.length) msgs.push(`Building a world around ${d.themes[0].toLowerCase()}...`);
+  if (d.familyMembers) msgs.push(`Writing in the people ${d.childName} loves most...`);
+  msgs.push('Almost there, something special is taking shape...');
+  let msgIdx = 0;
+  const loadingText = document.querySelector('.loading-text');
+  const loadingSub = document.querySelector('.loading-sub');
+  loadingText.textContent = msgs[0];
+  loadingSub.textContent = 'This takes about 30 seconds. Worth the wait.';
+  const msgInterval = setInterval(() => {
+    msgIdx++;
+    if (msgIdx < msgs.length) loadingText.textContent = msgs[msgIdx];
+    else clearInterval(msgInterval);
+  }, 4000);
+
   try {
     const res = await fetch('/api/generate-preview', {
       method:'POST',
@@ -1697,8 +1758,25 @@ async function generatePreview() {
     fullStoryText = data.fullStory;
     const audio = document.getElementById('previewAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
+    clearInterval(msgInterval);
+
+    // Populate preview screen with story summary
+    const catLabels = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story' };
+    document.getElementById('previewTitle').textContent = `${storyData.childName}'s preview is ready`;
+    document.getElementById('previewSub').textContent = 'Press play to hear a sample. Love it? Unlock the full 15 minute story.';
+    let summary = `<p style="font-size:0.78rem;color:var(--purple);font-weight:700;margin:0 0 0.4rem">What you built:</p>`;
+    summary += `<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500">`;
+    summary += `A ${(catLabels[storyData.category]||'story').toLowerCase()} for <strong>${storyData.childName}</strong>`;
+    if (storyData.friendName) summary += ` with best friend <strong>${storyData.friendName}</strong>`;
+    if (storyData.hasPet && storyData.petName) summary += `, ${storyData.petName} the ${storyData.petType || 'pet'}`;
+    if (storyData.themes && storyData.themes.length) summary += `, featuring ${storyData.themes.join(', ').toLowerCase()}`;
+    if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${storyData.setting.toLowerCase()}`;
+    summary += `.</p>`;
+    document.getElementById('previewSummary').innerHTML = summary;
+
     goTo('screenPreview');
   } catch(err) {
+    clearInterval(msgInterval);
     goTo('screenVoice');
     alert('Something went wrong: ' + err.message);
   }
@@ -1715,13 +1793,16 @@ async function unlockFull() {
   document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
   document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';
   try {
+    // Capture email for Stripe pre-fill and abandoned cart
+    const previewEmail = document.getElementById('previewEmail').value.trim();
+
     // Save story data so we can retrieve it after Stripe redirect
     sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, fullStoryText, selectedVoiceId }));
 
     const res = await fetch('/api/create-checkout', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData })
+      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.error || 'Something went wrong');
@@ -1966,7 +2047,10 @@ async function saveStoryToDb(email, audioUrl, stripeSessionId) {
     });
     const data = await res.json();
     if (!data.success) console.error('Save story failed:', data.error);
-    else console.log('Story saved:', data.storyId);
+    else {
+      console.log('Story saved:', data.storyId);
+      lastSavedStoryId = data.storyId;
+    }
   } catch(e) { console.error('Save story error:', e); }
 }
 
@@ -2132,8 +2216,17 @@ function playShared() {
 
 // Share story via email
 let shareStory = null;
+let lastSavedStoryId = null;
 
 let shareMode = 'email';
+
+function shareFromFullScreen() {
+  if (!lastSavedStoryId) {
+    alert('Your story is still being saved. Please try again in a moment.');
+    return;
+  }
+  openShareModal({ id: lastSavedStoryId, childName: storyData.childName });
+}
 
 function openShareModal(story) {
   shareStory = story;
