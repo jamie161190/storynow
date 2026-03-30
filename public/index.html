@@ -2280,24 +2280,25 @@ function showVoices() {
 
   renderFilteredVoices();
 
-  // Preload voice preview URLs by fetching each voice individually
-  // (list-voices only returns account voices, not library voices)
+  // Preload voice preview URLs individually (cached in Supabase after first generation)
   if (Object.keys(voicePreviewUrls).length < ALL_VOICES.length) {
     const toLoad = ALL_VOICES.filter(v => !voicePreviewUrls[v.id]);
     let idx = 0;
     function loadNextBatch() {
-      const batch = toLoad.slice(idx, idx + 4);
-      if (!batch.length) return;
-      idx += 4;
-      batch.forEach(v => {
+      const batch = toLoad.slice(idx, idx + 3);
+      if (!batch.length) {
+        console.log('All voice previews loaded:', Object.keys(voicePreviewUrls).length);
+        return;
+      }
+      idx += 3;
+      Promise.allSettled(batch.map(v =>
         fetch('/api/voice-preview?id=' + v.id)
           .then(r => r.json())
           .then(d => {
             if (d.success && d.preview_url) voicePreviewUrls[v.id] = d.preview_url;
           })
-          .catch(() => {});
-      });
-      setTimeout(loadNextBatch, 600);
+          .catch(() => {})
+      )).then(() => setTimeout(loadNextBatch, 300));
     }
     loadNextBatch();
   }
