@@ -584,7 +584,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         </div>
       </div>
     </div>
-    <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Now imagine hearing their name instead.</p>
+    <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Now imagine one with their child's name, their best friend, their world.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.2rem;text-align:center">This is just a snippet. Full stories are around 15 minutes.</p>
     <p style="font-size:0.72rem;color:var(--purple);margin-top:0.3rem;text-align:center;font-weight:600">You choose the voice. 20+ narrators, male and female, different accents.</p>
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
@@ -594,11 +594,6 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div style="width:100%;max-width:440px;margin-top:1rem;background:linear-gradient(135deg,var(--orange-light),#FFF8F0);border:2px solid #FFD9B8;border-radius:var(--radius);padding:1.15rem 1.25rem;text-align:center">
     <p style="font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;color:var(--text);margin:0 0 0.35rem">The perfect gift</p>
     <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.6;margin:0;font-weight:500">Grandparents, aunties, uncles, godparents, family friends: make a story for a child you love, and you can even appear in it yourself. Send it by WhatsApp or email in one tap.</p>
-  </div>
-
-  <!-- OCCASION HOOKS -->
-  <div style="width:100%;max-width:440px;margin-top:1rem;text-align:center">
-    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.7;font-weight:600;margin:0">Perfect for birthdays, Christmas, bedtime, rainy afternoons, first day at school, a new sibling arriving, or just because they deserve something magical.</p>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -669,7 +664,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I gift this to someone?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. On the extras step, toggle "This is a gift for someone else" and enter the recipient's email. We will send them a beautifully designed email with the story inside. Perfect for birthdays, Christmas, or just because.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. After you choose the story type, we ask if this is a gift. Tell us who it is from, add a message, and we will send them a beautifully designed email with the story inside. Perfect for birthdays, Christmas, or just because.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is £19.99 for one story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
@@ -694,7 +689,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- CATEGORY -->
 <div class="screen" id="screenCategory">
   <button class="back-btn" onclick="goTo('screenLanding')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressCategory"></div><p class="progress-step-label">Step 1 of 8</p></div>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressCategory"></div><p class="progress-step-label">Step 1 of 7</p></div>
   <h2 class="section-title">What kind of story?</h2>
   <p class="section-sub">Each one is written from scratch, just for them.</p>
   <div class="category-cards">
@@ -782,7 +777,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </div>
     </div>
 
-    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenDetails')">Continue</button>
+    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenGift')">Continue</button>
   </div>
 </div>
 
@@ -807,41 +802,60 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 </div>
 
-<!-- DETAILS: MAIN CHARACTER -->
-<div class="screen" id="screenDetails">
+<!-- GIFT MINI-STEP -->
+<div class="screen" id="screenGift">
   <button class="back-btn" onclick="goTo(storyData.category==='learning'?'screenLearningSetup':'screenCategory')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressDetails"></div><p class="progress-step-label">Step 2 of 8</p></div>
+  <h2 class="section-title">Is this a gift?</h2>
+  <p class="section-sub">If you are making this for someone else's child, we can make it extra special.</p>
+
+  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:440px;margin-top:0.5rem">
+    <button class="cat-card" onclick="setGiftMode(true)" id="giftYesBtn" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
+      <span style="font-size:1.8rem">&#127873;</span>
+      <div>
+        <p style="margin:0;font-size:0.95rem;font-weight:700;color:var(--text)">Yes, it's a gift</p>
+        <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:500">From a grandparent, auntie, uncle, godparent, or family friend</p>
+      </div>
+    </button>
+    <button class="cat-card" onclick="setGiftMode(false)" id="giftNoBtn" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
+      <span style="font-size:1.8rem">&#128106;</span>
+      <div>
+        <p style="margin:0;font-size:0.95rem;font-weight:700;color:var(--text)">No, it's for my child</p>
+        <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:500">I'm the parent or carer</p>
+      </div>
+    </button>
+  </div>
+
+  <!-- Gift fields, shown when "Yes" is tapped -->
+  <div id="giftFields" style="display:none;margin-top:1rem;width:100%;max-width:440px">
+    <div class="form-group">
+      <label>Your name (the gift giver)</label>
+      <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
+    </div>
+    <div class="toggle-row" style="margin-bottom:0.75rem">
+      <button class="toggle on" id="giftInStoryToggle" onclick="toggleGiftInStory()"></button>
+      <span class="toggle-label">Put me in the story as a character</span>
+    </div>
+    <p class="form-hint" id="giftInStoryHint" style="margin-top:-0.5rem">You will appear in the adventure with a real role, not just a mention.</p>
+    <div class="form-group">
+      <label>A message for them (optional)</label>
+      <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
+      <p class="form-hint">This will be read aloud by the narrator at the very start, before the story begins.</p>
+    </div>
+    <div class="form-group">
+      <label>Recipient's email (optional)</label>
+      <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
+      <p class="form-hint">We will email them a link to listen to their story. You can also send it from your account later.</p>
+    </div>
+    <p class="inline-error" id="giftError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
+    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateGift()">Continue</button>
+  </div>
+</div>
+
+<div class="screen" id="screenDetails">
+  <button class="back-btn" onclick="goTo('screenGift')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressDetails"></div><p class="progress-step-label">Step 2 of 7</p></div>
   <h2 class="section-title">The main character</h2>
   <p class="section-sub">This is who the story is all about.</p>
-
-  <!-- Gift toggle: right at the top so it frames everything -->
-  <div class="gift-section" style="margin-bottom:1rem">
-    <div class="toggle-row">
-      <button class="toggle" id="giftToggle" onclick="toggleGift()"></button>
-      <span class="toggle-label">This is a gift for someone else</span>
-    </div>
-    <div id="giftFields" style="display:none">
-      <div class="form-group">
-        <label>Your name (the gift giver)</label>
-        <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
-      </div>
-      <div class="toggle-row" style="margin-bottom:0.75rem">
-        <button class="toggle on" id="giftInStoryToggle" onclick="toggleGiftInStory()"></button>
-        <span class="toggle-label">Put me in the story as a character</span>
-      </div>
-      <p class="form-hint" id="giftInStoryHint" style="margin-top:-0.5rem">You will appear in the adventure with a real role, not just a mention.</p>
-      <div class="form-group">
-        <label>A message for them (optional)</label>
-        <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
-        <p class="form-hint">This will be read aloud by the narrator at the very start, before the story begins.</p>
-      </div>
-      <div class="form-group">
-        <label>Recipient's email (optional)</label>
-        <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
-        <p class="form-hint">We will email them a link to listen to their story. Don't have it yet? No problem, you can send it from your account whenever you're ready.</p>
-      </div>
-    </div>
-  </div>
 
   <div class="form-group">
     <label>Their name</label>
@@ -867,6 +881,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p class="form-hint" id="proudOfHint">If there is a birthday, achievement, or milestone, we will weave it into the heart of the story.</p>
   </div>
 
+  <div class="form-group">
+    <label>Your email</label>
+    <input type="email" id="earlyEmail" placeholder="e.g. your@email.com">
+    <p class="form-hint">So we can send you the story when it is ready. No spam, ever.</p>
+  </div>
+
   <p class="inline-error" id="detailsError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateDetails()">Continue</button>
 </div>
@@ -874,7 +894,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: WHO'S IN THE STORY -->
 <div class="screen" id="screenPeople">
   <button class="back-btn" onclick="goTo('screenDetails')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressPeople"></div><p class="progress-step-label">Step 3 of 8</p></div>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressPeople"></div><p class="progress-step-label">Step 3 of 7</p></div>
   <h2 class="section-title">Who else is in the story?</h2>
   <p class="section-sub">The people (and animals) that matter most. Everyone you add will play a real part in the adventure.</p>
 
@@ -925,7 +945,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 <!-- DETAILS: THEME -->
 <div class="screen" id="screenTheme">
   <button class="back-btn" onclick="goTo('screenPeople')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressTheme"></div><p class="progress-step-label">Step 4 of 8</p></div>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressTheme"></div><p class="progress-step-label">Step 4 of 7</p></div>
   <h2 class="section-title">What are they into?</h2>
   <p class="section-sub" id="themeSubtext">Pick as many as you like. These shape the whole story.</p>
 
@@ -966,26 +986,10 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateTheme()">Continue</button>
 </div>
 
-<!-- DETAILS: MEMORABLE THINGS -->
-<div class="screen" id="screenMemorables">
-  <button class="back-btn" onclick="goTo('screenTheme')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressMemorables"></div><p class="progress-step-label">Step 5 of 8</p></div>
-  <h2 class="section-title">The special things</h2>
-  <p class="section-sub">Teddies, toys, comfort items. The things they cannot go anywhere without.</p>
-
-  <div class="form-group">
-    <label>Favourite teddy, toy, or comfort item (optional)</label>
-    <input type="text" id="favTeddy" placeholder="e.g. a small white bunny called Mr Flopsy, a red fire engine, her yellow blanket">
-    <p class="form-hint">Include the colour and what it looks like. This will appear in the story exactly as you describe it.</p>
-  </div>
-
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep5_Memorables');goTo('screenWhere')">Continue</button>
-</div>
-
-<!-- DETAILS: WHERE -->
+<!-- DETAILS: WHERE + MEMORABLE THINGS (merged) -->
 <div class="screen" id="screenWhere">
-  <button class="back-btn" onclick="goTo('screenMemorables')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressWhere"></div><p class="progress-step-label">Step 6 of 8</p></div>
+  <button class="back-btn" onclick="goTo('screenTheme')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressWhere"></div><p class="progress-step-label">Step 5 of 7</p></div>
   <h2 class="section-title">Where does the story happen?</h2>
   <p class="section-sub">Pick a setting or let us surprise them.</p>
 
@@ -1005,13 +1009,19 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <input type="text" id="customWhere" placeholder="e.g. Grandma's garden, the park on Elm Street, Disneyland">
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep6_Where');goTo('screenExtras')">Continue</button>
+  <div class="form-group" style="margin-top:1rem">
+    <label>Favourite teddy, toy, or comfort item (optional)</label>
+    <input type="text" id="favTeddy" placeholder="e.g. a small white bunny called Mr Flopsy, a red fire engine, her yellow blanket">
+    <p class="form-hint">Include the colour and what it looks like. This will appear in the story exactly as you describe it.</p>
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep5_Where');goTo('screenExtras')">Continue</button>
 </div>
 
 <!-- DETAILS: LEARNING + EXTRAS + MESSAGE -->
 <div class="screen" id="screenExtras">
   <button class="back-btn" onclick="goTo('screenWhere')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressExtras"></div><p class="progress-step-label">Step 7 of 8</p></div>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressExtras"></div><p class="progress-step-label">Step 6 of 7</p></div>
   <h2 class="section-title">Final touches</h2>
   <p class="section-sub">Almost there. These are the details that make it unforgettable.</p>
 
@@ -1158,9 +1168,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     </div>
     <div id="previewError"></div>
     <div style="width:100%;max-width:340px;margin:0.75rem auto 1rem">
-      <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email (so we can send you the story)</label>
+      <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Confirm your email</label>
       <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
-      <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">We will email you a link to listen anytime. No account needed.</p>
+      <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">We will send the full story here. You can change this if needed.</p>
       <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
     </div>
     <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()">&#128275; Unlock the full story for £19.99</button>
@@ -1648,14 +1658,14 @@ function goTo(id, skipHistory) {
   }
 
   // Update progress bar
-  const progressMap = {screenCategory:1,screenDetails:2,screenPeople:3,screenTheme:4,screenMemorables:5,screenWhere:6,screenExtras:7,screenVoice:8};
+  const progressMap = {screenCategory:1,screenDetails:2,screenPeople:3,screenTheme:4,screenWhere:5,screenExtras:6,screenVoice:7};
   const stepNum = progressMap[id];
   if (stepNum) {
     const barId = 'progress' + id.replace('screen','');
     const bar = document.getElementById(barId);
     if (bar) {
       let dots = '';
-      for (let i = 1; i <= 8; i++) {
+      for (let i = 1; i <= 7; i++) {
         dots += `<div class="progress-dot ${i < stepNum ? 'done' : ''} ${i === stepNum ? 'active' : ''}"></div>`;
       }
       bar.innerHTML = dots;
@@ -1709,6 +1719,10 @@ function restoreDetails() {
   if (storyData.friendName) document.getElementById('friendName').value = storyData.friendName;
   if (storyData.sidekickName) document.getElementById('sidekickName').value = storyData.sidekickName;
   if (storyData.proudOf) document.getElementById('proudOf').value = storyData.proudOf;
+  // Restore early email from preview email if available
+  const earlyEmailEl = document.getElementById('earlyEmail');
+  const prevEmail = document.getElementById('previewEmail');
+  if (earlyEmailEl && prevEmail && prevEmail.value) earlyEmailEl.value = prevEmail.value;
   if (storyData.familyMembers) document.getElementById('familyMembers').value = storyData.familyMembers;
   if (storyData.teacherName) document.getElementById('teacherName').value = storyData.teacherName;
   if (storyData.petName) document.getElementById('petName').value = storyData.petName;
@@ -1726,15 +1740,12 @@ function restoreDetails() {
     const pf = document.getElementById('petFields');
     if (pf) pf.style.display = 'block';
   }
-  if (storyData.isGift) {
-    const gt = document.getElementById('giftToggle');
-    if (gt && !gt.classList.contains('on')) gt.classList.add('on');
-    const gf = document.getElementById('giftFields');
-    if (gf) gf.style.display = 'block';
+  if (storyData.isGift || isGiftMode) {
+    isGiftMode = true;
+    setGiftMode(true, false);
     if (storyData.giftEmail) document.getElementById('giftEmail').value = storyData.giftEmail;
     if (storyData.giftFrom) document.getElementById('giftFrom').value = storyData.giftFrom;
     if (storyData.giftMessage) document.getElementById('giftMessage').value = storyData.giftMessage;
-    // Restore gift-in-story toggle state
     const gis = document.getElementById('giftInStoryToggle');
     if (storyData.giftInStory === false) {
       if (gis && gis.classList.contains('on')) gis.classList.remove('on');
@@ -1742,7 +1753,6 @@ function restoreDetails() {
     } else {
       if (gis && !gis.classList.contains('on')) gis.classList.add('on');
     }
-    // Hide personal message field when gift is active
     const pmg = document.getElementById('personalMessageGroup');
     if (pmg) pmg.style.display = 'none';
   }
@@ -1813,7 +1823,7 @@ function selectCategory(cat, el) {
   applyCategoryTheme(cat);
   trackEvent('ViewContent', { content_name: cat, content_category: 'story_type' });
   // Learning goes to its own setup screen first
-  setTimeout(() => goTo(cat === 'learning' ? 'screenLearningSetup' : 'screenDetails'), 300);
+  setTimeout(() => goTo(cat === 'learning' ? 'screenLearningSetup' : 'screenGift'), 300);
 }
 
 // ===== LEARNING SETUP =====
@@ -1870,18 +1880,52 @@ function updateExtrasVisibility() {
   document.getElementById('learningGoalGroup').style.display = 'none';
   document.getElementById('customScenarioGroup').style.display = storyData.category === 'custom' ? 'block' : 'none';
   // Hide personal message if gift is selected (gift message replaces it)
-  const isGift = document.getElementById('giftToggle').classList.contains('on');
-  document.getElementById('personalMessageGroup').style.display = isGift ? 'none' : 'block';
+  document.getElementById('personalMessageGroup').style.display = isGiftMode ? 'none' : 'block';
 }
 
+let isGiftMode = false;
+
+function setGiftMode(isGift, navigate) {
+  isGiftMode = isGift;
+  const yesBtn = document.getElementById('giftYesBtn');
+  const noBtn = document.getElementById('giftNoBtn');
+  const fields = document.getElementById('giftFields');
+
+  if (yesBtn) {
+    yesBtn.style.borderColor = isGift ? 'var(--purple)' : 'var(--border)';
+    yesBtn.style.background = isGift ? 'var(--purple-light)' : 'var(--card)';
+  }
+  if (noBtn) {
+    noBtn.style.borderColor = isGift ? 'var(--border)' : 'var(--purple)';
+    noBtn.style.background = isGift ? 'var(--card)' : 'var(--purple-light)';
+  }
+
+  if (isGift) {
+    if (fields) fields.style.display = 'block';
+    const pmg = document.getElementById('personalMessageGroup');
+    if (pmg) pmg.style.display = 'none';
+  } else {
+    if (fields) fields.style.display = 'none';
+    const pmg = document.getElementById('personalMessageGroup');
+    if (pmg) pmg.style.display = 'block';
+    if (navigate !== false) {
+      trackEvent('FormStep_Gift');
+      goTo('screenDetails');
+    }
+  }
+}
+
+function validateGift() {
+  hideInlineError('giftError');
+  const giftFrom = document.getElementById('giftFrom').value.trim();
+  if (!giftFrom) { showInlineError('giftError', 'Please tell us who the gift is from.'); return; }
+  trackEvent('FormStep_Gift');
+  goTo('screenDetails');
+}
+
+// Legacy toggle kept for backwards compat
 function toggleGift() {
-  const t = document.getElementById('giftToggle');
-  t.classList.toggle('on');
-  const isOn = t.classList.contains('on');
-  document.getElementById('giftFields').style.display = isOn ? 'block' : 'none';
-  // Hide personal message when gift is on (gift message serves the same purpose)
-  const pmg = document.getElementById('personalMessageGroup');
-  if (pmg) pmg.style.display = isOn ? 'none' : 'block';
+  setGiftMode(!isGiftMode);
 }
 
 function toggleGiftInStory() {
@@ -2001,15 +2045,14 @@ function validateDetails() {
   const name = document.getElementById('childName').value.trim();
   const age = document.getElementById('age').value;
   const gender = document.getElementById('gender').value;
+  const email = document.getElementById('earlyEmail').value.trim();
   if (!name) { showInlineError('detailsError', 'Please tell us their name.'); return; }
   if (!age) { showInlineError('detailsError', 'Please tell us their age.'); return; }
   if (!gender) { showInlineError('detailsError', 'Please select boy or girl.'); return; }
-  // Validate gift fields if gift toggle is on (email is optional)
-  const isGift = document.getElementById('giftToggle').classList.contains('on');
-  if (isGift) {
-    const giftFrom = document.getElementById('giftFrom').value.trim();
-    if (!giftFrom) { showInlineError('detailsError', 'Please tell us who the gift is from.'); return; }
-  }
+  if (!email || !email.includes('@')) { showInlineError('detailsError', 'Please enter your email so we can send you the story.'); return; }
+  // Pre-fill the preview email field
+  const previewEmailEl = document.getElementById('previewEmail');
+  if (previewEmailEl && !previewEmailEl.value) previewEmailEl.value = email;
   trackEvent('FormStep2_Details');
   goTo('screenPeople');
 }
@@ -2027,7 +2070,7 @@ function validateTheme() {
   const themes = getSelectedThemes();
   if (themes.length === 0) { showInlineError('themeError', 'Please pick at least one thing they love, or type something in.'); return; }
   trackEvent('FormStep4_Theme');
-  goTo('screenMemorables');
+  goTo('screenWhere');
 }
 
 function goToLength() {
@@ -2076,7 +2119,7 @@ function goToLength() {
   }
   storyData.customScenario = document.getElementById('customScenario').value.trim();
   storyData.extraDetails = document.getElementById('extraDetails').value.trim();
-  storyData.isGift = document.getElementById('giftToggle').classList.contains('on');
+  storyData.isGift = isGiftMode;
   if(storyData.isGift) {
     storyData.giftEmail = document.getElementById('giftEmail').value.trim();
     storyData.giftFrom = document.getElementById('giftFrom').value.trim();
@@ -2168,7 +2211,7 @@ function renderFilteredVoices() {
     card.innerHTML = `
       <div class="voice-emoji">${v.emoji}</div>
       <div class="voice-info">
-        <h4>${v.name}${isRecommended ? ' <span style="font-size:0.7rem;color:var(--green);font-weight:700">Recommended</span>' : ''}</h4>
+        <h4>${v.name}${isRecommended ? ' <span style="font-size:0.65rem;color:white;font-weight:700;background:var(--green);padding:0.15rem 0.45rem;border-radius:20px;vertical-align:middle;margin-left:0.25rem">Top pick</span>' : ''}</h4>
         <p>${v.desc}</p>
         <div class="voice-tags">
           <span class="voice-tag">${accentLabel}</span>
@@ -2298,7 +2341,7 @@ function showReview() {
   if (d.category === 'learning' && d.teacherName) html += row('Teacher', d.teacherName, 'screenPeople');
   if (d.hasPet && d.petName) html += row('Pet', `${d.petName}${d.petType ? ' (' + d.petType + ')' : ''}`, 'screenPeople');
   html += row('Interests', d.themes.join(', ') + (d.themeDetail ? ' (' + d.themeDetail + ')' : ''), 'screenTheme');
-  if (d.favTeddy) html += row('Favourite teddy', d.favTeddy, 'screenMemorables');
+  if (d.favTeddy) html += row('Favourite teddy', d.favTeddy, 'screenWhere');
   html += row('Setting', d.setting || 'Surprise me', 'screenWhere');
   if (d.category === 'learning') {
     if (d.subject) html += row('Subject', d.subject, 'screenLearningSetup');
@@ -2307,12 +2350,12 @@ function showReview() {
   if (d.customScenario) html += row('Story idea', d.customScenario, 'screenExtras');
   if (d.extraDetails) html += row('Extra details', d.extraDetails, 'screenExtras');
   if (d.isGift) {
-    if (d.giftFrom) html += row('Gift from', d.giftFrom + (d.giftInStory ? ' (appears in story)' : ''), 'screenDetails');
-    if (d.giftMessage) html += row('Gift message', d.giftMessage, 'screenDetails');
+    if (d.giftFrom) html += row('Gift from', d.giftFrom + (d.giftInStory ? ' (appears in story)' : ''), 'screenGift');
+    if (d.giftMessage) html += row('Gift message', d.giftMessage, 'screenGift');
     if (d.giftEmail) {
-      html += row('Send to', d.giftEmail, 'screenDetails');
+      html += row('Send to', d.giftEmail, 'screenGift');
     } else {
-      html += row('Send to', 'You can send this from your account later', 'screenDetails');
+      html += row('Send to', 'You can send this from your account later', 'screenGift');
     }
   } else if (d.personalMessage) {
     html += row('Personal message', d.personalMessage, 'screenExtras');
