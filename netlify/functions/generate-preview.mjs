@@ -74,6 +74,7 @@ Think carefully before you begin. Plan the full story arc first. Decide:
 - Where are the scene changes? (At least every 300 words.)
 - Where is the emotional peak?
 - How does the friend shine? (Three distinct moments minimum.)
+- For learning stories: map out the difficulty curve. Plan which challenges go where, which ones the friend helps with, and where the breathing moments (humour, twists, celebrations) break up the learning. The themes and interests should BUILD THE WORLD, and the subject knowledge should be THE KEY that unlocks that world.
 Then write. The story must feel inevitable, like every detail was placed with intention, because it was.`;
 
 // ============================================================
@@ -178,7 +179,7 @@ PACING: Not just fast. VARIED. This is the most important word for journey stori
 
 ENGAGEMENT TECHNIQUES:
 - THE TICKING CLOCK: Give the adventure a time pressure. They have to reach somewhere, solve something, or save something before it is too late. This creates forward momentum the child can feel.
-- THE RUNNING GAG: Give ${d.friendName} a funny recurring habit, phrase, or reaction that appears 3 to 4 times throughout. Kids love repetition they can predict.
+- THE RUNNING GAG: Give ${d.friendName || 'the best friend'} a funny recurring habit, phrase, or reaction that appears 3 to 4 times throughout. Kids love repetition they can predict.
 - THE IMPOSSIBLE CHOICE: At around the 60% mark, ${d.childName} faces a decision where both options have consequences. This is where the story gets personal and the child leans in.
 - SENSORY WORLD BUILDING: Since the child is stuck in a car or plane, the story must paint vivid sensory pictures. Not "they entered a cave" but "The air turned cold. Water dripped somewhere in the dark. And then, from deep inside the cave, a sound. A low rumble. Like breathing."
 - END WITH A DOOR OPEN: The final line should hint that there could be another adventure. Not a cliffhanger, but a promise. The child should turn to their parent and say "Can I get another one?"
@@ -196,6 +197,7 @@ ${characterBlock(d)}
 
 SUBJECT AREA: ${d.subject}
 ${d.learningGoal ? 'SPECIFIC LEARNING GOAL: The parent says their child is working on: "' + d.learningGoal + '". This is the most important instruction in this entire prompt.' : ''}
+${d.interest ? '\nCRITICAL CONNECTION: The child\'s themes and interests (' + d.interest + ') must BUILD THE WORLD of this story. The subject (' + d.subject + ') must be THE KEY that unlocks that world. For example: if the child loves dinosaurs and is learning maths, the adventure takes place in a dinosaur world where maths is the magic that controls the dinosaurs. Never separate the interests from the learning. They must be fused.' : ''}
 
 CONFIDENCE LEVEL: ${d.confidence === 'starting' ? 'JUST STARTING. The child is new to this. Keep challenges very simple. Celebrate small wins enthusiastically. Use lots of scaffolding (e.g. give multiple choice rather than open questions). Make them feel clever for getting easy things right. Build confidence above all else.' : d.confidence === 'nearly' ? 'NEARLY MASTERED. The child is close to owning this. Push them. Include tricky variations, edge cases, and combinations. The final challenge should genuinely stretch them. They should feel proud because it was hard and they still got it.' : 'PRACTISING. The child knows the basics but needs repetition. Mix easy wins with moderate challenges. Start simple to build momentum, then gradually raise difficulty. The child should feel the satisfaction of getting faster and more confident.'}
 
@@ -203,32 +205,38 @@ THE GOLDEN RULE OF LEARNING STORIES:
 The learning must feel like a SUPERPOWER, not a test. ${d.childName} is not answering questions. ${d.childName} is using knowledge to save the day, unlock doors, defeat villains, crack codes, and rescue friends. The difference is everything. A child who feels tested switches off. A child who feels powerful leans in.
 
 CRITICAL: INTERACTIVE AUDIO PAUSES
-This story is read aloud by a narrator. At each learning moment, the narrator must PAUSE and invite the child to answer before revealing the answer. Write these pauses directly into the text like this:
+This story is read aloud by a narrator. At each learning moment, the narrator must PAUSE and invite the child to answer before revealing the answer. To create a pause that sounds natural when read aloud by a text to speech engine, write a short sentence like "Take a moment." or "Think about it." followed by a new paragraph. Do NOT use three dots or ellipsis for pauses as these sound unnatural when spoken aloud. Write the pauses like this:
 
-For maths: "${d.childName} stared at the magic door. Seven times four. Can you work it out? ... That is right, twenty eight! The door burst open with a flash of golden light."
+For maths: "${d.childName} stared at the magic door. Seven times four. Can you work it out?
 
-For spelling: "To unlock the chest, ${d.childName} needed to spell the word 'because.' B, E, C... can you finish it? ... A, U, S, E! The lock clicked open."
+Take a moment.
 
-For alphabet: "The next stepping stone had a letter. It comes after G. What letter is it? ... H! The stone lit up and ${d.childName} leaped across."
+That is right, twenty eight! The door burst open with a flash of golden light."
 
-For phonics: "The magic word started with a 'ch' sound. Was it a chair? A ship? Or a cherry? ... Cherry! ${d.childName} shouted it and the spell exploded with colour."
+For spelling: "To unlock the chest, ${d.childName} needed to spell the word because. B. E. C. Can you finish it?
 
-For reading: "The sign on the door said C... A... T. Can you read it? ... Cat! And behind the door was the biggest, fluffiest cat ${d.childName} had ever seen."
+Go on, spell it out.
 
-For science: "The volcano was building pressure underground. What is the hot liquid rock called before it reaches the surface? ... Magma! ${d.childName} remembered."
+A, U, S, E! The lock clicked open."
 
-For languages: "The friendly dragon spoke French. 'Bonjour!' it said. That means... hello! Can you say it? Bonjour!"
+For science: "The volcano was building pressure underground. What is the hot liquid rock called before it reaches the surface?
+
+Think about it.
+
+Magma! ${d.childName} remembered."
+
+For languages: "The friendly dragon spoke French. Bonjour! it said. That means hello! Can you say it? Bonjour!"
 
 THE PATTERN FOR EVERY CHALLENGE:
 1. Present the question naturally inside the story
 2. The narrator asks "Can you work it out?" or "What do you think?" or similar
-3. Write three dots "..." to create a natural pause (the narrator will pause here)
+3. Write a short bridging sentence on its own line like "Take a moment." or "Think about it." or "Go on, have a guess." This creates a natural spoken pause.
 4. Then reveal the answer with celebration and excitement
 5. The story continues because the child "got it right"
 
 The child listening at home shouts the answer during the pause. The narrator then confirms it. The child feels like the story is talking directly to them.
 
-VARY THE PROMPT PHRASES. Do not use "Can you work it out?" every time. Rotate between: "What do you think?", "Do you know?", "Quick, what is it?", "Can you help?", "Shout it out!", "What comes next?", "${d.friendName} looked at ${d.childName}. Do you know this one?"
+VARY THE PROMPT PHRASES. Do not use "Can you work it out?" every time. Rotate between: "What do you think?", "Do you know?", "Quick, what is it?", "Can you help?", "Shout it out!", "What comes next?", "${d.friendName || 'Their friend'} looked at ${d.childName}. Do you know this one?"
 
 YOU MUST:
 1. Include at least 8 to 10 interactive pause moments
