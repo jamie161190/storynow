@@ -264,7 +264,7 @@ export default async (req) => {
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-    const tokenMap = { standard: 1800, long: 3200, epic: 3200 };
+    const tokenMap = { standard: 1800, long: 5000, epic: 5000 };
     const maxTokens = tokenMap[storyData.length] || 1800;
 
     const startTime = Date.now();
@@ -272,9 +272,8 @@ export default async (req) => {
 
     let storyResponse;
     try {
-      // Use Haiku for speed: stories generate 3-5x faster with similar quality
       storyResponse = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: maxTokens,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: promptFn(storyData) }]
