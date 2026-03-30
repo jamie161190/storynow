@@ -335,17 +335,17 @@ export function buildPreviewPrompt(storyData) {
 
   return fullPrompt + `
 
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening of the story, approximately 150 to 200 words. This should be the gripping, personalised opening that hooks the listener instantly. It must:
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening of the story, approximately 60 to 80 words. This must be a tight, gripping hook that lasts about 30 seconds when read aloud. It must:
 - Start immediately with action, discovery, or wonder
 - Use the child's name at least twice
 - Mention the best friend by name
 - Reference at least one personal detail (pet, interest, setting)
 - End mid-scene at a moment of suspense or wonder, so the listener desperately wants to hear more
-- Include at least one or two natural pauses ( ... ) for the narrator
+- Include one natural pause ( ... ) for the narrator
 
 Do NOT wrap up or resolve anything. Stop at a cliffhanger or a moment of breathless anticipation. This opening must make a parent think "I have to buy this."
 
-Write ONLY the opening now. No more than 200 words.`;
+Write ONLY the opening now. Absolutely no more than 80 words.`;
 }
 
 // Build the full story prompt that continues from the preview opening
@@ -363,5 +363,5 @@ HERE IS THE OPENING THAT HAS ALREADY BEEN WRITTEN AND READ TO THE CHILD:
 ${previewStory}
 ---
 
-Continue this story now. Write the REMAINING portion (approximately ${(WORD_COUNTS[storyData.length] || 2200) - 200} words) to complete the full story. The listener will hear the opening above followed immediately by what you write now, so the transition must be seamless. Do not repeat the opening. Do not summarise what happened. Just continue.`;
+Continue this story now. Write the REMAINING portion (approximately ${(WORD_COUNTS[storyData.length] || 2200) - 80} words) to complete the full story. The listener will hear the opening above followed immediately by what you write now, so the transition must be seamless. Do not repeat the opening. Do not summarise what happened. Just continue.`;
 }

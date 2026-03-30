@@ -107,8 +107,12 @@ export default async (req) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
+        max_tokens: 16000,
         temperature: 1,
+        thinking: {
+          type: 'enabled',
+          budget_tokens: 500
+        },
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
       })

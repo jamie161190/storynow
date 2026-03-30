@@ -16,7 +16,7 @@
   external_node_modules = ["stripe"]
 
 [functions."full-worker-background"]
-  external_node_modules = ["@anthropic-ai/sdk"]
+  external_node_modules = []
 
 [functions."create-discount"]
   external_node_modules = ["stripe"]

@@ -94,26 +94,11 @@ export default async (req) => {
       });
     }
 
-    // ── Trigger the background worker ──
-    const siteUrl = process.env.URL || 'https://storytold.netlify.app';
-    const bgPayload = JSON.stringify({ storyData, previewStory, voiceId, childName, sessionId, jobId });
+    // Payment validated. The frontend will call the background function directly.
+    console.log('Payment validated for job:', jobId, '. Frontend will trigger background worker.');
 
-    console.log('Triggering full story background worker for job:', jobId);
-
-    // Fire and forget: background functions return 202 instantly.
-    fetch(`${siteUrl}/.netlify/functions/full-worker-background`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: bgPayload
-    }).then(r => {
-      console.log('Full worker response:', r.status);
-    }).catch(err => {
-      console.error('Failed to invoke full worker:', err.message);
-    });
-
-    // Return immediately so the frontend starts polling
-    return new Response(JSON.stringify({ polling: true, jobId }), {
-      status: 202,
+    return new Response(JSON.stringify({ success: true, jobId }), {
+      status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
 

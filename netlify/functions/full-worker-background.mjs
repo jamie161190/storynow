@@ -1,4 +1,8 @@
-import Anthropic from '@anthropic-ai/sdk';
+// Full Story Worker Background Function
+// Generates the full story text (continuing from preview opening),
+// then generates TTS audio, uploads to Supabase.
+// Uses direct fetch() calls - ZERO SDK dependencies.
+
 import { SYSTEM_PROMPT, buildFullStoryPrompt } from './lib/story-prompts.mjs';
 
 // TTS chunk helper: splits text into chunks at sentence boundaries
@@ -89,11 +93,25 @@ async function fetchWithRetry(url, options, retries = 3) {
   }
 }
 
+async function saveJobResult(supabaseUrl, supabaseKey, jobId, result) {
+  try {
+    await fetch(`${supabaseUrl}/storage/v1/object/stories/full-jobs/${jobId}.json`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseKey}`,
+        'apikey': supabaseKey,
+        'Content-Type': 'application/json',
+        'x-upsert': 'true'
+      },
+      body: JSON.stringify(result)
+    });
+  } catch (e) {
+    console.error('[FULL-BG] Failed to save job result:', e.message);
+  }
+}
+
 // ============================================================
 // BACKGROUND FUNCTION HANDLER
-// Generates the full story text (continuing from preview opening),
-// then generates TTS audio for the complete story, uploads to
-// Supabase, and saves the result for polling.
 // ============================================================
 export const handler = async (event) => {
   let jobId;
@@ -111,34 +129,42 @@ export const handler = async (event) => {
 
     console.log('[FULL-BG] Starting full story generation for job:', jobId);
 
-    // ── Step 1: Generate the rest of the story with Anthropic ──
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    // ── Step 1: Generate the rest of the story with Anthropic (direct fetch) ──
     const storyStart = Date.now();
-
     let continuationText;
     try {
-      const stream = await anthropic.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 8000,
-        temperature: 1,
-        thinking: {
-          type: 'enabled',
-          budget_tokens: 5000
+      const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json'
         },
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: buildFullStoryPrompt(storyData, previewStory) }],
-        stream: true
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 16000,
+          temperature: 1,
+          thinking: {
+            type: 'enabled',
+            budget_tokens: 5000
+          },
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: buildFullStoryPrompt(storyData, previewStory) }]
+        })
       });
 
-      let storyText = '';
-      for await (const ev of stream) {
-        if (ev.type === 'content_block_delta') {
-          if (ev.delta.type === 'text_delta') {
-            storyText += ev.delta.text;
-          }
+      if (!apiResponse.ok) {
+        const errBody = await apiResponse.text();
+        throw new Error('Anthropic API ' + apiResponse.status + ': ' + errBody);
+      }
+
+      const apiResult = await apiResponse.json();
+      continuationText = '';
+      for (const block of apiResult.content) {
+        if (block.type === 'text') {
+          continuationText += block.text;
         }
       }
-      continuationText = storyText;
       console.log('[FULL-BG] Story continuation generated in', Date.now() - storyStart, 'ms, words:', continuationText.split(' ').length);
     } catch (apiErr) {
       console.error('[FULL-BG] Anthropic API error:', apiErr.message);
@@ -266,7 +292,6 @@ export const handler = async (event) => {
         if (existingCheck.ok) {
           const existing = await existingCheck.json();
           if (existing.length > 0) {
-            // Update existing record with audio URL
             await fetch(
               `${supabaseUrl}/rest/v1/stories?id=eq.${existing[0].id}`,
               {
@@ -306,20 +331,3 @@ export const handler = async (event) => {
     return { statusCode: 200 };
   }
 };
-
-async function saveJobResult(supabaseUrl, supabaseKey, jobId, result) {
-  try {
-    await fetch(`${supabaseUrl}/storage/v1/object/stories/full-jobs/${jobId}.json`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${supabaseKey}`,
-        'apikey': supabaseKey,
-        'Content-Type': 'application/json',
-        'x-upsert': 'true'
-      },
-      body: JSON.stringify(result)
-    });
-  } catch (e) {
-    console.error('[FULL-BG] Failed to save job result:', e.message);
-  }
-}
