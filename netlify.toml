@@ -3,10 +3,6 @@
   publish = "public"
   functions = "netlify/functions"
 
-[functions]
-  # Story generation needs time for AI writing + voice synthesis
-  # Default is 10s which is not enough
-  timeout = 60
 
 [[edge_functions]]
   path = "/"
