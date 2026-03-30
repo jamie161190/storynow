@@ -2226,19 +2226,27 @@ async function previewVoice(voiceId, btn) {
     currentPreviewBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
   }
 
-  // Check cache for preview URL
-  if (!voicePreviewUrls[voiceId]) {
+  // MOBILE FIX: On iOS, audio.play() must happen synchronously within
+  // the user gesture. If we need to fetch the URL first, the gesture is
+  // lost. So we play a tiny silent buffer immediately to "unlock" the
+  // audio element, then swap in the real source once it's ready.
+  const needsFetch = !voicePreviewUrls[voiceId];
+  if (needsFetch) {
+    // Unlock audio on mobile by playing a tiny silent WAV within the gesture
+    audio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+    try { await audio.play(); } catch(e) { /* ok */ }
+    audio.pause();
+
     btn.innerHTML = '<span style="font-size:0.6rem;color:var(--purple)">...</span>';
     try {
       const res = await fetch('/api/voice-preview?id=' + voiceId);
       const data = await res.json();
-      if (data.success) voicePreviewUrls[voiceId] = data.preview_url;
+      if (data.success && data.preview_url) voicePreviewUrls[voiceId] = data.preview_url;
       else console.warn('Voice preview API error:', data.error);
     } catch(e) { console.warn('Voice preview fetch failed:', e.message); }
   }
 
   if (voicePreviewUrls[voiceId]) {
-    audio.src = voicePreviewUrls[voiceId];
     audio.onended = () => {
       btn.classList.remove('playing');
       btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
@@ -2246,8 +2254,12 @@ async function previewVoice(voiceId, btn) {
     };
     audio.onerror = () => {
       console.warn('Audio playback error for voice:', voiceId);
+      btn.classList.remove('playing');
       btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+      currentPreviewBtn = null;
     };
+    audio.src = voicePreviewUrls[voiceId];
+    audio.load();
     try {
       await audio.play();
       btn.classList.add('playing');
