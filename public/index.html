@@ -544,7 +544,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         <div class="step-number" style="background:var(--orange-light);color:var(--orange)">2</div>
         <div class="step-content">
           <h4>Pick a voice and listen</h4>
-          <p>Choose a narrator, hear a free preview in 30 seconds. Love it? Unlock the full story.</p>
+          <p>Choose a narrator, hear a free preview in about a minute. Love it? Unlock the full story.</p>
         </div>
       </div>
       <div class="how-step">
@@ -995,7 +995,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="loader-dot"></div>
   </div>
   <p class="loading-text">Writing their story...</p>
-  <p class="loading-sub">This takes about 30 seconds. Something magical is happening.</p>
+  <p class="loading-sub">Our best AI is crafting every detail. Usually about a minute.</p>
 </div>
 
 <!-- PREVIEW -->
@@ -1870,12 +1870,12 @@ async function generatePreview() {
   const loadingText = document.querySelector('.loading-text');
   const loadingSub = document.querySelector('.loading-sub');
   loadingText.textContent = msgs[0];
-  loadingSub.textContent = 'This takes about 30 seconds. Worth the wait.';
+  loadingSub.textContent = 'Our best AI is crafting every detail. Usually about a minute.';
   const msgInterval = setInterval(() => {
     msgIdx++;
     if (msgIdx < msgs.length) loadingText.textContent = msgs[msgIdx];
     else clearInterval(msgInterval);
-  }, 4000);
+  }, 8000);
 
   try {
     // Generate a job ID so we can recover the result if the connection times out
