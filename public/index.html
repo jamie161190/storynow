@@ -111,10 +111,10 @@ fbq('track', 'PageView');
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What is Storytold?",
+      "name": "Can I hear a Storytold story before I pay?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Storytold creates personalised audio stories for children. Each story uses your child's real name, their friends, pets, and favourite things. You choose the story type (bedtime, adventure, or learning), pick a narrator voice, and get a unique 15-minute audio story."
+        "text": "Yes. You get a free preview of the opening of your story before you spend anything. Only pay if you love it."
       }
     },
     {
@@ -122,15 +122,23 @@ fbq('track', 'PageView');
       "name": "How much does a Storytold story cost?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "You can create a free preview to hear a sample of your child's story. The full 15-minute story costs just £19.99."
+        "text": "The full 15-minute personalised audio story costs £19.99. No subscription, no hidden costs. You own it forever."
       }
     },
     {
       "@type": "Question",
-      "name": "What types of stories can I create?",
+      "name": "Can I share my child's story with family?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Storytold offers three story types: Bedtime stories that are calm and gentle, Adventure stories with action and twists, and Learning stories that teach subjects like maths and science through fun storytelling."
+        "text": "Yes. Share it by email or WhatsApp in seconds. Grandparents, aunties, uncles, whoever you like. You can also save the audio straight to your phone. No extra cost."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I gift a Storytold story?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Toggle the gift option on the extras step, enter the recipient's email, and we send them a beautifully designed email with the story inside."
       }
     }
   ]
@@ -560,7 +568,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <!-- REAL PARENT TESTIMONIAL -->
   <div style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
     <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.6rem">Real messages from real parents</p>
-    <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.75rem;font-weight:500">We don't do fake reviews. Here's what Lisa sent the morning after her daughter Livvie heard her first story.</p>
+    <p style="font-size:0.8rem;color:var(--text-muted);margin:0 0 0.75rem;font-weight:500">Our friend Lisa was one of the first to try Storytold before we launched. This is what she sent the morning after her daughter Livvie heard her story.</p>
     <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);border:2px solid var(--border)">
       <img src="/lisa-testimonial.png" alt="WhatsApp message from Lisa: Livvie's woken up asking me for another story, I blame you. It really is brilliant though." style="width:100%;display:block">
     </div>
@@ -580,12 +588,8 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.75rem;text-align:center">Common questions</p>
     <div style="display:flex;flex-direction:column;gap:0.5rem">
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is it safe? What do you do with my child's details?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">We only use your child's details to create their story. Nothing is shared, sold, or stored beyond what's needed. The story is yours. We take child safety seriously.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I hear it before I pay?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. You get a free preview of the opening of your child's story before you spend anything. Only pay if you love it.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. You get a free preview of the opening of your story before you spend anything. Only pay if you love it. Lots of parents make them as gifts too.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long is the full story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
@@ -593,11 +597,15 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I share it with family?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Share it with grandparents, aunties, uncles, anyone, via WhatsApp or email. No extra cost, no limit. You can also download the audio to keep forever.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">We built sharing right in. Once your story is ready, tap share and send it by email or WhatsApp in seconds. Grandparents, aunties, uncles, whoever you like. You can also save the audio straight to your phone. No extra cost, no fuss.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if my child doesn't like it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">We'll rewrite it for free. No questions asked. We want every child to love their story.</p>
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if I don't like the full version?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let us know and we will generate you a brand new one. No hassle, no questions. We want you to love it as much as they will.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I gift this to someone?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. On the extras step, toggle "This is a gift for someone else" and enter the recipient's email. We will send them a beautifully designed email with the story inside. Perfect for birthdays, Christmas, or just because.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is £19.99 for one story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
