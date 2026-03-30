@@ -2039,8 +2039,9 @@ async function handleStripeReturn() {
   if (!sessionId) return;
   lastStripeSessionId = sessionId;
 
-  // Clean the URL
-  window.history.replaceState({}, '', window.location.pathname);
+  // NOTE: Do NOT clean the URL yet. If something fails, a page refresh must
+  // re-trigger handleStripeReturn so the customer doesn't lose their paid story.
+  // URL is cleaned after successful generation below.
 
   // Restore saved story data (try sessionStorage first, fall back to server)
   let saved = sessionStorage.getItem('storytold_story');
@@ -2137,6 +2138,7 @@ async function handleStripeReturn() {
     // Save story to Supabase, then send email with share link
     // If save fails, still send the email (just without a direct listen link)
     if (verifyData.customerEmail) {
+      lastSavedStoryId = null; // Reset so stale ID from a previous story isn't used if save fails
       try {
         await saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
       } catch(saveErr) {
@@ -2151,16 +2153,17 @@ async function handleStripeReturn() {
       document.getElementById('savedEmailNote').style.display = 'block';
     }
 
-    // Clear saved session
+    // Everything worked: clean URL and clear saved session
+    window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
   } catch(err) {
-    // Keep session data so user can retry if audio generation failed after payment
-    const canRetry = sessionStorage.getItem('storytold_story') && sessionId;
-    if (canRetry) {
+    // Always offer retry after payment failure. The session_id is still in the URL
+    // (we no longer clean it early), so a reload will re-trigger handleStripeReturn.
+    // Story data will be recovered from sessionStorage or Supabase pending backup.
+    if (sessionId) {
       const retry = confirm('Something went wrong generating your story audio, but your payment is confirmed. Would you like to try again? (Your payment is safe.)');
       if (retry) {
-        // Re-add session_id to URL and reload to trigger handleStripeReturn again
         window.location.href = window.location.pathname + '?session_id=' + sessionId;
         return;
       }
