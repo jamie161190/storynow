@@ -2280,19 +2280,26 @@ function showVoices() {
 
   renderFilteredVoices();
 
-  // Preload all voice preview URLs in one batch call
-  if (Object.keys(voicePreviewUrls).length === 0) {
-    fetch('/api/list-voices')
-      .then(r => r.json())
-      .then(d => {
-        if (d.success && d.voices) {
-          d.voices.forEach(v => {
-            if (v.preview_url) voicePreviewUrls[v.id] = v.preview_url;
-          });
-          console.log('Preloaded', Object.keys(voicePreviewUrls).length, 'voice previews');
-        }
-      })
-      .catch(e => console.warn('Voice preload failed:', e));
+  // Preload voice preview URLs by fetching each voice individually
+  // (list-voices only returns account voices, not library voices)
+  if (Object.keys(voicePreviewUrls).length < ALL_VOICES.length) {
+    const toLoad = ALL_VOICES.filter(v => !voicePreviewUrls[v.id]);
+    let idx = 0;
+    function loadNextBatch() {
+      const batch = toLoad.slice(idx, idx + 4);
+      if (!batch.length) return;
+      idx += 4;
+      batch.forEach(v => {
+        fetch('/api/voice-preview?id=' + v.id)
+          .then(r => r.json())
+          .then(d => {
+            if (d.success && d.preview_url) voicePreviewUrls[v.id] = d.preview_url;
+          })
+          .catch(() => {});
+      });
+      setTimeout(loadNextBatch, 600);
+    }
+    loadNextBatch();
   }
 }
 
@@ -2509,7 +2516,8 @@ async function generatePreview() {
       loadingText.textContent = 'Almost there, just finishing up...';
       data = await pollForPreview(jobId);
     }
-    if (!data || !data.success) throw new Error('Story generation failed. Please try again.');
+    if (!data) throw new Error('Story generation timed out. Please try again.');
+    if (!data.success) throw new Error(data.error || 'Story generation failed. Please try again.');
     fullStoryText = data.fullStory;
     const audio = document.getElementById('previewAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
@@ -2562,8 +2570,12 @@ async function generatePreview() {
     goTo('screenPreview');
   } catch(err) {
     clearInterval(msgInterval);
-    goTo('screenVoice');
-    alert('Something went wrong: ' + err.message);
+    console.error('Preview generation error:', err.message);
+    // Show error on the loading screen with a retry button
+    const loadingText = document.querySelector('.loading-text');
+    const loadingSub = document.querySelector('.loading-sub');
+    if (loadingText) loadingText.textContent = 'Oops, something went wrong';
+    if (loadingSub) loadingSub.innerHTML = '<p style="margin:0.5rem 0;color:var(--text-muted);font-size:0.85rem">' + escHtml(err.message) + '</p><button class="btn btn-primary" style="margin-top:1rem;padding:0.75rem 2rem" onclick="generatePreview()">Try again</button><br><a onclick="goTo(\'screenReview\')" style="font-size:0.78rem;color:var(--purple);cursor:pointer;display:inline-block;margin-top:0.75rem;font-weight:600">or go back and edit</a>';
   }
 }
 
