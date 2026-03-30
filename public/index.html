@@ -1253,6 +1253,12 @@ function playSample() {
   });
 })();
 
+// Escape user input before inserting into HTML to prevent XSS
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 function goTo(id, skipHistory) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -1680,7 +1686,7 @@ function showReview() {
   const d = storyData;
   const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
   let html = '<div style="display:flex;flex-direction:column;gap:0.6rem">';
-  const row = (label, val) => val ? `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem"><span style="font-size:0.72rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.03em">${label}</span><p style="margin:0.2rem 0 0;font-size:0.88rem;color:var(--text);font-weight:600">${val}</p></div>` : '';
+  const row = (label, val) => val ? `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem"><span style="font-size:0.72rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.03em">${escHtml(label)}</span><p style="margin:0.2rem 0 0;font-size:0.88rem;color:var(--text);font-weight:600">${escHtml(val)}</p></div>` : '';
   html += row('Story type', catLabel[d.category] || d.category);
   html += row('Child\'s name', d.childName);
   html += row('Age', d.age);
@@ -1766,11 +1772,11 @@ async function generatePreview() {
     document.getElementById('previewSub').textContent = 'Press play to hear a sample. Love it? Unlock the full 15 minute story.';
     let summary = `<p style="font-size:0.78rem;color:var(--purple);font-weight:700;margin:0 0 0.4rem">What you built:</p>`;
     summary += `<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500">`;
-    summary += `A ${(catLabels[storyData.category]||'story').toLowerCase()} for <strong>${storyData.childName}</strong>`;
-    if (storyData.friendName) summary += ` with best friend <strong>${storyData.friendName}</strong>`;
-    if (storyData.hasPet && storyData.petName) summary += `, ${storyData.petName} the ${storyData.petType || 'pet'}`;
-    if (storyData.themes && storyData.themes.length) summary += `, featuring ${storyData.themes.join(', ').toLowerCase()}`;
-    if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${storyData.setting.toLowerCase()}`;
+    summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} for <strong>${escHtml(storyData.childName)}</strong>`;
+    if (storyData.friendName) summary += ` with best friend <strong>${escHtml(storyData.friendName)}</strong>`;
+    if (storyData.hasPet && storyData.petName) summary += `, ${escHtml(storyData.petName)} the ${escHtml(storyData.petType || 'pet')}`;
+    if (storyData.themes && storyData.themes.length) summary += `, featuring ${escHtml(storyData.themes.join(', ').toLowerCase())}`;
+    if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${escHtml(storyData.setting.toLowerCase())}`;
     summary += `.</p>`;
     document.getElementById('previewSummary').innerHTML = summary;
 
@@ -2158,7 +2164,7 @@ function renderLibrary(stories) {
     card.innerHTML = `
       <div class="lib-icon">${catEmoji[s.category] || '\u{2728}'}</div>
       <div class="lib-info">
-        <div class="lib-name">${s.childName}'s ${catLabel[s.category] || 'Story'}</div>
+        <div class="lib-name">${escHtml(s.childName)}'s ${catLabel[s.category] || 'Story'}</div>
         <div class="lib-meta">${lenLabel[s.length] || s.length} &middot; ${date}${s.isGift ? ' &middot; Gift' : ''}</div>
       </div>
       <div class="lib-actions">

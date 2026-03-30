@@ -2,6 +2,17 @@
 // Set RESEND_API_KEY in Netlify env vars after creating account at resend.com
 import Stripe from 'stripe';
 
+// Prevent XSS: escape user input before inserting into HTML emails
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export default async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -65,19 +76,19 @@ export default async (req) => {
     let subject, html;
 
     if (type === 'purchase') {
-      subject = `${childName}'s story is ready! 🎧`;
+      subject = `${esc(childName)}'s story is ready! 🎧`;
       html = purchaseEmail(childName, category, length, to, storyId);
     } else if (type === 'gift') {
-      subject = `${giftFrom} made something special for ${childName} 🎁`;
+      subject = `${esc(giftFrom)} made something special for ${esc(childName)} 🎁`;
       html = giftEmail(childName, giftFrom, giftMessage);
     } else if (type === 'review') {
-      subject = `New review from ${reviewName}`;
-      html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>New Review Submitted</h2><p><strong>From:</strong> ${reviewName}</p>${reviewChildName ? `<p><strong>Child:</strong> ${reviewChildName}</p>` : ''}<p><strong>Review:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${reviewText}</blockquote></div>`;
+      subject = `New review from ${esc(reviewName)}`;
+      html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>New Review Submitted</h2><p><strong>From:</strong> ${esc(reviewName)}</p>${reviewChildName ? `<p><strong>Child:</strong> ${esc(reviewChildName)}</p>` : ''}<p><strong>Review:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${esc(reviewText)}</blockquote></div>`;
     } else if (type === 'contact') {
-      subject = `Storytold contact from ${contactName}`;
-      html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>Contact Form Message</h2><p><strong>Name:</strong> ${contactName}</p><p><strong>Email:</strong> ${contactEmail}</p><p><strong>Message:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${contactText}</blockquote><p style="color:#666;font-size:13px">Reply directly to ${contactEmail}</p></div>`;
+      subject = `Storytold contact from ${esc(contactName)}`;
+      html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>Contact Form Message</h2><p><strong>Name:</strong> ${esc(contactName)}</p><p><strong>Email:</strong> ${esc(contactEmail)}</p><p><strong>Message:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${esc(contactText)}</blockquote><p style="color:#666;font-size:13px">Reply directly to ${esc(contactEmail)}</p></div>`;
     } else if (type === 'share') {
-      subject = `${giftFrom} shared ${childName}'s story with you 🎧`;
+      subject = `${esc(giftFrom)} shared ${esc(childName)}'s story with you 🎧`;
       html = shareEmail(childName, giftFrom, giftMessage, storyId);
     } else {
       return new Response(JSON.stringify({ error: 'Invalid email type' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -113,9 +124,11 @@ export default async (req) => {
 };
 
 function purchaseEmail(childName, category, length, customerEmail, storyId) {
+  const safeChild = esc(childName);
+  const safeEmail = esc(customerEmail);
   const lengthLabel = '~15 min';
   const categoryLabel = category === 'learning' ? 'Learning Adventure' : category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
-  const listenUrl = storyId ? `https://storytold.ai?listen=${storyId}` : 'https://storytold.ai';
+  const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}` : 'https://storytold.ai';
   const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai`);
 
   return `
@@ -129,27 +142,27 @@ function purchaseEmail(childName, category, length, customerEmail, storyId) {
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:24px;text-align:center;margin:0 0 8px;">🎧</p>
-      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">${childName}'s story is ready!</h2>
+      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">${safeChild}'s story is ready!</h2>
       <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        Thank you for creating something truly special. ${childName}'s personalised ${categoryLabel.toLowerCase()} (${lengthLabel}) has been created and is ready to enjoy.
+        Thank you for creating something truly special. ${safeChild}'s personalised ${categoryLabel.toLowerCase()} (${lengthLabel}) has been created and is ready to enjoy.
       </p>
       ${storyId ? `
       <div style="text-align:center;margin:0 0 24px;">
-        <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${childName}'s story</a>
+        <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
       </div>` : ''}
       <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 8px;font-size:15px;color:#2D2844;font-weight:700;">Share with the whole family</p>
-        <p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;">Grandparents, aunties, uncles. Let everyone hear ${childName}'s story. No extra cost.</p>
+        <p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;">Grandparents, aunties, uncles. Let everyone hear ${safeChild}'s story. No extra cost.</p>
         <a href="https://wa.me/?text=${waText}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;">Share on WhatsApp</a>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
         You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email:
       </p>
       <div style="background:#F8F5FF;border-radius:10px;padding:12px;text-align:center;margin:0 0 20px;">
-        <p style="margin:0;font-size:16px;font-weight:700;color:#7C5CFC;">${customerEmail}</p>
+        <p style="margin:0;font-size:16px;font-weight:700;color:#7C5CFC;">${safeEmail}</p>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        We hope ${childName} loves every second of it.
+        We hope ${safeChild} loves every second of it.
       </p>
       <div style="text-align:center;">
         <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
@@ -162,6 +175,9 @@ function purchaseEmail(childName, category, length, customerEmail, storyId) {
 }
 
 function giftEmail(childName, giftFrom, giftMessage) {
+  const safeChild = esc(childName);
+  const safeFrom = esc(giftFrom);
+  const safeMsg = esc(giftMessage);
   return `
 <!DOCTYPE html>
 <html>
@@ -173,17 +189,17 @@ function giftEmail(childName, giftFrom, giftMessage) {
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:32px;text-align:center;margin:0 0 8px;">🎁</p>
-      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">A special gift for ${childName}</h2>
+      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">A special gift for ${safeChild}</h2>
       <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        ${giftFrom} has created a personalised audio story just for ${childName}. It is a one of a kind story where ${childName} is the star of the adventure.
+        ${safeFrom} has created a personalised audio story just for ${safeChild}. It is a one of a kind story where ${safeChild} is the star of the adventure.
       </p>
       ${giftMessage ? `
       <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #FF8C42;">
-        <p style="margin:0 0 4px;font-size:13px;color:#999;">A message from ${giftFrom}:</p>
-        <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${giftMessage}"</p>
+        <p style="margin:0 0 4px;font-size:13px;color:#999;">A message from ${safeFrom}:</p>
+        <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${safeMsg}"</p>
       </div>` : ''}
       <div style="text-align:center;margin:24px 0;">
-        <a href="https://storytold.ai" style="display:inline-block;background:#FF8C42;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${childName}'s story</a>
+        <a href="https://storytold.ai" style="display:inline-block;background:#FF8C42;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
       </div>
       <p style="color:#999;font-size:13px;text-align:center;line-height:1.5;margin:0;">
         This story was made with love using Storytold, where every child becomes the hero of their own audio adventure.
@@ -196,7 +212,10 @@ function giftEmail(childName, giftFrom, giftMessage) {
 }
 
 function shareEmail(childName, fromName, message, storyId) {
-  const listenUrl = storyId ? `https://storytold.ai?listen=${storyId}` : 'https://storytold.ai';
+  const safeChild = esc(childName);
+  const safeFrom = esc(fromName);
+  const safeMsg = esc(message);
+  const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}` : 'https://storytold.ai';
   return `
 <!DOCTYPE html>
 <html>
@@ -208,14 +227,14 @@ function shareEmail(childName, fromName, message, storyId) {
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:32px;text-align:center;margin:0 0 8px;">🎧</p>
-      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">Listen to ${childName}'s story!</h2>
+      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">Listen to ${safeChild}'s story!</h2>
       <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        ${fromName} shared a personalised audio story made for ${childName}. It is a one of a kind story where ${childName} is the star of the adventure.
+        ${safeFrom} shared a personalised audio story made for ${safeChild}. It is a one of a kind story where ${safeChild} is the star of the adventure.
       </p>
       ${message ? `
       <div style="background:#F8F5FF;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #7C5CFC;">
-        <p style="margin:0 0 4px;font-size:13px;color:#999;">Message from ${fromName}:</p>
-        <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${message}"</p>
+        <p style="margin:0 0 4px;font-size:13px;color:#999;">Message from ${safeFrom}:</p>
+        <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${safeMsg}"</p>
       </div>` : ''}
       <div style="text-align:center;margin:24px 0;">
         <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen now</a>
