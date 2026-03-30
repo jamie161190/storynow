@@ -598,27 +598,35 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
   <!-- HOW IT WORKS -->
   <div class="how-it-works">
-    <p class="how-title">How it works</p>
-    <div class="how-steps">
+    <p class="how-title">Here is what happens</p>
+    <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
+      <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
+        You tell us their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">5</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they love <strong style="color:var(--purple)">dinosaurs</strong> and are scared of the dark but pretend they are not.
+      </p>
+      <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
+        We write a story where Chase and Ellis ride a T-Rex through a glowing volcano, face their fear of the dark together, and come home heroes. Narrated in the voice you choose. Ready in about a minute.
+      </p>
+    </div>
+    <div class="how-steps" style="margin-top:0.75rem">
       <div class="how-step">
         <div class="step-number" style="background:var(--purple-light);color:var(--purple)">1</div>
         <div class="step-content">
-          <h4>Tell us about them</h4>
-          <p>Name, age, best friend, pet, favourite things. The more you share, the more magical it gets.</p>
+          <h4>Share the details</h4>
+          <p>Name, age, friends, interests, little quirks. Takes about two minutes.</p>
         </div>
       </div>
       <div class="how-step">
         <div class="step-number" style="background:var(--orange-light);color:var(--orange)">2</div>
         <div class="step-content">
-          <h4>Pick a voice and listen</h4>
-          <p>Choose a narrator, hear a free preview in about a minute. Love it? Unlock the full story.</p>
+          <h4>Hear a free preview</h4>
+          <p>Pick a narrator and listen to a taste of their story before you spend anything.</p>
         </div>
       </div>
       <div class="how-step">
         <div class="step-number" style="background:var(--green-light);color:var(--green)">3</div>
         <div class="step-content">
-          <h4>Share it with everyone</h4>
-          <p>Send it to grandparents, family, anyone via WhatsApp or email. Download it, replay it, keep it forever.</p>
+          <h4>Unlock and share</h4>
+          <p>Get the full 15 minute story. Send it to grandparents, family, anyone. Keep it forever.</p>
         </div>
       </div>
     </div>
@@ -877,7 +885,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
   <div class="form-group" id="proudOfGroup">
     <label id="proudOfLabel">Is there an occasion? (optional)</label>
-    <input type="text" id="proudOf" placeholder="e.g. Their birthday, just scored a goal, learned to ride a bike, starting school">
+    <input type="text" id="proudOf" placeholder="e.g. Their birthday, starting school">
     <p class="form-hint" id="proudOfHint">If there is a birthday, achievement, or milestone, we will weave it into the heart of the story.</p>
   </div>
 
@@ -899,7 +907,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <p class="section-sub">The people (and animals) that matter most. Everyone you add will play a real part in the adventure.</p>
 
   <div class="form-group">
-    <label>Best friend</label>
+    <label>Best friend or favourite person</label>
     <input type="text" id="friendName" placeholder="e.g. Ellis, cousin Amara, big brother Jake">
     <p class="form-hint">This is the person who goes on the adventure with them. They will have their own lines and moments in the story.</p>
   </div>
@@ -1831,13 +1839,13 @@ let selectedSubject = '';
 let selectedConfidence = 'practising';
 
 const SUBJECT_PLACEHOLDERS = {
-  maths: 'e.g. Their 7 times table, counting in 2s and 5s, adding two digit numbers, halving and doubling, telling the time, fractions...',
-  reading: 'e.g. Letter sounds like ch, sh, th, blending CVC words, reading short sentences, sight words like "the" and "said"...',
-  spelling: 'e.g. Spelling "because" and "together", words with double letters, silent letters, tricky words from their homework...',
-  science: 'e.g. The solar system and planets, how plants grow, states of matter (solids, liquids, gases), the human body, magnets...',
-  geography: 'e.g. The continents and oceans, where different animals live, countries and capitals, rivers and mountains, the water cycle...',
-  history: 'e.g. The Great Fire of London, Ancient Egypt, the Romans, World War 2, the Tudors, the Stone Age...',
-  languages: 'e.g. Basic French greetings and colours, Spanish numbers 1 to 20, common phrases like "my name is" and "how are you"...'
+  maths: 'e.g. Their 7 times table, telling the time',
+  reading: 'e.g. Letter sounds like ch and sh, sight words',
+  spelling: 'e.g. Spelling "because" and "together"',
+  science: 'e.g. The solar system, how plants grow',
+  geography: 'e.g. Continents and oceans, where animals live',
+  history: 'e.g. Ancient Egypt, the Great Fire of London',
+  languages: 'e.g. French greetings and colours, Spanish numbers'
 };
 
 const SUBJECT_HINTS = {
@@ -2326,44 +2334,95 @@ function showVoices() {
 function showReview() {
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
   const d = storyData;
-  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
-  let html = '<div style="display:flex;flex-direction:column;gap:0.6rem">';
-  const pencil = (screen) => `<span onclick="goTo('${screen}')" style="cursor:pointer;float:right;font-size:0.82rem;opacity:0.5;margin-top:-0.1rem" title="Edit">&#9998;</span>`;
-  const row = (label, val, screen) => val ? `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem">${screen ? pencil(screen) : ''}<span style="font-size:0.72rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.03em">${escHtml(label)}</span><p style="margin:0.2rem 0 0;font-size:0.88rem;color:var(--text);font-weight:600">${escHtml(val)}</p></div>` : '';
-  html += row('Story type', catLabel[d.category] || d.category, 'screenCategory');
-  html += row('Child\'s name', d.childName, 'screenDetails');
-  html += row('Age', d.age, 'screenDetails');
-  html += row('Gender', d.gender, 'screenDetails');
-  if (d.proudOf) html += row('Occasion', d.proudOf, 'screenDetails');
-  html += row('Best friend', d.friendName, 'screenPeople');
-  if (d.sidekickName) html += row('Sidekick', d.sidekickName, 'screenPeople');
-  if (d.familyMembers) html += row('Other people', d.familyMembers, 'screenPeople');
-  if (d.category === 'learning' && d.teacherName) html += row('Teacher', d.teacherName, 'screenPeople');
-  if (d.hasPet && d.petName) html += row('Pet', `${d.petName}${d.petType ? ' (' + d.petType + ')' : ''}`, 'screenPeople');
-  html += row('Interests', d.themes.join(', ') + (d.themeDetail ? ' (' + d.themeDetail + ')' : ''), 'screenTheme');
-  if (d.favTeddy) html += row('Favourite teddy', d.favTeddy, 'screenWhere');
-  html += row('Setting', d.setting || 'Surprise me', 'screenWhere');
-  if (d.category === 'learning') {
-    if (d.subject) html += row('Subject', d.subject, 'screenLearningSetup');
-    if (d.learningGoal) html += row('Learning goal', d.learningGoal, 'screenLearningSetup');
+  const catEmoji = { bedtime:'&#127769;', journey:'&#127757;', learning:'&#128218;', custom:'&#9999;&#65039;' };
+  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story', custom:'Custom Story' };
+  const pencil = (screen) => `<span onclick="goTo('${screen}')" style="cursor:pointer;font-size:0.78rem;color:var(--purple);font-weight:700;float:right" title="Edit">Edit</span>`;
+
+  // Helper: build a grouped card
+  const card = (title, editScreen, items) => {
+    const filteredItems = items.filter(i => i[1]);
+    if (filteredItems.length === 0) return '';
+    let inner = filteredItems.map(([label, val]) =>
+      `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0.3rem 0;border-bottom:1px solid var(--border)"><span style="font-size:0.78rem;color:var(--text-muted);font-weight:600">${escHtml(label)}</span><span style="font-size:0.85rem;color:var(--text);font-weight:700;text-align:right;max-width:60%">${escHtml(val)}</span></div>`
+    ).join('');
+    // Remove last border
+    inner = inner.replace(/border-bottom:1px solid var\(--border\)"><span style="font-size:0\.78rem;color:var\(--text-muted\)/, (m, i) => m);
+    return `<div style="background:var(--card);border:2px solid var(--border);border-radius:14px;padding:0.85rem 1rem;margin-bottom:0.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+        <span style="font-size:0.82rem;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.03em">${title}</span>
+        ${editScreen ? pencil(editScreen) : ''}
+      </div>
+      ${inner}
+    </div>`;
+  };
+
+  let html = '';
+
+  // Story type hero
+  html += `<div style="background:var(--cat-accent-light,var(--purple-light));border:2px solid var(--cat-accent,var(--purple));border-radius:14px;padding:1rem;text-align:center;margin-bottom:0.5rem">
+    <span style="font-size:1.8rem">${catEmoji[d.category] || '&#128214;'}</span>
+    <p style="margin:0.3rem 0 0;font-size:1rem;font-weight:800;color:var(--text)">${catLabel[d.category] || d.category} for ${escHtml(d.childName)}</p>
+    <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${escHtml(d.gender)}, age ${escHtml(d.age)}${d.proudOf ? ' &middot; ' + escHtml(d.proudOf) : ''}</p>
+    ${pencil('screenDetails')}
+  </div>`;
+
+  // Characters card
+  const charItems = [['Best friend', d.friendName]];
+  if (d.sidekickName) charItems.push(['Sidekick', d.sidekickName]);
+  if (d.familyMembers) charItems.push(['Others', d.familyMembers]);
+  if (d.category === 'learning' && d.teacherName) charItems.push(['Teacher', d.teacherName]);
+  if (d.hasPet && d.petName) charItems.push(['Pet', d.petName + (d.petType ? ' (' + d.petType + ')' : '')]);
+  html += card('Characters', 'screenPeople', charItems);
+
+  // Story world card
+  const worldItems = [['Interests', d.themes.join(', ') + (d.themeDetail ? ' (' + d.themeDetail + ')' : '')]];
+  if (d.favTeddy) worldItems.push(['Special item', d.favTeddy]);
+  worldItems.push(['Setting', d.setting || 'Surprise me']);
+  html += card('Story world', 'screenTheme', worldItems);
+
+  // Learning card (if applicable)
+  if (d.category === 'learning' && (d.subject || d.learningGoal)) {
+    const learnItems = [];
+    if (d.subject) learnItems.push(['Subject', d.subject]);
+    if (d.learningGoal) learnItems.push(['Focus', d.learningGoal]);
+    if (d.confidence) learnItems.push(['Level', d.confidence]);
+    html += card('Learning', 'screenLearningSetup', learnItems);
   }
-  if (d.customScenario) html += row('Story idea', d.customScenario, 'screenExtras');
-  if (d.extraDetails) html += row('Extra details', d.extraDetails, 'screenExtras');
+
+  // Extras card
+  const extraItems = [];
+  if (d.customScenario) extraItems.push(['Story idea', d.customScenario]);
+  if (d.extraDetails) extraItems.push(['Extra details', d.extraDetails]);
+  if (!d.isGift && d.personalMessage) extraItems.push(['Personal message', d.personalMessage]);
+  if (extraItems.length) html += card('Extras', 'screenExtras', extraItems);
+
+  // Gift card
   if (d.isGift) {
-    if (d.giftFrom) html += row('Gift from', d.giftFrom + (d.giftInStory ? ' (appears in story)' : ''), 'screenGift');
-    if (d.giftMessage) html += row('Gift message', d.giftMessage, 'screenGift');
-    if (d.giftEmail) {
-      html += row('Send to', d.giftEmail, 'screenGift');
-    } else {
-      html += row('Send to', 'You can send this from your account later', 'screenGift');
-    }
-  } else if (d.personalMessage) {
-    html += row('Personal message', d.personalMessage, 'screenExtras');
+    const giftItems = [];
+    if (d.giftFrom) giftItems.push(['From', d.giftFrom + (d.giftInStory ? ' (in story)' : '')]);
+    if (d.giftMessage) giftItems.push(['Message', d.giftMessage]);
+    giftItems.push(['Send to', d.giftEmail || 'You can send later from your account']);
+    html += card('&#127873; Gift', 'screenGift', giftItems);
   }
-  // Find selected voice name
-  const voiceCard = document.querySelector('.voice-card.selected .vc-name');
-  if (voiceCard) html += row('Storyteller', voiceCard.textContent, 'screenVoice');
-  html += '</div>';
+
+  // Voice card
+  const voiceObj = ALL_VOICES.find(v => v.id === selectedVoiceId);
+  if (voiceObj) {
+    html += `<div style="background:var(--card);border:2px solid var(--border);border-radius:14px;padding:0.85rem 1rem;margin-bottom:0.5rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem">
+        <span style="font-size:0.82rem;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:0.03em">Storyteller</span>
+        ${pencil('screenVoice')}
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem">
+        <span style="font-size:1.5rem">${voiceObj.emoji}</span>
+        <div>
+          <p style="margin:0;font-size:0.92rem;font-weight:700;color:var(--text)">${escHtml(voiceObj.name)}</p>
+          <p style="margin:0;font-size:0.75rem;color:var(--text-muted);font-weight:500">${escHtml(voiceObj.desc)}</p>
+        </div>
+      </div>
+    </div>`;
+  }
+
   document.getElementById('reviewContent').innerHTML = html;
   goTo('screenReview');
 }
