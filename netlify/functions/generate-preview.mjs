@@ -110,6 +110,10 @@ Weave these in naturally as subplots, character traits, or setting details. They
       themesSection = `THEMES AND INTERESTS: ${d.interest}
 The themes must drive the world and the plot, not just decorate it. If the child loves dinosaurs, the story lives and breathes dinosaurs.`;
     }
+    if (d.themeDetail) {
+      themesSection += `\nSPECIFIC DETAILS FROM THE PARENT: "${d.themeDetail}"
+This is critical. The parent has told you exactly what their child loves within this theme. If they said "Manchester United", the story must feature Manchester United, not just generic football. If they said "Elsa", the story must feature Elsa or someone unmistakably like her. If they said "Spider-Man", Spider-Man must be in the story. Use the REAL names, teams, characters, and details they gave you. This is what makes the story feel like it was made for their child and no one else.`;
+    }
   }
 
   let block = `THE MAIN CHARACTER:
@@ -120,9 +124,11 @@ ${d.proudOf ? '- Occasion: ' + d.proudOf : ''}
 
 PEOPLE IN THE STORY:
 - Best friend: ${d.friendName} (must have at least 3 meaningful moments: dialogue, an action, a connection)
+${d.sidekickName ? `- Sidekick: ${d.sidekickName}
+The sidekick is ${d.childName}'s loyal companion throughout the adventure. They could be a real person, a superhero partner, a magical creature, or an imaginary friend. Give the sidekick a distinct personality, catchphrases, and at least 2-3 moments where they help, encourage, or have fun with ${d.childName}. The sidekick should feel different from the best friend in tone and role.` : ''}
 ${d.familyMembers ? '- Family: ' + d.familyMembers + '\nIMPORTANT: Every family member listed above MUST appear in the story with dialogue or a meaningful action. Do not just name-drop them. Each person should have at least one moment where they speak, do something, or interact with ' + d.childName + ' in a way the child would remember. If a parent included themselves, they are telling you they want to be IN the story. Make that happen.' : ''}
 ${d.teacherName ? '- Teacher: ' + d.teacherName : ''}
-${d.isGift && d.giftFrom ? `- Gift giver: ${d.giftFrom}
+${d.isGift && d.giftFrom && d.giftInStory ? `- Gift giver: ${d.giftFrom}
 THIS STORY IS A GIFT from ${d.giftFrom} to ${d.childName}. ${d.giftFrom} MUST appear in the story as a real character with at least one warm, memorable moment. They could tuck ${d.childName} in, cheer them on, appear as a wise guide, or share a loving line of dialogue. The child hearing this story needs to feel that ${d.giftFrom} is right there with them.` : ''}
 
 ${themesSection}
@@ -132,7 +138,8 @@ ${d.setting === 'Surprise me' ? 'Choose a setting that fits the themes and categ
 
   if (d.hasPet && d.petName) {
     block += `\n\nPET: ${d.petName}${d.petType ? ' (a ' + d.petType + ')' : ''}
-The pet must do something memorable. Not "wagged his tail." Something the child would retell to their friends.`;
+The pet must do something memorable. Not "wagged his tail." Something the child would retell to their friends.
+${d.petType ? `IMPORTANT: You know what ${d.petType}s are really like. Use that knowledge. How they move, the sounds they make, their quirks and personality traits. If it's a golden retriever, it's bounding and joyful and probably knocking things over. If it's a cat, it's aloof and then suddenly affectionate at the worst moment. If it's a hamster, it's tiny and quick and escapes from things. If it's a rabbit, it thumps its foot and does zoomies. Make ${d.petName} behave like a real ${d.petType} would, not like a generic pet. The child will know the difference.` : ''}`;
   }
 
   if (d.favTeddy) {
@@ -369,6 +376,16 @@ export default async (req) => {
     }
     if (storyData?.giftMessage && storyData.giftMessage.length > 500) {
       return new Response(JSON.stringify({ error: 'Gift message too long' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    if (storyData?.themeDetail && storyData.themeDetail.length > 500) {
+      return new Response(JSON.stringify({ error: 'Theme detail too long' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    if (storyData?.sidekickName && storyData.sidekickName.length > 200) {
+      return new Response(JSON.stringify({ error: 'Sidekick name too long' }), {
         status: 400, headers: { 'Content-Type': 'application/json' }
       });
     }

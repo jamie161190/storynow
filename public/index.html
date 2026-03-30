@@ -757,8 +757,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <div class="form-group">
         <label>Your name (the gift giver)</label>
         <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
-        <p class="form-hint">You will actually appear as a character in the story.</p>
       </div>
+      <div class="toggle-row" style="margin-bottom:0.75rem">
+        <button class="toggle on" id="giftInStoryToggle" onclick="toggleGiftInStory()"></button>
+        <span class="toggle-label">Put me in the story as a character</span>
+      </div>
+      <p class="form-hint" id="giftInStoryHint" style="margin-top:-0.5rem">You will appear in the adventure with a real role, not just a mention.</p>
       <div class="form-group">
         <label>A message for them (optional)</label>
         <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
@@ -808,9 +812,14 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <p class="section-sub">The people (and animals) that matter most. Everyone you add will play a real part in the adventure.</p>
 
   <div class="form-group">
-    <label>Best friend or sidekick</label>
+    <label>Best friend</label>
     <input type="text" id="friendName" placeholder="e.g. Ellis, cousin Amara, big brother Jake">
-    <p class="form-hint">This person goes on the adventure with them. They will have their own lines and moments in the story.</p>
+    <p class="form-hint">This is the person who goes on the adventure with them. They will have their own lines and moments in the story.</p>
+  </div>
+  <div class="form-group">
+    <label>Sidekick (optional)</label>
+    <input type="text" id="sidekickName" placeholder="e.g. a robot called Sparky, a talking fox, Captain Brave">
+    <p class="form-hint">A sidekick can be anyone or anything: a superhero partner, a magical creature, an imaginary friend. They will be by their side for the whole adventure.</p>
   </div>
   <div class="form-group">
     <label>Other people in the story (optional)</label>
@@ -863,10 +872,18 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Cars"><span class="theme-icon">&#128663;</span><span class="theme-label">Cars</span></div>
     <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Fashion"><span class="theme-icon">&#128087;</span><span class="theme-label">Fashion</span></div>
     <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Aeroplanes"><span class="theme-icon">&#9992;&#65039;</span><span class="theme-label">Aeroplanes</span></div>
-    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Dolls"><span class="theme-icon">&#128030;</span><span class="theme-label">Dolls</span></div>
+    <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Dolls"><span class="theme-icon">&#129534;</span><span class="theme-label">Dolls</span></div>
     <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Pirates"><span class="theme-icon">&#127988;&#8205;&#9760;&#65039;</span><span class="theme-label">Pirates</span></div>
     <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Superheroes"><span class="theme-icon">&#129464;</span><span class="theme-label">Superheroes</span></div>
   </div>
+  <div id="themeFollowUp" style="display:none;margin-top:1rem">
+    <div class="form-group">
+      <label id="themeFollowUpLabel">Tell us more</label>
+      <input type="text" id="themeDetail" placeholder="">
+      <p class="form-hint" id="themeFollowUpHint">The more specific you are, the more real the story feels.</p>
+    </div>
+  </div>
+
   <div class="form-group" style="margin-top:1rem">
     <label>Or tell us something else</label>
     <input type="text" id="customTheme" placeholder="e.g. Minecraft, ballet, cooking, trains">
@@ -1409,6 +1426,7 @@ function restoreDetails() {
   if (storyData.age) document.getElementById('age').value = storyData.age;
   if (storyData.gender) document.getElementById('gender').value = storyData.gender;
   if (storyData.friendName) document.getElementById('friendName').value = storyData.friendName;
+  if (storyData.sidekickName) document.getElementById('sidekickName').value = storyData.sidekickName;
   if (storyData.proudOf) document.getElementById('proudOf').value = storyData.proudOf;
   if (storyData.familyMembers) document.getElementById('familyMembers').value = storyData.familyMembers;
   if (storyData.teacherName) document.getElementById('teacherName').value = storyData.teacherName;
@@ -1435,6 +1453,14 @@ function restoreDetails() {
     if (storyData.giftEmail) document.getElementById('giftEmail').value = storyData.giftEmail;
     if (storyData.giftFrom) document.getElementById('giftFrom').value = storyData.giftFrom;
     if (storyData.giftMessage) document.getElementById('giftMessage').value = storyData.giftMessage;
+    // Restore gift-in-story toggle state
+    const gis = document.getElementById('giftInStoryToggle');
+    if (storyData.giftInStory === false) {
+      if (gis && gis.classList.contains('on')) gis.classList.remove('on');
+      document.getElementById('giftInStoryHint').textContent = 'Your name will still be in the opening message, but you won\'t appear as a character.';
+    } else {
+      if (gis && !gis.classList.contains('on')) gis.classList.add('on');
+    }
     // Show occasion field when gift is active
     document.getElementById('proudOfGroup').style.display = 'block';
     // Hide personal message field when gift is active
@@ -1446,7 +1472,9 @@ function restoreDetails() {
     document.querySelectorAll('.theme-tile').forEach(t => {
       if (storyData.themes.includes(t.dataset.theme)) t.classList.add('selected');
     });
+    updateThemeFollowUp();
   }
+  if (storyData.themeDetail) document.getElementById('themeDetail').value = storyData.themeDetail;
   // Restore where selection
   if (storyData.where) {
     document.querySelectorAll('.where-tile').forEach(t => {
@@ -1561,14 +1589,53 @@ function toggleGift() {
   if (pmg) pmg.style.display = isOn ? 'none' : 'block';
 }
 
+function toggleGiftInStory() {
+  const t = document.getElementById('giftInStoryToggle');
+  t.classList.toggle('on');
+  const isOn = t.classList.contains('on');
+  document.getElementById('giftInStoryHint').textContent = isOn
+    ? 'You will appear in the adventure with a real role, not just a mention.'
+    : 'Your name will still be in the opening message, but you won\'t appear as a character.';
+}
+
 function togglePet() {
   const t = document.getElementById('petToggle');
   t.classList.toggle('on');
   document.getElementById('petFields').style.display = t.classList.contains('on') ? 'block' : 'none';
 }
 
+const THEME_FOLLOWUPS = {
+  Football: { label: 'Favourite team or player?', placeholder: 'e.g. Manchester United, Messi, Lionesses', hint: 'We will weave the real team or player into the story.' },
+  Princesses: { label: 'Which princess?', placeholder: 'e.g. Elsa, Rapunzel, Moana, a made-up one', hint: 'They will meet or become this princess in the story.' },
+  Superheroes: { label: 'Which superheroes?', placeholder: 'e.g. Spider-Man, Batman, or they ARE the superhero', hint: 'They can team up with a hero or become one themselves.' },
+  Dolls: { label: 'What kind of dolls?', placeholder: 'e.g. Barbie, Baby Annabel, LOL Surprise', hint: 'The dolls will come to life or play a real part in the adventure.' },
+  Cars: { label: 'Any favourites?', placeholder: 'e.g. Lightning McQueen, monster trucks, Ferrari', hint: 'The cars will be real characters in the story.' },
+  Space: { label: 'Anything specific?', placeholder: 'e.g. Mars, the Moon, aliens, astronauts', hint: 'We will build the space adventure around this.' },
+  Animals: { label: 'Which animals?', placeholder: 'e.g. lions, dolphins, pandas, all of them!', hint: 'These animals will play a starring role.' },
+  Dinosaurs: { label: 'Any favourites?', placeholder: 'e.g. T-Rex, Triceratops, a friendly one', hint: 'The dinosaur will be a real character in the story.' },
+  Pirates: { label: 'Any pirate details?', placeholder: 'e.g. Captain Hook, treasure maps, a pirate ship called...', hint: 'We will build the pirate world around this.' },
+  Fashion: { label: 'What kind of fashion?', placeholder: 'e.g. designing dresses, a fashion show, becoming a model', hint: 'Fashion will drive the whole adventure.' }
+};
+
 function toggleTheme(el) {
   el.classList.toggle('selected');
+  updateThemeFollowUp();
+}
+
+function updateThemeFollowUp() {
+  const selected = Array.from(document.querySelectorAll('#themeGrid .theme-tile.selected')).map(t => t.dataset.theme);
+  const followUp = document.getElementById('themeFollowUp');
+  // Find the first selected theme that has a follow-up
+  const match = selected.find(t => THEME_FOLLOWUPS[t]);
+  if (match) {
+    const cfg = THEME_FOLLOWUPS[match];
+    document.getElementById('themeFollowUpLabel').textContent = cfg.label;
+    document.getElementById('themeDetail').placeholder = cfg.placeholder;
+    document.getElementById('themeFollowUpHint').textContent = cfg.hint;
+    followUp.style.display = 'block';
+  } else {
+    followUp.style.display = 'none';
+  }
 }
 
 function toggleWhere(el) {
@@ -1645,10 +1712,12 @@ function goToLength() {
   storyData.gender = gender;
   storyData.proudOf = document.getElementById('proudOf').value.trim();
   storyData.friendName = friend;
+  storyData.sidekickName = document.getElementById('sidekickName').value.trim();
   storyData.familyMembers = document.getElementById('familyMembers').value.trim();
   storyData.teacherName = (storyData.category === 'learning') ? document.getElementById('teacherName').value.trim() : '';
   storyData.themes = themes;
   storyData.interest = themes.join(', ');
+  storyData.themeDetail = document.getElementById('themeDetail').value.trim();
   storyData.hasPet = document.getElementById('petToggle').classList.contains('on');
   storyData.petName = document.getElementById('petName').value.trim();
   storyData.petType = document.getElementById('petType').value.trim();
@@ -1671,6 +1740,7 @@ function goToLength() {
     storyData.giftEmail = document.getElementById('giftEmail').value.trim();
     storyData.giftFrom = document.getElementById('giftFrom').value.trim();
     storyData.giftMessage = document.getElementById('giftMessage').value.trim();
+    storyData.giftInStory = document.getElementById('giftInStoryToggle').classList.contains('on');
     // Gift message doubles as the personal message read aloud at the start
     storyData.personalMessage = storyData.giftMessage;
   } else {
@@ -1881,11 +1951,12 @@ function showReview() {
   html += row('Age', d.age, 'screenDetails');
   html += row('Gender', d.gender, 'screenDetails');
   if (d.proudOf) html += row('Occasion', d.proudOf, 'screenDetails');
-  html += row('Best friend / sidekick', d.friendName, 'screenPeople');
+  html += row('Best friend', d.friendName, 'screenPeople');
+  if (d.sidekickName) html += row('Sidekick', d.sidekickName, 'screenPeople');
   if (d.familyMembers) html += row('Other people', d.familyMembers, 'screenPeople');
   if (d.category === 'learning' && d.teacherName) html += row('Teacher', d.teacherName, 'screenPeople');
   if (d.hasPet && d.petName) html += row('Pet', `${d.petName}${d.petType ? ' (' + d.petType + ')' : ''}`, 'screenPeople');
-  html += row('Interests', d.themes.join(', '), 'screenTheme');
+  html += row('Interests', d.themes.join(', ') + (d.themeDetail ? ' (' + d.themeDetail + ')' : ''), 'screenTheme');
   if (d.favTeddy) html += row('Favourite teddy', d.favTeddy, 'screenMemorables');
   html += row('Setting', d.setting || 'Surprise me', 'screenWhere');
   if (d.category === 'learning') {
@@ -1895,7 +1966,7 @@ function showReview() {
   if (d.customScenario) html += row('Story idea', d.customScenario, 'screenExtras');
   if (d.extraDetails) html += row('Extra details', d.extraDetails, 'screenExtras');
   if (d.isGift) {
-    if (d.giftFrom) html += row('Gift from', d.giftFrom, 'screenDetails');
+    if (d.giftFrom) html += row('Gift from', d.giftFrom + (d.giftInStory ? ' (appears in story)' : ''), 'screenDetails');
     if (d.giftMessage) html += row('Gift message', d.giftMessage, 'screenDetails');
     if (d.giftEmail) {
       html += row('Send to', d.giftEmail, 'screenDetails');
