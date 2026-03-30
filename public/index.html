@@ -726,6 +726,30 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <h2 class="section-title">The main character</h2>
   <p class="section-sub">This is who the story is all about.</p>
 
+  <!-- Gift toggle: right at the top so it frames everything -->
+  <div class="gift-section" style="margin-bottom:1rem">
+    <div class="toggle-row">
+      <button class="toggle" id="giftToggle" onclick="toggleGift()"></button>
+      <span class="toggle-label">This is a gift for someone else</span>
+    </div>
+    <div id="giftFields" style="display:none">
+      <div class="form-group">
+        <label>Your name (the gift giver)</label>
+        <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
+      </div>
+      <div class="form-group">
+        <label>A message for them (optional)</label>
+        <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
+        <p class="form-hint">This will be read aloud at the very start of the story.</p>
+      </div>
+      <div class="form-group">
+        <label>Recipient's email</label>
+        <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
+        <p class="form-hint">We will send them a beautiful email with the story inside.</p>
+      </div>
+    </div>
+  </div>
+
   <div class="form-group">
     <label>Their name</label>
     <input type="text" id="childName" placeholder="e.g. Chase">
@@ -744,10 +768,10 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       </select>
     </div>
   </div>
-  <div class="form-group">
-    <label>Something they are proud of (optional)</label>
-    <input type="text" id="proudOf" placeholder="e.g. Scored a goal, learned to ride a bike">
-    <p class="form-hint">We will weave this into the story to celebrate them.</p>
+  <div class="form-group" id="proudOfGroup">
+    <label id="proudOfLabel">What is the occasion? (optional)</label>
+    <input type="text" id="proudOf" placeholder="e.g. Their birthday, just scored a goal, learned to ride a bike">
+    <p class="form-hint" id="proudOfHint">We will weave this into the story to make it feel extra special.</p>
   </div>
 
   <p class="inline-error" id="detailsError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
@@ -759,20 +783,35 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <button class="back-btn" onclick="goTo('screenDetails')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressPeople"></div><p class="progress-step-label">Step 3 of 8</p></div>
   <h2 class="section-title">Who else is in the story?</h2>
-  <p class="section-sub">Friends, family, the people they love most.</p>
+  <p class="section-sub">The people (and animals) that matter most. Everyone you add will play a real part in the adventure.</p>
 
   <div class="form-group">
-    <label>Best friend's name</label>
-    <input type="text" id="friendName" placeholder="e.g. Ellis">
+    <label>Best friend or sidekick</label>
+    <input type="text" id="friendName" placeholder="e.g. Ellis, cousin Amara, big brother Jake">
+    <p class="form-hint">This person goes on the adventure with them. They will have their own lines and moments in the story.</p>
   </div>
   <div class="form-group">
-    <label>Family members (optional)</label>
-    <input type="text" id="familyMembers" placeholder="e.g. Brother Jake, sister Isla, Mum, Dad, Nanny Rose">
-    <p class="form-hint">We will give them real roles in the story, not just a mention.</p>
+    <label>Other people in the story (optional)</label>
+    <input type="text" id="familyMembers" placeholder="e.g. Mum, Dad, Nanny Rose, sister Isla, Mrs Thompson">
+    <p class="form-hint">Family, teachers, anyone you like. They will each get a real role, not just a mention.</p>
   </div>
-  <div class="form-group">
-    <label>Teacher's name (optional)</label>
-    <input type="text" id="teacherName" placeholder="e.g. Mrs Thompson">
+
+  <div class="toggle-row" style="margin-top:0.75rem">
+    <button class="toggle" id="petToggle" onclick="togglePet()"></button>
+    <span class="toggle-label">They have a pet</span>
+  </div>
+  <div id="petFields" style="display:none">
+    <div class="form-row">
+      <div class="form-group" style="flex:1">
+        <label>Pet's name</label>
+        <input type="text" id="petName" placeholder="e.g. Buddy">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label>What kind?</label>
+        <input type="text" id="petType" placeholder="e.g. Golden retriever">
+      </div>
+    </div>
+    <p class="form-hint" style="margin-top:-0.25rem">Pets get their own memorable moment in the story.</p>
   </div>
 
   <p class="inline-error" id="peopleError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
@@ -814,24 +853,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <button class="back-btn" onclick="goTo('screenTheme')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressMemorables"></div><p class="progress-step-label">Step 5 of 8</p></div>
   <h2 class="section-title">The special things</h2>
-  <p class="section-sub">Pets, teddies, toys. The things they can not live without.</p>
-
-  <div class="toggle-row">
-    <button class="toggle" id="petToggle" onclick="togglePet()"></button>
-    <span class="toggle-label">Include a pet in the story</span>
-  </div>
-  <div id="petFields" style="display:none">
-    <div class="form-row">
-      <div class="form-group" style="flex:1">
-        <label>Pet's name</label>
-        <input type="text" id="petName" placeholder="e.g. Buddy">
-      </div>
-      <div class="form-group" style="flex:1">
-        <label>What kind?</label>
-        <input type="text" id="petType" placeholder="e.g. Golden retriever">
-      </div>
-    </div>
-  </div>
+  <p class="section-sub">Teddies, toys, comfort items. The things they cannot go anywhere without.</p>
 
   <div class="form-group">
     <label>Favourite teddy, toy, or comfort item (optional)</label>
@@ -904,33 +926,10 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <p class="form-hint">The more you tell us, the more personal the story feels. Little details make all the difference.</p>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" id="personalMessageGroup">
     <label>Add a personal message (optional)</label>
     <textarea id="personalMessage" placeholder="e.g. Chase, this is from Daddy. I am so proud of you..."></textarea>
     <p class="form-hint">This will be read aloud at the start of the story.</p>
-  </div>
-
-  <div class="gift-section">
-    <div class="toggle-row">
-      <button class="toggle" id="giftToggle" onclick="toggleGift()"></button>
-      <span class="toggle-label">This is a gift for someone else</span>
-    </div>
-    <div id="giftFields" style="display:none">
-      <div class="form-group">
-        <label>Recipient's email</label>
-        <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
-        <p class="form-hint">We will send them a beautiful email with the story inside.</p>
-      </div>
-      <div class="form-group">
-        <label>Your name (the gift giver)</label>
-        <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
-      </div>
-      <div class="form-group">
-        <label>Gift message</label>
-        <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
-      </div>
-      <p class="form-hint" style="margin-top:0.5rem">The gift email will be sent as soon as the story is ready.</p>
-    </div>
   </div>
 
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep7_Extras');goToLength()">Continue</button>
@@ -979,6 +978,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 
   <div class="voice-cards" id="voiceCards"></div>
+  <div id="voiceShowMore" style="text-align:center;margin-top:0.5rem">
+    <button onclick="showAllVoices()" style="background:none;border:2px solid var(--border);border-radius:var(--radius-full);padding:0.5rem 1.5rem;font-size:0.82rem;font-weight:700;color:var(--purple);cursor:pointer;font-family:'Nunito',sans-serif">Show all voices</button>
+  </div>
   <p class="voice-empty" id="voiceEmpty" style="display:none">No voices match those filters. Try changing one.</p>
   <audio id="voicePreviewAudio" preload="none"></audio>
   <button class="btn btn-primary" style="width:100%;margin-top:1.5rem" onclick="showReview()">Create my preview</button>
@@ -1379,7 +1381,6 @@ function restoreDetails() {
   if (storyData.friendName) document.getElementById('friendName').value = storyData.friendName;
   if (storyData.proudOf) document.getElementById('proudOf').value = storyData.proudOf;
   if (storyData.familyMembers) document.getElementById('familyMembers').value = storyData.familyMembers;
-  if (storyData.teacherName) document.getElementById('teacherName').value = storyData.teacherName;
   if (storyData.petName) document.getElementById('petName').value = storyData.petName;
   if (storyData.petType) document.getElementById('petType').value = storyData.petType;
   if (storyData.favTeddy) document.getElementById('favTeddy').value = storyData.favTeddy;
@@ -1403,6 +1404,9 @@ function restoreDetails() {
     if (storyData.giftEmail) document.getElementById('giftEmail').value = storyData.giftEmail;
     if (storyData.giftFrom) document.getElementById('giftFrom').value = storyData.giftFrom;
     if (storyData.giftMessage) document.getElementById('giftMessage').value = storyData.giftMessage;
+    // Hide personal message field when gift is active
+    const pmg = document.getElementById('personalMessageGroup');
+    if (pmg) pmg.style.display = 'none';
   }
   // Restore theme selections
   if (storyData.themes && storyData.themes.length) {
@@ -1507,12 +1511,19 @@ function updateExtrasVisibility() {
   document.getElementById('subjectGroup').style.display = 'none';
   document.getElementById('learningGoalGroup').style.display = 'none';
   document.getElementById('customScenarioGroup').style.display = storyData.category === 'custom' ? 'block' : 'none';
+  // Hide personal message if gift is selected (gift message replaces it)
+  const isGift = document.getElementById('giftToggle').classList.contains('on');
+  document.getElementById('personalMessageGroup').style.display = isGift ? 'none' : 'block';
 }
 
 function toggleGift() {
   const t = document.getElementById('giftToggle');
   t.classList.toggle('on');
-  document.getElementById('giftFields').style.display = t.classList.contains('on') ? 'block' : 'none';
+  const isOn = t.classList.contains('on');
+  document.getElementById('giftFields').style.display = isOn ? 'block' : 'none';
+  // Hide personal message when gift is on (gift message serves the same purpose)
+  const pmg = document.getElementById('personalMessageGroup');
+  if (pmg) pmg.style.display = isOn ? 'none' : 'block';
 }
 
 function togglePet() {
@@ -1557,6 +1568,14 @@ function validateDetails() {
   if (!name) { showInlineError('detailsError', 'Please tell us their name.'); return; }
   if (!age) { showInlineError('detailsError', 'Please tell us their age.'); return; }
   if (!gender) { showInlineError('detailsError', 'Please select boy or girl.'); return; }
+  // Validate gift fields if gift toggle is on
+  const isGift = document.getElementById('giftToggle').classList.contains('on');
+  if (isGift) {
+    const giftFrom = document.getElementById('giftFrom').value.trim();
+    const giftEmail = document.getElementById('giftEmail').value.trim();
+    if (!giftFrom) { showInlineError('detailsError', 'Please tell us who the gift is from.'); return; }
+    if (!giftEmail) { showInlineError('detailsError', 'Please enter the recipient\'s email so we can send them the story.'); return; }
+  }
   trackEvent('FormStep2_Details');
   goTo('screenPeople');
 }
@@ -1594,7 +1613,6 @@ function goToLength() {
   storyData.proudOf = document.getElementById('proudOf').value.trim();
   storyData.friendName = friend;
   storyData.familyMembers = document.getElementById('familyMembers').value.trim();
-  storyData.teacherName = document.getElementById('teacherName').value.trim();
   storyData.themes = themes;
   storyData.interest = themes.join(', ');
   storyData.hasPet = document.getElementById('petToggle').classList.contains('on');
@@ -1614,14 +1632,15 @@ function goToLength() {
   }
   storyData.customScenario = document.getElementById('customScenario').value.trim();
   storyData.extraDetails = document.getElementById('extraDetails').value.trim();
-  storyData.personalMessage = document.getElementById('personalMessage').value.trim();
   storyData.isGift = document.getElementById('giftToggle').classList.contains('on');
   if(storyData.isGift) {
     storyData.giftEmail = document.getElementById('giftEmail').value.trim();
     storyData.giftFrom = document.getElementById('giftFrom').value.trim();
     storyData.giftMessage = document.getElementById('giftMessage').value.trim();
-    storyData.giftDelivery = document.getElementById('giftDelivery').value;
-    storyData.giftDate = document.getElementById('giftDate').value;
+    // Gift message doubles as the personal message read aloud at the start
+    storyData.personalMessage = storyData.giftMessage;
+  } else {
+    storyData.personalMessage = document.getElementById('personalMessage').value.trim();
   }
   goTo('screenVoice');
 }
@@ -1649,6 +1668,14 @@ function getFilteredVoices() {
   });
 }
 
+let showingAllVoices = false;
+
+function showAllVoices() {
+  showingAllVoices = true;
+  document.getElementById('voiceShowMore').style.display = 'none';
+  renderFilteredVoices();
+}
+
 function renderFilteredVoices() {
   const container = document.getElementById('voiceCards');
   const voices = getFilteredVoices();
@@ -1664,10 +1691,25 @@ function renderFilteredVoices() {
 
   document.getElementById('voiceEmpty').style.display = voices.length === 0 ? 'block' : 'none';
 
+  // Show top 4 initially, or all if filters are active or user clicked "show all"
+  const filtersActive = voiceFilters.gender !== 'all' || voiceFilters.accent !== 'all' || voiceFilters.age !== 'all';
+  const limit = (showingAllVoices || filtersActive) ? voices.length : 4;
+  const displayVoices = voices.slice(0, limit);
+
+  // Show/hide the "show more" button
+  const showMoreBtn = document.getElementById('voiceShowMore');
+  if (showMoreBtn) {
+    const remaining = voices.length - limit;
+    showMoreBtn.style.display = remaining > 0 ? 'block' : 'none';
+    if (remaining > 0) {
+      showMoreBtn.querySelector('button').textContent = `Show all ${voices.length} voices`;
+    }
+  }
+
   // Check if currently selected voice is still in filtered results
   const selectedStillVisible = voices.some(v => v.id === selectedVoiceId);
 
-  voices.forEach((v, i) => {
+  displayVoices.forEach((v, i) => {
     const isRecommended = v.best.includes(cat);
     const isSelected = v.id === selectedVoiceId || (!selectedStillVisible && i === 0);
     if (!selectedStillVisible && i === 0) selectedVoiceId = v.id;
@@ -1803,9 +1845,8 @@ function showReview() {
   html += row('Child\'s name', d.childName);
   html += row('Age', d.age);
   html += row('Gender', d.gender);
-  html += row('Best friend', d.friendName);
-  if (d.familyMembers) html += row('Family members', d.familyMembers);
-  if (d.teacherName) html += row('Teacher', d.teacherName);
+  html += row('Best friend / sidekick', d.friendName);
+  if (d.familyMembers) html += row('Other people', d.familyMembers);
   if (d.hasPet && d.petName) html += row('Pet', `${d.petName}${d.petType ? ' (' + d.petType + ')' : ''}`);
   if (d.favTeddy) html += row('Favourite teddy', d.favTeddy);
   html += row('Interests', d.themes.join(', '));
@@ -1814,7 +1855,7 @@ function showReview() {
     if (d.subject) html += row('Subject', d.subject);
     if (d.learningGoal) html += row('Learning goal', d.learningGoal);
   }
-  if (d.proudOf) html += row('Proud of', d.proudOf);
+  if (d.proudOf) html += row('Occasion', d.proudOf);
   if (d.customScenario) html += row('Story idea', d.customScenario);
   if (d.extraDetails) html += row('Extra details', d.extraDetails);
   if (d.personalMessage) html += row('Personal message', d.personalMessage);
