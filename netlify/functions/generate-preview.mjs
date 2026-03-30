@@ -63,7 +63,18 @@ CRITICAL FOR ALL STORIES LONGER THAN 5 MINUTES:
 - At least 40% of the story should be dialogue, not narration. Kids zone out during long descriptive passages. Characters talking to each other is what holds attention.
 - Plant something early that pays off later. A throwaway detail in act 1 becomes the key to solving the problem in act 3. This makes the child feel like the story was designed just for them (because it was).
 - Vary sentence rhythm deliberately. Three short punchy sentences. Then one long flowing one that carries them forward. Then a one word sentence. Boom. This creates a natural audio rhythm that holds attention.
-- Include at least one moment where a character says the child's name directly in dialogue ("Come on, Chase, we have got this!"). This snaps the child's attention back every time.`;
+- Include at least one moment where a character says the child's name directly in dialogue ("Come on, Chase, we have got this!"). This snaps the child's attention back every time.
+
+11. BEFORE YOU WRITE
+Think carefully before you begin. Plan the full story arc first. Decide:
+- What is the opening hook? (First sentence must grab attention.)
+- Where does each personal detail land? (Name, friend, pet, interests, family, proud-of moment, extra details.)
+- What is the callback? (Plant something in act 1 that pays off in act 3.)
+- What is the twist? (What the child thought was the problem is not the real problem.)
+- Where are the scene changes? (At least every 300 words.)
+- Where is the emotional peak?
+- How does the friend shine? (Three distinct moments minimum.)
+Then write. The story must feel inevitable, like every detail was placed with intention, because it was.`;
 
 // ============================================================
 // AGE BAND INSTRUCTIONS: appended to each prompt
@@ -289,11 +300,19 @@ export default async (req) => {
     const startTime = Date.now();
     console.log('Generating story:', { category: storyData.category, length: storyData.length, childName: storyData.childName });
 
+    // Use Opus with extended thinking for the highest quality stories.
+    // Extended thinking lets Claude plan the story arc, place personal details
+    // strategically, and craft callbacks before writing a single word.
     let storyResponse;
     try {
       storyResponse = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: maxTokens,
+        model: 'claude-opus-4-20250514',
+        max_tokens: 16000,
+        temperature: 1, // required to be 1 when using extended thinking
+        thinking: {
+          type: 'enabled',
+          budget_tokens: 4000 // think for ~4k tokens before writing
+        },
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: promptFn(storyData) }]
       });
@@ -303,7 +322,9 @@ export default async (req) => {
       throw new Error('Story generation failed: ' + apiErr.message);
     }
 
-    const fullStory = storyResponse.content[0].text;
+    // With extended thinking, response has thinking blocks then text blocks
+    const textBlock = storyResponse.content.find(b => b.type === 'text');
+    const fullStory = textBlock ? textBlock.text : storyResponse.content[0].text;
     // Frame personal message with a narrator intro so it flows naturally into the story
     const messageIntro = storyData.personalMessage
       ? `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `
