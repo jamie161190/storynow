@@ -1330,6 +1330,10 @@ let fullStoryText = '';
 let lastStripeSessionId = '';
 let currentPlayingCategory = '';
 
+// ===== TEMPORARY: bypass payment for testing =====
+// Set to false to re-enable Stripe payments
+const BYPASS_PAYMENT = true;
+
 // ===== CURATED VOICE LIBRARY =====
 // Each voice tagged with gender, accent, age, and recommended story types
 // preview_url will be populated from ElevenLabs API on first load
@@ -2413,6 +2417,51 @@ async function unlockFull() {
   emailErr.style.display = 'none';
 
   trackEvent('InitiateCheckout', { value: 19.99, currency: 'GBP', content_name: storyData.category });
+
+  if (BYPASS_PAYMENT) {
+    // TEMPORARY: skip Stripe, go straight to full audio generation
+    goTo('screenLoading');
+    document.querySelector('.loading-text').textContent = 'Generating the full story...';
+    document.querySelector('.loading-sub').textContent = 'This takes a couple of minutes. Your story is being crafted.';
+    const fakeSessionId = 'bypass-' + Date.now();
+    const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    try {
+      let data;
+      try {
+        const res = await fetch('/api/generate-full', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId: fakeSessionId, jobId: fullJobId })
+        });
+        const text = await res.text();
+        try { data = JSON.parse(text); } catch(e) { data = null; }
+        if (data && !data.success) throw new Error(data.error || 'Something went wrong');
+      } catch(fetchErr) {
+        if (fetchErr.message && !fetchErr.message.includes('Something went wrong')) { data = null; } else { throw fetchErr; }
+      }
+      if (!data || !data.success) {
+        document.querySelector('.loading-text').textContent = 'Almost there, just finishing up...';
+        data = await pollForFull(fullJobId);
+      }
+      if (!data || !data.success) throw new Error('Audio generation timed out. Please try again.');
+      const audio = document.getElementById('fullStoryAudio');
+      audio.src = data.audioUrl || ('data:audio/mpeg;base64,' + data.fullAudio);
+      document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
+      document.getElementById('sendGiftBtn').style.display = storyData.isGift ? 'block' : 'none';
+      document.getElementById('giftSentMsg').style.display = 'none';
+      document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
+      if (previewEmail) {
+        document.getElementById('savedEmailAddr').textContent = previewEmail;
+        document.getElementById('savedEmailNote').style.display = 'block';
+      }
+      goTo('screenFull');
+    } catch(err) {
+      alert('Something went wrong: ' + err.message);
+      goTo('screenPreview');
+    }
+    return;
+  }
+
   goTo('screenLoading');
   document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
   document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';

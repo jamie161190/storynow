@@ -85,6 +85,11 @@ export default async (req) => {
       });
     }
 
+    // TEMPORARY: bypass payment verification for testing
+    // To re-enable, remove this block and uncomment the payment verification below
+    const BYPASS_PAYMENT = true;
+
+    if (!BYPASS_PAYMENT) {
     // Payment verification: this endpoint must only work for paid sessions
     if (!sessionId) {
       return new Response(JSON.stringify({ error: 'Missing payment session' }), {
@@ -104,6 +109,7 @@ export default async (req) => {
         status: 403, headers: { 'Content-Type': 'application/json' }
       });
     }
+    } // end BYPASS_PAYMENT check
 
     // Prevent session replay: one payment = one full audio generation
     const supabaseUrl = process.env.SUPABASE_URL;
