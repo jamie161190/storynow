@@ -8,7 +8,8 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText, contactName, contactEmail, contactText } = await req.json();
+    const body = await req.json();
+    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText, contactName, contactEmail, contactText } = body;
 
     if (!type || !to) {
       return new Response(JSON.stringify({ error: 'Missing type or recipient email' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -65,7 +66,7 @@ export default async (req) => {
 
     if (type === 'purchase') {
       subject = `${childName}'s story is ready! 🎧`;
-      html = purchaseEmail(childName, category, length, to);
+      html = purchaseEmail(childName, category, length, to, storyId);
     } else if (type === 'gift') {
       subject = `${giftFrom} made something special for ${childName} 🎁`;
       html = giftEmail(childName, giftFrom, giftMessage);
@@ -111,9 +112,11 @@ export default async (req) => {
   }
 };
 
-function purchaseEmail(childName, category, length, customerEmail) {
+function purchaseEmail(childName, category, length, customerEmail, storyId) {
   const lengthLabel = '~15 min';
   const categoryLabel = category === 'learning' ? 'Learning Adventure' : category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
+  const listenUrl = storyId ? `https://storytold.ai?listen=${storyId}` : 'https://storytold.ai';
+  const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai`);
 
   return `
 <!DOCTYPE html>
@@ -128,13 +131,16 @@ function purchaseEmail(childName, category, length, customerEmail) {
       <p style="font-size:24px;text-align:center;margin:0 0 8px;">🎧</p>
       <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">${childName}'s story is ready!</h2>
       <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        Thank you for creating something truly special. ${childName}'s personalised audio story has been created and is ready to enjoy.
+        Thank you for creating something truly special. ${childName}'s personalised ${categoryLabel.toLowerCase()} (${lengthLabel}) has been created and is ready to enjoy.
       </p>
-      <div style="background:#F8F5FF;border-radius:12px;padding:16px;margin:0 0 20px;">
-        <p style="margin:0 0 4px;font-size:13px;color:#999;">Story type</p>
-        <p style="margin:0 0 12px;font-size:15px;color:#2D2844;font-weight:600;">${categoryLabel}</p>
-        <p style="margin:0 0 4px;font-size:13px;color:#999;">Length</p>
-        <p style="margin:0;font-size:15px;color:#2D2844;font-weight:600;">${lengthLabel}</p>
+      ${storyId ? `
+      <div style="text-align:center;margin:0 0 24px;">
+        <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${childName}'s story</a>
+      </div>` : ''}
+      <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:15px;color:#2D2844;font-weight:700;">Share with the whole family</p>
+        <p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;">Grandparents, aunties, uncles. Let everyone hear ${childName}'s story. No extra cost.</p>
+        <a href="https://wa.me/?text=${waText}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;">Share on WhatsApp</a>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
         You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email:

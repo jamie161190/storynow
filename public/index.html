@@ -1871,14 +1871,10 @@ async function handleStripeReturn() {
     document.getElementById('giftSentMsg').style.display = 'none';
     document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
 
-    // Send purchase confirmation email (non-blocking)
+    // Save story to Supabase first, then send email with share link
     if (verifyData.customerEmail) {
-      sendPurchaseEmail(verifyData.customerEmail, sessionId);
-    }
-
-    // Save story to Supabase (non-blocking) using the Supabase Storage URL
-    if (verifyData.customerEmail) {
-      saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
+      await saveStoryToDb(verifyData.customerEmail, data.audioUrl, sessionId);
+      sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId);
     }
 
     // Show which email the story is saved under
@@ -2013,7 +2009,7 @@ async function sendGift() {
 }
 
 // Send purchase confirmation email (called after successful payment)
-async function sendPurchaseEmail(email, stripeSessionId) {
+async function sendPurchaseEmail(email, stripeSessionId, storyId) {
   try {
     await fetch('/api/send-email', {
       method:'POST',
@@ -2024,7 +2020,8 @@ async function sendPurchaseEmail(email, stripeSessionId) {
         childName: storyData.childName,
         category: storyData.category,
         length: storyData.length,
-        sessionId: stripeSessionId
+        sessionId: stripeSessionId,
+        storyId: storyId || null
       })
     });
   } catch(e) { /* silent */ }
