@@ -116,12 +116,14 @@ The themes must drive the world and the plot, not just decorate it. If the child
 - Name: ${d.childName} (${d.gender || 'child'})
 - Age: ${d.age}
 - ${pronounLine}
-${d.proudOf ? '- Something they are proud of: ' + d.proudOf : ''}
+${d.proudOf ? '- Occasion: ' + d.proudOf : ''}
 
 PEOPLE IN THE STORY:
 - Best friend: ${d.friendName} (must have at least 3 meaningful moments: dialogue, an action, a connection)
 ${d.familyMembers ? '- Family: ' + d.familyMembers + '\nIMPORTANT: Every family member listed above MUST appear in the story with dialogue or a meaningful action. Do not just name-drop them. Each person should have at least one moment where they speak, do something, or interact with ' + d.childName + ' in a way the child would remember. If a parent included themselves, they are telling you they want to be IN the story. Make that happen.' : ''}
 ${d.teacherName ? '- Teacher: ' + d.teacherName : ''}
+${d.isGift && d.giftFrom ? `- Gift giver: ${d.giftFrom}
+THIS STORY IS A GIFT from ${d.giftFrom} to ${d.childName}. ${d.giftFrom} MUST appear in the story as a real character with at least one warm, memorable moment. They could tuck ${d.childName} in, cheer them on, appear as a wise guide, or share a loving line of dialogue. The child hearing this story needs to feel that ${d.giftFrom} is right there with them.` : ''}
 
 ${themesSection}
 
@@ -365,6 +367,11 @@ export default async (req) => {
         status: 400, headers: { 'Content-Type': 'application/json' }
       });
     }
+    if (storyData?.giftMessage && storyData.giftMessage.length > 500) {
+      return new Response(JSON.stringify({ error: 'Gift message too long' }), {
+        status: 400, headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     const promptFn = STORY_PROMPTS[storyData.category];
     if (!promptFn) return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -401,10 +408,18 @@ export default async (req) => {
     // With extended thinking, response has thinking blocks then text blocks
     const textBlock = storyResponse.content.find(b => b.type === 'text');
     const fullStory = textBlock ? textBlock.text : storyResponse.content[0].text;
-    // Frame personal message with a narrator intro so it flows naturally into the story
-    const messageIntro = storyData.personalMessage
-      ? `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `
-      : '';
+    // Frame the intro: gift stories get a warm gift intro, otherwise use personal message
+    let messageIntro = '';
+    if (storyData.isGift && storyData.giftFrom) {
+      const giftMsg = storyData.giftMessage || storyData.personalMessage;
+      messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... `;
+      if (giftMsg) {
+        messageIntro += `${giftMsg} ... `;
+      }
+      messageIntro += `And now, your story begins. ... `;
+    } else if (storyData.personalMessage) {
+      messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
+    }
     const fullStoryWithMessage = messageIntro + fullStory;
     // Use ~150 words for a ~60 second preview, end at a sentence boundary
     const words = fullStoryWithMessage.split(' ');

@@ -59,8 +59,8 @@ export default async (req) => {
     }
 
     // ── Verify the request is legitimate ──────────────────────
-    if (type === 'purchase' || type === 'gift') {
-      // Purchase and gift emails require a valid paid Stripe session
+    if (type === 'purchase') {
+      // Purchase emails require a valid paid Stripe session
       if (!sessionId) {
         return new Response(JSON.stringify({ error: 'Missing payment session' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
       }
@@ -68,6 +68,30 @@ export default async (req) => {
       const session = await stripe.checkout.sessions.retrieve(sessionId);
       if (!session || session.payment_status !== 'paid') {
         return new Response(JSON.stringify({ error: 'Payment not verified' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+      }
+    } else if (type === 'gift') {
+      // Gift emails can be sent either with a Stripe session (at purchase time)
+      // or with an auth token (sending later from account)
+      if (sessionId) {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        if (!session || session.payment_status !== 'paid') {
+          return new Response(JSON.stringify({ error: 'Payment not verified' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+        }
+      } else if (body.token) {
+        // Verify auth token for account-based gift sending
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+        const tokenRes = await fetch(
+          `${supabaseUrl}/rest/v1/auth_tokens?token=eq.${encodeURIComponent(body.token)}&select=email&limit=1`,
+          { headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey } }
+        );
+        const tokens = await tokenRes.json();
+        if (!tokens.length) {
+          return new Response(JSON.stringify({ error: 'Invalid session' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+        }
+      } else {
+        return new Response(JSON.stringify({ error: 'Authentication required' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
       }
     } else if (type === 'review') {
       // Reviews just need basic content, no auth required

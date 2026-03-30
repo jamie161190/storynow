@@ -127,7 +127,10 @@ export default async (req) => {
         length: s.length,
         audioUrl: s.audio_url,
         createdAt: s.created_at,
-        isGift: s.is_gift
+        isGift: s.is_gift,
+        giftEmail: s.gift_email,
+        giftFrom: s.gift_from,
+        giftSent: s.gift_sent
       }))
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 

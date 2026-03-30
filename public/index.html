@@ -719,6 +719,27 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   </div>
 </div>
 
+<!-- SEND GIFT MODAL -->
+<div class="share-overlay" id="giftSendOverlay" onclick="if(event.target===this)closeGiftSendModal()">
+  <div class="share-modal">
+    <button class="share-close" onclick="closeGiftSendModal()">&times;</button>
+    <div id="giftSendForm">
+      <h3>&#127873; Send this gift</h3>
+      <p>Send <span id="giftSendChildName"></span>'s story to the lucky recipient.</p>
+      <input type="email" id="giftSendEmail" placeholder="Recipient's email" class="form-input">
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:-0.5rem 0 1rem">We will send them a beautiful email with a link to listen.</p>
+      <button class="share-send-btn" id="giftSendBtn" onclick="sendGiftEmail()">Send gift</button>
+      <p id="giftSendError" style="color:#FF6B9D;font-size:0.85rem;text-align:center;margin-top:0.75rem;display:none"></p>
+    </div>
+    <div id="giftSendSuccess" style="display:none;text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem">&#127873;</div>
+      <h3>Gift sent!</h3>
+      <p style="color:var(--text-muted);margin-top:0.5rem">They will receive an email with the story inside.</p>
+      <button class="share-send-btn" style="margin-top:1rem" onclick="closeGiftSendModal()">Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- DETAILS: MAIN CHARACTER -->
 <div class="screen" id="screenDetails">
   <button class="back-btn" onclick="goTo(storyData.category==='learning'?'screenLearningSetup':'screenCategory')">&#8592; Back</button>
@@ -743,9 +764,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
         <p class="form-hint">This will be read aloud at the very start of the story.</p>
       </div>
       <div class="form-group">
-        <label>Recipient's email</label>
+        <label>Recipient's email (optional)</label>
         <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
-        <p class="form-hint">We will send them a beautiful email with the story inside.</p>
+        <p class="form-hint">We will send them a beautiful email with the story inside. Don't have it yet? No problem, you can send it from your account anytime.</p>
       </div>
     </div>
   </div>
@@ -1581,13 +1602,11 @@ function validateDetails() {
   if (!name) { showInlineError('detailsError', 'Please tell us their name.'); return; }
   if (!age) { showInlineError('detailsError', 'Please tell us their age.'); return; }
   if (!gender) { showInlineError('detailsError', 'Please select boy or girl.'); return; }
-  // Validate gift fields if gift toggle is on
+  // Validate gift fields if gift toggle is on (email is optional)
   const isGift = document.getElementById('giftToggle').classList.contains('on');
   if (isGift) {
     const giftFrom = document.getElementById('giftFrom').value.trim();
-    const giftEmail = document.getElementById('giftEmail').value.trim();
     if (!giftFrom) { showInlineError('detailsError', 'Please tell us who the gift is from.'); return; }
-    if (!giftEmail) { showInlineError('detailsError', 'Please enter the recipient\'s email so we can send them the story.'); return; }
   }
   trackEvent('FormStep2_Details');
   goTo('screenPeople');
@@ -1877,7 +1896,11 @@ function showReview() {
   if (d.isGift) {
     if (d.giftFrom) html += row('Gift from', d.giftFrom, 'screenDetails');
     if (d.giftMessage) html += row('Gift message', d.giftMessage, 'screenDetails');
-    html += row('Gift recipient', d.giftEmail, 'screenDetails');
+    if (d.giftEmail) {
+      html += row('Send to', d.giftEmail, 'screenDetails');
+    } else {
+      html += row('Send to', 'You can send this from your account later', 'screenDetails');
+    }
   } else if (d.personalMessage) {
     html += row('Personal message', d.personalMessage, 'screenExtras');
   }
@@ -2211,6 +2234,28 @@ async function handleStripeReturn() {
         console.error('Story save failed, sending email without listen link:', saveErr);
       }
       sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId);
+
+      // If it's a gift and they provided an email, auto-send the gift too
+      if (storyData.isGift && storyData.giftEmail && lastSavedStoryId) {
+        try {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'gift',
+              to: storyData.giftEmail,
+              childName: storyData.childName,
+              giftFrom: storyData.giftFrom,
+              giftMessage: storyData.giftMessage,
+              storyId: lastSavedStoryId,
+              sessionId
+            })
+          });
+          // Mark as sent on the post-purchase screen
+          document.getElementById('sendGiftBtn').style.display = 'none';
+          document.getElementById('giftSentMsg').style.display = 'block';
+        } catch(e) { /* non-blocking */ }
+      }
     }
 
     // Show which email the story is saved under
@@ -2350,6 +2395,16 @@ async function downloadStory() {
 }
 
 async function sendGift() {
+  if (!storyData.giftEmail) {
+    // No email was provided at purchase time, open the modal to collect it
+    openSendGiftModal({
+      id: lastSavedStoryId,
+      childName: storyData.childName,
+      giftFrom: storyData.giftFrom,
+      giftEmail: ''
+    });
+    return;
+  }
   const btn = document.getElementById('sendGiftBtn');
   btn.textContent = 'Sending...';
   btn.disabled = true;
@@ -2525,19 +2580,25 @@ function renderLibrary(stories) {
   list.innerHTML = '';
   stories.forEach(s => {
     const date = new Date(s.createdAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const giftUnsent = s.isGift && !s.giftSent;
+    const giftLabel = s.isGift ? (s.giftSent ? ' &middot; Gift sent' : ' &middot; Gift (not sent yet)') : '';
     const card = document.createElement('div');
     card.className = 'library-card';
     card.innerHTML = `
       <div class="lib-icon">${catEmoji[s.category] || '\u{2728}'}</div>
       <div class="lib-info">
         <div class="lib-name">${escHtml(s.childName)}'s ${catLabel[s.category] || 'Story'}</div>
-        <div class="lib-meta">${lenLabel[s.length] || s.length} &middot; ${date}${s.isGift ? ' &middot; Gift' : ''}</div>
+        <div class="lib-meta">${lenLabel[s.length] || s.length} &middot; ${date}${giftLabel}</div>
       </div>
       <div class="lib-actions">
+        ${giftUnsent ? '<button class="lib-gift-btn" title="Send this gift" style="background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0.25rem">&#127873;</button>' : ''}
         <button class="lib-share-btn" title="Share this story"><svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg></button>
         <div class="lib-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
       </div>
     `;
+    if (giftUnsent) {
+      card.querySelector('.lib-gift-btn').onclick = (e) => { e.stopPropagation(); openSendGiftModal(s); };
+    }
     card.querySelector('.lib-share-btn').onclick = (e) => { e.stopPropagation(); openShareModal(s); };
     card.querySelector('.lib-play').onclick = () => playLibraryStory(s);
     card.onclick = () => playLibraryStory(s);
@@ -2647,6 +2708,80 @@ function shareViaWhatsApp() {
 function closeShareModal() {
   document.getElementById('shareOverlay').classList.remove('active');
   shareStory = null;
+}
+
+// SEND GIFT MODAL
+let giftSendStory = null;
+
+function openSendGiftModal(story) {
+  giftSendStory = story;
+  document.getElementById('giftSendChildName').textContent = story.childName;
+  document.getElementById('giftSendEmail').value = story.giftEmail || '';
+  document.getElementById('giftSendForm').style.display = 'block';
+  document.getElementById('giftSendSuccess').style.display = 'none';
+  document.getElementById('giftSendError').style.display = 'none';
+  document.getElementById('giftSendOverlay').classList.add('active');
+}
+
+function closeGiftSendModal() {
+  document.getElementById('giftSendOverlay').classList.remove('active');
+  giftSendStory = null;
+}
+
+async function sendGiftEmail() {
+  const email = document.getElementById('giftSendEmail').value.trim();
+  const errEl = document.getElementById('giftSendError');
+  errEl.style.display = 'none';
+
+  if (!email || !email.includes('@')) {
+    errEl.textContent = 'Please enter a valid email address';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('giftSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const token = loginAuthToken || sessionStorage.getItem('storytold_auth_token');
+    // Send the gift email (authenticated via token since no Stripe session)
+    const res = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'gift',
+        to: email,
+        childName: giftSendStory.childName,
+        giftFrom: giftSendStory.giftFrom || 'Someone special',
+        giftMessage: null,
+        storyId: giftSendStory.id,
+        token
+      })
+    });
+
+    // Update gift_sent and gift_email in the database
+    if (token) {
+      await fetch(`${location.origin}/api/update-gift-sent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId: giftSendStory.id, giftEmail: email, token })
+      });
+    }
+
+    document.getElementById('giftSendForm').style.display = 'none';
+    document.getElementById('giftSendSuccess').style.display = 'block';
+
+    // Update the card in the library to show "Gift sent"
+    giftSendStory.giftSent = true;
+    giftSendStory.giftEmail = email;
+  } catch (err) {
+    errEl.textContent = 'Something went wrong. Please try again.';
+    errEl.style.display = 'block';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Send gift';
 }
 
 async function sendShareEmail() {
