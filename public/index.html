@@ -2508,6 +2508,9 @@ async function unlockFull() {
         document.getElementById('savedEmailAddr').textContent = previewEmail;
         document.getElementById('savedEmailNote').style.display = 'block';
       }
+      // In bypass mode, set a temporary ID so sharing works
+      // (Normal flow saves via handleStripeReturn and gets a real DB ID)
+      lastSavedStoryId = fakeSessionId;
       goTo('screenFull');
     } catch(err) {
       alert('Something went wrong: ' + err.message);
