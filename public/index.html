@@ -304,7 +304,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 @keyframes celebrate{0%{transform:scale(0);opacity:0}50%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
 
 .audio-progress{width:100%;max-width:320px;margin:0 auto 2rem}
-.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;cursor:pointer}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:3px;width:0%;transition:width 0.3s}
 .progress-times{display:flex;justify-content:space-between;margin-top:0.4rem;font-size:0.75rem;color:var(--text-muted);font-weight:600}
 
@@ -385,7 +385,9 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="logo-wrap">
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
-  <p class="hero-text" style="color:var(--text-soft);font-size:0.88rem;line-height:1.7;margin-bottom:0.4rem">I built this because my son Chase asked why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I made it happen.</p>
+  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);padding:1.1rem 1.2rem;margin-bottom:0.6rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
+    <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">I built this because my son Chase asked why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I made it happen.</p>
+  </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">your child</span> by name.</h1>
   <p class="hero-text">Tell us about your child and we'll create a one of a kind audio story just for them. Their name, their world, woven into every scene.</p>
 
@@ -462,12 +464,25 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <a class="my-stories-link" onclick="goTo('screenLogin')">&#128274; Log in / My Stories</a>
   </div>
 
+  <!-- REVIEWS -->
+  <div id="reviewsSection" style="width:100%;max-width:440px;margin-top:1.5rem;display:none">
+    <p style="font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem;text-align:center">What parents are saying</p>
+    <div id="reviewsList" style="display:flex;flex-direction:column;gap:0.6rem"></div>
+  </div>
+
   <!-- FOUNDER NOTE -->
   <div style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
     <div style="margin-bottom:0.75rem">
-      <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--purple-light)">
+      <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid var(--purple-light)">
     </div>
     <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.7;font-weight:500">Built by a dad in the UK for his 9 year old. Now available for every child.</p>
+    <p style="font-size:0.8rem;color:var(--purple);margin-top:0.5rem;cursor:pointer;font-weight:600" onclick="document.getElementById('reviewForm').style.display='block';this.style.display='none'">Loved your child's reaction? Tell us about it</p>
+    <div id="reviewForm" style="display:none;margin-top:0.75rem;text-align:left">
+      <input id="reviewName" type="text" placeholder="Your first name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
+      <input id="reviewChildName" type="text" placeholder="Your child's name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
+      <textarea id="reviewText" placeholder="What happened when they heard their story?" rows="3" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.5rem;font-family:'Nunito',sans-serif;resize:vertical;background:var(--card)"></textarea>
+      <button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:0.65rem" onclick="submitReview()">Send</button>
+    </div>
   </div>
 
   <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;text-align:center;margin-top:0.75rem">hello@storytold.ai</p>
@@ -849,7 +864,17 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
   <div class="voice-cards" id="voiceCards"></div>
   <p class="voice-empty" id="voiceEmpty" style="display:none">No voices match those filters. Try changing one.</p>
   <audio id="voicePreviewAudio" preload="none"></audio>
-  <button class="btn btn-primary" style="width:100%;margin-top:1.5rem" onclick="generatePreview()">Create my preview</button>
+  <button class="btn btn-primary" style="width:100%;margin-top:1.5rem" onclick="showReview()">Create my preview</button>
+</div>
+
+<!-- REVIEW ANSWERS -->
+<div class="screen" id="screenReview">
+  <button class="back-btn" onclick="goTo('screenVoice')">&#8592; Back</button>
+  <h2 class="section-title">Check your details</h2>
+  <p class="section-sub">Make sure everything looks right before we create the story.</p>
+  <div id="reviewContent" style="width:100%;max-width:440px"></div>
+  <button class="btn btn-primary" style="width:100%;margin-top:1.2rem" onclick="generatePreview()">Looks good, create my preview!</button>
+  <p style="font-size:0.75rem;color:var(--text-muted);text-align:center;margin-top:0.5rem">You can go back and change anything</p>
 </div>
 
 <!-- LOADING -->
@@ -887,14 +912,18 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="full-celebration">&#127881;</div>
     <p class="full-title" id="fullTitle">Their story is ready</p>
     <p class="full-for" id="fullStoryFor"></p>
-    <div class="audio-player" id="fullPlayBtn" onclick="playFull()">
-      <svg class="play-icon" id="fullPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <div style="display:flex;align-items:center;gap:1.2rem;justify-content:center">
+      <button onclick="seekAudio('fullStoryAudio',-15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.5 3c-4.65 0-8.58 3.03-9.96 7.22L1 9.5l1.5 5.5 4.5-4-2.1-.68C5.98 6.83 8.93 4.5 12.5 4.5c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5c-2.07 0-3.95-.84-5.3-2.2l-1.06 1.06C7.82 20.04 10.06 21 12.5 21c5.25 0 9.5-4.25 9.5-9.5S17.75 3 12.5 3z"/></svg>15s</button>
+      <div class="audio-player" id="fullPlayBtn" onclick="playFull()">
+        <svg class="play-icon" id="fullPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <button onclick="seekAudio('fullStoryAudio',15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11.5 3c4.65 0 8.58 3.03 9.96 7.22L23 9.5l-1.5 5.5-4.5-4 2.1-.68C18.02 6.83 15.07 4.5 11.5 4.5 7.36 4.5 4 7.86 4 12s3.36 7.5 7.5 7.5c2.07 0 3.95-.84 5.3-2.2l1.06 1.06C16.18 20.04 13.94 21 11.5 21 6.25 21 2 16.75 2 11.5S6.25 3 11.5 3z"/></svg>15s</button>
     </div>
     <audio id="fullStoryAudio"></audio>
 
     <!-- PROGRESS BAR -->
     <div class="audio-progress">
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-bar" onclick="seekBar(event,'fullStoryAudio','progressFill')"><div class="progress-fill" id="progressFill"></div></div>
       <div class="progress-times">
         <span id="currentTime">0:00</span>
         <span id="totalTime">0:00</span>
@@ -943,12 +972,16 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="full-celebration">&#127911;</div>
     <p class="full-title" id="sharedTitle">A story just for you</p>
     <p class="full-for" id="sharedFor"></p>
-    <div class="audio-player" id="sharedPlayBtn" onclick="playShared()">
-      <svg class="play-icon" id="sharedPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <div style="display:flex;align-items:center;gap:1.2rem;justify-content:center">
+      <button onclick="seekAudio('sharedAudio',-15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.5 3c-4.65 0-8.58 3.03-9.96 7.22L1 9.5l1.5 5.5 4.5-4-2.1-.68C5.98 6.83 8.93 4.5 12.5 4.5c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5c-2.07 0-3.95-.84-5.3-2.2l-1.06 1.06C7.82 20.04 10.06 21 12.5 21c5.25 0 9.5-4.25 9.5-9.5S17.75 3 12.5 3z"/></svg>15s</button>
+      <div class="audio-player" id="sharedPlayBtn" onclick="playShared()">
+        <svg class="play-icon" id="sharedPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <button onclick="seekAudio('sharedAudio',15)" style="background:none;border:none;cursor:pointer;padding:0.5rem;color:var(--text-muted);font-size:0.7rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:0.15rem"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M11.5 3c4.65 0 8.58 3.03 9.96 7.22L23 9.5l-1.5 5.5-4.5-4 2.1-.68C18.02 6.83 15.07 4.5 11.5 4.5 7.36 4.5 4 7.86 4 12s3.36 7.5 7.5 7.5c2.07 0 3.95-.84 5.3-2.2l1.06 1.06C16.18 20.04 13.94 21 11.5 21 6.25 21 2 16.75 2 11.5S6.25 3 11.5 3z"/></svg>15s</button>
     </div>
     <audio id="sharedAudio"></audio>
     <div class="audio-progress">
-      <div class="progress-bar"><div class="progress-fill" id="sharedProgressFill"></div></div>
+      <div class="progress-bar" onclick="seekBar(event,'sharedAudio','sharedProgressFill')"><div class="progress-fill" id="sharedProgressFill"></div></div>
       <div class="progress-times">
         <span id="sharedCurrentTime">0:00</span>
         <span id="sharedTotalTime">0:00</span>
@@ -1529,6 +1562,44 @@ function showVoices() {
   renderFilteredVoices();
 }
 
+function showReview() {
+  if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
+  const d = storyData;
+  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
+  let html = '<div style="display:flex;flex-direction:column;gap:0.6rem">';
+  const row = (label, val) => val ? `<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.7rem 0.9rem"><span style="font-size:0.72rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.03em">${label}</span><p style="margin:0.2rem 0 0;font-size:0.88rem;color:var(--text);font-weight:600">${val}</p></div>` : '';
+  html += row('Story type', catLabel[d.category] || d.category);
+  html += row('Child\'s name', d.childName);
+  html += row('Age', d.age);
+  html += row('Gender', d.gender);
+  html += row('Best friend', d.friendName);
+  if (d.familyMembers) html += row('Family members', d.familyMembers);
+  if (d.teacherName) html += row('Teacher', d.teacherName);
+  if (d.hasPet && d.petName) html += row('Pet', `${d.petName}${d.petType ? ' (' + d.petType + ')' : ''}`);
+  if (d.favTeddy) html += row('Favourite teddy', d.favTeddy);
+  html += row('Interests', d.themes.join(', '));
+  html += row('Setting', d.setting || 'Surprise me');
+  if (d.category === 'learning') {
+    if (d.subject) html += row('Subject', d.subject);
+    if (d.learningGoal) html += row('Learning goal', d.learningGoal);
+  }
+  if (d.proudOf) html += row('Proud of', d.proudOf);
+  if (d.customScenario) html += row('Story idea', d.customScenario);
+  if (d.extraDetails) html += row('Extra details', d.extraDetails);
+  if (d.personalMessage) html += row('Personal message', d.personalMessage);
+  if (d.isGift) {
+    html += row('Gift for', d.giftEmail);
+    if (d.giftFrom) html += row('Gift from', d.giftFrom);
+    if (d.giftMessage) html += row('Gift message', d.giftMessage);
+  }
+  // Find selected voice name
+  const voiceCard = document.querySelector('.voice-card.selected .vc-name');
+  if (voiceCard) html += row('Storyteller', voiceCard.textContent);
+  html += '</div>';
+  document.getElementById('reviewContent').innerHTML = html;
+  goTo('screenReview');
+}
+
 async function generatePreview() {
   // Make sure we have a valid voice selected
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
@@ -1677,6 +1748,19 @@ async function handleStripeReturn() {
     alert('Something went wrong: ' + err.message + '. If you have paid, please contact hello@storytold.ai and we will sort it out.');
     goTo('screenLanding');
   }
+}
+
+function seekAudio(audioId, delta) {
+  const audio = document.getElementById(audioId);
+  if (audio && audio.duration) audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + delta));
+}
+function seekBar(e, audioId, fillId) {
+  const audio = document.getElementById(audioId);
+  if (!audio || !audio.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  audio.currentTime = pct * audio.duration;
+  document.getElementById(fillId).style.width = (pct * 100) + '%';
 }
 
 function playFull() {
@@ -2018,8 +2102,8 @@ function shareViaWhatsApp() {
   if (!shareStory) return;
   const msg = document.getElementById('waMessage').value.trim();
   const listenUrl = `https://storytold.ai?listen=${shareStory.id}`;
-  let text = `Listen to ${shareStory.childName}'s personalised audio story! ${listenUrl}`;
-  if (msg) text = `${msg}\n\n${text}`;
+  let text = `Listen to ${shareStory.childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know your child by name.`;
+  if (msg) text = `${msg}\n\nListen to ${shareStory.childName}'s story: ${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know your child by name.`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
@@ -2090,6 +2174,40 @@ function playLibraryStory(story) {
   goTo('screenFull');
   audio.play();
   document.getElementById('fullPlayIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+}
+
+// ===== REVIEWS =====
+const REVIEWS = [
+  // Add reviews here as they come in, format:
+  // { name: 'Sarah', childName: 'Mia', text: 'She asked for another one before the first one finished.' },
+];
+
+function renderReviews() {
+  if (REVIEWS.length === 0) return;
+  document.getElementById('reviewsSection').style.display = 'block';
+  const list = document.getElementById('reviewsList');
+  list.innerHTML = REVIEWS.map(r => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow)">
+      <p style="font-size:0.88rem;color:var(--text);line-height:1.6;margin:0 0 0.4rem">"${r.text}"</p>
+      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;font-weight:700">${r.name}${r.childName ? ', ' + r.childName + '\u2019s parent' : ''}</p>
+    </div>
+  `).join('');
+}
+renderReviews();
+
+async function submitReview() {
+  const name = document.getElementById('reviewName').value.trim();
+  const childName = document.getElementById('reviewChildName').value.trim();
+  const text = document.getElementById('reviewText').value.trim();
+  if (!name || !text) { alert('Please fill in your name and your review.'); return; }
+  try {
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'review', to: 'hello@storytold.ai', reviewName: name, reviewChildName: childName, reviewText: text })
+    });
+  } catch(e) {}
+  document.getElementById('reviewForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Thank you! We really appreciate it.</p>';
 }
 </script>
 </body>
