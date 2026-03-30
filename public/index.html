@@ -279,17 +279,52 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .section-sub{font-size:0.9rem;color:var(--text-soft);text-align:center;margin-bottom:2rem;line-height:1.5;font-weight:500}
 
 /* ===== CATEGORY CARDS ===== */
-.category-cards{display:flex;flex-direction:column;gap:0.75rem;width:100%}
-.cat-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.25rem;cursor:pointer;transition:all 0.25s ease;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow)}
-.cat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.cat-card.selected{border-color:var(--purple);background:var(--purple-light)}
-.cat-icon{font-size:1.8rem;width:54px;height:54px;display:flex;align-items:center;justify-content:center;border-radius:16px;flex-shrink:0}
-.cat-bedtime .cat-icon{background:linear-gradient(135deg,#E8E0FF,#D4C8FF)}
-.cat-journey .cat-icon{background:linear-gradient(135deg,#FFE5D0,#FFD0A8)}
-.cat-learning .cat-icon{background:linear-gradient(135deg,#D4F1FF,#B8E6FF)}
-.cat-custom .cat-icon{background:linear-gradient(135deg,#FFE4EE,#FFCCD8)}
-.cat-info h3{font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:0.2rem}
-.cat-info p{font-size:0.82rem;color:var(--text-soft);line-height:1.4;font-weight:500}
+.category-cards{display:flex;flex-direction:column;gap:0.85rem;width:100%}
+.cat-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1.35rem 1.25rem;cursor:pointer;transition:all 0.3s ease;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cat-card::before{content:'';position:absolute;top:0;left:0;width:5px;height:100%;border-radius:3px 0 0 3px;transition:width 0.3s}
+.cat-card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,0.1)}
+.cat-card.selected::before{width:5px}
+
+/* Bedtime: deep indigo, dreamy, night sky */
+.cat-bedtime{border-color:#D4C8FF}
+.cat-bedtime::before{background:linear-gradient(180deg,#7C5CFC,#5B3FD4)}
+.cat-bedtime.selected{border-color:#7C5CFC;background:linear-gradient(135deg,#F3EEFF,#E8E0FF)}
+.cat-bedtime:hover{border-color:#B8A9FF}
+
+/* Adventure: warm orange, exciting, energetic */
+.cat-journey{border-color:#FFD9B8}
+.cat-journey::before{background:linear-gradient(180deg,#FF8C42,#E06B20)}
+.cat-journey.selected{border-color:#FF8C42;background:linear-gradient(135deg,#FFF5EC,#FFE8D4)}
+.cat-journey:hover{border-color:#FFAD6E}
+
+/* Learning: bright teal, curious, smart */
+.cat-learning{border-color:#B8E6E6}
+.cat-learning::before{background:linear-gradient(180deg,#00B4A0,#008F7F)}
+.cat-learning.selected{border-color:#00B4A0;background:linear-gradient(135deg,#EDFAF8,#D4F1EE)}
+.cat-learning:hover{border-color:#4DD9C9}
+
+/* Custom: pink/rose */
+.cat-custom{border-color:#FFCCD8}
+.cat-custom::before{background:linear-gradient(180deg,#FF6B9D,#E04D7D)}
+.cat-custom.selected{border-color:#FF6B9D;background:linear-gradient(135deg,#FFF0F4,#FFE4EE)}
+.cat-custom:hover{border-color:#FF9DB8}
+
+.cat-icon{font-size:2rem;width:58px;height:58px;display:flex;align-items:center;justify-content:center;border-radius:16px;flex-shrink:0;transition:transform 0.3s}
+.cat-card:hover .cat-icon{transform:scale(1.08)}
+.cat-bedtime .cat-icon{background:linear-gradient(135deg,#E8E0FF,#C8B8FF);box-shadow:0 4px 12px rgba(124,92,252,0.15)}
+.cat-journey .cat-icon{background:linear-gradient(135deg,#FFE5D0,#FFC8A0);box-shadow:0 4px 12px rgba(255,140,66,0.15)}
+.cat-learning .cat-icon{background:linear-gradient(135deg,#D4F1EE,#A8E6DF);box-shadow:0 4px 12px rgba(0,180,160,0.15)}
+.cat-custom .cat-icon{background:linear-gradient(135deg,#FFE4EE,#FFC8D8);box-shadow:0 4px 12px rgba(255,107,157,0.15)}
+.cat-info h3{font-family:'Nunito',sans-serif;font-size:1.08rem;font-weight:800;margin-bottom:0.15rem}
+.cat-bedtime .cat-info h3{color:#5B3FD4}
+.cat-journey .cat-info h3{color:#D4660F}
+.cat-learning .cat-info h3{color:#008F7F}
+.cat-custom .cat-info h3{color:#D44070}
+.cat-info p{font-size:0.82rem;color:var(--text-soft);line-height:1.45;font-weight:500}
+.cat-tag{display:inline-block;font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;padding:0.2rem 0.55rem;border-radius:20px;margin-top:0.35rem}
+.cat-bedtime .cat-tag{background:#E8E0FF;color:#5B3FD4}
+.cat-journey .cat-tag{background:#FFE5D0;color:#D4660F}
+.cat-learning .cat-tag{background:#D4F1EE;color:#008F7F}
 
 /* ===== GIFT SECTION ===== */
 .gift-section{width:100%;margin-top:0.5rem;padding-top:1rem;border-top:2px solid var(--border)}
@@ -371,19 +406,19 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .loader-dot:nth-child(3){background:var(--sky);bottom:0;left:50%;transform:translateX(-50%);animation-delay:0.4s}
 .loader-dot:nth-child(4){background:var(--pink);top:50%;left:0;transform:translateY(-50%);animation-delay:0.6s}
 @keyframes loaderDots{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.5);opacity:1}}
-.loading-text{font-family:'Nunito',sans-serif;font-size:1.3rem;font-weight:800;color:var(--text)}
+.loading-text{font-family:'Nunito',sans-serif;font-size:1.3rem;font-weight:800;color:var(--cat-accent,var(--text))}
 .loading-sub{font-size:0.88rem;color:var(--text-soft);font-weight:500}
 
 /* ===== PREVIEW ===== */
 .preview-container{width:100%;text-align:center;padding:2rem 0}
-.preview-badge{display:inline-flex;align-items:center;gap:0.4rem;background:var(--green-light);color:var(--green);font-size:0.8rem;font-weight:700;padding:0.4rem 1rem;border-radius:var(--radius-full);margin-bottom:1rem}
+.preview-badge{display:inline-flex;align-items:center;gap:0.4rem;background:var(--cat-accent-light,var(--green-light));color:var(--cat-accent-dark,var(--green));font-size:0.8rem;font-weight:700;padding:0.4rem 1rem;border-radius:var(--radius-full);margin-bottom:1rem}
 .preview-title{font-family:'Nunito',sans-serif;font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:0.5rem}
 .preview-sub{font-size:0.9rem;color:var(--text-soft);margin-bottom:2rem;font-weight:500;line-height:1.5}
 
-.audio-player{width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple-soft),var(--pink));display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 40px rgba(124,92,252,0.25);position:relative}
-.audio-player:hover{transform:scale(1.05);box-shadow:0 12px 48px rgba(124,92,252,0.35)}
+.audio-player{width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,var(--purple-soft)));display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 40px var(--cat-glow,rgba(124,92,252,0.25));position:relative}
+.audio-player:hover{transform:scale(1.05);box-shadow:0 12px 48px var(--cat-glow,rgba(124,92,252,0.35))}
 .audio-player:active{transform:scale(0.98)}
-.audio-player::before{content:'';position:absolute;inset:-6px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--orange),var(--pink));opacity:0.15;animation:glow 3s ease-in-out infinite}
+.audio-player::before{content:'';position:absolute;inset:-6px;border-radius:50%;background:var(--cat-accent,var(--purple));opacity:0.15;animation:glow 3s ease-in-out infinite}
 @keyframes glow{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:0.25;transform:scale(1.04)}}
 .play-icon{width:48px;height:48px;fill:#fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));position:relative;z-index:1}
 
@@ -400,7 +435,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 
 .audio-progress{width:100%;max-width:320px;margin:0 auto 2rem}
 .progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden;cursor:pointer}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:3px;width:0%;transition:width 0.3s}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,var(--pink)));border-radius:3px;width:0%;transition:width 0.3s}
 .progress-times{display:flex;justify-content:space-between;margin-top:0.4rem;font-size:0.75rem;color:var(--text-muted);font-weight:600}
 
 .post-actions{display:flex;flex-direction:column;gap:0.6rem;width:100%;margin-top:0.5rem}
@@ -638,21 +673,24 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
       <div class="cat-icon">&#127769;</div>
       <div class="cat-info">
         <h3>Bedtime</h3>
-        <p>Warm, calming, and gentle. Ends with them drifting off to sleep feeling safe and loved.</p>
+        <p>Warm, calming, and gentle. The story winds down slowly until they drift off feeling safe and loved.</p>
+        <span class="cat-tag">Perfect for sleep routines</span>
       </div>
     </div>
     <div class="cat-card cat-journey" onclick="selectCategory('journey',this)">
       <div class="cat-icon">&#9992;&#65039;</div>
       <div class="cat-info">
         <h3>Adventure</h3>
-        <p>Action packed with twists, humour, and cliffhangers. The kind of story they will ask to hear again.</p>
+        <p>Action packed with twists, humour, and cliffhangers. The kind of story they beg to hear again.</p>
+        <span class="cat-tag">Great for car journeys</span>
       </div>
     </div>
     <div class="cat-card cat-learning" onclick="selectCategory('learning',this)">
       <div class="cat-icon">&#128218;</div>
       <div class="cat-info">
         <h3>Learning</h3>
-        <p>They become a superhero who saves the day using maths, science, or any subject you choose.</p>
+        <p>They save the day using real knowledge. Maths, science, spelling, any subject you choose. They will not even realise they are learning.</p>
+        <span class="cat-tag">Education disguised as magic</span>
       </div>
     </div>
     <!-- Make My Own: hidden for launch, backend ready -->
@@ -1068,12 +1106,12 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     <div class="preview-badge">&#10003; Preview ready</div>
     <p class="preview-title" id="previewTitle">Have a listen</p>
     <p class="preview-sub" id="previewSub">Here is a taste of their story. If it feels right, unlock the full version.</p>
-    <div id="previewSummary" style="background:var(--purple-light);border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.5rem;text-align:left;max-width:340px;width:100%"></div>
+    <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.5rem;text-align:left;max-width:340px;width:100%"></div>
     <div class="audio-player" onclick="playPreview()">
       <svg class="play-icon" id="previewPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
     <div style="width:100%;max-width:340px;margin:0.5rem auto 0">
-      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="previewProgress" style="height:100%;background:var(--purple);width:0%;transition:width 0.3s"></div></div>
+      <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="previewProgress" style="height:100%;background:var(--cat-accent,var(--purple));width:0%;transition:width 0.3s"></div></div>
       <div style="display:flex;justify-content:space-between;margin-top:0.2rem"><span id="previewTime" style="font-size:0.7rem;color:var(--text-muted)">0:00</span><span id="previewDuration" style="font-size:0.7rem;color:var(--text-muted)">0:00</span></div>
     </div>
     <audio id="previewAudio"></audio>
@@ -1679,10 +1717,28 @@ function restoreLearningSetup() {
   });
 }
 
+// Category colour themes that carry through the entire flow
+const CAT_THEMES = {
+  bedtime:  { accent: '#7C5CFC', accentLight: '#E8E0FF', accentDark: '#5B3FD4', glow: 'rgba(124,92,252,0.12)', label: 'Bedtime Story' },
+  journey:  { accent: '#FF8C42', accentLight: '#FFE5D0', accentDark: '#D4660F', glow: 'rgba(255,140,66,0.12)', label: 'Adventure' },
+  learning: { accent: '#00B4A0', accentLight: '#D4F1EE', accentDark: '#008F7F', glow: 'rgba(0,180,160,0.12)', label: 'Learning Adventure' },
+  custom:   { accent: '#FF6B9D', accentLight: '#FFE4EE', accentDark: '#D44070', glow: 'rgba(255,107,157,0.12)', label: 'Custom Story' }
+};
+
+function applyCategoryTheme(cat) {
+  const theme = CAT_THEMES[cat] || CAT_THEMES.journey;
+  const root = document.documentElement;
+  root.style.setProperty('--cat-accent', theme.accent);
+  root.style.setProperty('--cat-accent-light', theme.accentLight);
+  root.style.setProperty('--cat-accent-dark', theme.accentDark);
+  root.style.setProperty('--cat-glow', theme.glow);
+}
+
 function selectCategory(cat, el) {
   storyData.category = cat;
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+  applyCategoryTheme(cat);
   trackEvent('ViewContent', { content_name: cat, content_category: 'story_type' });
   // Learning goes to its own setup screen first
   setTimeout(() => goTo(cat === 'learning' ? 'screenLearningSetup' : 'screenDetails'), 300);
@@ -2204,6 +2260,7 @@ async function pollForFull(jobId) {
 async function generatePreview() {
   // Make sure we have a valid voice selected
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
+  applyCategoryTheme(storyData.category);
   trackEvent('AddToCart', { content_name: storyData.category, value: 19.99, currency: 'GBP' });
   goTo('screenLoading');
 
@@ -2293,9 +2350,11 @@ async function generatePreview() {
 
     // Populate preview screen with story summary
     const catLabels = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story' };
+    const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
+    document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
     document.getElementById('previewTitle').textContent = `${storyData.childName}'s preview is ready`;
     document.getElementById('previewSub').textContent = 'Press play to hear a sample. Love it? Unlock the full 15 minute story.';
-    let summary = `<p style="font-size:0.78rem;color:var(--purple);font-weight:700;margin:0 0 0.4rem">What you built:</p>`;
+    let summary = `<p style="font-size:0.78rem;color:var(--cat-accent-dark,var(--purple));font-weight:700;margin:0 0 0.4rem">What you built:</p>`;
     summary += `<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500">`;
     summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} for <strong>${escHtml(storyData.childName)}</strong>`;
     if (storyData.friendName) summary += ` with best friend <strong>${escHtml(storyData.friendName)}</strong>`;
@@ -2419,6 +2478,7 @@ async function handleStripeReturn() {
   Object.assign(storyData, savedData);
   fullStoryText = savedStory;
   selectedVoiceId = savedVoice;
+  applyCategoryTheme(storyData.category);
 
   // Verify payment
   goTo('screenLoading');
@@ -2885,6 +2945,7 @@ async function loadSharedStory(storyId) {
     document.getElementById('sharedTitle').textContent = s.childName + "'s story";
     document.getElementById('sharedFor').textContent = catLabel[s.category] || 'A personalised story';
     currentPlayingCategory = s.category || 'journey';
+    applyCategoryTheme(currentPlayingCategory);
     document.getElementById('sharedAudio').src = s.audioUrl;
     document.getElementById('sharedLoading').style.display = 'none';
     document.querySelector('#screenShared .full-player').style.display = 'block';
@@ -3103,6 +3164,7 @@ function playLibraryStory(story) {
   const audio = document.getElementById('fullStoryAudio');
   audio.src = story.audioUrl;
   currentPlayingCategory = story.category || 'journey';
+  applyCategoryTheme(currentPlayingCategory);
   document.getElementById('fullStoryFor').textContent = 'A story for ' + story.childName;
   document.getElementById('sendGiftBtn').style.display = 'none';
   document.getElementById('giftSentMsg').style.display = 'none';
