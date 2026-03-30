@@ -8,7 +8,7 @@
 import { SYSTEM_PROMPT, buildPreviewPrompt } from './lib/story-prompts.mjs';
 
 export default async (req) => {
-  // ── Rate limiting: max 20 previews per IP per hour ──
+  // ── Rate limiting: max 5 previews per IP per hour ──
   const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-nf-client-connection-ip') || 'unknown';
   const rateLimitKey = `preview_${clientIP}`;
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -28,7 +28,7 @@ export default async (req) => {
       );
       if (rlCheck.ok) {
         const recent = await rlCheck.json();
-        if (recent.length >= 20) {
+        if (recent.length >= 5) {
           console.log('Rate limited:', clientIP, recent.length, 'requests in last hour');
           return new Response(JSON.stringify({ error: 'You have reached the preview limit. Please try again later.' }), {
             status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' }

@@ -26,8 +26,7 @@ export default async (req) => {
       });
     }
 
-    // TEMPORARY: bypass payment verification for testing
-    const BYPASS_PAYMENT = true;
+    const BYPASS_PAYMENT = false;
 
     if (!BYPASS_PAYMENT) {
       // Payment verification: this endpoint must only work for paid sessions
