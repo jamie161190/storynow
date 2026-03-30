@@ -120,7 +120,8 @@ This is critical. The parent has told you exactly what their child loves within 
 - Name: ${d.childName} (${d.gender || 'child'})
 - Age: ${d.age}
 - ${pronounLine}
-${d.proudOf ? '- Occasion: ' + d.proudOf : ''}
+${d.proudOf ? `- Occasion: ${d.proudOf}
+THIS IS IMPORTANT. The parent told you about this occasion because it matters to them. Weave it into the story as a source of pride, courage, or celebration. If it is a birthday, the adventure should feel like a birthday gift. If the child learned something new, that achievement should give them confidence at a key moment. If it is a milestone, the story should honour it. Do not just mention it once. Let it resonate.` : ''}
 
 PEOPLE IN THE STORY:
 - Best friend: ${d.friendName} (must have at least 3 meaningful moments: dialogue, an action, a connection)
@@ -152,6 +153,12 @@ This item should appear in the story. Give it a role, a moment, a reason to matt
 ${d.extraDetails}`;
   }
 
+  if (d.personalMessage) {
+    block += `\n\nPERSONAL MESSAGE FROM THE PARENT (read aloud before the story starts):
+"${d.personalMessage}"
+You do NOT need to include this message in the story text. It will be read separately before the story begins. However, you should be AWARE of it because it sets the emotional tone. If the message says "Happy birthday," the story should feel celebratory. If it says "I am so proud of you," the story should make the child feel capable and valued. Let the message and the story feel like they belong together.`;
+  }
+
   return block;
 }
 
@@ -165,6 +172,8 @@ TONE: Warm, calming, soothing. The story should wind down gradually. The first h
 ${characterBlock(d)}
 
 SENSORY LANGUAGE: Use warmth, soft light, gentle sounds, cosiness. Stars, blankets, rain on windows, a cat purring. Make the listener feel sleepy.
+${d.sidekickName ? `
+SIDEKICK IN BEDTIME: ${d.sidekickName} is with ${d.childName} throughout this story. In a bedtime story, the sidekick plays a comforting role: they might walk alongside ${d.childName} on a gentle adventure, say something reassuring at a quiet moment, or be the one who tucks ${d.childName} in at the end. If the sidekick is a parent or family member, make the ending especially warm and intimate, as if the listener can feel that person right there with them.` : ''}
 
 BEDTIME PACING: The first half can be a gentle journey or discovery with soft excitement. But the energy must drop steadily from the midpoint onwards. The final third should feel like sinking into a warm bath. Sentences get shorter. The world gets quieter. Sounds become softer. By the last few paragraphs, the child should already be drifting.
 
@@ -286,6 +295,14 @@ THE SCENARIO THE PARENT DESCRIBED:
 "${d.customScenario}"
 
 YOUR JOB: Write a story that helps ${d.childName} feel prepared, brave, calm, or excited about this situation. Do not lecture. Do not moralise. Let the story do the emotional work. The child should finish the story feeling empowered and positive. The scenario should be woven into a narrative, not addressed head on like a therapy session.
+
+HOW TO STRUCTURE THIS:
+- Use the same 4 act structure as any other story. Act 1: hook them. Act 2: deepen the adventure. Act 3: the twist, the real emotional challenge. Act 4: resolution with growth.
+- At least 40% dialogue. Characters talking to each other holds the child's attention far better than narration.
+- Change scenes at least every 300 words. The ear needs fresh stimulus.
+- Plant a detail early that pays off later. This makes the child feel the story was designed for them.
+- ${d.friendName} must have at least 3 distinct moments and should help ${d.childName} through the emotional core of the story.
+- The scenario should be addressed through METAPHOR and ADVENTURE, not directly. If the child is nervous about the dentist, the story might involve a brave explorer who has to enter a mysterious cave where a friendly giant checks everyone's teeth. The child should see themselves in the character without feeling like they are being lectured.
 
 LENGTH: Approximately ${WORD_COUNTS[d.length] || 600} words.
 
@@ -445,15 +462,16 @@ export default async (req) => {
       messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
     }
     const fullStoryWithMessage = messageIntro + fullStory;
-    // Use ~75 words for a ~30 second preview, end at a sentence boundary
-    const words = fullStoryWithMessage.split(' ');
-    let previewText = words.slice(0, 75).join(' ');
+    // Build preview: intro (if any) + ~75 words of actual story
+    // This ensures the listener always hears real story content, not just the intro
+    const storyWords = fullStory.split(' ');
+    let storyPreview = storyWords.slice(0, 75).join(' ');
     // Try to end at the last complete sentence
-    const lastSentenceEnd = previewText.search(/[.!?][^.!?]*$/);
+    const lastSentenceEnd = storyPreview.search(/[.!?][^.!?]*$/);
     if (lastSentenceEnd > 40) {
-      previewText = previewText.substring(0, lastSentenceEnd + 1);
+      storyPreview = storyPreview.substring(0, lastSentenceEnd + 1);
     }
-    previewText += ' ... To hear what happens next, unlock the full story.';
+    const previewText = messageIntro + storyPreview + ' ... To hear what happens next, unlock the full story.';
     // Validate voice ID: must be alphanumeric, fallback to Sarah if invalid
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
     console.log('Using voice ID:', useVoiceId);
