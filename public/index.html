@@ -1380,6 +1380,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 let storyData = { category:'', length:'long', themes:[], where:'Surprise me' };
 let selectedVoiceId = '';
 let fullStoryText = '';
+let previewStoryText = '';
 let lastStripeSessionId = '';
 let currentPlayingCategory = '';
 
@@ -2432,10 +2433,13 @@ async function pollForPreview(jobId) {
 }
 
 async function pollForFull(jobId) {
-  const maxAttempts = 40; // 40 x 3s = 120s max wait (full audio takes longer)
+  const maxAttempts = 60; // 60 x 3s = 180s max wait (story generation + TTS)
   const loadingText = document.querySelector('.loading-text');
   const pollingMsgs = [
-    'Recording the narration now...',
+    'Writing the full story now...',
+    'Weaving in every personal detail...',
+    'The story is taking shape...',
+    'Now recording the narration...',
     'Adding emotion and expression to every line...',
     'Making sure every detail sounds perfect...',
     'Nearly there, just polishing the final moments...'
@@ -2445,7 +2449,7 @@ async function pollForFull(jobId) {
     msgIdx++;
     if (msgIdx < pollingMsgs.length) loadingText.textContent = pollingMsgs[msgIdx];
     else clearInterval(msgTimer);
-  }, 10000);
+  }, 15000);
 
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, 3000));
@@ -2532,7 +2536,8 @@ async function generatePreview() {
     }
     if (!data) throw new Error('Story generation timed out. Please try again.');
     if (!data.success) throw new Error(data.error || 'Story generation failed. Please try again.');
-    fullStoryText = data.fullStory;
+    previewStoryText = data.previewStory || '';
+    fullStoryText = data.fullStory || previewStoryText;
     const audio = document.getElementById('previewAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
 
@@ -2573,10 +2578,10 @@ async function generatePreview() {
     summary += `.</p>`;
     document.getElementById('previewSummary').innerHTML = summary;
 
-    // Show first 2-3 paragraphs of story text below the player
-    if (fullStoryText) {
-      const paragraphs = fullStoryText.split(/\n\n+/).filter(p => p.trim().length > 0);
-      const storySnippet = paragraphs.slice(0, 3).join('</p><p style="margin:0.5rem 0">');
+    // Show the preview story text below the player
+    const storySnippetText = previewStoryText || fullStoryText;
+    if (storySnippetText) {
+      const paragraphs = storySnippetText.split(/\n\n+/).filter(p => p.trim().length > 0);
       document.getElementById('storyTextContent').innerHTML = '<p style="margin:0.5rem 0">' + escHtml(paragraphs.slice(0, 3).join('\n\n')).replace(/\n\n/g, '</p><p style="margin:0.5rem 0">') + '</p>';
       document.getElementById('storyTextPreview').style.display = 'block';
     }
@@ -2630,8 +2635,8 @@ async function unlockFull() {
   if (BYPASS_PAYMENT) {
     // TEMPORARY: skip Stripe, go straight to full audio generation
     goTo('screenLoading');
-    document.querySelector('.loading-text').textContent = 'Generating the full story...';
-    document.querySelector('.loading-sub').textContent = 'This takes a couple of minutes. Your story is being crafted.';
+    document.querySelector('.loading-text').textContent = 'Writing the full story...';
+    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. We're writing the complete story and recording every word.';
     const fakeSessionId = 'bypass-' + Date.now();
     const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     try {
@@ -2640,7 +2645,7 @@ async function unlockFull() {
         const res = await fetch('/api/generate-full', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId: fakeSessionId, jobId: fullJobId })
+          body: JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId: fakeSessionId, jobId: fullJobId })
         });
         const text = await res.text();
         try { data = JSON.parse(text); } catch(e) { data = null; }
@@ -2681,12 +2686,12 @@ async function unlockFull() {
   try {
 
     // Save story data so we can retrieve it after Stripe redirect
-    sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, fullStoryText, selectedVoiceId }));
+    sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, previewStoryText, selectedVoiceId }));
 
     const res = await fetch('/api/create-checkout', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, fullStoryText, selectedVoiceId })
+      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, previewStoryText, selectedVoiceId })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.error || 'Something went wrong');
@@ -2736,9 +2741,10 @@ async function handleStripeReturn() {
     return;
   }
   const parsed = JSON.parse(saved);
-  const { storyData: savedData, fullStoryText: savedStory, selectedVoiceId: savedVoice } = parsed;
+  const { storyData: savedData, previewStoryText: savedPreview, fullStoryText: savedStory, selectedVoiceId: savedVoice } = parsed;
   Object.assign(storyData, savedData);
-  fullStoryText = savedStory;
+  previewStoryText = savedPreview || savedStory || '';
+  fullStoryText = savedStory || savedPreview || '';
   selectedVoiceId = savedVoice;
   applyCategoryTheme(storyData.category);
 
@@ -2760,8 +2766,8 @@ async function handleStripeReturn() {
     trackEvent('Purchase', { value: 19.99, currency: 'GBP', content_name: storyData.category });
 
     // Payment confirmed, now generate full audio
-    document.querySelector('.loading-text').textContent = 'Generating the full story...';
-    document.querySelector('.loading-sub').textContent = 'This takes a couple of minutes. Your story is being crafted.';
+    document.querySelector('.loading-text').textContent = 'Writing the full story...';
+    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. We're writing the complete story and recording every word.';
 
     const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     let data;
@@ -2770,7 +2776,7 @@ async function handleStripeReturn() {
       const res = await fetch('/api/generate-full', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId, jobId: fullJobId })
+        body: JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId, jobId: fullJobId })
       });
       const text = await res.text();
       try { data = JSON.parse(text); } catch(e) {
@@ -3068,7 +3074,7 @@ async function saveStoryToDb(email, audioUrl, stripeSessionId) {
       body: JSON.stringify({
         email,
         storyData,
-        fullStoryText,
+        previewStoryText,
         audioUrl,
         voiceId: selectedVoiceId,
         stripeSessionId

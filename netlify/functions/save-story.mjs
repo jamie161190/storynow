@@ -7,7 +7,9 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const { email, storyData, fullStoryText, audioUrl, voiceId, stripeSessionId } = await req.json();
+    const reqBody = await req.json();
+    const { email, storyData, audioUrl, voiceId, stripeSessionId } = reqBody;
+    const fullStoryText = reqBody.previewStoryText || reqBody.fullStoryText || '';
 
     if (!email || !storyData) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { 'Content-Type': 'application/json' } });

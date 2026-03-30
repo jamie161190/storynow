@@ -10,7 +10,7 @@ export default async (req) => {
     const storyData = body.storyData || {};
     const childName = storyData.childName || body.childName || 'your child';
     const customerEmail = body.customerEmail || null;
-    const fullStoryText = body.fullStoryText || '';
+    const previewStoryText = body.previewStoryText || body.fullStoryText || '';
     const selectedVoiceId = body.selectedVoiceId || '';
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -53,9 +53,9 @@ export default async (req) => {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
-    if (supabaseUrl && supabaseKey && fullStoryText) {
+    if (supabaseUrl && supabaseKey && previewStoryText) {
       try {
-        const pendingData = JSON.stringify({ storyData, fullStoryText, selectedVoiceId });
+        const pendingData = JSON.stringify({ storyData, previewStoryText, selectedVoiceId });
         const fileName = `pending/${session.id}.json`;
 
         await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {

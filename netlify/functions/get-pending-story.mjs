@@ -38,7 +38,7 @@ export default async (req) => {
     return new Response(JSON.stringify({
       success: true,
       storyData: pendingData.storyData,
-      fullStoryText: pendingData.fullStoryText,
+      previewStoryText: pendingData.previewStoryText || pendingData.fullStoryText,
       selectedVoiceId: pendingData.selectedVoiceId
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 
