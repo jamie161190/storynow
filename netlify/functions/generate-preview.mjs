@@ -1,10 +1,11 @@
 // ============================================================
-// GENERATE PREVIEW — Thin gateway function
-// Validates inputs, triggers the background worker, returns immediately.
-// The actual story generation happens in story-worker-background.mjs
-// which has a 15-minute timeout (Netlify background function).
-// The frontend polls check-preview.mjs for the result.
+// GENERATE PREVIEW — Does all work inline (no background function)
+// Calls Anthropic API + ElevenLabs TTS directly via fetch().
+// Returns the complete result. Also saves to Supabase so
+// check-preview can recover if the connection drops.
 // ============================================================
+
+import { SYSTEM_PROMPT, buildPreviewPrompt } from './lib/story-prompts.mjs';
 
 export default async (req) => {
   // ── Rate limiting: max 20 previews per IP per hour ──
@@ -93,33 +94,118 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    // ── Trigger the background worker ──
-    // Background functions return 202 immediately and run for up to 15 minutes.
-    const siteUrl = process.env.URL || 'https://storytold.netlify.app';
-    const bgPayload = JSON.stringify({ storyData, voiceId, jobId });
+    console.log('Generating preview inline for job:', jobId, 'category:', storyData.category);
+    const startTime = Date.now();
 
-    console.log('Triggering background worker for job:', jobId, 'category:', storyData.category);
-
-    // Fire and forget: background functions return 202 instantly.
-    // Don't await to avoid eating into this function's 10s timeout.
-    fetch(`${siteUrl}/.netlify/functions/story-worker-background`, {
+    // ── Step 1: Call Anthropic API directly via fetch ──
+    const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: bgPayload
-    }).then(r => {
-      console.log('Background worker response:', r.status);
-    }).catch(err => {
-      console.error('Failed to invoke background worker:', err.message);
+      headers: {
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        temperature: 1,
+        thinking: {
+          type: 'enabled',
+          budget_tokens: 500
+        },
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
+      })
     });
 
-    // Return immediately so the frontend starts polling
-    return new Response(JSON.stringify({ polling: true, jobId }), {
-      status: 202,
+    if (!apiResponse.ok) {
+      const errBody = await apiResponse.text();
+      console.error('Anthropic API error:', apiResponse.status, errBody);
+      return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.' }), {
+        status: 500, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const apiResult = await apiResponse.json();
+    let previewStory = '';
+    for (const block of apiResult.content) {
+      if (block.type === 'text') {
+        previewStory += block.text;
+      }
+    }
+    console.log('Preview text generated in', Date.now() - startTime, 'ms, words:', previewStory.split(' ').length);
+
+    // ── Step 2: Build message intro ──
+    let messageIntro = '';
+    if (storyData.isGift && storyData.giftFrom) {
+      const giftMsg = storyData.giftMessage || storyData.personalMessage;
+      messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... `;
+      if (giftMsg) {
+        messageIntro += `${giftMsg} ... `;
+      }
+      messageIntro += `And now, your story begins. ... `;
+    } else if (storyData.personalMessage) {
+      messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
+    }
+
+    const previewText = messageIntro + previewStory + ' ... ... To hear what happens next, unlock the full story.';
+
+    // ── Step 3: Generate TTS via ElevenLabs ──
+    const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
+    console.log('Generating TTS with voice:', useVoiceId);
+
+    const ttsStart = Date.now();
+    const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': process.env.ELEVENLABS_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: previewText,
+        model_id: 'eleven_flash_v2_5',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      })
+    });
+
+    if (!ttsResponse.ok) {
+      const errText = await ttsResponse.text();
+      console.error('ElevenLabs error:', ttsResponse.status, errText);
+      return new Response(JSON.stringify({ error: 'Voice generation failed. Please try again.' }), {
+        status: 500, headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const audioBase64 = Buffer.from(await ttsResponse.arrayBuffer()).toString('base64');
+    console.log('TTS generated in', Date.now() - ttsStart, 'ms, total:', Date.now() - startTime, 'ms');
+
+    // ── Build result ──
+    const result = { success: true, previewAudio: audioBase64, previewStory, storyData };
+
+    // Save to Supabase as well (for polling fallback if connection drops)
+    if (supabaseUrl && supabaseKey && jobId) {
+      try {
+        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
+            'Content-Type': 'application/json',
+            'x-upsert': 'true'
+          },
+          body: JSON.stringify(result)
+        });
+      } catch (e) { /* non-critical */ }
+    }
+
+    // Return result directly
+    return new Response(JSON.stringify(result), {
+      status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (err) {
-    console.error('Generate preview error:', err.message);
+    console.error('Generate preview error:', err.message, err.stack);
     return new Response(JSON.stringify({ error: 'Something went wrong. Please try again.', debug: err.message }), {
       status: 500, headers: { 'Content-Type': 'application/json' }
     });
