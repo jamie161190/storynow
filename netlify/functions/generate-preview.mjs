@@ -80,10 +80,30 @@ function getAgeBand(age) {
 // SHARED CHARACTER BLOCK: builds the same info section for all prompts
 // ============================================================
 function characterBlock(d) {
-  const gender = `(${d.gender})`;
+  const genderLabel = (d.gender || '').toLowerCase();
+  const pronounLine = genderLabel === 'boy' ? 'Use he/him/his pronouns for ' + d.childName + '.'
+    : genderLabel === 'girl' ? 'Use she/her/hers pronouns for ' + d.childName + '.'
+    : 'Use they/them/their pronouns for ' + d.childName + '.';
+
+  // Split themes into primary and secondary if multiple
+  let themesSection = '';
+  if (d.interest) {
+    const themes = d.interest.split(',').map(t => t.trim()).filter(Boolean);
+    if (themes.length > 1) {
+      themesSection = `PRIMARY THEME: ${themes[0]}
+This theme shapes the entire world, setting, and central conflict. It is the heartbeat of the story.
+SECONDARY THEMES: ${themes.slice(1).join(', ')}
+Weave these in naturally as subplots, character traits, or setting details. They enrich the story but do not compete with the primary theme.`;
+    } else {
+      themesSection = `THEMES AND INTERESTS: ${d.interest}
+The themes must drive the world and the plot, not just decorate it. If the child loves dinosaurs, the story lives and breathes dinosaurs.`;
+    }
+  }
+
   let block = `THE MAIN CHARACTER:
-- Name: ${d.childName} ${gender}
+- Name: ${d.childName} (${d.gender || 'child'})
 - Age: ${d.age}
+- ${pronounLine}
 ${d.proudOf ? '- Something they are proud of: ' + d.proudOf : ''}
 
 PEOPLE IN THE STORY:
@@ -91,8 +111,7 @@ PEOPLE IN THE STORY:
 ${d.familyMembers ? '- Family: ' + d.familyMembers + '\nIMPORTANT: Every family member listed above MUST appear in the story with dialogue or a meaningful action. Do not just name-drop them. Each person should have at least one moment where they speak, do something, or interact with ' + d.childName + ' in a way the child would remember. If a parent included themselves, they are telling you they want to be IN the story. Make that happen.' : ''}
 ${d.teacherName ? '- Teacher: ' + d.teacherName : ''}
 
-THEMES AND INTERESTS: ${d.interest}
-The themes must drive the world and the plot, not just decorate it. If the child loves dinosaurs, the story lives and breathes dinosaurs.
+${themesSection}
 
 SETTING: ${d.setting || 'Surprise me'}
 ${d.setting === 'Surprise me' ? 'Choose a setting that fits the themes and category perfectly.' : 'Set the story in or around this place.'}`;
@@ -285,11 +304,20 @@ export default async (req) => {
     }
 
     const fullStory = storyResponse.content[0].text;
+    // Frame personal message with a narrator intro so it flows naturally into the story
     const messageIntro = storyData.personalMessage
-      ? `${storyData.personalMessage} ...... ...... `
+      ? `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `
       : '';
     const fullStoryWithMessage = messageIntro + fullStory;
-    const previewText = fullStoryWithMessage.split(' ').slice(0, 60).join(' ') + '...';
+    // Use ~150 words for a ~60 second preview, end at a sentence boundary
+    const words = fullStoryWithMessage.split(' ');
+    let previewText = words.slice(0, 150).join(' ');
+    // Try to end at the last complete sentence
+    const lastSentenceEnd = previewText.search(/[.!?][^.!?]*$/);
+    if (lastSentenceEnd > 80) {
+      previewText = previewText.substring(0, lastSentenceEnd + 1);
+    }
+    previewText += ' ... To hear what happens next, unlock the full story.';
     // Validate voice ID: must be alphanumeric, fallback to Sarah if invalid
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
     console.log('Using voice ID:', useVoiceId);

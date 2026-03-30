@@ -1014,6 +1014,10 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
     </div>
     <audio id="previewAudio"></audio>
     <audio id="fullAudio"></audio>
+    <div id="storyTextPreview" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin:0.75rem auto 0;max-width:340px;width:100%;text-align:left;font-size:0.88rem;line-height:1.65;color:var(--text);display:none;max-height:200px;overflow:hidden;position:relative">
+      <div id="storyTextContent" style="font-style:italic"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(transparent,var(--card))"></div>
+    </div>
     <div id="previewError"></div>
     <div style="width:100%;max-width:340px;margin:0.75rem auto 1rem">
       <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email (so we can send you the story)</label>
@@ -1832,6 +1836,19 @@ async function pollForPreview(jobId) {
   return null;
 }
 
+async function pollForFull(jobId) {
+  const maxAttempts = 40; // 40 x 3s = 120s max wait (full audio takes longer)
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 3000));
+    try {
+      const res = await fetch('/api/check-full?jobId=' + jobId);
+      const data = await res.json();
+      if (data.ready && data.success) return data;
+    } catch(e) { /* keep polling */ }
+  }
+  return null;
+}
+
 async function generatePreview() {
   // Make sure we have a valid voice selected
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
@@ -1929,6 +1946,14 @@ async function generatePreview() {
     if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${escHtml(storyData.setting.toLowerCase())}`;
     summary += `.</p>`;
     document.getElementById('previewSummary').innerHTML = summary;
+
+    // Show first 2-3 paragraphs of story text below the player
+    if (fullStoryText) {
+      const paragraphs = fullStoryText.split(/\n\n+/).filter(p => p.trim().length > 0);
+      const storySnippet = paragraphs.slice(0, 3).join('</p><p style="margin:0.5rem 0">');
+      document.getElementById('storyTextContent').innerHTML = '<p style="margin:0.5rem 0">' + escHtml(paragraphs.slice(0, 3).join('\n\n')).replace(/\n\n/g, '</p><p style="margin:0.5rem 0">') + '</p>';
+      document.getElementById('storyTextPreview').style.display = 'block';
+    }
 
     goTo('screenPreview');
   } catch(err) {
@@ -2053,15 +2078,39 @@ async function handleStripeReturn() {
 
     // Payment confirmed, now generate full audio
     document.querySelector('.loading-text').textContent = 'Generating the full story...';
-    document.querySelector('.loading-sub').textContent = 'Almost there. This is going to be special.';
+    document.querySelector('.loading-sub').textContent = 'This takes a couple of minutes. Your story is being crafted.';
 
-    const res = await fetch('/api/generate-full', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId })
-    });
-    const data = await res.json();
-    if(!data.success) throw new Error(data.error || 'Something went wrong');
+    const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    let data;
+
+    try {
+      const res = await fetch('/api/generate-full', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ fullStory: fullStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId, jobId: fullJobId })
+      });
+      const text = await res.text();
+      try { data = JSON.parse(text); } catch(e) {
+        console.log('Full audio direct response timed out, polling...');
+        data = null;
+      }
+      if (data && !data.success) throw new Error(data.error || 'Something went wrong');
+    } catch(fetchErr) {
+      if (fetchErr.message && !fetchErr.message.includes('Something went wrong') && !fetchErr.message.includes('Payment') && !fetchErr.message.includes('already been used')) {
+        console.log('Full audio fetch error, will poll:', fetchErr.message);
+        data = null;
+      } else {
+        throw fetchErr;
+      }
+    }
+
+    // If direct response failed (timeout), poll for the result
+    if (!data || !data.success) {
+      document.querySelector('.loading-text').textContent = 'Almost there, just finishing up...';
+      document.querySelector('.loading-sub').textContent = 'Your payment is confirmed. The audio is being generated.';
+      data = await pollForFull(fullJobId);
+    }
+    if (!data || !data.success) throw new Error('Audio generation timed out. Your payment is safe. Please contact hello@storytold.ai');
 
     const audio = document.getElementById('fullStoryAudio');
     audio.src = 'data:audio/mpeg;base64,' + data.fullAudio;
