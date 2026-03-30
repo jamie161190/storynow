@@ -95,7 +95,7 @@ ${d.proudOf ? '- Something they are proud of: ' + d.proudOf : ''}
 
 PEOPLE IN THE STORY:
 - Best friend: ${d.friendName} (must have at least 3 meaningful moments: dialogue, an action, a connection)
-${d.familyMembers ? '- Family: ' + d.familyMembers + ' (give at least one family member a real moment in the story, not just a mention)' : ''}
+${d.familyMembers ? '- Family: ' + d.familyMembers + '\nIMPORTANT: Every family member listed above MUST appear in the story with dialogue or a meaningful action. Do not just name-drop them. Each person should have at least one moment where they speak, do something, or interact with ' + d.childName + ' in a way the child would remember. If a parent included themselves, they are telling you they want to be IN the story. Make that happen.' : ''}
 ${d.teacherName ? '- Teacher: ' + d.teacherName : ''}
 
 THEMES AND INTERESTS: ${d.interest}
