@@ -10,6 +10,8 @@ export default async (req) => {
     const storyData = body.storyData || {};
     const childName = storyData.childName || body.childName || 'your child';
     const customerEmail = body.customerEmail || null;
+    const fullStoryText = body.fullStoryText || '';
+    const selectedVoiceId = body.selectedVoiceId || '';
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
 
@@ -44,6 +46,32 @@ export default async (req) => {
         length: storyData.length || ''
       }
     });
+
+    // Save pending story data to Supabase Storage so it survives the redirect
+    // (sessionStorage gets wiped on many mobile browsers during cross-site redirect)
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+    if (supabaseUrl && supabaseKey && fullStoryText) {
+      try {
+        const pendingData = JSON.stringify({ storyData, fullStoryText, selectedVoiceId });
+        const fileName = `pending/${session.id}.json`;
+
+        await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
+            'Content-Type': 'application/json',
+            'x-upsert': 'true'
+          },
+          body: pendingData
+        });
+      } catch (pendingErr) {
+        // Non-fatal: sessionStorage may still work, so don't block checkout
+        console.error('Failed to save pending story data:', pendingErr.message);
+      }
+    }
 
     return new Response(JSON.stringify({
       success: true,

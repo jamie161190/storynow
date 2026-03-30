@@ -1808,7 +1808,7 @@ async function unlockFull() {
     const res = await fetch('/api/create-checkout', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined })
+      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, fullStoryText, selectedVoiceId })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.error || 'Something went wrong');
@@ -1830,13 +1830,34 @@ async function handleStripeReturn() {
   // Clean the URL
   window.history.replaceState({}, '', window.location.pathname);
 
-  // Restore saved story data
-  const saved = sessionStorage.getItem('storytold_story');
+  // Restore saved story data (try sessionStorage first, fall back to server)
+  let saved = sessionStorage.getItem('storytold_story');
+  if (!saved) {
+    // sessionStorage was wiped during redirect (common on mobile browsers)
+    // Recover from server-side backup
+    try {
+      goTo('screenLoading');
+      document.querySelector('.loading-text').textContent = 'Restoring your story...';
+      document.querySelector('.loading-sub').textContent = 'Just a moment.';
+      const pendingRes = await fetch('/api/get-pending-story', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId })
+      });
+      const pendingData = await pendingRes.json();
+      if (pendingData.success) {
+        saved = JSON.stringify(pendingData);
+      }
+    } catch (e) {
+      console.error('Failed to recover pending story:', e);
+    }
+  }
   if (!saved) {
     alert('Session expired. Please create your story again.');
     return;
   }
-  const { storyData: savedData, fullStoryText: savedStory, selectedVoiceId: savedVoice } = JSON.parse(saved);
+  const parsed = JSON.parse(saved);
+  const { storyData: savedData, fullStoryText: savedStory, selectedVoiceId: savedVoice } = parsed;
   Object.assign(storyData, savedData);
   fullStoryText = savedStory;
   selectedVoiceId = savedVoice;

@@ -15,6 +15,11 @@ export default async (req) => {
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     const resendKey = process.env.RESEND_API_KEY;
 
+    if (!supabaseUrl || !supabaseKey || !resendKey) {
+      console.error('Missing env vars:', { supabaseUrl: !!supabaseUrl, supabaseKey: !!supabaseKey, resendKey: !!resendKey });
+      return new Response(JSON.stringify({ error: 'Service temporarily unavailable. Please try again shortly.' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+    }
+
     // Check if this email has any stories
     const checkRes = await fetch(
       `${supabaseUrl}/rest/v1/stories?email=eq.${encodeURIComponent(email)}&select=id&limit=1`,
