@@ -416,15 +416,20 @@ export function buildPreviewPrompt(storyData) {
 
   return fullPrompt + `
 
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening of the story, approximately 60 to 80 words. This must be a tight, gripping hook that lasts about 30 seconds when read aloud. It must:
-- Start immediately with action, discovery, or wonder
-- Use the child's name at least twice
-- Mention the best friend by name
-- Reference at least one personal detail (pet, interest, setting)
-- End mid-scene at a moment of suspense or wonder, so the listener desperately wants to hear more
-- Include one natural pause ( ... ) for the narrator
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening of the story, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them cry, gasp, or smile so wide they cannot say no.
 
-Do NOT wrap up or resolve anything. Stop at a cliffhanger or a moment of breathless anticipation. This opening must make a parent think "I have to buy this."
+THE FORMULA THAT SELLS:
+1. FIRST SENTENCE: The child's name in a moment of wonder or emotion, not walking or waking up. Something is already happening TO them or BECAUSE of them. Example: "Chase could not believe his eyes" or "The moment Isla whispered the secret word, everything changed."
+2. SECOND SENTENCE: Their best friend reacts, speaks, or does something that proves this story KNOWS this child's world. Use the friend's name in dialogue or action.
+3. NEXT 2 TO 3 SENTENCES: Stack personal details fast. The pet does something memorable. The interest or theme becomes the world around them. A family member is referenced naturally. Every sentence should make the parent think "how does it know all this?"
+4. FINAL SENTENCE: Stop mid-action at an impossible, wonderful, or terrifying moment. The child is about to discover, face, or unlock something extraordinary. The listener MUST need to know what happens next.
+
+RULES:
+- The child's name appears at least 3 times
+- Include one natural pause ( ... ) for the narrator
+- NO generic openings (no "once upon a time", no waking up, no "it was a [adjective] day")
+- NO resolution, NO wrapping up, NO moral lessons
+- The preview must feel like the story already knows and loves this child
 
 Write ONLY the opening now. Absolutely no more than 80 words.`;
 }
