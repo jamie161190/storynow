@@ -1442,8 +1442,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </button>
     </div>
     <div class="post-actions" style="margin-top:1.5rem">
-      <p style="text-align:center;color:var(--text-muted);font-size:0.95rem;margin-bottom:1rem">Every child deserves a story with their name in it.</p>
-      <button class="btn btn-primary" style="width:100%" onclick="goTo('screenCategory')">Create one for a child you love</button>
+      <div style="background:linear-gradient(135deg,#F8F5FF,#FFF0F5);border:2px solid var(--purple-light);border-radius:16px;padding:1.25rem;text-align:center;margin-bottom:1rem">
+        <p style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin:0 0 0.3rem">Know a child who deserves their own story?</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);margin:0 0 0.75rem;line-height:1.5">Their name, their friends, their world. A 15 minute audio story made just for them. Free preview, then £19.99.</p>
+        <button class="btn btn-primary" style="width:100%;font-size:0.95rem" onclick="goTo('screenCategory')">Create a story for a child you love</button>
+        <p style="font-size:0.68rem;color:var(--text-muted);margin:0.4rem 0 0">Siblings included. Up to 3 children, same price.</p>
+      </div>
     </div>
   </div>
   <div id="sharedLoading" style="text-align:center;padding:3rem;display:none">
@@ -1798,6 +1802,7 @@ function goTo(id, skipHistory) {
 
   if(id === 'screenVoice') showVoices();
   if(id === 'screenExtras') updateExtrasVisibility();
+  if(id === 'screenPreview' && typeof renderAdditionalChildren === 'function') renderAdditionalChildren();
   if(id === 'screenCategory') restoreCategory();
   if(id === 'screenDetails') restoreDetails();
   if(id === 'screenPeople') {
@@ -3206,6 +3211,9 @@ async function handleStripeReturn() {
           age: kid.age,
           gender: kid.gender,
           friendName: kid.friendName,
+          // Clear personal message and gift message for siblings (these are specific to the primary child)
+          personalMessage: '',
+          giftMessage: '',
           // Add primary child as a family member/sibling if not already mentioned
           familyMembers: storyData.familyMembers
             ? (storyData.familyMembers.includes(storyData.childName) ? storyData.familyMembers : storyData.familyMembers + ', ' + storyData.childName)
@@ -3340,16 +3348,20 @@ async function handleStripeReturn() {
 
       sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId, discountCode, discountPercent);
 
-      // If it's a gift and they provided an email, send gift email for first child
+      // If it's a gift and they provided an email, send gift email for all children
       if (storyData.isGift && storyData.giftEmail) {
         try {
+          const allChildNames = successfulStories.map(s => s.childName);
+          const giftChildLabel = allChildNames.length === 1 ? allChildNames[0] :
+            allChildNames.length === 2 ? allChildNames.join(' & ') :
+            allChildNames.slice(0, -1).join(', ') + ' & ' + allChildNames[allChildNames.length - 1];
           await fetch('/api/send-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               type: 'gift',
               to: storyData.giftEmail,
-              childName: storyData.childName,
+              childName: giftChildLabel,
               giftFrom: storyData.giftFrom,
               giftMessage: storyData.giftMessage,
               storyId: successfulStories[0]?.storyId,
@@ -3728,13 +3740,18 @@ async function sendGift() {
 // Send purchase confirmation email (called after successful payment)
 async function sendPurchaseEmail(email, stripeSessionId, storyId, discountCode, discountPercent) {
   try {
+    // Include all children's names in purchase email
+    const allKids = [storyData.childName, ...(storyData.additionalChildren || []).map(c => c.childName)].filter(Boolean);
+    const childLabel = allKids.length === 1 ? allKids[0] :
+      allKids.length === 2 ? allKids.join(' & ') :
+      allKids.slice(0, -1).join(', ') + ' & ' + allKids[allKids.length - 1];
     await fetch('/api/send-email', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         type: 'purchase',
         to: email,
-        childName: storyData.childName,
+        childName: childLabel,
         category: storyData.category,
         length: storyData.length,
         sessionId: stripeSessionId,
@@ -3971,7 +3988,10 @@ function shareFromFullScreen() {
     alert('Your story is still being saved. Please try again in a moment.');
     return;
   }
-  openShareModal({ id: lastSavedStoryId, childName: storyData.childName });
+  // Use the currently displayed child's name (from tab), not always the primary child
+  const displayedFor = document.getElementById('fullStoryFor')?.textContent || '';
+  const displayedName = displayedFor.replace('A story for ', '').trim() || storyData.childName;
+  openShareModal({ id: lastSavedStoryId, childName: displayedName });
 }
 
 function openShareModal(story) {
