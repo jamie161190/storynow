@@ -334,4 +334,7 @@ export default async (req) => {
   return new Response(JSON.stringify({ processed }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 };
 
-export const config = { path: '/api/retry-worker' };
+export const config = {
+  path: '/api/retry-worker',
+  schedule: '@hourly'
+};
