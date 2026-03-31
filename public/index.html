@@ -550,6 +550,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .progress-dot.active{background:var(--cat-accent,var(--purple))}
 .progress-step-label{font-size:0.72rem;color:var(--text-muted);font-weight:600;text-align:center;margin-top:0.4rem}
 
+/* ===== FAQ TOGGLE ===== */
+details[open] summary span:last-child{transform:rotate(45deg)}
+details summary span:last-child{transition:transform 0.2s;display:inline-block}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
   .logo-img{width:220px}
@@ -1526,7 +1530,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <input type="text" id="loginCode" placeholder="000000" class="form-input" style="width:100%;margin-bottom:1rem;text-align:center;font-size:1.8rem;letter-spacing:8px;font-weight:800" maxlength="6" inputmode="numeric">
     <button class="btn btn-primary" style="width:100%" id="verifyCodeBtn" onclick="verifyLoginCode()">Verify</button>
     <p id="codeError" style="color:#FF6B9D;font-size:0.85rem;text-align:center;margin-top:0.75rem;display:none"></p>
-    <p style="text-align:center;margin-top:1rem"><a class="my-stories-link" onclick="sendLoginCode()">Resend code</a></p>
+    <p style="text-align:center;margin-top:1rem"><a onclick="resendLoginCode()" style="font-size:0.85rem;color:var(--purple);font-weight:700;cursor:pointer">Resend code</a></p>
   </div>
 </div>
 
@@ -1537,9 +1541,6 @@ let fullStoryText = '';
 let previewStoryText = '';
 let lastStripeSessionId = '';
 let currentPlayingCategory = '';
-
-// ===== Payment gate =====
-const BYPASS_PAYMENT = false;
 
 // ===== CURATED VOICE LIBRARY =====
 // Each voice tagged with gender, accent, age, and recommended story types
@@ -1628,6 +1629,9 @@ function playSample() {
     document.getElementById('sampleFill').style.width = '0%';
     document.getElementById('sampleTime').textContent = '0:00';
     bgMusic.stop();
+  });
+  sa.addEventListener('error', () => {
+    document.getElementById('samplePlayer').style.display = 'none';
   });
 })();
 
@@ -1958,7 +1962,8 @@ function restoreDetails() {
   if (storyData.themeDetail) document.getElementById('themeDetail').value = storyData.themeDetail;
   // Restore where selection
   if (storyData.where) {
-    document.querySelectorAll('.where-tile').forEach(t => {
+    document.querySelectorAll('#whereGrid .theme-tile').forEach(t => {
+      t.classList.remove('selected');
       if (t.dataset.where === storyData.where) t.classList.add('selected');
     });
   }
@@ -2241,7 +2246,7 @@ function validateDetails() {
   if (!name) { showInlineError('detailsError', 'Please tell me their name.'); return; }
   if (!age) { showInlineError('detailsError', 'Please tell us their age.'); return; }
   if (!gender) { showInlineError('detailsError', 'Please select boy or girl.'); return; }
-  if (!email || !email.includes('@')) { showInlineError('detailsError', 'Please enter your email so I can send you the story.'); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showInlineError('detailsError', 'Please enter a valid email so I can send you the story.'); return; }
   // Pre-fill the preview email field
   const previewEmailEl = document.getElementById('previewEmail');
   if (previewEmailEl && !previewEmailEl.value) previewEmailEl.value = email;
@@ -3049,51 +3054,6 @@ async function unlockFull() {
 
   trackEvent('InitiateCheckout', { value: 19.99, currency: 'GBP', content_name: storyData.category });
 
-  if (BYPASS_PAYMENT) {
-    // TEMPORARY: skip Stripe, go straight to full audio generation
-    startGeneratingScreen(storyData.childName);
-    const fakeSessionId = 'bypass-' + Date.now();
-    const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    try {
-      // Call background function with retry
-      const bgPayloadBypass = JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId: fakeSessionId, jobId: fullJobId });
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          const bgRes = await fetch('/.netlify/functions/full-worker-background', { method:'POST', headers:{'Content-Type':'application/json'}, body: bgPayloadBypass });
-          if (bgRes.ok || bgRes.status === 202) break;
-        } catch(e) { console.log('BG trigger attempt', attempt + 1, ':', e.message); }
-        if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
-      }
-
-      // Poll for the result
-      let data = await pollForFull(fullJobId);
-      stopGeneratingScreen();
-      if (!data || !data.success) throw new Error('Audio generation timed out. Please try again.');
-      const audio = document.getElementById('fullStoryAudio');
-      audio.volume = 0.75;
-      audio.src = data.audioUrl || ('data:audio/mpeg;base64,' + data.fullAudio);
-      document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
-      document.getElementById('sendGiftBtn').style.display = storyData.isGift ? 'block' : 'none';
-      document.getElementById('giftSentMsg').style.display = 'none';
-      document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
-      if (previewEmail) {
-        document.getElementById('savedEmailAddr').textContent = previewEmail;
-        document.getElementById('savedEmailNote').style.display = 'block';
-      }
-      // In bypass mode, set a temporary ID so sharing works
-      // (Normal flow saves via handleStripeReturn and gets a real DB ID)
-      lastSavedStoryId = fakeSessionId;
-      goTo('screenFull');
-      showNextStoryBanner(previewEmail);
-    } catch(err) {
-      stopGeneratingScreen();
-      alert('Something went wrong: ' + err.message);
-      goTo('screenPreview');
-      isCheckingOut = false;
-    }
-    return;
-  }
-
   goTo('screenLoading');
   document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
   document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';
@@ -3339,9 +3299,9 @@ async function handleStripeReturn() {
     document.getElementById('giftSentMsg').style.display = 'none';
 
     // Generate discount code and send purchase email
+    let discountCode = null;
+    let discountPercent = 25;
     if (verifyData.customerEmail) {
-      let discountCode = null;
-      let discountPercent = 25;
       try {
         const discRes = await fetch('/api/create-discount', {
           method: 'POST',
@@ -3841,6 +3801,33 @@ function showLoginError(msg) {
   el.style.display = 'block';
 }
 
+// Resend code from the verify screen (uses stored email, not the input on the previous screen)
+async function resendLoginCode() {
+  if (!loginEmailAddr) { goTo('screenLogin'); return; }
+  document.getElementById('loginEmail').value = loginEmailAddr;
+  const btn = document.getElementById('verifyCodeBtn');
+  btn.textContent = 'Resending...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/send-login-code', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: loginEmailAddr })
+    });
+    const data = await res.json();
+    btn.textContent = 'Verify';
+    btn.disabled = false;
+    if (!res.ok) { showCodeError(data.error || 'Something went wrong'); return; }
+    document.getElementById('codeSentTo').textContent = 'New code sent to ' + loginEmailAddr;
+    document.getElementById('loginCode').value = '';
+    document.getElementById('loginCode').focus();
+  } catch(e) {
+    btn.textContent = 'Verify';
+    btn.disabled = false;
+    showCodeError('Could not resend code. Please try again.');
+  }
+}
+
 // Step 2: Verify code and load stories
 async function verifyLoginCode() {
   const code = document.getElementById('loginCode').value.trim();
@@ -4243,7 +4230,7 @@ async function submitContact() {
       body: JSON.stringify({ type: 'contact', to: 'jamie@builtsmarter.co.uk', contactName: name, contactEmail: email, contactText: text })
     });
   } catch(e) {}
-  document.getElementById('contactForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Sent! We\'ll get back to you soon.</p>';
+  document.getElementById('contactForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Sent! I will get back to you soon.</p>';
 }
 </script>
 </body>
