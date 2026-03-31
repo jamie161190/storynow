@@ -1,11 +1,9 @@
 // ============================================================
-// GENERATE PREVIEW — Does all work inline (no background function)
-// Calls Anthropic API + ElevenLabs TTS directly via fetch().
-// Returns the complete result. Also saves to Supabase so
-// check-preview can recover if the connection drops.
+// GENERATE PREVIEW — Triggers background worker, returns immediately
+// The actual generation (Anthropic + ElevenLabs) runs in
+// preview-worker-background.mjs which has a 15-minute timeout.
+// Client polls check-preview for the result.
 // ============================================================
-
-import { SYSTEM_PROMPT, buildPreviewPrompt } from './lib/story-prompts.mjs';
 
 export default async (req) => {
   // ── Rate limiting: max 5 previews per IP per hour ──
@@ -50,14 +48,6 @@ export default async (req) => {
     }
   }
 
-  // Guard: check env vars
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return new Response(JSON.stringify({ error: 'Story service not configured (missing AI key)' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
-  }
-  if (!process.env.ELEVENLABS_API_KEY) {
-    return new Response(JSON.stringify({ error: 'Voice service not configured' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
-  }
-
   try {
     const { storyData, voiceId, jobId } = await req.json();
 
@@ -94,144 +84,28 @@ export default async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid category' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
-    console.log('Generating preview inline for job:', jobId, 'category:', storyData.category);
-    const startTime = Date.now();
+    console.log('Triggering preview background worker for job:', jobId, 'category:', storyData.category);
 
-    // ── Step 1: Call Anthropic API with retry ──
-    const apiBody = JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 16000,
-      temperature: 0.8,
-      thinking: {
-        type: 'enabled',
-        budget_tokens: 1024
-      },
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
-    });
-
-    let apiResponse;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'Content-Type': 'application/json'
-        },
-        body: apiBody
-      });
-      if (apiResponse.ok) break;
-      const errBody = await apiResponse.text();
-      console.error('Anthropic API error (attempt ' + (attempt + 1) + '):', apiResponse.status, errBody);
-      if (attempt < 2 && (apiResponse.status === 429 || apiResponse.status >= 500)) {
-        const waitMs = apiResponse.status === 429 ? 5000 : 2000 * (attempt + 1);
-        await new Promise(r => setTimeout(r, waitMs));
-        continue;
-      }
-    }
-
-    if (!apiResponse.ok) {
-      return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.' }), {
-        status: 500, headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    const apiResult = await apiResponse.json();
-    let previewStory = '';
-    for (const block of apiResult.content) {
-      if (block.type === 'text') {
-        previewStory += block.text;
-      }
-    }
-    console.log('Preview text generated in', Date.now() - startTime, 'ms, words:', previewStory.split(' ').length);
-
-    // ── Step 2: Build message intro ──
-    let messageIntro = '';
-    if (storyData.isGift && storyData.giftFrom) {
-      const giftMsg = storyData.giftMessage || storyData.personalMessage;
-      messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... `;
-      if (giftMsg) {
-        messageIntro += `${giftMsg} ... `;
-      }
-      messageIntro += `And now, your story begins. ... `;
-    } else if (storyData.personalMessage) {
-      messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
-    }
-
-    const previewText = messageIntro + previewStory + ' ... ... To hear what happens next, unlock the full story.';
-
-    // ── Save partial result BEFORE TTS so polling can recover if function times out ──
-    if (supabaseUrl && supabaseKey && jobId) {
-      try {
-        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
-            'Content-Type': 'application/json',
-            'x-upsert': 'true'
-          },
-          body: JSON.stringify({ status: 'generating_audio', fullStory: previewText, previewStory, storyData })
-        });
-        console.log('Partial result saved for job:', jobId);
-      } catch (e) {
-        console.error('Failed to save partial result:', e.message);
-      }
-    }
-
-    // ── Step 3: Generate TTS via ElevenLabs ──
-    const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
-    console.log('Generating TTS with voice:', useVoiceId);
-
-    const ttsStart = Date.now();
-    const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
+    // ── Trigger background function ──
+    const siteUrl = process.env.URL || 'https://storytold.ai';
+    const bgRes = await fetch(`${siteUrl}/.netlify/functions/preview-worker-background`, {
       method: 'POST',
-      headers: {
-        'xi-api-key': process.env.ELEVENLABS_API_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text: previewText,
-        model_id: 'eleven_flash_v2_5',
-        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ storyData, voiceId, jobId })
     });
 
-    if (!ttsResponse.ok) {
-      const errText = await ttsResponse.text();
-      console.error('ElevenLabs error:', ttsResponse.status, errText);
-      return new Response(JSON.stringify({ error: 'Voice generation failed. Please try again.' }), {
-        status: 500, headers: { 'Content-Type': 'application/json' }
+    if (bgRes.status === 202) {
+      console.log('Preview background worker triggered successfully for job:', jobId);
+      return new Response(JSON.stringify({ polling: true, jobId }), {
+        status: 200, headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const audioBase64 = Buffer.from(await ttsResponse.arrayBuffer()).toString('base64');
-    console.log('TTS generated in', Date.now() - ttsStart, 'ms, total:', Date.now() - startTime, 'ms');
-
-    // ── Build result ──
-    const result = { success: true, previewAudio: audioBase64, previewStory, storyData };
-
-    // Save to Supabase as well (for polling fallback if connection drops)
-    if (supabaseUrl && supabaseKey && jobId) {
-      try {
-        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${supabaseKey}`,
-            'apikey': supabaseKey,
-            'Content-Type': 'application/json',
-            'x-upsert': 'true'
-          },
-          body: JSON.stringify(result)
-        });
-      } catch (e) { /* non-critical */ }
-    }
-
-    // Return result directly
-    return new Response(JSON.stringify(result), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' }
+    // If background trigger failed, log it but still tell client to poll
+    // (the background function may have started despite non-202 response)
+    console.error('Background trigger returned:', bgRes.status);
+    return new Response(JSON.stringify({ polling: true, jobId }), {
+      status: 200, headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (err) {

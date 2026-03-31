@@ -96,7 +96,7 @@ export default async (req) => {
 
         if (ttsRes.ok) {
           const audioBase64 = Buffer.from(await ttsRes.arrayBuffer()).toString('base64');
-          const completeResult = { success: true, previewAudio: audioBase64, fullStory: result.fullStory, storyData: result.storyData };
+          const completeResult = { success: true, previewAudio: audioBase64, previewStory: result.previewStory || result.fullStory, fullStory: result.fullStory, storyData: result.storyData };
 
           // Save the complete result back to Supabase for future polls
           try {

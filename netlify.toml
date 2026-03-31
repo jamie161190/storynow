@@ -18,6 +18,9 @@
 [functions."full-worker-background"]
   external_node_modules = []
 
+[functions."preview-worker-background"]
+  external_node_modules = []
+
 [functions."create-discount"]
   external_node_modules = ["stripe"]
 
