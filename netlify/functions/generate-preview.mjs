@@ -161,6 +161,25 @@ export default async (req) => {
 
     const previewText = messageIntro + previewStory + ' ... ... To hear what happens next, unlock the full story.';
 
+    // ── Save partial result BEFORE TTS so polling can recover if function times out ──
+    if (supabaseUrl && supabaseKey && jobId) {
+      try {
+        await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${supabaseKey}`,
+            'apikey': supabaseKey,
+            'Content-Type': 'application/json',
+            'x-upsert': 'true'
+          },
+          body: JSON.stringify({ status: 'generating_audio', fullStory: previewText, previewStory, storyData })
+        });
+        console.log('Partial result saved for job:', jobId);
+      } catch (e) {
+        console.error('Failed to save partial result:', e.message);
+      }
+    }
+
     // ── Step 3: Generate TTS via ElevenLabs ──
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
     console.log('Generating TTS with voice:', useVoiceId);
