@@ -868,7 +868,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <button class="back-btn" onclick="goTo('screenGift')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressDetails"></div><p class="progress-step-label">Step 2 of 7</p></div>
   <h2 class="section-title">The main character</h2>
-  <p class="section-sub">This is who the story is all about.</p>
+  <p class="section-sub">This is who the story is all about. Got siblings? You can create a story for each child, included in the price.</p>
 
   <div class="form-group">
     <label>Their name</label>
@@ -1137,16 +1137,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <p class="section-sub">Make sure everything looks right. Tap &#9998; to edit anything.</p>
   <div id="reviewContent" style="width:100%;max-width:440px"></div>
 
-  <!-- Add another child (multi-kid) -->
-  <div id="addChildSection" style="width:100%;max-width:440px;margin-top:0.75rem">
-    <div id="additionalChildCards"></div>
-    <button id="addChildBtn" onclick="addAnotherChild()" style="width:100%;background:linear-gradient(135deg,#FFF0E5,#F8F5FF);border:2px dashed var(--purple);border-radius:14px;padding:1rem;cursor:pointer;font-family:'Quicksand',sans-serif;transition:all 0.25s">
-      <p style="margin:0 0 0.2rem;font-size:1.1rem">&#128118;</p>
-      <p style="margin:0 0 0.15rem;font-size:0.88rem;font-weight:800;color:var(--purple)">Add another child</p>
-      <p style="margin:0;font-size:0.75rem;color:var(--text-muted);font-weight:600">Got siblings? Every child is included in your £19.99</p>
-    </button>
-  </div>
-
   <!-- Background music option -->
   <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin-top:1rem;max-width:440px;width:100%">
     <div class="toggle-row" style="margin-bottom:0">
@@ -1287,6 +1277,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
       <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
     </div>
+
+    <!-- Add another child (multi-kid) -->
+    <div id="addChildSection" style="width:100%;max-width:340px;margin:0.25rem auto 0.75rem">
+      <div id="additionalChildCards"></div>
+      <button id="addChildBtn" onclick="addAnotherChild()" style="background:none;border:2px dashed var(--purple-light);border-radius:12px;padding:0.7rem 1rem;width:100%;cursor:pointer;font-family:'Quicksand',sans-serif;font-size:0.82rem;font-weight:700;color:var(--purple);display:flex;align-items:center;justify-content:center;gap:0.4rem;transition:all 0.2s">
+        <span style="font-size:1.1rem">+</span> Add a sibling or another child <span style="font-size:0.72rem;font-weight:600;color:var(--text-muted)">(included free)</span>
+      </button>
+      <p style="font-size:0.62rem;color:var(--text-muted);text-align:center;margin:0.3rem 0 0">Same price, up to 3 children. Each gets their own unique story.</p>
+    </div>
+
     <p class="unlock-price" id="unlockSub" style="margin-bottom:0.5rem">15 minutes long. Download, share with family, keep forever.</p>
     <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()">&#128275; Unlock the full story for £19.99</button>
     <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.5rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
@@ -2648,6 +2648,15 @@ function removeChild(idx) {
 function updateChildField(idx, field, value) {
   if (storyData.additionalChildren[idx]) {
     storyData.additionalChildren[idx][field] = value;
+    // Update unlock button live when a name changes
+    if (field === 'childName') {
+      const allKids = [storyData.childName, ...storyData.additionalChildren.map(c => c.childName)].filter(Boolean);
+      const unlockBtn = document.getElementById('unlockBtn');
+      if (unlockBtn && allKids.length > 1) {
+        const kidNames = allKids.length === 2 ? allKids.join(' & ') : allKids.slice(0, -1).join(', ') + ' & ' + allKids[allKids.length - 1];
+        unlockBtn.innerHTML = '&#128275; Unlock stories for ' + escHtml(kidNames) + ' for £19.99';
+      }
+    }
   }
 }
 
@@ -2691,7 +2700,7 @@ function renderAdditionalChildren() {
       </div>
       <div>
         <label style="font-size:0.72rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.25rem">Their best friend</label>
-        <input type="text" value="${escHtml(child.friendName)}" placeholder="e.g. Olivia, cousin Zac"
+        <input type="text" value="${escHtml(child.friendName)}" placeholder="e.g. ${escHtml(storyData.childName || 'Olivia')}, cousin Zac"
           oninput="updateChildField(${idx},'friendName',this.value)"
           style="width:100%;padding:0.6rem 0.75rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Quicksand',sans-serif;font-weight:500;box-sizing:border-box;background:var(--bg)">
       </div>
@@ -2706,6 +2715,21 @@ function renderAdditionalChildren() {
     addBtn.style.display = 'none';
   } else {
     addBtn.style.display = 'block';
+  }
+
+  // Update unlock button to reflect all children
+  const allKids = [storyData.childName, ...children.map(c => c.childName)].filter(Boolean);
+  const unlockBtn = document.getElementById('unlockBtn');
+  const unlockSub = document.getElementById('unlockSub');
+  if (unlockBtn) {
+    if (allKids.length > 1) {
+      const kidNames = allKids.length === 2 ? allKids.join(' & ') : allKids.slice(0, -1).join(', ') + ' & ' + allKids[allKids.length - 1];
+      unlockBtn.innerHTML = '&#128275; Unlock stories for ' + escHtml(kidNames) + ' for £19.99';
+      if (unlockSub) unlockSub.textContent = allKids.length + ' unique stories. Download, share with family, keep forever.';
+    } else {
+      unlockBtn.innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + "'s full story for £19.99";
+      if (unlockSub) unlockSub.textContent = '15 minutes long. Download, share with family, keep forever.';
+    }
   }
 }
 
@@ -2771,9 +2795,6 @@ async function pollForFull(jobId) {
 }
 
 async function generatePreview() {
-  // Validate additional children if any
-  const childErr = validateAdditionalChildren();
-  if (childErr) { alert(childErr); return; }
   // Make sure we have a valid voice selected
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
   applyCategoryTheme(storyData.category);
@@ -3007,6 +3028,10 @@ async function unlockFull() {
     return;
   }
   emailErr.style.display = 'none';
+
+  // Validate additional children if any were added
+  const childErr = validateAdditionalChildren();
+  if (childErr) { alert(childErr); isCheckingOut = false; return; }
 
   trackEvent('InitiateCheckout', { value: 19.99, currency: 'GBP', content_name: storyData.category });
 
