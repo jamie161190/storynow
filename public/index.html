@@ -593,7 +593,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
     </div>
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">them</span> by name.</h1>
-  <p class="hero-text">A bedtime story where they are the hero. Their name, their friends, their favourite things, woven into every scene. Narrated by a voice you choose, ready in minutes.</p>
+  <p class="hero-text">A bedtime story where they are the hero. Their name, their best friend, even their pet, all woven into the adventure. You can be in it too. Narrated by a voice you choose, ready in minutes.</p>
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer">
@@ -1798,6 +1798,20 @@ function toggleBgMusic() {
 }
 
 function goTo(id, skipHistory) {
+  // Stop homepage sample audio + background music when leaving any screen
+  const sampleAudio = document.getElementById('sampleAudio');
+  if (sampleAudio && !sampleAudio.paused) {
+    sampleAudio.pause();
+    sampleAudio.currentTime = 0;
+    bgMusic.stop();
+    const sIcon = document.getElementById('sampleIcon');
+    if (sIcon) sIcon.innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
+    const sFill = document.getElementById('sampleFill');
+    if (sFill) sFill.style.width = '0%';
+    const sTime = document.getElementById('sampleTime');
+    if (sTime) sTime.textContent = '0:00';
+  }
+
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
