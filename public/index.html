@@ -556,6 +556,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <div class="shape shape-4"></div>
   </div>
 
+  <!-- TOP NAV -->
+  <div style="width:100%;max-width:440px;display:flex;justify-content:flex-end;margin-bottom:0.25rem">
+    <a onclick="goTo('screenLogin')" style="font-size:0.75rem;color:var(--text-muted);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.3rem">&#128218; My Stories</a>
+  </div>
+
   <!-- HERO -->
   <div class="logo-wrap">
     <img src="/logo.svg" alt="Storytold" class="logo-img">
@@ -592,10 +597,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
   <!-- FIRST CTA (after the proof) -->
   <div class="cta-group">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free. No questions asked.</p>
-    <p style="font-size:0.72rem;color:var(--orange);font-weight:600;text-align:center;margin:0.3rem 0 0">&#127873; Also makes the perfect gift.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
   </div>
 
   <!-- HOW IT WORKS (concrete example only, no numbered steps) -->
@@ -608,6 +612,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
         I write a story where Chase and Ellis ride a T-Rex through a glowing volcano with Grandad Pete, Mr Flopsy tucked under one arm, face their fear of the dark together, and come home heroes. Narrated in the voice you choose. Ready in about a minute.
       </p>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
     </div>
   </div>
 
@@ -622,10 +627,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
   <!-- SECOND CTA -->
   <div class="cta-group">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create a free preview</button>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.3rem 0 0">&#128274; Secure payment via Stripe. No subscription. You own it forever.</p>
-    <a class="my-stories-link" onclick="goTo('screenLogin')">&#128274; Log in / My Stories</a>
   </div>
 
   <!-- FAQ -->
@@ -791,6 +795,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 <!-- GIFT MINI-STEP -->
 <div class="screen" id="screenGift">
   <button class="back-btn" onclick="goTo(storyData.category==='learning'?'screenLearningSetup':'screenCategory')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressGift"></div><p class="progress-step-label">Quick question before we start</p></div>
   <h2 class="section-title">Is this a gift?</h2>
   <p class="section-sub">If you are making this for someone else's child, I can make it extra special.</p>
 
@@ -818,14 +823,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
     </div>
     <div class="toggle-row" style="margin-bottom:0.75rem">
-      <button class="toggle on" id="giftInStoryToggle" onclick="toggleGiftInStory()"></button>
+      <button class="toggle" id="giftInStoryToggle" onclick="toggleGiftInStory()"></button>
       <span class="toggle-label">Put me in the story as a character</span>
     </div>
-    <p class="form-hint" id="giftInStoryHint" style="margin-top:-0.5rem">You will appear in the adventure with a real role, not just a mention.</p>
+    <p class="form-hint" id="giftInStoryHint" style="margin-top:-0.5rem">Toggle this on and you will be IN the adventure with them, not just mentioned.</p>
     <div class="form-group">
       <label>A message for them (optional)</label>
       <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
-      <p class="form-hint">This will be read aloud by the narrator at the very start, before the story begins.</p>
+      <p class="form-hint">The narrator will read this aloud before the story begins.</p>
     </div>
     <div class="form-group">
       <label>Recipient's email (optional)</label>
@@ -893,7 +898,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="form-group">
     <label>Sidekick (optional)</label>
     <input type="text" id="sidekickName" placeholder="e.g. Mum, Daddy, Grandma, a robot called Sparky, Captain Brave">
-    <p class="form-hint">A sidekick can be anyone: Mum, Dad, a grandparent, the person giving this as a gift, a superhero partner, a magical creature. They will be by their side for the whole adventure.</p>
+    <p class="form-hint">Can be anyone: a parent, grandparent, the gift-giver, or even a magical creature. They will be by their side the whole adventure.</p>
   </div>
   <div class="form-group">
     <label>Other people in the story (optional)</label>
@@ -1235,16 +1240,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(transparent,var(--card))"></div>
     </div>
     <div id="previewError"></div>
-    <div style="width:100%;max-width:340px;margin:0.75rem auto 1rem">
-      <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Confirm your email</label>
-      <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
-      <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">I will send the full story here. You can change this if needed.</p>
+    <div id="previewEmailWrap" style="width:100%;max-width:340px;margin:0.75rem auto 1rem">
+      <div id="previewEmailConfirm" style="display:none;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;text-align:left">
+        <p style="font-size:0.72rem;color:var(--text-muted);margin:0 0 0.15rem;font-weight:600">I'll send the full story to:</p>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <p id="previewEmailDisplay" style="font-size:0.92rem;font-weight:700;color:var(--purple);margin:0"></p>
+          <a onclick="document.getElementById('previewEmailConfirm').style.display='none';document.getElementById('previewEmailEdit').style.display='block';document.getElementById('previewEmail').focus()" style="font-size:0.72rem;color:var(--purple);font-weight:700;cursor:pointer">Change</a>
+        </div>
+      </div>
+      <div id="previewEmailEdit" style="display:none">
+        <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email</label>
+        <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
+        <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">I will send the full story here.</p>
+      </div>
       <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
     </div>
+    <p class="unlock-price" id="unlockSub" style="margin-bottom:0.5rem">15 minutes long. Download, share with family, keep forever.</p>
     <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()">&#128275; Unlock the full story for £19.99</button>
-    <p class="unlock-price" id="unlockSub">15 minutes long. Download, share with family, keep forever.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
-    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.5rem 0 0">&#128274; Secure payment via Stripe. No subscription. Your data is safe.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.5rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
+    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.3rem 0 0">&#128274; Secure payment via Stripe. No subscription.</p>
     <a onclick="goTo('screenReview')" style="font-size:0.78rem;color:var(--purple);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">Want to change something? Go back</a>
   </div>
 </div>
@@ -1316,10 +1330,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     <div id="feedbackPrompt" style="display:none;background:linear-gradient(135deg,#FFF0E5,#F8F5FF);border:2px solid var(--border);border-radius:16px;padding:1.25rem;margin-top:1rem;text-align:center">
       <p style="font-size:1rem;font-weight:800;color:var(--text);margin:0 0 0.3rem">How did it go?</p>
       <p style="font-size:0.82rem;color:var(--text-muted);margin:0 0 0.75rem">I would love to know what you thought.</p>
-      <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap">
+      <div id="feedbackButtons" style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap">
         <button onclick="submitFeedback('loved')" style="background:var(--cat-accent,var(--purple));color:#fff;border:none;border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">They loved it!</button>
         <button onclick="submitFeedback('ok')" style="background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">It was okay</button>
-        <button onclick="submitFeedback('improve')" style="background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">Could be better</button>
+        <button onclick="showImproveFeedback()" style="background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">Could be better</button>
+      </div>
+      <div id="feedbackImproveBox" style="display:none;margin-top:0.75rem">
+        <textarea id="feedbackImproveText" placeholder="What would make it better? I read every single one of these." style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Quicksand',sans-serif;resize:none;height:70px;background:var(--card);box-sizing:border-box"></textarea>
+        <button onclick="submitFeedback('improve')" style="background:var(--cat-accent,var(--purple));color:#fff;border:none;border-radius:50px;padding:0.5rem 1.2rem;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;margin-top:0.4rem;width:100%">Send feedback</button>
       </div>
       <div id="feedbackThanks" style="display:none;margin-top:0.75rem">
         <p style="font-size:0.85rem;color:var(--green);font-weight:700;margin:0">Thank you! Your feedback helps me make better stories.</p>
@@ -1327,7 +1345,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     </div>
 
     <!-- Create another -->
-    <div class="library-cta" onclick="goTo('screenLanding')" style="margin-top:1rem">
+    <div class="library-cta" onclick="goTo('screenCategory')" style="margin-top:1rem">
       <p style="font-size:1.3rem;margin:0 0 0.3rem">&#10024;</p>
       <p style="font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;color:var(--text);margin:0 0 0.15rem">Create another story</p>
       <p style="font-size:0.8rem;color:var(--text-muted);margin:0;font-weight:600">A new adventure, a bedtime story, or a learning quest</p>
@@ -1346,7 +1364,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div id="libraryList" class="library-list"></div>
 
   <!-- Create another CTA at bottom of library -->
-  <div class="library-cta" id="libraryCta" onclick="goTo('screenLanding')" style="display:none;margin-top:1.25rem">
+  <div class="library-cta" id="libraryCta" onclick="goTo('screenCategory')" style="display:none;margin-top:1.25rem">
     <p style="font-size:1.3rem;margin:0 0 0.3rem">&#10024;</p>
     <p style="font-family:'Nunito',sans-serif;font-weight:800;font-size:0.95rem;color:var(--text);margin:0 0 0.15rem">Create another story</p>
     <p style="font-size:0.8rem;color:var(--text-muted);margin:0;font-weight:600">Every one is completely unique</p>
@@ -1392,8 +1410,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </button>
     </div>
     <div class="post-actions" style="margin-top:1.5rem">
-      <p style="text-align:center;color:var(--text-muted);font-size:0.95rem;margin-bottom:1rem">Want to create a personalised story for a child in your life?</p>
-      <button class="btn btn-primary" style="width:100%" onclick="goTo('screenLanding')">Create your own story</button>
+      <p style="text-align:center;color:var(--text-muted);font-size:0.95rem;margin-bottom:1rem">Every child deserves a story with their name in it.</p>
+      <button class="btn btn-primary" style="width:100%" onclick="goTo('screenCategory')">Create one for a child you love</button>
     </div>
   </div>
   <div id="sharedLoading" style="text-align:center;padding:3rem;display:none">
@@ -1732,7 +1750,7 @@ function goTo(id, skipHistory) {
   }
 
   // Update progress bar
-  const progressMap = {screenCategory:1,screenDetails:2,screenPeople:3,screenTheme:4,screenWhere:5,screenExtras:6,screenVoice:7};
+  const progressMap = {screenCategory:1,screenGift:1,screenDetails:2,screenPeople:3,screenTheme:4,screenWhere:5,screenExtras:6,screenVoice:7};
   const stepNum = progressMap[id];
   if (stepNum) {
     const barId = 'progress' + id.replace('screen','');
@@ -1777,6 +1795,65 @@ window.addEventListener('popstate', (e) => {
 
 // Set initial state so first back press goes to landing
 history.replaceState({ screen: 'screenLanding' }, '', '');
+
+// ===== FORM STATE PERSISTENCE =====
+// Save form inputs so interrupted parents don't lose progress
+const FORM_FIELDS = ['childName','age','gender','proudOf','earlyEmail','friendName','sidekickName','familyMembers','teacherName','petName','petType','customTheme','themeDetail','customWhere','favTeddy','extraDetails','personalMessage','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2','customScenario'];
+
+function saveFormState() {
+  try {
+    const state = {};
+    FORM_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.value) state[id] = el.value;
+    });
+    state._category = storyData.category;
+    state._isGift = isGiftMode;
+    state._themes = storyData.themes || [];
+    state._where = storyData.where || 'Surprise me';
+    state._voiceId = selectedVoiceId;
+    sessionStorage.setItem('storytold_form', JSON.stringify(state));
+  } catch(e) { /* silently fail */ }
+}
+
+function restoreFormState() {
+  try {
+    const raw = sessionStorage.getItem('storytold_form');
+    if (!raw) return false;
+    const state = JSON.parse(raw);
+    FORM_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && state[id]) el.value = state[id];
+    });
+    if (state._category) storyData.category = state._category;
+    if (state._isGift) isGiftMode = state._isGift;
+    if (state._themes) storyData.themes = state._themes;
+    if (state._where) storyData.where = state._where;
+    if (state._voiceId) selectedVoiceId = state._voiceId;
+    return true;
+  } catch(e) { return false; }
+}
+
+// Auto-save form state whenever navigating between screens
+const _origGoTo = goTo;
+goTo = function(id, skipHistory) {
+  _origGoTo(id, skipHistory);
+  if (['screenDetails','screenPeople','screenTheme','screenWhere','screenExtras','screenVoice','screenReview'].includes(id)) {
+    saveFormState();
+  }
+  // Preview screen: show email as confirmation if already filled, or as input if empty
+  if (id === 'screenPreview') {
+    const email = document.getElementById('previewEmail').value.trim();
+    if (email && email.includes('@')) {
+      document.getElementById('previewEmailDisplay').textContent = email;
+      document.getElementById('previewEmailConfirm').style.display = 'block';
+      document.getElementById('previewEmailEdit').style.display = 'none';
+    } else {
+      document.getElementById('previewEmailConfirm').style.display = 'none';
+      document.getElementById('previewEmailEdit').style.display = 'block';
+    }
+  }
+};
 
 function restoreCategory() {
   if (!storyData.category) return;
@@ -3030,15 +3107,19 @@ async function handleStripeReturn() {
   }
 }
 
+function showImproveFeedback() {
+  document.getElementById('feedbackButtons').style.display = 'none';
+  document.getElementById('feedbackImproveBox').style.display = 'block';
+}
+
 function submitFeedback(rating) {
-  trackEvent('StoryFeedback', { rating: rating, content_name: storyData.category });
+  const improveText = (document.getElementById('feedbackImproveText') || {}).value || '';
+  trackEvent('StoryFeedback', { rating: rating, content_name: storyData.category, feedback_text: improveText });
+  document.getElementById('feedbackButtons').style.display = 'none';
+  document.getElementById('feedbackImproveBox').style.display = 'none';
   document.getElementById('feedbackThanks').style.display = 'block';
-  // Hide the buttons
-  const btns = document.getElementById('feedbackPrompt').querySelectorAll('button');
-  btns.forEach(b => b.style.display = 'none');
-  // If they said "could be better", offer the guarantee
   if (rating === 'improve') {
-    document.getElementById('feedbackThanks').innerHTML = '<p style="font-size:0.85rem;color:var(--purple);font-weight:700;margin:0 0 0.3rem">I want to make it right.</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0">Email me at <a href="mailto:hello@storytold.ai" style="color:var(--purple);font-weight:700">hello@storytold.ai</a> and I will rewrite it for free.</p>';
+    document.getElementById('feedbackThanks').innerHTML = '<p style="font-size:0.85rem;color:var(--purple);font-weight:700;margin:0 0 0.3rem">Thank you, I read every one of these.</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0">If you want me to rewrite it for free, email <a href="mailto:hello@storytold.ai" style="color:var(--purple);font-weight:700">hello@storytold.ai</a> and I will sort it out.</p>';
   }
 }
 
