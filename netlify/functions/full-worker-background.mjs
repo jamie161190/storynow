@@ -177,7 +177,7 @@ export const handler = async (event) => {
       if (!apiResponse.ok) {
         const errBody = await apiResponse.text();
         console.error('[PREVIEW-BG] Anthropic error:', apiResponse.status, errBody);
-        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Story generation failed. Please try again.' });
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'API error ' + apiResponse.status + ': ' + errBody.substring(0, 200) });
         return { statusCode: 200 };
       }
 
