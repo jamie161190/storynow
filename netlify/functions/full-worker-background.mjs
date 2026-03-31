@@ -111,6 +111,36 @@ async function saveJobResult(supabaseUrl, supabaseKey, jobId, result) {
 }
 
 // ============================================================
+// RETRY QUEUE: Save failed paid stories for automatic retry
+// ============================================================
+async function queueForRetry(supabaseUrl, supabaseKey, data) {
+  try {
+    const retryId = 'retry_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    await fetch(`${supabaseUrl}/storage/v1/object/stories/retry-queue/${retryId}.json`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseKey}`,
+        'apikey': supabaseKey,
+        'Content-Type': 'application/json',
+        'x-upsert': 'true'
+      },
+      body: JSON.stringify({
+        ...data,
+        retryId,
+        attempts: 0,
+        createdAt: new Date().toISOString(),
+        status: 'pending'
+      })
+    });
+    console.log('[FULL-BG] Queued for retry:', retryId);
+    return retryId;
+  } catch (e) {
+    console.error('[FULL-BG] Failed to queue for retry:', e.message);
+    return null;
+  }
+}
+
+// ============================================================
 // BACKGROUND FUNCTION HANDLER
 // ============================================================
 // Save to preview-jobs bucket (for preview mode)
@@ -135,7 +165,7 @@ export const handler = async (event) => {
   let jobId;
   try {
     const parsed = JSON.parse(event.body);
-    const { storyData, previewStory, voiceId, childName, sessionId, jobId: jid, fromScratch, mode } = parsed;
+    const { storyData, previewStory, voiceId, childName, sessionId, jobId: jid, fromScratch, mode, customerEmail } = parsed;
     jobId = jid;
 
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -303,10 +333,18 @@ export const handler = async (event) => {
       console.log('[FULL-BG] Story continuation generated in', Date.now() - storyStart, 'ms, words:', continuationText.split(' ').length);
     } catch (apiErr) {
       console.error('[FULL-BG] Anthropic API error:', apiErr.message);
+      // Queue for automatic retry so the customer gets their story
+      const retryId = await queueForRetry(supabaseUrl, supabaseKey, {
+        storyData, previewStory, voiceId, childName, sessionId, jobId, fromScratch, customerEmail,
+        originalPayload: event.body
+      });
       if (jobId) {
         await saveJobResult(supabaseUrl, supabaseKey, jobId, {
           success: false,
-          error: 'Story generation failed. Your payment is confirmed, please try again or contact hello@storytold.ai'
+          queued: !!retryId,
+          error: retryId
+            ? 'Story is queued and will be emailed to you shortly.'
+            : 'Story generation failed. Your payment is confirmed, please try again or contact hello@storytold.ai'
         });
       }
       return { statusCode: 200 };
@@ -461,9 +499,23 @@ export const handler = async (event) => {
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     if (jobId && supabaseUrl && supabaseKey) {
+      // Try to queue for retry
+      let retryId = null;
+      try {
+        const parsed = JSON.parse(event.body);
+        retryId = await queueForRetry(supabaseUrl, supabaseKey, {
+          storyData: parsed.storyData, previewStory: parsed.previewStory, voiceId: parsed.voiceId,
+          childName: parsed.childName, sessionId: parsed.sessionId, jobId, fromScratch: parsed.fromScratch,
+          customerEmail: parsed.customerEmail, originalPayload: event.body
+        });
+      } catch (qErr) { console.error('[FULL-BG] Queue error:', qErr.message); }
+
       await saveJobResult(supabaseUrl, supabaseKey, jobId, {
         success: false,
-        error: 'Audio generation failed. Your payment is confirmed, please try again or contact hello@storytold.ai'
+        queued: !!retryId,
+        error: retryId
+          ? 'Story is queued and will be emailed to you shortly.'
+          : 'Audio generation failed. Your payment is confirmed, please try again or contact hello@storytold.ai'
       });
     }
     return { statusCode: 200 };

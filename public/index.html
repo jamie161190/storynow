@@ -3213,7 +3213,7 @@ async function handleStripeReturn() {
       // Build the payload: for the first child, use preview continuation; for extra children, generate from scratch
       let bgPayload;
       if (isFirst) {
-        bgPayload = JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: kid.childName, sessionId, jobId: fullJobId });
+        bgPayload = JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: kid.childName, sessionId, jobId: fullJobId, customerEmail: verifyData.customerEmail });
       } else {
         // Build modified storyData for this child, keeping shared details
         const childStoryData = {
@@ -3231,7 +3231,7 @@ async function handleStripeReturn() {
             : storyData.childName
         };
         // Signal the backend this is a from-scratch generation (no preview to continue from)
-        bgPayload = JSON.stringify({ storyData: childStoryData, previewStory: '', voiceId: selectedVoiceId, childName: kid.childName, sessionId, jobId: fullJobId, fromScratch: true });
+        bgPayload = JSON.stringify({ storyData: childStoryData, previewStory: '', voiceId: selectedVoiceId, childName: kid.childName, sessionId, jobId: fullJobId, fromScratch: true, customerEmail: verifyData.customerEmail });
       }
 
       // Call background function with retry
@@ -3264,6 +3264,11 @@ async function handleStripeReturn() {
       // Poll for this child's result
       let data = await pollForFull(fullJobId);
       if (!data || !data.success) {
+        // Check if the story was queued for retry (will be emailed when ready)
+        if (data && data.queued) {
+          completedStories.push({ childName: kid.childName, audioUrl: null, storyId: null, queued: true });
+          continue;
+        }
         console.error(`Story generation failed for ${kid.childName}`);
         completedStories.push({ childName: kid.childName, audioUrl: null, storyId: null, failed: true });
         continue; // Try next child even if one fails
@@ -3303,8 +3308,34 @@ async function handleStripeReturn() {
 
     stopGeneratingScreen();
 
-    // Check at least one story succeeded
-    const successfulStories = completedStories.filter(s => !s.failed);
+    // Check results
+    const successfulStories = completedStories.filter(s => !s.failed && !s.queued);
+    const queuedStories = completedStories.filter(s => s.queued);
+
+    // If all stories were queued for retry, show a friendly message
+    if (successfulStories.length === 0 && queuedStories.length > 0) {
+      stopGeneratingScreen();
+      goTo('screenFull');
+      const names = queuedStories.map(s => s.childName).join(' and ');
+      document.getElementById('fullTitle').textContent = 'Almost there!';
+      document.getElementById('fullStoryFor').textContent = '';
+      document.querySelector('#screenFull .full-hero').insertAdjacentHTML('afterend',
+        '<div style="text-align:center;padding:1.5rem;max-width:400px;margin:0 auto">' +
+        '<p style="font-size:1rem;color:var(--text);line-height:1.7;margin:0 0 1rem">' +
+        'Our story engine is very busy right now, but do not worry. ' + escHtml(names) + '\'s story is in the queue and will be ready shortly.</p>' +
+        '<p style="font-size:0.95rem;color:var(--text);line-height:1.7;margin:0 0 1.5rem">' +
+        'We will email you as soon as it is ready to listen. You can close this page safely.</p>' +
+        '<p style="font-size:0.82rem;color:var(--text-muted)">Your payment is confirmed. No action needed.</p>' +
+        '</div>'
+      );
+      document.querySelector('#screenFull .full-player').style.display = 'none';
+      // Clean URL
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState({}, '', cleanUrl);
+      sessionStorage.removeItem('storytold_story');
+      return;
+    }
+
     if (successfulStories.length === 0) {
       throw new Error('Audio generation timed out. Your payment is safe. Please contact hello@storytold.ai');
     }
