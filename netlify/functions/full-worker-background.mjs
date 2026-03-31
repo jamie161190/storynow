@@ -156,28 +156,41 @@ export const handler = async (event) => {
         return { statusCode: 200 };
       }
 
-      // Call Anthropic API with full thinking for best quality
-      const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 16000,
-          temperature: 1,
-          thinking: { type: 'enabled', budget_tokens: 1024 },
-          system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
-        })
+      // Call Anthropic API with full thinking for best quality (retry on 429/529/5xx)
+      const previewApiBody = JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 16000,
+        temperature: 1,
+        thinking: { type: 'enabled', budget_tokens: 1024 },
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
       });
+
+      let apiResponse;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': process.env.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+            'Content-Type': 'application/json'
+          },
+          body: previewApiBody
+        });
+        if (apiResponse.ok) break;
+        const shouldRetry = apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500;
+        if (attempt < 2 && shouldRetry) {
+          const waitMs = apiResponse.status === 429 ? 5000 : 3000 * (attempt + 1);
+          console.log('[PREVIEW-BG] Anthropic returned ' + apiResponse.status + ', retrying in ' + waitMs + 'ms (attempt ' + (attempt + 1) + ')');
+          await new Promise(r => setTimeout(r, waitMs));
+          continue;
+        }
+      }
 
       if (!apiResponse.ok) {
         const errBody = await apiResponse.text();
-        console.error('[PREVIEW-BG] Anthropic error:', apiResponse.status, errBody);
-        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'API error ' + apiResponse.status + ': ' + errBody.substring(0, 200) });
+        console.error('[PREVIEW-BG] Anthropic error after retries:', apiResponse.status, errBody);
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Story generation is temporarily busy. Please try again in a moment.' });
         return { statusCode: 200 };
       }
 
