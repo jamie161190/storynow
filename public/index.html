@@ -615,7 +615,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Got siblings? Every child is included, same price.</p>
+    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Got siblings? Each child gets their own story, same price.</p>
     <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
   </div>
 
@@ -739,6 +739,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
     </div>
     -->
+  </div>
+  <div style="background:linear-gradient(135deg,#F8F5FF,#FFF0F5);border:2px solid var(--purple-light);border-radius:12px;padding:0.65rem 0.9rem;margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;max-width:440px;width:100%">
+    <span style="font-size:1.2rem">&#128118;&#128118;</span>
+    <p style="font-size:0.75rem;color:var(--text);font-weight:600;margin:0;line-height:1.5">Got more than one child? You can add siblings after the preview. Each gets their own unique story, included in the price.</p>
   </div>
 </div>
 
@@ -2739,12 +2743,17 @@ function renderAdditionalChildren() {
 }
 
 function validateAdditionalChildren() {
+  const allNames = [storyData.childName.trim().toLowerCase()];
   for (let i = 0; i < storyData.additionalChildren.length; i++) {
     const c = storyData.additionalChildren[i];
     if (!c.childName.trim()) return `Please enter a name for child ${i + 2}.`;
     if (!c.age || c.age < 2 || c.age > 14) return `Please enter an age (2 to 14) for ${c.childName}.`;
     if (!c.gender) return `Please select a gender for ${c.childName}.`;
     if (!c.friendName.trim()) return `Please enter a best friend for ${c.childName}.`;
+    // Duplicate name protection
+    const nameLower = c.childName.trim().toLowerCase();
+    if (allNames.includes(nameLower)) return `You have already added a story for ${c.childName}. Each child should be different.`;
+    allNames.push(nameLower);
   }
   return null;
 }
