@@ -57,7 +57,7 @@ export default async (req) => {
     // 3. No preview URL available (library voices not in account).
     //    Generate a short TTS sample and cache it in Supabase.
     const voiceName = data.name || 'this voice';
-    const sampleText = `Hello there. I'm ${voiceName}, and I'd love to tell your child a story. Imagine a world made just for them, where every detail is something they love.`;
+    const sampleText = `Hello there. I'm ${voiceName}, and I'd love to tell them a story. Imagine a world made just for them, where every detail is something they love.`;
 
     const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
       method: 'POST',

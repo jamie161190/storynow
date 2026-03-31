@@ -8,11 +8,20 @@ export default async (req) => {
 
     const body = await req.json();
     const storyData = body.storyData || {};
-    const childName = storyData.childName || body.childName || 'your child';
+    const childName = storyData.childName || body.childName || 'a special child';
     const customerEmail = body.customerEmail || null;
     const previewStoryText = body.previewStoryText || body.fullStoryText || '';
     const selectedVoiceId = body.selectedVoiceId || '';
     const additionalChildren = body.additionalChildren || storyData.additionalChildren || [];
+
+    // UTM and tracking params forwarded from the frontend
+    const utmSource = body.utm_source || '';
+    const utmMedium = body.utm_medium || '';
+    const utmCampaign = body.utm_campaign || '';
+    const fbclid = body.fbclid || '';
+    const fbc = body.fbc || '';
+    const fbp = body.fbp || '';
+    const userAgent = body.user_agent || '';
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
 
@@ -48,7 +57,14 @@ export default async (req) => {
         childName: childName,
         category: storyData.category || '',
         length: storyData.length || '',
-        additionalChildren: additionalChildren.map(c => c.childName).join(', ') || ''
+        additionalChildren: additionalChildren.map(c => c.childName).join(', ') || '',
+        utm_source: utmSource,
+        utm_medium: utmMedium,
+        utm_campaign: utmCampaign,
+        fbclid: fbclid,
+        fbc: fbc,
+        fbp: fbp,
+        user_agent: userAgent
       }
     });
 

@@ -154,7 +154,7 @@ fbq('track', 'PageView');
       "name": "What ages does Storytold work for?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Storytold creates stories for children aged 2 to 14. The language, themes, and complexity automatically adapt to your child's age."
+        "text": "Storytold creates stories for children aged 2 to 14. The language, themes, and complexity automatically adapt to the child's age."
       }
     }
   ]
@@ -610,7 +610,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
         </div>
       </div>
     </div>
-    <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Make one for your child. Or give one as a gift they'll never forget.</p>
+    <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Make one for a child you love. Or give one as a gift they will never forget.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.2rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
@@ -680,11 +680,11 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What ages does this work for?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Ages 2 to 14. Stories automatically adapt to your child's age. Toddlers get simple language with sound effects and repetition. Older children get richer plots, real dialogue, and deeper themes.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Ages 2 to 14. Stories automatically adapt to the child's age. Toddlers get simple language with sound effects and repetition. Older children get richer plots, real dialogue, and deeper themes.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is my child's information safe?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Completely. Your child's details are only used to write their story. Nothing is shared, sold, or used for advertising. Payment is processed securely by Stripe. I take this seriously.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Completely. The child's details are only used to write their story. Nothing is shared, sold, or used for advertising. Payment is processed securely by Stripe. I take this seriously.</p>
       </details>
     </div>
   </div>
@@ -910,7 +910,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 
   <p class="inline-error" id="detailsError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateDetails()">Continue</button>
-  <p style="font-size:0.62rem;color:var(--text-muted);text-align:center;margin-top:0.6rem">&#128274; Your child's details are only used to write their story. Nothing is shared or sold. Ever.</p>
+  <p style="font-size:0.62rem;color:var(--text-muted);text-align:center;margin-top:0.6rem">&#128274; Their details are only used to write the story. Nothing is shared or sold. Ever.</p>
 </div>
 
 <!-- DETAILS: WHO'S IN THE STORY -->
@@ -1581,14 +1581,23 @@ let voiceFilters = { gender: 'all', accent: 'all', age: 'all' };
 let voicePreviewUrls = {};
 
 // Tracking helper: fires events to all pixels
-function trackEvent(eventName, params) {
+function trackEvent(eventName, params, options) {
   try {
+    const opts = options || {};
     // GA4
     if(typeof gtag === 'function') gtag('event', eventName, params || {});
-    // Meta Pixel
-    if(typeof fbq === 'function') fbq('track', eventName, params || {});
-    // TikTok
-    if(typeof ttq !== 'undefined' && ttq.track) ttq.track(eventName, params || {});
+    // Meta Pixel (with eventID for CAPI deduplication and advanced matching)
+    if(typeof fbq === 'function') {
+      const fbOpts = {};
+      if (opts.eventID) fbOpts.eventID = opts.eventID;
+      fbq('track', eventName, params || {}, fbOpts);
+    }
+    // TikTok (with event_id for dedup)
+    if(typeof ttq !== 'undefined' && ttq.track) {
+      const ttParams = { ...(params || {}) };
+      if (opts.eventID) ttParams.event_id = opts.eventID;
+      ttq.track(eventName, ttParams);
+    }
     // GTM dataLayer
     if(window.dataLayer) window.dataLayer.push({ event: eventName, ...params });
   } catch(e) { /* silent */ }
@@ -3065,7 +3074,7 @@ async function unlockFull() {
     const res = await fetch('/api/create-checkout', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, previewStoryText, selectedVoiceId, additionalChildren: storyData.additionalChildren || [] })
+      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, previewStoryText, selectedVoiceId, additionalChildren: storyData.additionalChildren || [], ...getTrackingParams() })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.error || 'Something went wrong');
@@ -3137,8 +3146,13 @@ async function handleStripeReturn() {
     const verifyData = await verifyRes.json();
     if (!verifyData.success) throw new Error('Payment not confirmed. Please contact support.');
 
-    // Fire Purchase event across all pixels
-    trackEvent('Purchase', { value: 19.99, currency: 'GBP', content_name: storyData.category });
+    // Update Meta pixel with customer email for better advanced matching
+    if (typeof fbq === 'function' && verifyData.customerEmail) {
+      fbq('init', '1656775315345896', { em: verifyData.customerEmail.trim().toLowerCase() });
+    }
+
+    // Fire Purchase event across all pixels (eventID matches server-side for dedup)
+    trackEvent('Purchase', { value: 19.99, currency: 'GBP', content_name: storyData.category }, { eventID: 'purchase_' + sessionId });
 
     // Payment confirmed, switch to dedicated generation screen
     const allChildren = [
@@ -3453,6 +3467,35 @@ function formatTime(s) {
 }
 
 // Reset icon when audio ends + handle Stripe return
+// ─── UTM + ad click ID capture (persists across page navigation) ───
+(function captureUtmParams() {
+  const params = new URLSearchParams(window.location.search);
+  const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid', 'ttclid'];
+  keys.forEach(k => {
+    const v = params.get(k);
+    if (v) sessionStorage.setItem('st_' + k, v);
+  });
+  // Capture Meta browser cookies (_fbc, _fbp) if present
+  const cookies = document.cookie.split(';').reduce((acc, c) => {
+    const [k, v] = c.trim().split('=');
+    if (k) acc[k] = v;
+    return acc;
+  }, {});
+  if (cookies._fbc) sessionStorage.setItem('st_fbc', cookies._fbc);
+  if (cookies._fbp) sessionStorage.setItem('st_fbp', cookies._fbp);
+})();
+
+function getTrackingParams() {
+  const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'fbclid', 'fbc', 'fbp'];
+  const params = {};
+  keys.forEach(k => {
+    const v = sessionStorage.getItem('st_' + k);
+    if (v) params[k] = v;
+  });
+  params.user_agent = navigator.userAgent;
+  return params;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('fullStoryAudio');
   if(audio) audio.addEventListener('ended', () => {
@@ -4032,8 +4075,8 @@ function shareViaWhatsApp() {
   if (!shareStory) return;
   const msg = document.getElementById('waMessage').value.trim();
   const listenUrl = `https://storytold.ai?listen=${shareStory.id}`;
-  let text = `Listen to ${shareStory.childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know your child by name.`;
-  if (msg) text = `${msg}\n\nListen to ${shareStory.childName}'s story: ${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know your child by name.`;
+  let text = `Listen to ${shareStory.childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know them by name.`;
+  if (msg) text = `${msg}\n\nListen to ${shareStory.childName}'s story: ${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know them by name.`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 

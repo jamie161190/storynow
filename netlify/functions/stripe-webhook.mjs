@@ -1,6 +1,8 @@
-// Stripe webhook handler for abandoned cart recovery
-// Listens for checkout.session.expired events and sends recovery emails
+// Stripe webhook handler for:
+// 1. Server-side conversion tracking (Meta CAPI + TikTok Events API) on successful purchase
+// 2. Abandoned cart recovery emails on expired checkout sessions
 import Stripe from 'stripe';
+import { createHash } from 'crypto';
 
 function esc(str) {
   if (!str) return '';
@@ -37,7 +39,122 @@ export default async (req) => {
     return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
-  // Only handle expired checkout sessions (abandoned carts)
+  // ─── PURCHASE COMPLETED: server-side conversion tracking ───
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const email = session.customer_details?.email || session.customer_email;
+    const amountTotal = session.amount_total; // in pence
+    const currency = session.currency || 'gbp';
+    const sessionId = session.id;
+    const metadata = session.metadata || {};
+
+    // Use session ID as event_id for deduplication with client-side pixels
+    const eventId = `purchase_${sessionId}`;
+    const eventTime = Math.floor(new Date(session.created * 1000).getTime() / 1000);
+    const hashedEmail = email ? createHash('sha256').update(email.trim().toLowerCase()).digest('hex') : null;
+
+    // Retrieve UTM params from metadata (passed through from create-checkout)
+    const utmSource = metadata.utm_source || '';
+    const utmMedium = metadata.utm_medium || '';
+    const utmCampaign = metadata.utm_campaign || '';
+    const fbclid = metadata.fbclid || '';
+    const fbc = fbclid ? `fb.1.${Date.now()}.${fbclid}` : (metadata.fbc || '');
+    const fbp = metadata.fbp || '';
+
+    // ── Meta Conversions API ──
+    const metaPixelId = process.env.META_PIXEL_ID || '1656775315345896';
+    const metaToken = process.env.META_CAPI_TOKEN;
+
+    if (metaToken) {
+      try {
+        const metaPayload = {
+          data: [{
+            event_name: 'Purchase',
+            event_time: eventTime,
+            event_id: eventId,
+            event_source_url: 'https://storytold.ai',
+            action_source: 'website',
+            user_data: {
+              ...(hashedEmail ? { em: [hashedEmail] } : {}),
+              ...(fbc ? { fbc } : {}),
+              ...(fbp ? { fbp } : {}),
+              client_user_agent: metadata.user_agent || ''
+            },
+            custom_data: {
+              currency: currency.toUpperCase(),
+              value: (amountTotal / 100).toFixed(2),
+              content_name: `Story for ${metadata.childName || 'a child'}`,
+              content_type: 'product',
+              content_ids: ['storytold_personalised_story']
+            }
+          }]
+        };
+
+        const metaRes = await fetch(
+          `https://graph.facebook.com/v18.0/${metaPixelId}/events?access_token=${metaToken}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(metaPayload)
+          }
+        );
+        const metaData = await metaRes.json();
+        console.log('Meta CAPI Purchase event sent:', metaData);
+      } catch (metaErr) {
+        console.error('Meta CAPI error:', metaErr.message);
+      }
+    } else {
+      console.warn('META_CAPI_TOKEN not set, skipping server-side Meta tracking');
+    }
+
+    // ── TikTok Events API ──
+    const tiktokPixelId = process.env.TIKTOK_PIXEL_ID || 'D74JVVJC77U5P0Q29FKG';
+    const tiktokToken = process.env.TIKTOK_EVENTS_TOKEN;
+
+    if (tiktokToken) {
+      try {
+        const tiktokPayload = {
+          pixel_code: tiktokPixelId,
+          partner_name: 'Storytold',
+          event: 'CompletePayment',
+          event_id: eventId,
+          timestamp: new Date(session.created * 1000).toISOString(),
+          context: {
+            user: {
+              ...(hashedEmail ? { email: hashedEmail } : {}),
+              ...(metadata.user_agent ? { user_agent: metadata.user_agent } : {})
+            },
+            page: { url: 'https://storytold.ai' }
+          },
+          properties: {
+            currency: currency.toUpperCase(),
+            value: (amountTotal / 100).toFixed(2),
+            content_type: 'product',
+            contents: [{ content_id: 'storytold_personalised_story', content_name: `Story for ${metadata.childName || 'a child'}`, quantity: 1, price: (amountTotal / 100).toFixed(2) }]
+          }
+        };
+
+        const ttRes = await fetch('https://business-api.tiktok.com/open_api/v1.3/event/track/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Token': tiktokToken
+          },
+          body: JSON.stringify(tiktokPayload)
+        });
+        const ttData = await ttRes.json();
+        console.log('TikTok Events API Purchase sent:', ttData);
+      } catch (ttErr) {
+        console.error('TikTok Events API error:', ttErr.message);
+      }
+    } else {
+      console.warn('TIKTOK_EVENTS_TOKEN not set, skipping server-side TikTok tracking');
+    }
+
+    console.log(`Server-side conversion tracking complete for session ${sessionId}`);
+  }
+
+  // ─── ABANDONED CART: recovery email ───
   if (event.type === 'checkout.session.expired') {
     const session = event.data.object;
     const email = session.customer_details?.email || session.customer_email;
@@ -156,7 +273,7 @@ function abandonedCartEmail(childName) {
       <p style="color:#666;font-size:15px;line-height:1.7;margin:0 0 20px;">
         ${hasChild
           ? `You were so close to creating something magical for ${safeChild}. A personalised audio story where ${safeChild} is the hero, narrated with their name woven into every chapter.`
-          : `You were so close to creating something magical. A personalised audio story where your child is the hero, narrated with their name woven into every chapter.`
+          : `You were so close to creating something magical. A personalised audio story where a child you love is the hero, with their name woven into every chapter.`
         }
       </p>
       <p style="color:#666;font-size:15px;line-height:1.7;margin:0 0 24px;">
@@ -168,7 +285,7 @@ function abandonedCartEmail(childName) {
       <div style="background:#FFF8F0;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 6px;font-size:14px;color:#2D2844;font-weight:700;">Not sure yet?</p>
         <p style="margin:0;font-size:13px;color:#666;line-height:1.6;">
-          Every story is truly unique. We use AI to write, narrate, and personalise a complete audio story around your child's name, age, interests, and the people they love. Nothing is recycled. Nothing is generic. It is theirs and theirs alone.
+          Every story is truly unique. I write, narrate, and personalise a complete audio story around their name, age, interests, and the people they love. Nothing is recycled. Nothing is generic. It is theirs and theirs alone.
         </p>
       </div>
       <p style="color:#999;font-size:13px;text-align:center;line-height:1.5;margin:0;">
@@ -178,7 +295,7 @@ function abandonedCartEmail(childName) {
         }
       </p>
     </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
     <p style="text-align:center;margin-top:12px;">
       <a href="https://storytold.ai" style="color:#bbb;font-size:11px;text-decoration:underline;">Unsubscribe</a>
     </p>

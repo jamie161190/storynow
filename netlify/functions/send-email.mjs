@@ -232,7 +232,7 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
         <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
       </div>`}
     </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
   </div>
 </body>
 </html>`;
@@ -270,7 +270,7 @@ function giftEmail(childName, giftFrom, giftMessage, storyId) {
         This story was made with love using Storytold, where every child becomes the hero of their own audio adventure.
       </p>
     </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
   </div>
 </body>
 </html>`;
@@ -311,7 +311,7 @@ function shareEmail(childName, fromName, message, storyId) {
         <a href="https://storytold.ai" style="color:#7C5CFC;font-size:14px;font-weight:600;text-decoration:none;">Create your own story &rarr;</a>
       </div>
     </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
   </div>
 </body>
 </html>`;
