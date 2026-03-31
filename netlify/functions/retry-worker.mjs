@@ -271,6 +271,10 @@ export default async (req) => {
           const safeChild = (childName || 'Your child').replace(/[<>&"']/g, '');
 
           try {
+            const safeEmail = (customerEmail || '').replace(/[<>&"']/g, '');
+            const categoryLabel = storyData.category === 'learning' ? 'Learning Adventure' : storyData.category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
+            const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai`);
+
             await fetch('https://api.resend.com/emails', {
               method: 'POST',
               headers: {
@@ -293,14 +297,30 @@ export default async (req) => {
       <p style="font-size:24px;text-align:center;margin:0 0 8px;">🎧</p>
       <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">${safeChild}'s story is ready!</h2>
       <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        Thank you for your patience. ${safeChild}'s personalised audio story has been created and is ready to enjoy.
+        Thank you for creating something truly special. ${safeChild}'s personalised ${categoryLabel.toLowerCase()} (~15 min) has been created and is ready to enjoy.
       </p>
-      <div style="text-align:center;margin:0 0 24px;">
+      ${storyId ? `<div style="text-align:center;margin:0 0 24px;">
         <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
+      </div>` : ''}
+      <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
+        <p style="margin:0 0 8px;font-size:15px;color:#2D2844;font-weight:700;">Share with the whole family</p>
+        <p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;">Grandparents, aunties, uncles. Let everyone hear ${safeChild}'s story. No extra cost.</p>
+        <a href="https://wa.me/?text=${waText}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;">Share on WhatsApp</a>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
-        You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email.
+        You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email:
       </p>
+      <div style="background:#F8F5FF;border-radius:10px;padding:12px;text-align:center;margin:0 0 20px;">
+        <p style="margin:0;font-size:16px;font-weight:700;color:#7C5CFC;">${safeEmail}</p>
+      </div>
+      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
+        We hope ${safeChild} loves every second of it.
+      </p>
+      <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
+        <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Loved it?</p>
+        <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Create another story for a child you love.</p>
+        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
+      </div>
     </div>
     <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
   </div>

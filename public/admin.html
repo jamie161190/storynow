@@ -102,7 +102,7 @@ audio { width: 100%; margin-top: 0.5rem; }
 
 <!-- Generate Story Modal -->
 <div class="modal-overlay" id="generateModal">
-  <div class="modal">
+  <div class="modal" style="max-height:85vh;overflow-y:auto">
     <h2>Generate Story</h2>
     <label>Customer email</label>
     <input type="email" id="genEmail" placeholder="customer@email.com">
@@ -123,8 +123,31 @@ audio { width: 100%; margin-top: 0.5rem; }
       <option value="boy">Boy</option>
       <option value="neutral">Neutral</option>
     </select>
-    <label>Extra details (optional)</label>
-    <textarea id="genDetails" placeholder="Loves dinosaurs, best friend is called Max..."></textarea>
+    <label>Themes (comma separated)</label>
+    <input type="text" id="genThemes" placeholder="e.g. Dinosaurs, Space, Football">
+    <label>Best friend</label>
+    <input type="text" id="genFriend" placeholder="e.g. Ellis, cousin Amara">
+    <label>Sidekick / adventure companion</label>
+    <input type="text" id="genSidekick" placeholder="e.g. Mum, Daddy, a robot called Sparky">
+    <label>Family members</label>
+    <input type="text" id="genFamily" placeholder="e.g. Mummy, Daddy, baby sister Isla">
+    <label>Pet</label>
+    <div style="display:flex;gap:0.5rem">
+      <input type="text" id="genPetName" placeholder="Pet name" style="flex:1">
+      <input type="text" id="genPetType" placeholder="Pet type" style="flex:1">
+    </div>
+    <label>Teacher name</label>
+    <input type="text" id="genTeacher" placeholder="e.g. Mrs Smith">
+    <label>Favourite teddy</label>
+    <input type="text" id="genTeddy" placeholder="e.g. Mr Snuggles">
+    <label>Proud of (something special about the child)</label>
+    <input type="text" id="genProud" placeholder="e.g. always sharing with friends">
+    <label>Where (setting)</label>
+    <input type="text" id="genWhere" placeholder="e.g. Enchanted Forest, Surprise me">
+    <label>Personal message</label>
+    <textarea id="genMessage" placeholder="e.g. Chase, this is from Daddy. I am so proud of you..."></textarea>
+    <label>Extra details</label>
+    <textarea id="genDetails" placeholder="Anything else..."></textarea>
     <label>Voice ID (optional)</label>
     <input type="text" id="genVoice" placeholder="Leave blank for default">
     <p id="genStatus" style="font-size:0.82rem;color:#7C5CFC;margin-top:0.75rem;display:none"></p>
@@ -262,10 +285,15 @@ function renderAttempts(attempts) {
     html += '<div class="card-detail">Category: ' + cat + '</div>';
     if (sd.age || sd.childAge) html += '<div class="card-detail">Age: ' + esc(sd.age || sd.childAge) + '</div>';
     if (sd.gender) html += '<div class="card-detail">Gender: ' + esc(sd.gender) + '</div>';
+    if (sd.themes && sd.themes.length) html += '<div class="card-detail">Themes: ' + esc(sd.themes.join(', ')) + '</div>';
+    if (sd.where) html += '<div class="card-detail">Setting: ' + esc(sd.where) + '</div>';
     if (sd.proudOf) html += '<div class="card-detail">Proud of: ' + esc(sd.proudOf) + '</div>';
     if (sd.friendName) html += '<div class="card-detail">Best friend: ' + esc(sd.friendName) + '</div>';
+    if (sd.sidekickName) html += '<div class="card-detail">Sidekick: ' + esc(sd.sidekickName) + '</div>';
     if (sd.familyMembers) html += '<div class="card-detail">Family: ' + esc(sd.familyMembers) + '</div>';
-    if (sd.petName) html += '<div class="card-detail">Pet: ' + esc(sd.petName) + ' (' + esc(sd.petType || '') + ')</div>';
+    if (sd.teacherName) html += '<div class="card-detail">Teacher: ' + esc(sd.teacherName) + '</div>';
+    if (sd.petName) html += '<div class="card-detail">Pet: ' + esc(sd.petName) + (sd.petType ? ' (' + esc(sd.petType) + ')' : '') + '</div>';
+    if (sd.favTeddy) html += '<div class="card-detail">Teddy: ' + esc(sd.favTeddy) + '</div>';
     if (sd.extraDetails) html += '<div class="card-detail">Extra: ' + esc(sd.extraDetails) + '</div>';
     if (sd.personalMessage) html += '<div class="card-detail">Message: ' + esc(sd.personalMessage) + '</div>';
     if (a.status) html += '<div class="card-detail"><span class="badge badge-orange">' + esc(a.status) + '</span></div>';
@@ -304,6 +332,17 @@ function openGenerateModal(email) {
   document.getElementById('genEmail').value = email || '';
   document.getElementById('genChildName').value = '';
   document.getElementById('genAge').value = '';
+  document.getElementById('genThemes').value = '';
+  document.getElementById('genFriend').value = '';
+  document.getElementById('genSidekick').value = '';
+  document.getElementById('genFamily').value = '';
+  document.getElementById('genPetName').value = '';
+  document.getElementById('genPetType').value = '';
+  document.getElementById('genTeacher').value = '';
+  document.getElementById('genTeddy').value = '';
+  document.getElementById('genProud').value = '';
+  document.getElementById('genWhere').value = '';
+  document.getElementById('genMessage').value = '';
   document.getElementById('genDetails').value = '';
   document.getElementById('genVoice').value = '';
   document.getElementById('genStatus').style.display = 'none';
@@ -321,7 +360,18 @@ function generateFromAttempt(attempt) {
   document.getElementById('genAge').value = sd.age || sd.childAge || '';
   document.getElementById('genCategory').value = sd.category || attempt.category || 'journey';
   document.getElementById('genGender').value = sd.gender || 'neutral';
-  document.getElementById('genDetails').value = [sd.proudOf, sd.friendName ? 'Best friend: ' + sd.friendName : '', sd.familyMembers ? 'Family: ' + sd.familyMembers : '', sd.petName ? 'Pet: ' + sd.petName : '', sd.extraDetails].filter(Boolean).join('. ');
+  document.getElementById('genThemes').value = (sd.themes || []).join(', ');
+  document.getElementById('genFriend').value = sd.friendName || '';
+  document.getElementById('genSidekick').value = sd.sidekickName || '';
+  document.getElementById('genFamily').value = sd.familyMembers || '';
+  document.getElementById('genPetName').value = sd.petName || '';
+  document.getElementById('genPetType').value = sd.petType || '';
+  document.getElementById('genTeacher').value = sd.teacherName || '';
+  document.getElementById('genTeddy').value = sd.favTeddy || '';
+  document.getElementById('genProud').value = sd.proudOf || '';
+  document.getElementById('genWhere').value = sd.where || '';
+  document.getElementById('genMessage').value = sd.personalMessage || '';
+  document.getElementById('genDetails').value = sd.extraDetails || '';
   document.getElementById('genVoice').value = attempt.voice_id || '';
   document.getElementById('genStatus').style.display = 'none';
   document.getElementById('generateModal').classList.add('active');
@@ -336,6 +386,17 @@ async function submitGenerate() {
   const age = document.getElementById('genAge').value.trim();
   const category = document.getElementById('genCategory').value;
   const gender = document.getElementById('genGender').value;
+  const themes = document.getElementById('genThemes').value.trim();
+  const friendName = document.getElementById('genFriend').value.trim();
+  const sidekickName = document.getElementById('genSidekick').value.trim();
+  const familyMembers = document.getElementById('genFamily').value.trim();
+  const petName = document.getElementById('genPetName').value.trim();
+  const petType = document.getElementById('genPetType').value.trim();
+  const teacherName = document.getElementById('genTeacher').value.trim();
+  const favTeddy = document.getElementById('genTeddy').value.trim();
+  const proudOf = document.getElementById('genProud').value.trim();
+  const where = document.getElementById('genWhere').value.trim();
+  const personalMessage = document.getElementById('genMessage').value.trim();
   const details = document.getElementById('genDetails').value.trim();
   const voiceId = document.getElementById('genVoice').value.trim();
 
@@ -355,9 +416,20 @@ async function submitGenerate() {
     age: age || '5',
     gender,
     category,
-    extraDetails: details,
     length: 'full'
   };
+  if (themes) storyData.themes = themes.split(',').map(t => t.trim()).filter(Boolean);
+  if (friendName) storyData.friendName = friendName;
+  if (sidekickName) storyData.sidekickName = sidekickName;
+  if (familyMembers) storyData.familyMembers = familyMembers;
+  if (petName) storyData.petName = petName;
+  if (petType) storyData.petType = petType;
+  if (teacherName) storyData.teacherName = teacherName;
+  if (favTeddy) storyData.favTeddy = favTeddy;
+  if (proudOf) storyData.proudOf = proudOf;
+  if (where) storyData.where = where;
+  if (personalMessage) storyData.personalMessage = personalMessage;
+  if (details) storyData.extraDetails = details;
 
   const data = await api('generate', {
     body: { email, storyData, voiceId: voiceId || undefined }
