@@ -9,8 +9,13 @@ export default async (req) => {
 
     const { sessionId } = await req.json();
 
-    if (!sessionId) {
+    if (!sessionId || typeof sessionId !== 'string') {
       return new Response(JSON.stringify({ error: 'Missing session ID' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // Validate session ID format (Stripe session IDs start with cs_)
+    if (!/^cs_[a-zA-Z0-9_]+$/.test(sessionId)) {
+      return new Response(JSON.stringify({ error: 'Invalid session ID' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
 
     const supabaseUrl = process.env.SUPABASE_URL;

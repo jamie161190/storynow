@@ -2,6 +2,16 @@
 
 export const WORD_COUNTS = { standard: 2200, long: 2200, epic: 2200 };
 
+// Age-adjusted word counts: younger children need shorter stories
+export function getWordCount(length, age) {
+  const base = WORD_COUNTS[length] || 2200;
+  const a = parseInt(age);
+  if (a <= 3) return Math.round(base * 0.55); // ~1200 words for toddlers
+  if (a <= 4) return Math.round(base * 0.7);  // ~1540 words for age 4
+  if (a <= 6) return Math.round(base * 0.85); // ~1870 words for ages 5-6
+  return base; // full 2200 for ages 7+
+}
+
 export const SYSTEM_PROMPT = `You are the world's greatest children's storyteller. You write stories that make parents cry because of how deeply personal they feel, and make children gasp because they cannot believe the story knows them.
 
 YOUR RULES:
@@ -52,6 +62,7 @@ Never write anything that could apply to any child. No "they were so brave" with
 
 9. START IMMEDIATELY
 No preamble. No "Once upon a time" unless it genuinely serves the story. Drop the listener straight into a moment. The first sentence should make a parent lean in.
+EXCEPTION: Bedtime stories may begin with a gentle, calming setup rather than immediate action. A soft sensory moment, a quiet discovery, a warm scene. The opening should draw the child in with wonder, not urgency.
 
 10. PACING
 Every story is ~15 minutes (~2200 words). For adventure and learning stories, use a four act structure with SUBPLOTS and SURPRISES. For bedtime stories, follow the specific bedtime structure in the story type instructions instead.
@@ -188,7 +199,7 @@ CRITICAL BEDTIME RULES:
 - Dialogue should be warm and quiet after the midpoint. Whispers, gentle questions, "Goodnight" exchanges.
 - For ages 2 to 4: heavy repetition, simple sound patterns, and a very clear "going to bed" ending. Think: "And they walked, and they walked, and the stars followed them all the way home."
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
+LENGTH: Approximately ${getWordCount(d.length, d.age)} words.
 
 ${getAgeBand(d.age)}
 
@@ -217,7 +228,7 @@ EMOTIONAL CORE: Every great adventure story needs a heart. Somewhere in the midd
 
 THE ENDING: The adventure resolves with ${d.childName} doing something brave, clever, or kind. Not through luck or magic, but through something they did, said, or figured out. Then the final line should leave a door open: a wink, a mysterious clue, a whispered "see you next time." The child should look up and say "can I get another one?"
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
+LENGTH: Approximately ${getWordCount(d.length, d.age)} words.
 
 ${getAgeBand(d.age)}
 
@@ -295,7 +306,7 @@ DIFFICULTY CURVE FOR MEDIUM AND LONG:
 THE VILLAIN OR OBSTACLE:
 There should be an antagonist or major obstacle that can ONLY be defeated through the child's knowledge. Not a scary villain, but a compelling one. A trickster who thinks ${d.childName} cannot solve the puzzles. A locked kingdom that has been waiting for someone smart enough. A machine that is broken and only the right answers can fix it. This gives the challenges STAKES beyond "answer the question."
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
+LENGTH: Approximately ${getWordCount(d.length, d.age)} words.
 
 ${getAgeBand(d.age)}
 
@@ -319,7 +330,7 @@ HOW TO STRUCTURE THIS:
 - ${d.friendName} must have at least 3 distinct moments and should help ${d.childName} through the emotional core of the story.
 - The scenario should be addressed through METAPHOR and ADVENTURE, not directly. If the child is nervous about the dentist, the story might involve a brave explorer who has to enter a mysterious cave where a friendly giant checks everyone's teeth. The child should see themselves in the character without feeling like they are being lectured.
 
-LENGTH: Approximately ${WORD_COUNTS[d.length] || 2200} words.
+LENGTH: Approximately ${getWordCount(d.length, d.age)} words.
 
 ${getAgeBand(d.age)}
 
@@ -363,5 +374,5 @@ HERE IS THE OPENING THAT HAS ALREADY BEEN WRITTEN AND READ TO THE CHILD:
 ${previewStory}
 ---
 
-Continue this story now. Write the REMAINING portion (approximately ${(WORD_COUNTS[storyData.length] || 2200) - 80} words) to complete the full story. The listener will hear the opening above followed immediately by what you write now, so the transition must be seamless. Do not repeat the opening. Do not summarise what happened. Just continue.`;
+Continue this story now. Write the REMAINING portion (approximately ${getWordCount(storyData.length, storyData.age) - 80} words) to complete the full story. The listener will hear the opening above followed immediately by what you write now, so the transition must be seamless. Do not repeat the opening. Do not summarise what happened. Just continue.`;
 }

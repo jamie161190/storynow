@@ -1124,6 +1124,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 <!-- LOADING -->
 <div class="screen loading-screen" id="screenLoading">
+  <!-- Jamie's personal message -->
+  <div id="loadingJamie" style="display:flex;align-items:center;gap:0.75rem;background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);padding:0.85rem 1rem;margin-bottom:1.5rem;max-width:380px;width:100%;box-shadow:var(--shadow)">
+    <img src="/jamie-chase.jpg" alt="Jamie" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0">
+    <p style="margin:0;font-size:0.82rem;color:var(--text);line-height:1.5;font-weight:500"><strong style="color:var(--purple)">Jamie here.</strong> I'm writing this one by hand. Give me a minute.</p>
+  </div>
+
   <div class="loader-wrap">
     <div class="loader-dot"></div>
     <div class="loader-dot"></div>
@@ -1132,6 +1138,81 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   </div>
   <p class="loading-text">Writing their story...</p>
   <p class="loading-sub">Every detail you shared is being woven in. This usually takes about a minute.</p>
+
+  <!-- Animated detail cards: show the child's details appearing one by one -->
+  <div id="loadingDetails" style="display:flex;flex-wrap:wrap;gap:0.4rem;justify-content:center;max-width:380px;margin-top:1.25rem"></div>
+
+  <!-- Progress bar -->
+  <div style="width:100%;max-width:300px;margin-top:1.25rem">
+    <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+      <div id="loadingProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--orange));border-radius:2px;transition:width 0.8s ease"></div>
+    </div>
+  </div>
+</div>
+
+<!-- POST-PAYMENT GENERATION -->
+<div class="screen loading-screen" id="screenGenerating">
+  <!-- Payment confirmed banner -->
+  <div style="background:var(--green-light);border:2px solid var(--green);border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:1rem;max-width:400px;width:100%;text-align:center">
+    <p style="margin:0;font-size:0.85rem;font-weight:700;color:#2E7D32">&#10003; Payment confirmed. Your story is being made.</p>
+  </div>
+
+  <!-- Do not close warning -->
+  <div style="background:var(--orange-light);border:2px solid var(--orange);border-radius:var(--radius);padding:0.65rem 1rem;margin-bottom:1.5rem;max-width:400px;width:100%;text-align:center">
+    <p style="margin:0;font-size:0.78rem;font-weight:700;color:#E65100">&#9888; Please don't close or refresh this page</p>
+  </div>
+
+  <!-- Jamie message -->
+  <div style="display:flex;align-items:center;gap:0.75rem;background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);padding:0.85rem 1rem;margin-bottom:1.5rem;max-width:400px;width:100%;box-shadow:var(--shadow)">
+    <img src="/jamie-chase.jpg" alt="Jamie" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0">
+    <p style="margin:0;font-size:0.82rem;color:var(--text);line-height:1.5;font-weight:500" id="genJamieMsg"><strong style="color:var(--purple)">Jamie here.</strong> I'm writing the full story now. This is the big one. Give me a few minutes.</p>
+  </div>
+
+  <!-- Stage progress -->
+  <div style="max-width:400px;width:100%;margin-bottom:1.5rem">
+    <div id="genStages" style="display:flex;flex-direction:column;gap:0.6rem">
+      <div class="gen-stage" id="genStage1" style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;background:var(--card);border:2px solid var(--border);border-radius:12px;transition:all 0.4s">
+        <span id="genIcon1" style="font-size:1.2rem;flex-shrink:0;width:28px;text-align:center">&#9202;</span>
+        <div style="flex:1">
+          <p style="margin:0;font-size:0.85rem;font-weight:700;color:var(--text)" id="genLabel1">Writing the full story</p>
+          <p style="margin:0.1rem 0 0;font-size:0.72rem;color:var(--text-muted);font-weight:500" id="genDesc1">Continuing from your preview, adding twists, dialogue, and every detail you shared</p>
+        </div>
+      </div>
+      <div class="gen-stage" id="genStage2" style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;background:var(--card);border:2px solid var(--border);border-radius:12px;opacity:0.4;transition:all 0.4s">
+        <span id="genIcon2" style="font-size:1.2rem;flex-shrink:0;width:28px;text-align:center">&#127908;</span>
+        <div style="flex:1">
+          <p style="margin:0;font-size:0.85rem;font-weight:700;color:var(--text)" id="genLabel2">Recording the narration</p>
+          <p style="margin:0.1rem 0 0;font-size:0.72rem;color:var(--text-muted);font-weight:500" id="genDesc2">Your chosen voice brings every word to life</p>
+        </div>
+      </div>
+      <div class="gen-stage" id="genStage3" style="display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1rem;background:var(--card);border:2px solid var(--border);border-radius:12px;opacity:0.4;transition:all 0.4s">
+        <span id="genIcon3" style="font-size:1.2rem;flex-shrink:0;width:28px;text-align:center">&#10024;</span>
+        <div style="flex:1">
+          <p style="margin:0;font-size:0.85rem;font-weight:700;color:var(--text)" id="genLabel3">Final polish</p>
+          <p style="margin:0.1rem 0 0;font-size:0.72rem;color:var(--text-muted);font-weight:500" id="genDesc3">Blending audio, checking quality, making it perfect</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Animated progress bar -->
+  <div style="width:100%;max-width:400px;margin-bottom:0.5rem">
+    <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden">
+      <div id="genProgress" style="height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--orange),var(--green));border-radius:3px;transition:width 1.2s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:0.35rem">
+      <span id="genProgressLabel" style="font-size:0.72rem;color:var(--text-muted);font-weight:600">Starting...</span>
+      <span id="genTimer" style="font-size:0.72rem;color:var(--text-muted);font-weight:600">0:00</span>
+    </div>
+  </div>
+
+  <!-- Fun fact / reassurance rotating -->
+  <div style="max-width:400px;width:100%;margin-top:1rem;text-align:center">
+    <p id="genFunFact" style="font-size:0.78rem;color:var(--text-soft);font-style:italic;line-height:1.5;font-weight:500;transition:opacity 0.5s"></p>
+  </div>
+
+  <!-- Safety net -->
+  <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin-top:1rem;max-width:340px">If anything goes wrong, your payment is safe and I will sort it out personally. <a href="mailto:hello@storytold.ai" style="color:var(--purple);font-weight:600">hello@storytold.ai</a></p>
 </div>
 
 <!-- PREVIEW -->
@@ -1458,6 +1539,7 @@ function trackEvent(eventName, params) {
 function playSample() {
   const audio = document.getElementById('sampleAudio');
   const icon = document.getElementById('sampleIcon');
+  audio.volume = 0.75;
   if (audio.paused) {
     audio.play();
     trackEvent('SamplePlay', { content_name: 'homepage_sample' });
@@ -1505,7 +1587,7 @@ function escHtml(str) {
 const bgMusic = {
   audio: new Audio(),
   fadeInterval: null,
-  targetVolume: 0.03,
+  targetVolume: 0.06,
   currentNarration: null,
 
   // Track URLs per category (hosted in Supabase storage)
@@ -2507,6 +2589,44 @@ async function generatePreview() {
   const loadingSub = document.querySelector('.loading-sub');
   loadingText.textContent = msgs[0];
   loadingSub.textContent = 'Every detail you shared is being woven in. This usually takes about a minute.';
+
+  // Animated detail pills: show each personal detail appearing one by one
+  const detailsWrap = document.getElementById('loadingDetails');
+  detailsWrap.innerHTML = '';
+  const catLabelsLoading = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story', custom:'Custom story' };
+  const pills = [];
+  pills.push(escHtml(d.childName));
+  if (d.age) pills.push('Age ' + escHtml(String(d.age)));
+  pills.push(escHtml(catLabelsLoading[d.category] || 'Story'));
+  if (d.friendName) pills.push(escHtml(d.friendName));
+  if (d.sidekickName) pills.push(escHtml(d.sidekickName));
+  if (d.hasPet && d.petName) pills.push(escHtml(d.petName) + ' the ' + escHtml(d.petType || 'pet'));
+  if (d.themes && d.themes.length) d.themes.forEach(t => pills.push(escHtml(t)));
+  if (d.setting && d.setting !== 'Surprise me') pills.push(escHtml(d.setting));
+  if (d.favTeddy) pills.push(escHtml(d.favTeddy));
+  if (d.familyMembers) pills.push(escHtml(d.familyMembers));
+
+  let pillIdx = 0;
+  const pillInterval = setInterval(() => {
+    if (pillIdx >= pills.length) { clearInterval(pillInterval); return; }
+    const span = document.createElement('span');
+    span.textContent = pills[pillIdx];
+    span.style.cssText = 'display:inline-block;background:var(--cat-accent-light,var(--purple-light));color:var(--cat-accent,var(--purple));font-size:0.72rem;font-weight:700;padding:0.3rem 0.7rem;border-radius:20px;opacity:0;transform:scale(0.8);transition:all 0.4s ease';
+    detailsWrap.appendChild(span);
+    requestAnimationFrame(() => { span.style.opacity = '1'; span.style.transform = 'scale(1)'; });
+    pillIdx++;
+  }, 1800);
+
+  // Progress bar animation
+  const progressBar = document.getElementById('loadingProgress');
+  if (progressBar) progressBar.style.width = '0%';
+  let progressPct = 0;
+  const progressInterval = setInterval(() => {
+    progressPct += Math.random() * 8 + 2;
+    if (progressPct > 90) progressPct = 90;
+    if (progressBar) progressBar.style.width = progressPct + '%';
+  }, 3000);
+
   const msgInterval = setInterval(() => {
     msgIdx++;
     if (msgIdx < msgs.length) loadingText.textContent = msgs[msgIdx];
@@ -2592,6 +2712,9 @@ async function generatePreview() {
     document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story for £19.99';
 
     clearInterval(msgInterval);
+    clearInterval(pillInterval);
+    clearInterval(progressInterval);
+    if (progressBar) progressBar.style.width = '100%';
 
     // Populate preview screen with story summary
     const catLabels = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story' };
@@ -2620,6 +2743,8 @@ async function generatePreview() {
     goTo('screenPreview');
   } catch(err) {
     clearInterval(msgInterval);
+    clearInterval(pillInterval);
+    clearInterval(progressInterval);
     console.error('Preview generation error:', err.message);
     // Show error on the loading screen with a retry button
     const loadingText = document.querySelector('.loading-text');
@@ -2670,21 +2795,23 @@ async function unlockFull() {
 
   if (BYPASS_PAYMENT) {
     // TEMPORARY: skip Stripe, go straight to full audio generation
-    goTo('screenLoading');
-    document.querySelector('.loading-text').textContent = 'Writing the full story...';
-    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. Your complete story is being written and recorded.';
+    startGeneratingScreen(storyData.childName);
     const fakeSessionId = 'bypass-' + Date.now();
     const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     try {
-      // Call background function directly (fire and forget, returns 202)
-      fetch('/.netlify/functions/full-worker-background', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId: fakeSessionId, jobId: fullJobId })
-      }).catch(e => console.log('BG trigger:', e.message));
+      // Call background function with retry
+      const bgPayloadBypass = JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId: fakeSessionId, jobId: fullJobId });
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const bgRes = await fetch('/.netlify/functions/full-worker-background', { method:'POST', headers:{'Content-Type':'application/json'}, body: bgPayloadBypass });
+          if (bgRes.ok || bgRes.status === 202) break;
+        } catch(e) { console.log('BG trigger attempt', attempt + 1, ':', e.message); }
+        if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+      }
 
       // Poll for the result
       let data = await pollForFull(fullJobId);
+      stopGeneratingScreen();
       if (!data || !data.success) throw new Error('Audio generation timed out. Please try again.');
       const audio = document.getElementById('fullStoryAudio');
       audio.volume = 0.75;
@@ -2703,6 +2830,7 @@ async function unlockFull() {
       goTo('screenFull');
       showNextStoryBanner(previewEmail);
     } catch(err) {
+      stopGeneratingScreen();
       alert('Something went wrong: ' + err.message);
       goTo('screenPreview');
       isCheckingOut = false;
@@ -2796,23 +2924,33 @@ async function handleStripeReturn() {
     // Fire Purchase event across all pixels
     trackEvent('Purchase', { value: 19.99, currency: 'GBP', content_name: storyData.category });
 
-    // Payment confirmed, now generate full audio
-    document.querySelector('.loading-text').textContent = 'Writing the full story...';
-    document.querySelector('.loading-sub').textContent = 'This takes a few minutes. Your complete story is being written and recorded.';
+    // Payment confirmed, switch to dedicated generation screen
+    startGeneratingScreen(storyData.childName);
 
     const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
 
-    // Call background function directly (fire and forget, returns 202)
-    fetch('/.netlify/functions/full-worker-background', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId, jobId: fullJobId })
-    }).catch(e => console.log('BG trigger:', e.message));
+    // Call background function with retry (critical: user has paid)
+    const bgPayload = JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId, jobId: fullJobId });
+    let bgTriggered = false;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const bgRes = await fetch('/.netlify/functions/full-worker-background', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: bgPayload
+        });
+        if (bgRes.ok || bgRes.status === 202) { bgTriggered = true; break; }
+        console.log('BG trigger attempt', attempt + 1, 'status:', bgRes.status);
+      } catch(e) {
+        console.log('BG trigger attempt', attempt + 1, 'error:', e.message);
+      }
+      if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+    }
+    if (!bgTriggered) console.warn('All BG trigger attempts failed, polling may still recover if worker started');
 
     // Poll for the result
-    document.querySelector('.loading-text').textContent = 'Writing the full story...';
-    document.querySelector('.loading-sub').textContent = 'Your payment is confirmed. The audio is being generated.';
     let data = await pollForFull(fullJobId);
+    stopGeneratingScreen();
     if (!data || !data.success) throw new Error('Audio generation timed out. Your payment is safe. Please contact hello@storytold.ai');
 
     const audio = document.getElementById('fullStoryAudio');
@@ -2876,6 +3014,7 @@ async function handleStripeReturn() {
     goTo('screenFull');
     showNextStoryBanner(verifyData.customerEmail);
   } catch(err) {
+    stopGeneratingScreen();
     // Always offer retry after payment failure. The session_id is still in the URL
     // (we no longer clean it early), so a reload will re-trigger handleStripeReturn.
     // Story data will be recovered from sessionStorage or Supabase pending backup.
@@ -2991,6 +3130,129 @@ function copyDiscountCode() {
     copied.style.display = 'block';
     setTimeout(() => { copied.style.display = 'none'; }, 2000);
   }).catch(() => {});
+}
+
+// ===== POST-PAYMENT GENERATION SCREEN =====
+let genTimerInterval = null;
+let genFactInterval = null;
+let genProgressInterval = null;
+let genStageTimeout1 = null;
+let genStageTimeout2 = null;
+
+function startGeneratingScreen(childName) {
+  goTo('screenGenerating');
+
+  // Personalise Jamie's message
+  const jamie = document.getElementById('genJamieMsg');
+  if (jamie && childName) {
+    jamie.innerHTML = `<strong style="color:var(--purple)">Jamie here.</strong> I'm writing ${escHtml(childName)}'s full story now. This is the big one. Give me a few minutes.`;
+  }
+
+  // Timer
+  const timerEl = document.getElementById('genTimer');
+  let seconds = 0;
+  if (genTimerInterval) clearInterval(genTimerInterval);
+  genTimerInterval = setInterval(() => {
+    seconds++;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    timerEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }, 1000);
+
+  // Progress bar (slow, organic growth)
+  const bar = document.getElementById('genProgress');
+  const label = document.getElementById('genProgressLabel');
+  bar.style.width = '0%';
+  let pct = 0;
+  if (genProgressInterval) clearInterval(genProgressInterval);
+  genProgressInterval = setInterval(() => {
+    // Slow climb, never reaches 100 until done
+    if (pct < 30) pct += Math.random() * 3 + 1;
+    else if (pct < 60) pct += Math.random() * 2 + 0.5;
+    else if (pct < 85) pct += Math.random() * 1.5 + 0.3;
+    else if (pct < 92) pct += Math.random() * 0.5;
+    if (pct > 92) pct = 92;
+    bar.style.width = pct + '%';
+    if (pct < 35) label.textContent = 'Writing the story...';
+    else if (pct < 65) label.textContent = 'Recording narration...';
+    else label.textContent = 'Almost ready...';
+  }, 2000);
+
+  // Stage animations (timed to roughly match real generation)
+  // Stage 1 starts active immediately
+  const s1 = document.getElementById('genStage1');
+  const s2 = document.getElementById('genStage2');
+  const s3 = document.getElementById('genStage3');
+  s1.style.opacity = '1'; s1.style.borderColor = 'var(--purple)'; s1.style.background = 'var(--purple-light)';
+  document.getElementById('genIcon1').textContent = '\u23F3'; // hourglass
+
+  // Stage 2 activates around 60s (story text is done, TTS begins)
+  if (genStageTimeout1) clearTimeout(genStageTimeout1);
+  genStageTimeout1 = setTimeout(() => {
+    s1.style.borderColor = 'var(--green)'; s1.style.background = 'var(--green-light)';
+    document.getElementById('genIcon1').textContent = '\u2705';
+    s2.style.opacity = '1'; s2.style.borderColor = 'var(--purple)'; s2.style.background = 'var(--purple-light)';
+    document.getElementById('genIcon2').textContent = '\u23F3';
+  }, 60000);
+
+  // Stage 3 activates around 150s (TTS mostly done, combining)
+  if (genStageTimeout2) clearTimeout(genStageTimeout2);
+  genStageTimeout2 = setTimeout(() => {
+    s2.style.borderColor = 'var(--green)'; s2.style.background = 'var(--green-light)';
+    document.getElementById('genIcon2').textContent = '\u2705';
+    s3.style.opacity = '1'; s3.style.borderColor = 'var(--purple)'; s3.style.background = 'var(--purple-light)';
+    document.getElementById('genIcon3').textContent = '\u23F3';
+  }, 150000);
+
+  // Fun facts / reassurance messages
+  const facts = [
+    `Every story is unique. No two children will ever hear the same thing.`,
+    `The narrator is recording every line with real emotion and expression.`,
+    `${childName ? escHtml(childName) + "'s" : "Their"} name will appear at least 8 times throughout the story.`,
+    `The story has been planned from start to finish before a single word was written.`,
+    `Every detail you shared is being woven into the plot, not just mentioned once.`,
+    `The best friend gets their own personality, dialogue, and at least 3 standout moments.`,
+    `You can download, share, and replay this story as many times as you like. It's yours forever.`,
+    `If it's not magical enough, I'll rewrite it for free. That's a genuine promise.`,
+    `Stories are written for the ear, not the eye. Pauses, rhythm, and pacing are all built in.`,
+    `Almost there. Something special is taking shape.`
+  ];
+  let factIdx = 0;
+  const factEl = document.getElementById('genFunFact');
+  factEl.style.opacity = '1';
+  factEl.textContent = facts[0];
+  if (genFactInterval) clearInterval(genFactInterval);
+  genFactInterval = setInterval(() => {
+    factIdx++;
+    if (factIdx >= facts.length) factIdx = 0;
+    factEl.style.opacity = '0';
+    setTimeout(() => {
+      factEl.textContent = facts[factIdx];
+      factEl.style.opacity = '1';
+    }, 400);
+  }, 12000);
+}
+
+function stopGeneratingScreen() {
+  if (genTimerInterval) { clearInterval(genTimerInterval); genTimerInterval = null; }
+  if (genFactInterval) { clearInterval(genFactInterval); genFactInterval = null; }
+  if (genProgressInterval) { clearInterval(genProgressInterval); genProgressInterval = null; }
+  if (genStageTimeout1) { clearTimeout(genStageTimeout1); genStageTimeout1 = null; }
+  if (genStageTimeout2) { clearTimeout(genStageTimeout2); genStageTimeout2 = null; }
+  // Complete the progress bar
+  const bar = document.getElementById('genProgress');
+  if (bar) bar.style.width = '100%';
+  // Mark all stages complete
+  ['genStage1','genStage2','genStage3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.style.opacity = '1'; el.style.borderColor = 'var(--green)'; el.style.background = 'var(--green-light)'; }
+  });
+  ['genIcon1','genIcon2','genIcon3'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '\u2705';
+  });
+  const label = document.getElementById('genProgressLabel');
+  if (label) label.textContent = 'Complete!';
 }
 
 async function showNextStoryBanner(email) {
@@ -3279,6 +3541,7 @@ async function loadSharedStory(storyId) {
     currentPlayingCategory = s.category || 'journey';
     applyCategoryTheme(currentPlayingCategory);
     document.getElementById('sharedAudio').src = s.audioUrl;
+    document.getElementById('sharedAudio').volume = 0.75;
     document.getElementById('sharedLoading').style.display = 'none';
     document.querySelector('#screenShared .full-player').style.display = 'block';
   } catch (err) {
@@ -3494,6 +3757,7 @@ async function sendShareEmail() {
 // Play a story from the library
 function playLibraryStory(story) {
   const audio = document.getElementById('fullStoryAudio');
+  audio.volume = 0.75;
   audio.src = story.audioUrl;
   currentPlayingCategory = story.category || 'journey';
   applyCategoryTheme(currentPlayingCategory);

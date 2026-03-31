@@ -97,30 +97,41 @@ export default async (req) => {
     console.log('Generating preview inline for job:', jobId, 'category:', storyData.category);
     const startTime = Date.now();
 
-    // ── Step 1: Call Anthropic API directly via fetch ──
-    const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json'
+    // ── Step 1: Call Anthropic API with retry ──
+    const apiBody = JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 16000,
+      temperature: 0.8,
+      thinking: {
+        type: 'enabled',
+        budget_tokens: 1024
       },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 16000,
-        temperature: 1,
-        thinking: {
-          type: 'enabled',
-          budget_tokens: 1024
-        },
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
-      })
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
     });
 
-    if (!apiResponse.ok) {
+    let apiResponse;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json'
+        },
+        body: apiBody
+      });
+      if (apiResponse.ok) break;
       const errBody = await apiResponse.text();
-      console.error('Anthropic API error:', apiResponse.status, errBody);
+      console.error('Anthropic API error (attempt ' + (attempt + 1) + '):', apiResponse.status, errBody);
+      if (attempt < 2 && (apiResponse.status === 429 || apiResponse.status >= 500)) {
+        const waitMs = apiResponse.status === 429 ? 5000 : 2000 * (attempt + 1);
+        await new Promise(r => setTimeout(r, waitMs));
+        continue;
+      }
+    }
+
+    if (!apiResponse.ok) {
       return new Response(JSON.stringify({ error: 'Story generation failed. Please try again.' }), {
         status: 500, headers: { 'Content-Type': 'application/json' }
       });

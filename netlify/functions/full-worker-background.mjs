@@ -143,7 +143,7 @@ export const handler = async (event) => {
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 16000,
-          temperature: 1,
+          temperature: 0.8,
           thinking: {
             type: 'enabled',
             budget_tokens: 5000
