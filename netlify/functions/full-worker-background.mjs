@@ -167,7 +167,7 @@ export const handler = async (event) => {
       });
 
       let apiResponse;
-      for (let attempt = 0; attempt < 3; attempt++) {
+      for (let attempt = 0; attempt < 5; attempt++) {
         apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: {
@@ -179,8 +179,8 @@ export const handler = async (event) => {
         });
         if (apiResponse.ok) break;
         const shouldRetry = apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500;
-        if (attempt < 2 && shouldRetry) {
-          const waitMs = apiResponse.status === 429 ? 5000 : 3000 * (attempt + 1);
+        if (attempt < 4 && shouldRetry) {
+          const waitMs = apiResponse.status === 429 ? 8000 : 4000 * (attempt + 1);
           console.log('[PREVIEW-BG] Anthropic returned ' + apiResponse.status + ', retrying in ' + waitMs + 'ms (attempt ' + (attempt + 1) + ')');
           await new Promise(r => setTimeout(r, waitMs));
           continue;
