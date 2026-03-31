@@ -302,7 +302,7 @@ export const handler = async (event) => {
             temperature: 1,
             thinking: {
               type: 'enabled',
-              budget_tokens: 5000
+              budget_tokens: 2000
             },
             system: SYSTEM_PROMPT,
             messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
