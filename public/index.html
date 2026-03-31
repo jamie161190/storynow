@@ -2837,6 +2837,10 @@ async function pollForFull(jobId) {
       const res = await fetch('/api/check-full?jobId=' + jobId);
       const data = await res.json();
       if (data.ready && data.success) { clearInterval(msgTimer); return data; }
+      if (data.ready && data.success === false && data.error) {
+        clearInterval(msgTimer);
+        return { success: false, error: data.error };
+      }
     } catch(e) { /* keep polling */ }
   }
   clearInterval(msgTimer);

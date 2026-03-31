@@ -257,25 +257,36 @@ export const handler = async (event) => {
     const storyStart = Date.now();
     let continuationText;
     try {
-      const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'x-api-key': process.env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 16000,
-          temperature: 1,
-          thinking: {
-            type: 'enabled',
-            budget_tokens: 5000
+      let apiResponse;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': process.env.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+            'Content-Type': 'application/json'
           },
-          system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
-        })
-      });
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 16000,
+            temperature: 1,
+            thinking: {
+              type: 'enabled',
+              budget_tokens: 5000
+            },
+            system: SYSTEM_PROMPT,
+            messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
+          })
+        });
+        if (apiResponse.ok) break;
+        const shouldRetry = apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500;
+        if (attempt < 4 && shouldRetry) {
+          const waitMs = apiResponse.status === 429 ? 8000 : 4000 * (attempt + 1);
+          console.log('[FULL-BG] Anthropic returned ' + apiResponse.status + ', retrying in ' + waitMs + 'ms (attempt ' + (attempt + 1) + ')');
+          await new Promise(r => setTimeout(r, waitMs));
+          continue;
+        }
+      }
 
       if (!apiResponse.ok) {
         const errBody = await apiResponse.text();
