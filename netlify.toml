@@ -21,6 +21,9 @@
 [functions."create-discount"]
   external_node_modules = ["stripe"]
 
+[functions."stripe-webhook"]
+  external_node_modules = ["stripe"]
+
 
 [[edge_functions]]
   path = "/"
