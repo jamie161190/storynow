@@ -20,7 +20,7 @@ export default async (req) => {
     }
 
     const body = await req.json();
-    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText, contactName, contactEmail, contactText } = body;
+    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText, contactName, contactEmail, contactText, discountCode, discountPercent } = body;
 
     if (!type || !to) {
       return new Response(JSON.stringify({ error: 'Missing type or recipient email' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -133,7 +133,7 @@ export default async (req) => {
 
     if (type === 'purchase') {
       subject = `${esc(childName)}'s story is ready! 🎧`;
-      html = purchaseEmail(childName, category, length, to, storyId);
+      html = purchaseEmail(childName, category, length, to, storyId, discountCode, discountPercent);
     } else if (type === 'gift') {
       subject = `${esc(giftFrom)} made something special for ${esc(childName)} 🎁`;
       html = giftEmail(childName, giftFrom, giftMessage, storyId);
@@ -179,7 +179,7 @@ export default async (req) => {
   }
 };
 
-function purchaseEmail(childName, category, length, customerEmail, storyId) {
+function purchaseEmail(childName, category, length, customerEmail, storyId, discountCode, discountPercent) {
   const safeChild = esc(childName);
   const safeEmail = esc(customerEmail);
   const lengthLabel = '~15 min';
@@ -220,11 +220,17 @@ function purchaseEmail(childName, category, length, customerEmail, storyId) {
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
         We hope ${safeChild} loves every second of it.
       </p>
+      ${discountCode ? `
       <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
-        <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Your next story: 25% off</p>
-        <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Because you are part of the Storytold family. Use code <strong style="color:#7C5CFC">NEXTONE</strong> at checkout.</p>
+        <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Your next story: ${discountPercent || 25}% off</p>
+        <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Because you are part of the Storytold family. Use code <strong style="color:#7C5CFC">${esc(discountCode)}</strong> at checkout.</p>
         <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
-      </div>
+      </div>` : `
+      <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
+        <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Loved it?</p>
+        <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Create another story for a child you love.</p>
+        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
+      </div>`}
     </div>
     <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know your child by name.</p>
   </div>

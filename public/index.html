@@ -3054,7 +3054,23 @@ async function handleStripeReturn() {
           console.error('Story save retry also failed:', retryErr);
         }
       }
-      sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId);
+      // Generate discount code BEFORE sending email so the email contains the real code
+      let discountCode = null;
+      let discountPercent = 25;
+      try {
+        const discRes = await fetch('/api/create-discount', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ customerEmail: verifyData.customerEmail })
+        });
+        const discData = await discRes.json();
+        if (discData.success && discData.code) {
+          discountCode = discData.code;
+          discountPercent = discData.percentOff || 25;
+        }
+      } catch(e) { console.error('Discount code generation failed:', e); }
+
+      sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId, discountCode, discountPercent);
 
       // If it's a gift and they provided an email, send regardless of DB save
       if (storyData.isGift && storyData.giftEmail) {
@@ -3089,7 +3105,7 @@ async function handleStripeReturn() {
     window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
-    showNextStoryBanner(verifyData.customerEmail);
+    showNextStoryBanner(verifyData.customerEmail, discountCode, discountPercent);
   } catch(err) {
     stopGeneratingScreen();
     // Always offer retry after payment failure. The session_id is still in the URL
@@ -3336,9 +3352,18 @@ function stopGeneratingScreen() {
   if (label) label.textContent = 'Complete!';
 }
 
-async function showNextStoryBanner(email) {
+async function showNextStoryBanner(email, existingCode, existingPercent) {
   const banner = document.getElementById('nextStoryBanner');
   if (!banner) return;
+
+  // Use pre-generated code if available, otherwise generate one
+  if (existingCode) {
+    document.getElementById('nsbCode').textContent = existingCode;
+    document.querySelector('.nsb-sub').textContent = `Use this code at checkout for ${existingPercent || 25}% off your next story`;
+    banner.style.display = 'block';
+    return;
+  }
+
   try {
     const res = await fetch('/api/create-discount', {
       method: 'POST',
@@ -3353,7 +3378,6 @@ async function showNextStoryBanner(email) {
     }
   } catch (e) {
     console.error('Failed to generate discount code:', e);
-    // Don't show the banner if we couldn't generate a code
   }
 }
 
@@ -3412,7 +3436,7 @@ async function sendGift() {
 }
 
 // Send purchase confirmation email (called after successful payment)
-async function sendPurchaseEmail(email, stripeSessionId, storyId) {
+async function sendPurchaseEmail(email, stripeSessionId, storyId, discountCode, discountPercent) {
   try {
     await fetch('/api/send-email', {
       method:'POST',
@@ -3424,7 +3448,9 @@ async function sendPurchaseEmail(email, stripeSessionId, storyId) {
         category: storyData.category,
         length: storyData.length,
         sessionId: stripeSessionId,
-        storyId: storyId || null
+        storyId: storyId || null,
+        discountCode: discountCode || null,
+        discountPercent: discountPercent || 25
       })
     });
   } catch(e) { /* silent */ }
