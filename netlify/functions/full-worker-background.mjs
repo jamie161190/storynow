@@ -326,7 +326,7 @@ export const handler = async (event) => {
     console.log(`[FULL-BG] Split into ${chunks.length} TTS chunks`);
 
     const audioBuffers = [];
-    const BATCH_SIZE = 2;
+    const BATCH_SIZE = 5;
     const ttsStart = Date.now();
 
     for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
