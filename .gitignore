@@ -1,3 +1,9 @@
 node_modules/
 .env
 uploads/
+
+generate-stories.mjs
+generate_previews.mjs
+generate_stories_batch2.mjs
+test-api.mjs
+test-sdk.mjs
