@@ -97,13 +97,15 @@ export default async (req) => {
     console.log('Generating preview inline for job:', jobId, 'category:', storyData.category);
     const startTime = Date.now();
 
-    // ── Step 1: Call Anthropic API ──
-    // Preview is only 60-80 words, so NO thinking mode needed (saves ~5-10s).
-    // Lower max_tokens since preview is tiny.
+    // ── Step 1: Call Anthropic API with thinking for best quality ──
     const apiBody = JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 16000,
       temperature: 0.8,
+      thinking: {
+        type: 'enabled',
+        budget_tokens: 1024
+      },
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
     });
