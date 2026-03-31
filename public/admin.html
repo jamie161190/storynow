@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storytold Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Quicksand', sans-serif; background: #FEFBF6; color: #2D2844; min-height: 100vh; }
+.login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.login-box { background: #fff; border-radius: 16px; padding: 2rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 360px; width: 100%; text-align: center; }
+.login-box h1 { color: #7C5CFC; font-size: 1.5rem; margin-bottom: 1rem; }
+.login-box input { width: 100%; padding: 0.75rem 1rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 1rem; font-family: inherit; margin-bottom: 0.75rem; }
+.login-box button { width: 100%; padding: 0.75rem; background: #7C5CFC; color: #fff; border: none; border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+.login-box .err { color: #FF6B9D; font-size: 0.82rem; margin-top: 0.5rem; display: none; }
+
+.admin { display: none; max-width: 900px; margin: 0 auto; padding: 1.5rem; }
+.admin.active { display: block; }
+.admin h1 { color: #7C5CFC; font-size: 1.4rem; margin-bottom: 0.25rem; }
+.admin .sub { color: #999; font-size: 0.82rem; margin-bottom: 1.5rem; }
+
+.tabs { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab { padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.82rem; font-weight: 700; cursor: pointer; border: 2px solid #E8E0F0; background: #fff; color: #2D2844; transition: all 0.2s; }
+.tab.active { background: #7C5CFC; color: #fff; border-color: #7C5CFC; }
+
+.search-bar { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+.search-bar input { flex: 1; padding: 0.6rem 1rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
+.search-bar button { padding: 0.6rem 1.5rem; background: #7C5CFC; color: #fff; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+.card { background: #fff; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid #F0ECF5; }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.card-title { font-weight: 800; font-size: 0.95rem; }
+.card-meta { font-size: 0.75rem; color: #999; }
+.card-detail { font-size: 0.82rem; color: #666; line-height: 1.6; margin-bottom: 0.3rem; }
+.card-actions { display: flex; gap: 0.4rem; margin-top: 0.75rem; flex-wrap: wrap; }
+.btn { padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: all 0.2s; }
+.btn-purple { background: #7C5CFC; color: #fff; }
+.btn-orange { background: #FF8C42; color: #fff; }
+.btn-green { background: #4CAF50; color: #fff; }
+.btn-red { background: #FF6B9D; color: #fff; }
+.btn-outline { background: transparent; border: 2px solid #E8E0F0; color: #666; }
+.badge { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 50px; font-size: 0.7rem; font-weight: 700; }
+.badge-green { background: #E8F5E9; color: #2E7D32; }
+.badge-orange { background: #FFF3E0; color: #E65100; }
+.badge-purple { background: #F3E8FF; color: #7C3AED; }
+.badge-red { background: #FFEBEE; color: #C62828; }
+
+.empty { text-align: center; padding: 3rem; color: #999; }
+.loading { text-align: center; padding: 2rem; color: #7C5CFC; font-weight: 700; }
+
+.detail-panel { background: #F8F5FF; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.detail-panel h3 { font-size: 0.9rem; color: #7C5CFC; margin-bottom: 0.75rem; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1rem; font-size: 0.82rem; }
+.detail-grid dt { color: #999; font-weight: 600; }
+.detail-grid dd { color: #2D2844; font-weight: 700; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.active { display: flex; }
+.modal { background: #fff; border-radius: 16px; padding: 1.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal h2 { font-size: 1.1rem; color: #7C5CFC; margin-bottom: 1rem; }
+.modal label { display: block; font-size: 0.82rem; font-weight: 700; color: #666; margin-bottom: 0.25rem; margin-top: 0.75rem; }
+.modal input, .modal select, .modal textarea { width: 100%; padding: 0.6rem 0.8rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
+.modal textarea { height: 80px; resize: vertical; }
+.modal .modal-actions { display: flex; gap: 0.5rem; margin-top: 1.25rem; }
+audio { width: 100%; margin-top: 0.5rem; }
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h1>Storytold Admin</h1>
+    <input type="password" id="adminPass" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button onclick="adminLogin()">Log in</button>
+    <p class="err" id="loginErr">Wrong password</p>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin" id="adminPanel">
+  <h1>Storytold Admin</h1>
+  <p class="sub" id="statsLine">Loading...</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('customers')">Customers</div>
+    <div class="tab" onclick="switchTab('attempts')">Attempts</div>
+    <div class="tab" onclick="switchTab('retry')">Retry Queue</div>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search by email or child name..." onkeydown="if(event.key==='Enter')doSearch()">
+    <button onclick="doSearch()">Search</button>
+  </div>
+
+  <div id="content">
+    <div class="loading">Loading...</div>
+  </div>
+</div>
+
+<!-- Generate Story Modal -->
+<div class="modal-overlay" id="generateModal">
+  <div class="modal">
+    <h2>Generate Story</h2>
+    <label>Customer email</label>
+    <input type="email" id="genEmail" placeholder="customer@email.com">
+    <label>Child name</label>
+    <input type="text" id="genChildName" placeholder="e.g. Lily">
+    <label>Age</label>
+    <input type="text" id="genAge" placeholder="e.g. 5">
+    <label>Category</label>
+    <select id="genCategory">
+      <option value="bedtime">Bedtime Story</option>
+      <option value="journey">Adventure Story</option>
+      <option value="learning">Learning Adventure</option>
+      <option value="custom">Custom</option>
+    </select>
+    <label>Gender</label>
+    <select id="genGender">
+      <option value="girl">Girl</option>
+      <option value="boy">Boy</option>
+      <option value="neutral">Neutral</option>
+    </select>
+    <label>Extra details (optional)</label>
+    <textarea id="genDetails" placeholder="Loves dinosaurs, best friend is called Max..."></textarea>
+    <label>Voice ID (optional)</label>
+    <input type="text" id="genVoice" placeholder="Leave blank for default">
+    <p id="genStatus" style="font-size:0.82rem;color:#7C5CFC;margin-top:0.75rem;display:none"></p>
+    <div class="modal-actions">
+      <button class="btn btn-purple" onclick="submitGenerate()">Generate Story</button>
+      <button class="btn btn-outline" onclick="closeModal('generateModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let adminSecret = '';
+let currentTab = 'customers';
+let allCustomers = [];
+let allAttempts = [];
+
+// ── Auth ──
+function adminLogin() {
+  adminSecret = document.getElementById('adminPass').value.trim();
+  if (!adminSecret) return;
+  // Test with a simple request
+  api('customers').then(data => {
+    if (data.error) {
+      document.getElementById('loginErr').style.display = 'block';
+      adminSecret = '';
+    } else {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('adminPanel').classList.add('active');
+      allCustomers = data.customers || [];
+      renderCustomers(allCustomers);
+      updateStats();
+      // Pre-load attempts
+      api('attempts').then(d => { allAttempts = d.attempts || []; });
+    }
+  });
+}
+
+// ── API helper ──
+async function api(action, opts = {}) {
+  const params = new URLSearchParams({ action, ...opts.params });
+  const fetchOpts = {
+    headers: { 'x-admin-secret': adminSecret, 'Content-Type': 'application/json' }
+  };
+  if (opts.body) {
+    fetchOpts.method = 'POST';
+    fetchOpts.body = JSON.stringify(opts.body);
+  }
+  const res = await fetch('/api/admin?' + params.toString(), fetchOpts);
+  return res.json();
+}
+
+// ── Tabs ──
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  if (tab === 'customers') renderCustomers(allCustomers);
+  else if (tab === 'attempts') renderAttempts(allAttempts);
+  else if (tab === 'retry') loadRetryQueue();
+}
+
+// ── Search ──
+async function doSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) {
+    if (currentTab === 'customers') renderCustomers(allCustomers);
+    else if (currentTab === 'attempts') renderAttempts(allAttempts);
+    return;
+  }
+  document.getElementById('content').innerHTML = '<div class="loading">Searching...</div>';
+  const data = await api('search', { params: { q } });
+  if (currentTab === 'customers' || currentTab === 'retry') {
+    // Group search results by email
+    const grouped = {};
+    for (const s of (data.stories || [])) {
+      if (!grouped[s.email]) grouped[s.email] = { email: s.email, stories: [], storyCount: 0 };
+      grouped[s.email].stories.push(s);
+      grouped[s.email].storyCount++;
+    }
+    renderCustomers(Object.values(grouped));
+  } else {
+    renderAttempts(data.attempts || []);
+  }
+}
+
+// ── Stats ──
+function updateStats() {
+  const totalCustomers = allCustomers.length;
+  const totalStories = allCustomers.reduce((sum, c) => sum + c.storyCount, 0);
+  document.getElementById('statsLine').textContent = totalCustomers + ' customers, ' + totalStories + ' stories generated';
+}
+
+// ── Render customers ──
+function renderCustomers(customers) {
+  if (!customers.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No customers found</div>';
+    return;
+  }
+  let html = '<button class="btn btn-green" onclick="openGenerateModal()" style="margin-bottom:1rem">+ Generate New Story</button>';
+  for (const c of customers) {
+    html += '<div class="card">';
+    html += '<div class="card-header"><span class="card-title">' + esc(c.email) + '</span><span class="badge badge-purple">' + c.storyCount + ' stories</span></div>';
+    for (const s of c.stories) {
+      const date = new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning', custom: 'Custom' }[s.category] || s.category;
+      html += '<div class="card-detail">' + esc(s.child_name) + ' &middot; ' + cat + ' &middot; ' + date;
+      if (s.audio_url) html += ' <span class="badge badge-green">Audio ready</span>';
+      else html += ' <span class="badge badge-orange">No audio</span>';
+      html += '</div>';
+      if (s.audio_url) {
+        html += '<audio controls preload="none" src="' + esc(s.audio_url) + '"></audio>';
+      }
+    }
+    html += '<div class="card-actions">';
+    html += '<button class="btn btn-purple" onclick="openGenerateModal(\'' + esc(c.email) + '\')">Generate for this customer</button>';
+    html += '</div></div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+// ── Render attempts ──
+function renderAttempts(attempts) {
+  if (!attempts.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No attempts found</div>';
+    return;
+  }
+  let html = '';
+  for (const a of attempts) {
+    const date = new Date(a.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const sd = a.story_data || {};
+    const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning', custom: 'Custom' }[sd.category || a.category] || (sd.category || a.category || 'Unknown');
+
+    html += '<div class="card">';
+    html += '<div class="card-header"><span class="card-title">' + esc(a.child_name || sd.childName || 'Unknown') + '</span><span class="card-meta">' + date + '</span></div>';
+    html += '<div class="card-detail">Category: ' + cat + '</div>';
+    if (sd.age || sd.childAge) html += '<div class="card-detail">Age: ' + esc(sd.age || sd.childAge) + '</div>';
+    if (sd.gender) html += '<div class="card-detail">Gender: ' + esc(sd.gender) + '</div>';
+    if (sd.proudOf) html += '<div class="card-detail">Proud of: ' + esc(sd.proudOf) + '</div>';
+    if (sd.friendName) html += '<div class="card-detail">Best friend: ' + esc(sd.friendName) + '</div>';
+    if (sd.familyMembers) html += '<div class="card-detail">Family: ' + esc(sd.familyMembers) + '</div>';
+    if (sd.petName) html += '<div class="card-detail">Pet: ' + esc(sd.petName) + ' (' + esc(sd.petType || '') + ')</div>';
+    if (sd.extraDetails) html += '<div class="card-detail">Extra: ' + esc(sd.extraDetails) + '</div>';
+    if (sd.personalMessage) html += '<div class="card-detail">Message: ' + esc(sd.personalMessage) + '</div>';
+    if (a.status) html += '<div class="card-detail"><span class="badge badge-orange">' + esc(a.status) + '</span></div>';
+
+    html += '<div class="card-actions">';
+    html += '<button class="btn btn-purple" onclick=\'generateFromAttempt(' + JSON.stringify(a).replace(/'/g, "\\'") + ')\'>Generate this story</button>';
+    html += '</div></div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+// ── Retry Queue ──
+async function loadRetryQueue() {
+  document.getElementById('content').innerHTML = '<div class="loading">Loading retry queue...</div>';
+  const data = await api('retry-queue');
+  const queue = data.queue || [];
+  if (!queue.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">Retry queue is empty. All good!</div>';
+    return;
+  }
+  let html = '';
+  for (const item of queue) {
+    const date = new Date(item.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    html += '<div class="card">';
+    html += '<div class="card-header"><span class="card-title">' + esc(item.childName || 'Unknown') + '</span><span class="badge badge-red">Attempt ' + item.attempts + '</span></div>';
+    html += '<div class="card-detail">Email: ' + esc(item.customerEmail || 'N/A') + '</div>';
+    html += '<div class="card-detail">Queued: ' + date + '</div>';
+    if (item.lastAttempt) html += '<div class="card-detail">Last tried: ' + new Date(item.lastAttempt).toLocaleString('en-GB') + '</div>';
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+// ── Generate Modal ──
+function openGenerateModal(email) {
+  document.getElementById('genEmail').value = email || '';
+  document.getElementById('genChildName').value = '';
+  document.getElementById('genAge').value = '';
+  document.getElementById('genDetails').value = '';
+  document.getElementById('genVoice').value = '';
+  document.getElementById('genStatus').style.display = 'none';
+  document.getElementById('generateModal').classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function generateFromAttempt(attempt) {
+  const sd = attempt.story_data || {};
+  document.getElementById('genEmail').value = '';
+  document.getElementById('genChildName').value = sd.childName || attempt.child_name || '';
+  document.getElementById('genAge').value = sd.age || sd.childAge || '';
+  document.getElementById('genCategory').value = sd.category || attempt.category || 'journey';
+  document.getElementById('genGender').value = sd.gender || 'neutral';
+  document.getElementById('genDetails').value = [sd.proudOf, sd.friendName ? 'Best friend: ' + sd.friendName : '', sd.familyMembers ? 'Family: ' + sd.familyMembers : '', sd.petName ? 'Pet: ' + sd.petName : '', sd.extraDetails].filter(Boolean).join('. ');
+  document.getElementById('genVoice').value = attempt.voice_id || '';
+  document.getElementById('genStatus').style.display = 'none';
+  document.getElementById('generateModal').classList.add('active');
+
+  // Prompt for email since attempts don't have one
+  document.getElementById('genEmail').focus();
+}
+
+async function submitGenerate() {
+  const email = document.getElementById('genEmail').value.trim();
+  const childName = document.getElementById('genChildName').value.trim();
+  const age = document.getElementById('genAge').value.trim();
+  const category = document.getElementById('genCategory').value;
+  const gender = document.getElementById('genGender').value;
+  const details = document.getElementById('genDetails').value.trim();
+  const voiceId = document.getElementById('genVoice').value.trim();
+
+  if (!email || !childName) {
+    document.getElementById('genStatus').textContent = 'Email and child name are required';
+    document.getElementById('genStatus').style.color = '#FF6B9D';
+    document.getElementById('genStatus').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('genStatus').textContent = 'Starting generation...';
+  document.getElementById('genStatus').style.color = '#7C5CFC';
+  document.getElementById('genStatus').style.display = 'block';
+
+  const storyData = {
+    childName,
+    age: age || '5',
+    gender,
+    category,
+    extraDetails: details,
+    length: 'full'
+  };
+
+  const data = await api('generate', {
+    body: { email, storyData, voiceId: voiceId || undefined }
+  });
+
+  if (data.success) {
+    document.getElementById('genStatus').textContent = 'Story generation started! ' + email + ' will receive an email when it is ready.';
+    document.getElementById('genStatus').style.color = '#4CAF50';
+  } else {
+    document.getElementById('genStatus').textContent = 'Error: ' + (data.error || 'Unknown error');
+    document.getElementById('genStatus').style.color = '#FF6B9D';
+  }
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

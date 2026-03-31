@@ -2969,6 +2969,15 @@ async function generatePreview() {
     previewStoryText = data.previewStory || '';
     fullStoryText = data.fullStory || previewStoryText;
     trackEvent('PreviewGenerated', { content_name: storyData.category, child_age: storyData.childAge });
+
+    // Save this attempt so admin can see what they tried to generate
+    try {
+      fetch('/api/save-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyData, voiceId: selectedVoiceId, previewStory: previewStoryText })
+      });
+    } catch(e) { /* non-blocking */ }
     const audio = document.getElementById('previewAudio');
     audio.volume = 0.75;
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
