@@ -255,8 +255,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ===== EMOTIONAL HOOK ===== */
 .emotion-block{background:linear-gradient(135deg,var(--purple-light),#F5F0FF);border-radius:var(--radius-lg);padding:2rem 1.5rem;margin-top:1rem;width:100%;max-width:440px;text-align:center;position:relative;overflow:hidden}
-.emotion-block::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(124,92,252,0.06)}
-.emotion-block::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,140,66,0.06)}
+.emotion-block::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(124,92,252,0.06);pointer-events:none}
+.emotion-block::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,140,66,0.06);pointer-events:none}
 .emotion-quote{font-family:'Nunito',sans-serif;font-size:1.35rem;font-weight:900;color:var(--purple);margin-bottom:0.75rem;line-height:1.3}
 .emotion-text{font-size:0.88rem;color:var(--text-soft);line-height:1.7;font-weight:500}
 
@@ -351,11 +351,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* ===== FORM ===== */
 .form-group{width:100%;margin-bottom:1.25rem}
 .form-group label{display:block;font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:0.5rem;letter-spacing:0.01em}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.85rem 1rem;border:2px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-size:0.95rem;font-weight:500;color:var(--text);background:var(--card);transition:all 0.25s}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.85rem 1rem;border:2px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-size:1rem;font-weight:500;color:var(--text);background:var(--card);transition:all 0.25s}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--cat-accent,var(--purple));box-shadow:0 0 0 4px var(--cat-glow,rgba(124,92,252,0.1))}
 .form-group textarea{resize:none;height:80px}
 .form-group input::placeholder,.form-group textarea::placeholder{color:var(--text-muted);font-weight:400}
-.form-input{padding:0.85rem 1rem;border:2px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-size:0.95rem;font-weight:500;color:var(--text);background:var(--card);transition:all 0.25s;box-sizing:border-box}
+.form-input{padding:0.85rem 1rem;border:2px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-size:1rem;font-weight:500;color:var(--text);background:var(--card);transition:all 0.25s;box-sizing:border-box}
 .form-input:focus{outline:none;border-color:var(--cat-accent,var(--purple));box-shadow:0 0 0 4px var(--cat-glow,rgba(124,92,252,0.1))}
 .form-input::placeholder{color:var(--text-muted);font-weight:400}
 .form-hint{font-size:0.75rem;color:var(--text-muted);margin-top:0.3rem;font-weight:500}
@@ -498,8 +498,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .share-modal{background:var(--card);border-radius:var(--radius);padding:2rem;max-width:400px;width:100%;box-shadow:var(--shadow-lg);position:relative}
 .share-modal h3{font-family:'Nunito',sans-serif;font-weight:800;color:var(--text);font-size:1.2rem;margin:0 0 0.5rem}
 .share-modal p{color:var(--text-muted);font-size:0.9rem;margin:0 0 1.25rem}
-.share-modal .form-input{width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;margin-bottom:0.75rem;background:var(--bg)}
-.share-modal textarea{width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:inherit;box-sizing:border-box;resize:none;height:80px;margin-bottom:1rem;background:var(--bg)}
+.share-modal .form-input{width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:inherit;box-sizing:border-box;margin-bottom:0.75rem;background:var(--bg)}
+.share-modal textarea{width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:inherit;box-sizing:border-box;resize:none;height:80px;margin-bottom:1rem;background:var(--bg)}
 .share-modal .share-send-btn{width:100%;padding:0.85rem;background:var(--purple);color:white;border:none;border-radius:50px;font-size:1rem;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:background 0.2s}
 .share-modal .share-send-btn:hover{background:#6A48E0}
 .share-modal .share-send-btn:disabled{opacity:0.6;cursor:not-allowed}
@@ -667,9 +667,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div style="width:100%;max-width:440px;margin-top:1.2rem;text-align:center">
     <p style="font-size:0.8rem;color:var(--text-muted);cursor:pointer;font-weight:600" onclick="document.getElementById('contactForm').style.display='block';this.style.display='none'">Questions? Get in touch</p>
     <div id="contactForm" style="display:none;margin-top:0.75rem;text-align:left">
-      <input id="contactName" type="text" placeholder="Your name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
-      <input id="contactEmail" type="email" placeholder="Your email" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
-      <textarea id="contactText" placeholder="How can I help?" rows="3" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;margin-bottom:0.5rem;font-family:'Nunito',sans-serif;resize:vertical;background:var(--card)"></textarea>
+      <input id="contactName" type="text" placeholder="Your name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
+      <input id="contactEmail" type="email" placeholder="Your email" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
+      <textarea id="contactText" placeholder="How can I help?" rows="3" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin-bottom:0.5rem;font-family:'Nunito',sans-serif;resize:vertical;background:var(--card)"></textarea>
       <button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:0.65rem" onclick="submitContact()">Send</button>
     </div>
     <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.6rem">hello@storytold.ai</p>
@@ -1250,7 +1250,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       </div>
       <div id="previewEmailEdit" style="display:none">
         <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email</label>
-        <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
+        <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
         <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">I will send the full story here.</p>
       </div>
       <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
@@ -1336,7 +1336,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <button onclick="showImproveFeedback()" style="background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:50px;padding:0.6rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif">Could be better</button>
       </div>
       <div id="feedbackImproveBox" style="display:none;margin-top:0.75rem">
-        <textarea id="feedbackImproveText" placeholder="What would make it better? I read every single one of these." style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Quicksand',sans-serif;resize:none;height:70px;background:var(--card);box-sizing:border-box"></textarea>
+        <textarea id="feedbackImproveText" placeholder="What would make it better? I read every single one of these." style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Quicksand',sans-serif;resize:none;height:70px;background:var(--card);box-sizing:border-box"></textarea>
         <button onclick="submitFeedback('improve')" style="background:var(--cat-accent,var(--purple));color:#fff;border:none;border-radius:50px;padding:0.5rem 1.2rem;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;margin-top:0.4rem;width:100%">Send feedback</button>
       </div>
       <div id="feedbackThanks" style="display:none;margin-top:0.75rem">
