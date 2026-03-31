@@ -3340,6 +3340,19 @@ async function handleStripeReturn() {
       throw new Error('Audio generation timed out. Your payment is safe. Please contact hello@storytold.ai');
     }
 
+    // If some stories were queued, show a note about them
+    if (queuedStories.length > 0) {
+      const queuedNames = queuedStories.map(s => s.childName).join(' and ');
+      setTimeout(() => {
+        const note = document.createElement('div');
+        note.style.cssText = 'background:#FFF8F0;border:2px solid #FFE0B2;border-radius:12px;padding:1rem;margin:1rem auto;max-width:400px;text-align:center';
+        note.innerHTML = '<p style="font-size:0.85rem;color:#E65100;font-weight:700;margin:0 0 0.3rem">' + escHtml(queuedNames) + '\'s story is still being created</p>' +
+          '<p style="font-size:0.78rem;color:#BF360C;margin:0">We will email you as soon as it is ready.</p>';
+        const hero = document.querySelector('#screenFull .full-hero');
+        if (hero) hero.after(note);
+      }, 500);
+    }
+
     // ── Set up the full story screen ──
     // Store all stories globally for tab switching
     window._multiStories = completedStories;
@@ -3484,7 +3497,7 @@ function seekBar(e, audioId, fillId) {
 }
 
 function switchStoryTab(idx) {
-  const stories = (window._multiStories || []).filter(s => !s.failed);
+  const stories = (window._multiStories || []).filter(s => !s.failed && !s.queued);
   if (!stories[idx]) return;
   const s = stories[idx];
   const audio = document.getElementById('fullStoryAudio');
