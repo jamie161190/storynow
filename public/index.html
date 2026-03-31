@@ -576,10 +576,9 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
     <div class="shape shape-4"></div>
   </div>
 
-  <!-- STICKY TOP NAV -->
-  <div id="stickyNav" style="position:sticky;top:0;z-index:100;width:100%;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0.6rem 1rem;display:flex;justify-content:space-between;align-items:center;max-width:100vw;margin-left:calc(-50vw + 50%);margin-right:calc(-50vw + 50%);margin-bottom:0.5rem">
-    <span style="font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;color:var(--purple);padding-left:0.5rem">Storytold</span>
-    <a onclick="goTo('screenLogin')" style="font-size:0.82rem;color:var(--purple);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:0.35rem;padding:0.35rem 0.75rem;border:2px solid var(--purple-light);border-radius:var(--radius-full);background:var(--purple-light);transition:all 0.2s">&#128100; Log in</a>
+  <!-- TOP NAV -->
+  <div style="width:100%;max-width:440px;display:flex;justify-content:flex-end;margin-bottom:0.25rem">
+    <a onclick="goTo('screenLogin')" style="font-size:0.82rem;color:var(--purple);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:0.35rem;padding:0.35rem 0.75rem;border:2px solid var(--purple-light);border-radius:var(--radius-full);background:var(--purple-light)">&#128100; Log in</a>
   </div>
 
   <!-- HERO -->
@@ -901,6 +900,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
         <option value="">Choose</option>
         <option value="boy">Boy</option>
         <option value="girl">Girl</option>
+        <option value="neutral">Prefer not to say</option>
       </select>
     </div>
   </div>
@@ -3067,7 +3067,7 @@ async function unlockFull() {
 
   // Validate additional children if any were added
   const childErr = validateAdditionalChildren();
-  if (childErr) { alert(childErr); isCheckingOut = false; return; }
+  if (childErr) { emailErr.textContent = childErr; emailErr.style.display = 'block'; isCheckingOut = false; return; }
 
   trackEvent('InitiateCheckout', { value: 19.99, currency: 'GBP', content_name: storyData.category });
 
@@ -3091,7 +3091,8 @@ async function unlockFull() {
   } catch(err) {
     goTo('screenPreview');
     isCheckingOut = false;
-    alert('Something went wrong: ' + err.message);
+    emailErr.textContent = 'Something went wrong. Please try again, or email hello@storytold.ai if the problem continues.';
+    emailErr.style.display = 'block';
   }
 }
 
@@ -3129,7 +3130,11 @@ async function handleStripeReturn() {
     }
   }
   if (!saved) {
-    alert('Session expired. Please create your story again.');
+    // Session expired - show inline message instead of alert
+    const expBanner = document.createElement('div');
+    expBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF8F0;border-bottom:2px solid var(--orange);padding:1rem;text-align:center;z-index:9999;font-size:0.85rem;color:#995500;font-weight:600';
+    expBanner.innerHTML = 'Your session expired. Please create your story again. <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:1rem;font-size:1.1rem">&times;</span>';
+    document.body.prepend(expBanner);
     return;
   }
   const parsed = JSON.parse(saved);
@@ -3385,8 +3390,12 @@ async function handleStripeReturn() {
         return;
       }
     }
-    alert('Something went wrong: ' + err.message + '. If you have paid, please contact hello@storytold.ai and I will sort it out.');
     goTo('screenLanding');
+    // Show a friendly error on the landing page instead of a raw alert
+    const errBanner = document.createElement('div');
+    errBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF0F0;border-bottom:2px solid #FF6B9D;padding:1rem;text-align:center;z-index:9999;font-size:0.85rem;color:#CC3366;font-weight:600';
+    errBanner.innerHTML = 'Something went wrong. If you have paid, your payment is safe. Please email <a href="mailto:hello@storytold.ai" style="color:#7C5CFC;font-weight:700">hello@storytold.ai</a> and I will sort it out. <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:1rem;font-size:1.1rem">&times;</span>';
+    document.body.prepend(errBanner);
   }
 }
 
@@ -4032,7 +4041,7 @@ let shareMode = 'email';
 
 function shareFromFullScreen() {
   if (!lastSavedStoryId) {
-    alert('Your story is still being saved. Please try again in a moment.');
+    return; // Story still saving, button will re-enable when done
     return;
   }
   // Use the currently displayed child's name (from tab), not always the primary child
@@ -4258,7 +4267,7 @@ async function submitReview() {
   const name = document.getElementById('reviewName').value.trim();
   const childName = document.getElementById('reviewChildName').value.trim();
   const text = document.getElementById('reviewText').value.trim();
-  if (!name || !text) { alert('Please fill in your name and your review.'); return; }
+  if (!name || !text) { return; }
   try {
     await fetch('/api/send-email', {
       method: 'POST',
@@ -4273,7 +4282,7 @@ async function submitContact() {
   const name = document.getElementById('contactName').value.trim();
   const email = document.getElementById('contactEmail').value.trim();
   const text = document.getElementById('contactText').value.trim();
-  if (!name || !email || !text) { alert('Please fill in all fields.'); return; }
+  if (!name || !email || !text) { return; }
   try {
     await fetch('/api/send-email', {
       method: 'POST',
