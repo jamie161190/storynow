@@ -167,7 +167,7 @@ export const handler = async (event) => {
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 16000,
-          temperature: 0.8,
+          temperature: 1,
           thinking: { type: 'enabled', budget_tokens: 1024 },
           system: SYSTEM_PROMPT,
           messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
@@ -254,7 +254,7 @@ export const handler = async (event) => {
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
           max_tokens: 16000,
-          temperature: 0.8,
+          temperature: 1,
           thinking: {
             type: 'enabled',
             budget_tokens: 5000
