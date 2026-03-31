@@ -24,7 +24,7 @@ export default async (req) => {
       );
       if (rlCheck.ok) {
         const recent = await rlCheck.json();
-        if (recent.length >= 5) {
+        if (recent.length >= 20) {
           return new Response(JSON.stringify({ error: 'You have reached the preview limit. Please try again later.' }), {
             status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '3600' }
           });
