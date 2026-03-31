@@ -32,12 +32,14 @@ If there is a pet, it must do something the child would retell. Not just "Buddy 
 You must write differently for every age. This is non-negotiable:
 
 Ages 2 to 4: Very short sentences. Simple words. Repetition is magic ("And they walked, and they walked, and they walked"). Sound effects and onomatopoeia ("Splish splash! Whoooosh!"). Everything is safe and gentle. ABSOLUTELY NO danger, scary moments, villains, darkness, or anything threatening. No one gets lost, hurt, or scared. Everything resolves quickly and happily. Familiar things: colours, animals, home, family. The child should feel held by the story like a warm hug. Even the "problem" should be gentle (e.g. a lost teddy, not a lost child).
+TODDLER MINIMUM: Every paragraph must contain either a sound effect, a repeated phrase pattern, or a simple rhythm. At least 30% of the story should be repetitive patterns or onomatopoeia. Think CBeebies bedtime story, not a simplified chapter book. "And the little unicorn clip-clopped, clip-clopped, clip-clopped all the way home." Use the child's name in repeated patterns: "Mia looked. Mia listened. Mia smiled."
 
 Ages 5 to 7: Clear beginning, middle, end. The child is brave but the world is kind. Simple moral woven in naturally, never stated. Dialogue brings characters alive. Relatable challenges: trying something new, being brave, making a friend smile.
 
 Ages 8 to 10: Real narrative tension. The child is clever and capable. Humour works brilliantly. The friend has their own personality and opinions. Vocabulary is richer but never showing off. The child solves problems through thinking, not luck.
 
 Ages 11 to 14: Young adult tone. Complex emotions alongside the adventure. Themes of identity, belonging, growing up. The friendship has depth, maybe even a moment of disagreement that makes it stronger. Respect their intelligence. Do not talk down to them. Ambiguity is fine.
+TEEN DIALOGUE: Must sound like real teens talking. Short fragments. Unfinished sentences. Sarcasm that is affectionate, not mean. The friend should challenge the protagonist occasionally, not just agree. Include at least one moment of eye-rolling humour. Never use slang that will date badly. Keep dialogue naturalistic and clipped. If it sounds like an adult wrote it, rewrite it.
 
 6. WRITTEN FOR THE EAR, NOT THE EYE
 This story will be read aloud by a text to speech narrator. Write for how it sounds, not how it looks. The narrator cannot see paragraph breaks or formatting, so you must build pauses and pacing into the words themselves.
@@ -47,7 +49,7 @@ PACING AND PAUSES (critical for audio):
 - Use them between scenes: "The cave fell silent ... When Chase opened his eyes, the world had changed."
 - Use them after questions in dialogue: "Do you know what that means? ... It means you are braver than you think."
 - Use them before the child's name for impact: "And the person who had been brave enough to solve it all? ... Chase."
-- Aim for at least one pause ( ... ) every 100 to 150 words. A story without pauses sounds like someone speed reading. A story with well placed pauses sounds like someone telling a story by a fire.
+- Aim for at least one pause ( ... ) every 100 to 150 words. COUNT YOUR PAUSES. If you have written 150 words without a ( ... ) pause, stop and add one. This is not optional. A story without pauses sounds like someone speed reading. A story with well placed pauses sounds like someone telling a story by a fire.
 - After a big emotional moment or scene change, use a double pause: "... ... " This creates a longer breath that lets the moment land.
 - Vary sentence length. Short punchy beats. Then a longer, flowing sentence that carries the listener forward before landing softly.
 - Avoid parentheses, asterisks, em dashes, or any visual formatting.
@@ -62,7 +64,7 @@ Never write anything that could apply to any child. No "they were so brave" with
 
 9. START IMMEDIATELY
 No preamble. No "Once upon a time" unless it genuinely serves the story. Drop the listener straight into a moment. The first sentence should make a parent lean in.
-EXCEPTION: Bedtime stories may begin with a gentle, calming setup rather than immediate action. A soft sensory moment, a quiet discovery, a warm scene. The opening should draw the child in with wonder, not urgency.
+EXCEPTION: Bedtime stories may begin with a gentle, calming setup rather than immediate action. A soft sensory moment, a quiet discovery, a warm scene. The opening should draw the child in with wonder, not urgency. BUT even bedtime stories must open with something SPECIFIC to this child. Not "Once upon a time in a land far away" but "Oscar was lying in bed, running his fingers along Rex's bumpy spine, when something outside the window caught his eye." Use the child's name and a personal detail within the first two sentences, even if the tone is gentle.
 
 10. PACING
 Every story is ~15 minutes (~2200 words). For adventure and learning stories, use a four act structure with SUBPLOTS and SURPRISES. For bedtime stories, follow the specific bedtime structure in the story type instructions instead.
@@ -96,14 +98,23 @@ Children lose interest during long descriptive passages. Characters talking to e
 - Every character has a distinct voice. The friend sounds different from the child who sounds different from any adults.
 - Characters call each other by name in dialogue regularly. Hearing their own name in a character's mouth snaps the child's attention back.
 - Use short, punchy dialogue exchanges. Not long speeches. Back and forth, like real kids talk.
-- Include at least one line the child will want to repeat. A catchphrase, a funny exclamation, a brave declaration.`;
+- Include at least one line the child will want to repeat. A catchphrase, a funny exclamation, a brave declaration.
+- DIALOGUE ATTRIBUTION: Vary it. Use "said" no more than 40% of the time. The rest should be: whispered, called, shouted, murmured, exclaimed, gasped, declared, laughed, wondered, OR action beats with no attribution tag at all ("Chase looked up. 'I think I know.'"). Repetitive "said/asked" creates a monotonous rhythm when narrated aloud.
+
+13. THE FINAL LINE
+The last line of the story is the line the child remembers. It must be SPECIFIC to this story, not a generic life lesson. Not "Maya knew she could do anything" but "Maya picked up her guitar, played the first chord, and for the first time in weeks, the music sounded like it was smiling." The final line should be a CALLBACK to something planted earlier in the story. It should be beautiful enough to make a parent pause.
+
+14. SENSORY PERSISTENCE
+Do not let the world disappear during the climax. Before writing your second half, plan one sensory detail for each remaining scene. What does the air smell like during the confrontation? What sound is in the background during the resolution? The sensory world must persist even during high-action moments. A story that sounds, smells, and feels real from start to finish is a story the child lives inside.`;
 
 export function getAgeBand(age) {
   const a = parseInt(age);
-  if (a <= 4) return `This child is very young (age ${a}). Use very simple vocabulary, short sentences, gentle repetition, sound effects, and keep everything safe, warm, and familiar. Think CBeebies bedtime hour. Sentences should rarely exceed 12 words. Use lots of "And then..." and repeated patterns. Name things the child knows: colours, animals, family, food, bath time, bedtime. For age 2 to 3, keep the TOTAL word count closer to 1200 words (shorter attention span). The story should feel like being read to by a loving parent.`;
+  if (a <= 4) return `This child is very young (age ${a}). Use very simple vocabulary, short sentences, gentle repetition, sound effects, and keep everything safe, warm, and familiar. Think CBeebies bedtime hour. Sentences should rarely exceed 12 words. Use lots of "And then..." and repeated patterns. Name things the child knows: colours, animals, family, food, bath time, bedtime. For age 2 to 3, keep the TOTAL word count closer to 1200 words (shorter attention span). The story should feel like being read to by a loving parent.
+CRITICAL FOR THIS AGE: Every single paragraph needs at least one of: a sound effect (Whoosh! Splash! Clip-clop!), a repeated pattern ("And they looked, and they looked, and they looked"), or a counting/naming rhythm ("One star. Two stars. Three stars."). This is NOT optional. Without these elements, the story will sound like a simplified story for older children, and it will not hold a ${a} year old's attention. Write as if you are performing the story, not just reading it.`;
   if (a <= 7) return `This child is ${a} years old. Use clear story structure with a beginning, middle, and end. Keep language accessible but not babyish. Dialogue and action keep them engaged. The world is kind and the child is brave. Use vocabulary that stretches them slightly (one or two words they might not know but can figure out from context). The friend should talk like a real kid their age. Include at least one moment that makes the child giggle or gasp.`;
   if (a <= 10) return `This child is ${a} years old. Write with real narrative tension, humour, and clever problem solving. Richer vocabulary is welcome. The friend should have their own personality and opinions. The child is the hero because they are smart, not lucky. Include wordplay, wit, and at least one genuinely funny moment. The characters can disagree, make mistakes, and learn. The story should feel like the best book they have ever read, not like something written for a younger kid.`;
-  return `This child is ${a} years old. Write at a young adult level. Complex emotions, genuine depth, themes of identity and belonging. Respect their intelligence completely. The friendship should feel real and layered, with moments of tension and reconciliation. Do not shy away from ambiguity or nuance. The humour should be smart, not silly. The stakes should feel real. The ending can be hopeful without being neat. Write as if you are writing for someone who reads real novels.`;
+  return `This child is ${a} years old. Write at a young adult level. Complex emotions, genuine depth, themes of identity and belonging. Respect their intelligence completely. The friendship should feel real and layered, with moments of tension and reconciliation. Do not shy away from ambiguity or nuance. The humour should be smart, not silly. The stakes should feel real. The ending can be hopeful without being neat. Write as if you are writing for someone who reads real novels.
+DIALOGUE REALITY CHECK: Read every line of teen dialogue back to yourself. If it sounds like an adult wrote it, rewrite it. Real teens speak in fragments: "Wait, what?" "No way." "That's actually... yeah." They trail off. They interrupt each other. They use understatement when they feel big emotions. If the dialogue sounds polished and complete, it is wrong.`;
 }
 
 export function characterBlock(d) {
@@ -144,7 +155,11 @@ The sidekick is ${d.childName}'s loyal companion throughout the adventure. They 
 ${d.familyMembers ? '- Family: ' + d.familyMembers + '\nIMPORTANT: Every family member listed above MUST appear in the story with dialogue or a meaningful action. Do not just name-drop them. Each person should have at least one moment where they speak, do something, or interact with ' + d.childName + ' in a way the child would remember. If a parent included themselves, they are telling you they want to be IN the story. Make that happen.' : ''}
 ${d.teacherName ? '- Teacher: ' + d.teacherName : ''}
 ${d.isGift && d.giftFrom && d.giftInStory ? `- Gift giver: ${d.giftFrom}
-THIS STORY IS A GIFT from ${d.giftFrom} to ${d.childName}. ${d.giftFrom} MUST appear in the story as a real character with at least one warm, memorable moment. They could tuck ${d.childName} in, cheer them on, appear as a wise guide, or share a loving line of dialogue. The child hearing this story needs to feel that ${d.giftFrom} is right there with them.` : ''}
+THIS STORY IS A GIFT from ${d.giftFrom} to ${d.childName}. ${d.giftFrom} MUST appear in the story as a real character with at least THREE meaningful moments:
+(1) A line of dialogue that only THEY would say, in THEIR voice, something that sounds like this specific person talking to this specific child.
+(2) A moment where they DO something that advances the plot, not just stand and watch.
+(3) A quiet moment of connection with ${d.childName} that would make the real ${d.giftFrom} cry hearing it.
+The child hearing this story needs to feel that ${d.giftFrom} is right there with them. This person PAID for this story as a gift. Make their presence unforgettable.` : ''}
 
 ${themesSection}
 
@@ -170,7 +185,8 @@ ${d.extraDetails}`;
   if (d.personalMessage) {
     block += `\n\nPERSONAL MESSAGE FROM THE PARENT (read aloud before the story starts):
 "${d.personalMessage}"
-You do NOT need to include this message in the story text. It will be read separately before the story begins. However, you should be AWARE of it because it sets the emotional tone. If the message says "Happy birthday," the story should feel celebratory. If it says "I am so proud of you," the story should make the child feel capable and valued. Let the message and the story feel like they belong together.`;
+You do NOT need to include this message in the story text. It will be read separately before the story begins. However, you should be AWARE of it because it sets the emotional tone. If the message says "Happy birthday," the story should feel celebratory. If it says "I am so proud of you," the story should make the child feel capable and valued. Let the message and the story feel like they belong together.
+ECHO THE MESSAGE: The story must echo the message's sentiment at least once in the middle and once near the end. If the message says "I am so proud of you," the story's climax should include a moment where the child proves they are worthy of pride, and the resolution should reference that feeling. The personal message and the story should feel like one continuous emotional experience, not two separate pieces.`;
   }
 
   return block;
@@ -280,7 +296,20 @@ THE PATTERN FOR EVERY CHALLENGE:
 
 The child listening at home shouts the answer during the pause. The narrator then confirms it. The child feels like the story is talking directly to them.
 
-VARY THE PROMPT PHRASES. Do not use "Can you work it out?" every time. Rotate between: "What do you think?", "Do you know?", "Quick, what is it?", "Can you help?", "Shout it out!", "What comes next?", "${d.friendName || 'Their friend'} looked at ${d.childName}. Do you know this one?"
+VARY THE PROMPT PHRASES. Do not use "Can you work it out?" every time. Use EACH of these ONCE throughout the story, choosing the one that fits the moment best: "What do you think?", "Do you know?", "Quick, what is it?", "Can you help?", "Shout it out!", "What comes next?", "${d.friendName || 'Their friend'} looked at ${d.childName}. Do you know this one?", "Go on, have a guess.", "This is the big one.", "Can you figure it out before ${d.childName} does?", "Here is the tricky part.", "Wait. Think about it.", "One. Two. Three. What is the answer?", "Close your eyes and think.", "Ready? Here it comes."
+
+VARY THE CHALLENGE DELIVERY. Do NOT present every challenge the same way. Mix these approaches across the 8 to 10 challenges:
+- At least 2 challenges should be presented BY THE VILLAIN or obstacle, not by a friendly character. The villain thinks ${d.childName} cannot solve it. Proving them wrong is powerful.
+- At least 2 challenges should be embedded in ACTION. The child has to calculate WHILE running, spell WHILE climbing, answer WHILE the ground is shaking. Learning under pressure is thrilling.
+- At least 1 challenge should be discovered by ${d.friendName}, who says "Wait, I think I know this one!" and either gets it right (showing teamwork) or gets it wrong and ${d.childName} gently helps.
+- At least 1 challenge should be a "trap" where the obvious answer is wrong. The child needs to think deeper. This teaches critical thinking, not just recall.
+- The final challenge should COMBINE two things they learned earlier in the story. This is the "boss level" and should feel genuinely triumphant.
+
+VARY THE REVEAL. Do not always reveal the answer the same way. Mix these:
+- Sometimes the answer causes a physical effect (door opens, bridge appears, light explodes)
+- Sometimes a character celebrates ("YES!" roared the dragon)
+- Sometimes the world CHANGES (the frozen river melts, the darkness lifts)
+- Sometimes it is quiet and personal (${d.childName} smiled, knowing they had figured it out)
 
 YOU MUST:
 1. Include at least 8 to 10 interactive pause moments
@@ -289,6 +318,7 @@ YOU MUST:
 4. Have the friend or pet help with one of the easier challenges
 5. End with the child mastering something hard, feeling proud and capable
 6. NEVER break the adventure. No "let us practice" or teacher explaining. The learning IS the adventure.
+7. Every challenge delivery method must be DIFFERENT from the previous one. If the last challenge was "arrive at location, character asks question," the next one must use a different approach.
 
 PACING FOR LEARNING STORIES:
 The biggest risk with a longer learning story is it feeling like a relentless quiz. You MUST break up the challenges with story moments that have nothing to do with learning. For every 2 to 3 challenges, include one of these breathing moments:
@@ -305,6 +335,46 @@ DIFFICULTY CURVE FOR MEDIUM AND LONG:
 
 THE VILLAIN OR OBSTACLE:
 There should be an antagonist or major obstacle that can ONLY be defeated through the child's knowledge. Not a scary villain, but a compelling one. A trickster who thinks ${d.childName} cannot solve the puzzles. A locked kingdom that has been waiting for someone smart enough. A machine that is broken and only the right answers can fix it. This gives the challenges STAKES beyond "answer the question."
+
+${d.subject === 'maths' ? `MATHS-SPECIFIC GUIDANCE:
+- Mix problem types: pure calculation, word problems, estimation, and visual/spatial challenges. Not just "X + Y = ?"
+- For times tables: include reverse problems ("Something times 6 equals 42. What is the something?") and word problems ("If each dragon has 7 scales, and there are 8 dragons...")
+- For "nearly mastered": the final challenge should genuinely be tricky, like combining two operations or a multi-step problem.
+- Make numbers PHYSICAL: 7 steps across a bridge, 4 groups of 6 gems, 3 rows of 8 windows. The child should SEE the maths in the world.`
+: d.subject === 'reading' ? `READING & PHONICS-SPECIFIC GUIDANCE:
+- Emphasise SOUNDS. The TTS narrator will be pronouncing letter sounds, so guide pronunciation: "ch like in CHOO CHOO train" not just "the ch sound."
+- Make words tactile and visual: "The word was big and bouncy, with two round letters in the middle, like eyes staring back."
+- For blending: build words sound by sound with anticipation. "S... N... A... what word is it forming? ... SNAKE! And sure enough, a friendly snake slithered into view."
+- Include rhyming patterns that reinforce phonics: words that share the sound the child is learning.`
+: d.subject === 'spelling' ? `SPELLING-SPECIFIC GUIDANCE:
+- Make each letter reveal dramatic. Each letter is a KEY that unlocks part of the magic. Not just listed, but revealed one at a time with tension.
+- Include memorable mnemonics: "B-E-A-UTIFUL. Mrs always said, Big Elephants Are Ugly, They Irritate Friendly Unicorns, Leaping!"
+- Mix approaches: some words spelled letter by letter, some by syllable, some by tracing in the air/sand. Keep it varied.
+- Include at least one "tricky bit" in each word where the child must think carefully about the unusual spelling.`
+: d.subject === 'science' ? `SCIENCE-SPECIFIC GUIDANCE:
+- Do not just ask WHAT. Explain WHY in a child-friendly way. "Why is the sky blue?" is better than "What colour is the sky?"
+- Every answer should include a memorable explanation the child will retell: "The sun is so far away that its light takes 8 whole minutes to reach us. That means the sunlight on your face right now LEFT the sun before you even started this adventure!"
+- Include at least one "wow" fact that will genuinely surprise the child. Science is about wonder.
+- Use analogies: "Your heart is about the size of your fist" or "If the Earth were a football, the Moon would be a tennis ball."
+- Encourage curiosity: have characters ask "but WHY does that happen?" and give satisfying answers.`
+: d.subject === 'geography' ? `GEOGRAPHY-SPECIFIC GUIDANCE:
+- Make facts memorable with scale comparisons: "Africa is so enormous you could fit the UK inside it 120 times and still have room for a swimming pool."
+- Include sensory descriptions of places: what you would SEE, HEAR, SMELL, and FEEL there. Make the child feel they are travelling.
+- Connect places to things children know: animals that live there, foods that come from there, famous buildings.
+- Use direction and distance: "They flew north, where the air grew colder" teaches cardinal directions naturally.`
+: d.subject === 'history' ? `HISTORY-SPECIFIC GUIDANCE:
+- Make the child feel they have TRAVELLED IN TIME. Describe what they would SEE, HEAR, and SMELL: "The Egyptian sun was so hot that the stone burned under their feet. Everywhere, the sound of hammering and chanting. And the smell: sand, sweat, and something sweet like honey."
+- Connect historical facts to the child's life: "That was 5,000 years ago. That is 250 times longer than you have been alive!"
+- Include real historical details that surprise: names, dates turned into stories, everyday life details (what did children eat? what games did they play?).
+- Have the characters MEET someone from history (or someone inspired by a historical figure) who teaches them through conversation.`
+: d.subject === 'languages' ? `LANGUAGE-SPECIFIC GUIDANCE:
+- SPACED REPETITION: Each new word or phrase must appear at least 3 times in the story: once when introduced, once used naturally in context 2 to 3 minutes later, and once more in the final act as a callback. This is how children retain vocabulary.
+- Always pair the foreign word with its meaning the first time, then use it alone the second time with context clues, then use it alone the third time (by which point the child knows it).
+- Include physical/action words the child can act out: "Sautez means jump! Can you jump? Sautez!"
+- Build simple phrases, not just single words. By the end, the child should be able to say a short sentence.
+- Make pronunciation fun: "Bonjour! Sounds like BON-JOOR. Can you say it? Bonjour!"
+- Include a "full sentence moment" at the climax where the child combines words they have learned throughout the story.`
+: ''}
 
 LENGTH: Approximately ${getWordCount(d.length, d.age)} words.
 
