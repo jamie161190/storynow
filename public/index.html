@@ -1716,8 +1716,11 @@ const bgMusic = {
     }
 
     this.audio.volume = 0;
+    console.log('[BGMUSIC] play() called. targetVolume:', this.targetVolume, 'src:', this.audio.src);
     this.audio.play().then(() => {
+      console.log('[BGMUSIC] playing, volume before fade:', this.audio.volume);
       this.fadeTo(this.targetVolume);
+      setTimeout(() => console.log('[BGMUSIC] volume after fade:', this.audio.volume), 2000);
     }).catch(e => {
       // Autoplay blocked or file not found, narration plays fine without music
       console.log('Background music skipped:', e.message);
