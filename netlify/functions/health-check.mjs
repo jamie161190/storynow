@@ -28,7 +28,7 @@ export default async (req) => {
     results.stripe = { status: 'FAIL', error: e.message };
   }
 
-  // Test Anthropic API
+  // Test Anthropic API (basic call)
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -52,6 +52,33 @@ export default async (req) => {
     }
   } catch (e) {
     results.anthropic = { status: 'FAIL', error: e.message };
+  }
+
+  // Test Anthropic API with thinking mode (matches preview generation settings)
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 100,
+        temperature: 1,
+        thinking: { type: 'enabled', budget_tokens: 100 },
+        messages: [{ role: 'user', content: 'Say OK' }]
+      })
+    });
+    if (res.ok) {
+      results.anthropic_thinking = { status: 'OK' };
+    } else {
+      const errText = await res.text();
+      results.anthropic_thinking = { status: 'FAIL', httpStatus: res.status, error: errText.slice(0, 300) };
+    }
+  } catch (e) {
+    results.anthropic_thinking = { status: 'FAIL', error: e.message };
   }
 
   // Test ElevenLabs API (just check voice list, don't generate audio)
@@ -111,7 +138,7 @@ export default async (req) => {
   }
 
   // Summary
-  const allOk = ['stripe', 'anthropic', 'elevenlabs', 'supabase_storage', 'supabase_db'].every(k => results[k].status === 'OK');
+  const allOk = ['stripe', 'anthropic', 'anthropic_thinking', 'elevenlabs', 'supabase_storage', 'supabase_db'].every(k => results[k].status === 'OK');
   results.summary = allOk ? 'ALL SYSTEMS OK' : 'ISSUES DETECTED - check individual services above';
 
   return new Response(JSON.stringify(results, null, 2), {
