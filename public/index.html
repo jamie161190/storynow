@@ -3235,6 +3235,7 @@ async function handleStripeReturn() {
 
       // Call background function with retry
       let bgTriggered = false;
+      let bgErrorStatus = '';
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
           const bgRes = await fetch('/.netlify/functions/full-worker-background', {
@@ -3243,11 +3244,20 @@ async function handleStripeReturn() {
             body: bgPayload
           });
           if (bgRes.ok || bgRes.status === 202) { bgTriggered = true; break; }
-          console.log(`BG trigger attempt ${attempt + 1} for ${kid.childName}:`, bgRes.status);
+          bgErrorStatus = 'Status ' + bgRes.status;
+          console.error(`BG trigger attempt ${attempt + 1} for ${kid.childName}: ${bgRes.status}`, await bgRes.text().catch(() => ''));
         } catch(e) {
-          console.log(`BG trigger attempt ${attempt + 1} for ${kid.childName}:`, e.message);
+          bgErrorStatus = e.message;
+          console.error(`BG trigger attempt ${attempt + 1} for ${kid.childName}:`, e.message);
         }
         if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
+      }
+
+      // If background function completely failed to trigger, skip polling (it would wait 10 min for nothing)
+      if (!bgTriggered) {
+        console.error(`Background function failed for ${kid.childName}: ${bgErrorStatus}`);
+        completedStories.push({ childName: kid.childName, audioUrl: null, storyId: null, failed: true });
+        continue;
       }
 
       // Poll for this child's result
@@ -3394,21 +3404,20 @@ async function handleStripeReturn() {
     showNextStoryBanner(verifyData.customerEmail, discountCode, discountPercent);
   } catch(err) {
     stopGeneratingScreen();
-    // Always offer retry after payment failure. The session_id is still in the URL
-    // (we no longer clean it early), so a reload will re-trigger handleStripeReturn.
+    console.error('Story generation error:', err.message, err.stack);
+    // Always offer retry. The session_id is still in the URL so a reload will re-trigger handleStripeReturn.
     // Story data will be recovered from sessionStorage or Supabase pending backup.
-    if (sessionId) {
-      const retry = confirm('Something went wrong generating your story audio, but your payment is confirmed. Would you like to try again? (Your payment is safe.)');
-      if (retry) {
-        window.location.href = window.location.pathname + '?session_id=' + sessionId;
-        return;
-      }
-    }
     goTo('screenLanding');
-    // Show a friendly error on the landing page instead of a raw alert
     const errBanner = document.createElement('div');
-    errBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF0F0;border-bottom:2px solid #FF6B9D;padding:1rem;text-align:center;z-index:9999;font-size:0.85rem;color:#CC3366;font-weight:600';
-    errBanner.innerHTML = 'Something went wrong. If you have paid, your payment is safe. Please email <a href="mailto:hello@storytold.ai" style="color:#7C5CFC;font-weight:700">hello@storytold.ai</a> and I will sort it out. <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:1rem;font-size:1.1rem">&times;</span>';
+    errBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF8F0;border-bottom:2px solid var(--orange, #E8A040);padding:1.25rem 1rem;text-align:center;z-index:9999;font-size:0.88rem;color:#8B6914;font-weight:600;line-height:1.6';
+    let bannerHtml = 'Something went wrong creating your story, but your payment is 100% safe.';
+    if (sessionId) {
+      bannerHtml += '<br><button onclick="window.location.href=window.location.pathname+\'?session_id=' + sessionId + '\'" style="margin-top:0.6rem;padding:0.6rem 1.5rem;border-radius:50px;border:none;background:var(--purple,#7C5CFC);color:white;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:inherit">Try again</button>';
+    }
+    bannerHtml += '<br><span style="font-size:0.78rem;font-weight:500">If it still doesn\'t work, email <a href="mailto:hello@storytold.ai" style="color:var(--purple,#7C5CFC);font-weight:700">hello@storytold.ai</a> and I will sort it personally.</span>';
+    bannerHtml += '<span onclick="this.parentElement.remove()" style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;color:#8B6914">&times;</span>';
+    errBanner.style.position = 'fixed';
+    errBanner.innerHTML = bannerHtml;
     document.body.prepend(errBanner);
   }
 }
