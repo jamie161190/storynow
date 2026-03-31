@@ -3,7 +3,7 @@
 // then generates TTS audio, uploads to Supabase.
 // Uses direct fetch() calls - ZERO SDK dependencies.
 
-import { SYSTEM_PROMPT, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
+import { SYSTEM_PROMPT, buildPreviewPrompt, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
 
 // TTS chunk helper: splits text into chunks at sentence boundaries
 function splitIntoChunks(text, maxChars = 4000) {
@@ -113,10 +113,29 @@ async function saveJobResult(supabaseUrl, supabaseKey, jobId, result) {
 // ============================================================
 // BACKGROUND FUNCTION HANDLER
 // ============================================================
+// Save to preview-jobs bucket (for preview mode)
+async function savePreviewResult(supabaseUrl, supabaseKey, jobId, result) {
+  try {
+    await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseKey}`,
+        'apikey': supabaseKey,
+        'Content-Type': 'application/json',
+        'x-upsert': 'true'
+      },
+      body: JSON.stringify(result)
+    });
+  } catch (e) {
+    console.error('[PREVIEW-BG] Failed to save result:', e.message);
+  }
+}
+
 export const handler = async (event) => {
   let jobId;
   try {
-    const { storyData, previewStory, voiceId, childName, sessionId, jobId: jid, fromScratch } = JSON.parse(event.body);
+    const parsed = JSON.parse(event.body);
+    const { storyData, previewStory, voiceId, childName, sessionId, jobId: jid, fromScratch, mode } = parsed;
     jobId = jid;
 
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -127,6 +146,98 @@ export const handler = async (event) => {
       return { statusCode: 200 };
     }
 
+    // ── PREVIEW MODE: Generate preview story + TTS, save to preview-jobs ──
+    if (mode === 'preview') {
+      console.log('[PREVIEW-BG] Starting preview generation for job:', jobId, 'category:', storyData?.category);
+      const startTime = Date.now();
+
+      if (!process.env.ANTHROPIC_API_KEY || !process.env.ELEVENLABS_API_KEY) {
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Service not configured' });
+        return { statusCode: 200 };
+      }
+
+      // Call Anthropic API with full thinking for best quality
+      const apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 16000,
+          temperature: 0.8,
+          thinking: { type: 'enabled', budget_tokens: 1024 },
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
+        })
+      });
+
+      if (!apiResponse.ok) {
+        const errBody = await apiResponse.text();
+        console.error('[PREVIEW-BG] Anthropic error:', apiResponse.status, errBody);
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Story generation failed. Please try again.' });
+        return { statusCode: 200 };
+      }
+
+      const apiResult = await apiResponse.json();
+      let previewText = '';
+      for (const block of apiResult.content) {
+        if (block.type === 'text') previewText += block.text;
+      }
+      console.log('[PREVIEW-BG] Text generated in', Date.now() - startTime, 'ms, words:', previewText.split(' ').length);
+
+      // Build message intro
+      let messageIntro = '';
+      if (storyData.isGift && storyData.giftFrom) {
+        const giftMsg = storyData.giftMessage || storyData.personalMessage;
+        messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... `;
+        if (giftMsg) messageIntro += `${giftMsg} ... `;
+        messageIntro += `And now, your story begins. ... `;
+      } else if (storyData.personalMessage) {
+        messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
+      }
+
+      const fullPreviewText = messageIntro + previewText + ' ... ... To hear what happens next, unlock the full story.';
+
+      // Save partial result before TTS
+      await savePreviewResult(supabaseUrl, supabaseKey, jobId, {
+        status: 'generating_audio', fullStory: fullPreviewText, previewStory: previewText, storyData
+      });
+
+      // Generate TTS
+      const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
+      const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
+        method: 'POST',
+        headers: {
+          'xi-api-key': process.env.ELEVENLABS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: fullPreviewText,
+          model_id: 'eleven_flash_v2_5',
+          voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+        })
+      });
+
+      if (!ttsResponse.ok) {
+        console.error('[PREVIEW-BG] TTS error:', ttsResponse.status);
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Voice generation failed. Please try again.' });
+        return { statusCode: 200 };
+      }
+
+      const audioBase64 = Buffer.from(await ttsResponse.arrayBuffer()).toString('base64');
+      console.log('[PREVIEW-BG] Complete in', Date.now() - startTime, 'ms');
+
+      // Save complete result
+      await savePreviewResult(supabaseUrl, supabaseKey, jobId, {
+        success: true, previewAudio: audioBase64, previewStory: previewText, storyData
+      });
+      return { statusCode: 200 };
+    }
+
+    // ── FULL STORY MODE (original flow) ──
     console.log('[FULL-BG] Starting full story generation for job:', jobId);
 
     // ── Step 1: Generate the rest of the story with Anthropic (direct fetch) ──

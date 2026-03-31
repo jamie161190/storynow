@@ -2920,36 +2920,39 @@ async function generatePreview() {
     const MIN_LOADING_MS = 30000; // Show loading for at least 30 seconds
     let data;
 
+    // Rate-limit check (fast, returns immediately)
     try {
-      const res = await fetch('/api/generate-preview', {
+      const rlRes = await fetch('/api/generate-preview', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ storyData, voiceId: selectedVoiceId, jobId })
       });
-      const text = await res.text();
-      try { data = JSON.parse(text); } catch(e) {
-        console.log('Direct response timed out, polling for result...');
-        data = null;
+      if (rlRes.status === 429) {
+        const rlData = await rlRes.json();
+        throw new Error(rlData.error || 'Preview limit reached. Please try again later.');
       }
-      // Real error from the gateway (not a timeout)
-      if (data && !data.success && data.error) {
-        console.error('API error detail:', data.debug || 'no debug info');
-        throw new Error(data.error || 'Something went wrong');
-      }
-    } catch(fetchErr) {
-      if (fetchErr.message && !fetchErr.message.includes('Something went wrong') && !fetchErr.message.includes('Too many')) {
-        console.log('Fetch error, will poll:', fetchErr.message);
-        data = null;
-      } else {
-        throw fetchErr;
-      }
+    } catch(rlErr) {
+      if (rlErr.message && rlErr.message.includes('limit')) throw rlErr;
+      console.log('Rate limit check skipped:', rlErr.message);
     }
 
-    // If direct response failed or timed out, poll for the result
-    if (!data || !data.success) {
-      loadingText.textContent = 'Almost there, just finishing up...';
-      data = await pollForPreview(jobId);
+    // Trigger the EXISTING background worker with mode=preview
+    // (same function that generates full stories, 15-min timeout, saves to Supabase)
+    try {
+      const bgRes = await fetch('/.netlify/functions/full-worker-background', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ mode: 'preview', storyData, voiceId: selectedVoiceId, jobId })
+      });
+      console.log('Preview background worker triggered:', bgRes.status);
+    } catch(bgErr) {
+      console.error('Background trigger failed:', bgErr.message);
+      throw new Error('Could not start story generation. Please try again.');
     }
+
+    // Poll Supabase for the result via check-preview
+    data = await pollForPreview(jobId);
+
     if (!data) throw new Error('Story generation timed out. Please try again.');
     if (!data.success) throw new Error(data.error || 'Story generation failed. Please try again.');
 
