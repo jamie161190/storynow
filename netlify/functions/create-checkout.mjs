@@ -12,6 +12,7 @@ export default async (req) => {
     const customerEmail = body.customerEmail || null;
     const previewStoryText = body.previewStoryText || body.fullStoryText || '';
     const selectedVoiceId = body.selectedVoiceId || '';
+    const additionalChildren = body.additionalChildren || storyData.additionalChildren || [];
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
 
@@ -29,7 +30,9 @@ export default async (req) => {
             currency: 'gbp',
             product_data: {
               name: 'Storytold: Personalised Audio Story',
-              description: `A personalised story for ${childName}`
+              description: additionalChildren.length > 0
+                ? `Personalised stories for ${childName}, ${additionalChildren.map(c => c.childName).join(', ')}`
+                : `A personalised story for ${childName}`
             },
             unit_amount: 1999
           },
@@ -44,7 +47,8 @@ export default async (req) => {
       metadata: {
         childName: childName,
         category: storyData.category || '',
-        length: storyData.length || ''
+        length: storyData.length || '',
+        additionalChildren: additionalChildren.map(c => c.childName).join(', ') || ''
       }
     });
 
@@ -55,7 +59,7 @@ export default async (req) => {
 
     if (supabaseUrl && supabaseKey && previewStoryText) {
       try {
-        const pendingData = JSON.stringify({ storyData, previewStoryText, selectedVoiceId });
+        const pendingData = JSON.stringify({ storyData: { ...storyData, additionalChildren }, previewStoryText, selectedVoiceId });
         const fileName = `pending/${session.id}.json`;
 
         await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {

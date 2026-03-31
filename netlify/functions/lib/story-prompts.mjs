@@ -446,3 +446,15 @@ ${previewStory}
 
 Continue this story now. Write the REMAINING portion (approximately ${getWordCount(storyData.length, storyData.age) - 80} words) to complete the full story. The listener will hear the opening above followed immediately by what you write now, so the transition must be seamless. Do not repeat the opening. Do not summarise what happened. Just continue.`;
 }
+
+// Build a complete story prompt from scratch (used for additional children in multi-kid orders)
+export function buildCompleteStoryPrompt(storyData) {
+  const promptFn = STORY_PROMPTS[storyData.category];
+  if (!promptFn) throw new Error('Invalid category: ' + storyData.category);
+  const fullPrompt = promptFn(storyData);
+  const wordCount = getWordCount(storyData.length, storyData.age);
+
+  return fullPrompt + `
+
+Write the COMPLETE story from beginning to end. Approximately ${wordCount} words. This is the full, finished story that will be read aloud in one sitting. Start with a gripping, personal opening that uses the child's name in the first two sentences. Build through rising action to a satisfying climax and resolution. Include natural pauses ( ... ) throughout for the narrator to breathe.`;
+}

@@ -3,7 +3,7 @@
 // then generates TTS audio, uploads to Supabase.
 // Uses direct fetch() calls - ZERO SDK dependencies.
 
-import { SYSTEM_PROMPT, buildFullStoryPrompt } from './lib/story-prompts.mjs';
+import { SYSTEM_PROMPT, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
 
 // TTS chunk helper: splits text into chunks at sentence boundaries
 function splitIntoChunks(text, maxChars = 4000) {
@@ -116,7 +116,7 @@ async function saveJobResult(supabaseUrl, supabaseKey, jobId, result) {
 export const handler = async (event) => {
   let jobId;
   try {
-    const { storyData, previewStory, voiceId, childName, sessionId, jobId: jid } = JSON.parse(event.body);
+    const { storyData, previewStory, voiceId, childName, sessionId, jobId: jid, fromScratch } = JSON.parse(event.body);
     jobId = jid;
 
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -149,7 +149,7 @@ export const handler = async (event) => {
             budget_tokens: 5000
           },
           system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: buildFullStoryPrompt(storyData, previewStory) }]
+          messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
         })
       });
 
@@ -190,7 +190,10 @@ export const handler = async (event) => {
       messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
     }
 
-    const fullStoryText = messageIntro + previewStory + '\n\n' + continuationText;
+    // For from-scratch stories (additional children), the continuation IS the full story
+    const fullStoryText = fromScratch
+      ? messageIntro + continuationText
+      : messageIntro + previewStory + '\n\n' + continuationText;
     console.log('[FULL-BG] Complete story:', fullStoryText.split(' ').length, 'words');
 
     // ── Step 3: Generate TTS for the complete story ──
