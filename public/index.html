@@ -576,9 +576,10 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
     <div class="shape shape-4"></div>
   </div>
 
-  <!-- TOP NAV -->
-  <div style="width:100%;max-width:440px;display:flex;justify-content:flex-end;margin-bottom:0.25rem">
-    <a onclick="goTo('screenLogin')" style="font-size:0.75rem;color:var(--text-muted);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.3rem">&#128218; My Stories</a>
+  <!-- STICKY TOP NAV -->
+  <div id="stickyNav" style="position:sticky;top:0;z-index:100;width:100%;background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0.6rem 1rem;display:flex;justify-content:space-between;align-items:center;max-width:100vw;margin-left:calc(-50vw + 50%);margin-right:calc(-50vw + 50%);margin-bottom:0.5rem">
+    <span style="font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;color:var(--purple);padding-left:0.5rem">Storytold</span>
+    <a onclick="goTo('screenLogin')" style="font-size:0.82rem;color:var(--purple);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:0.35rem;padding:0.35rem 0.75rem;border:2px solid var(--purple-light);border-radius:var(--radius-full);background:var(--purple-light);transition:all 0.2s">&#128100; Log in</a>
   </div>
 
   <!-- HERO -->
@@ -699,6 +700,13 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       <button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:0.65rem" onclick="submitContact()">Send</button>
     </div>
     <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.6rem">hello@storytold.ai</p>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="width:100%;max-width:440px;margin-top:2rem;padding-top:1.25rem;border-top:2px solid var(--border);text-align:center">
+    <a onclick="goTo('screenLogin')" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--purple);font-weight:700;cursor:pointer;padding:0.5rem 1.2rem;border:2px solid var(--purple-light);border-radius:var(--radius-full);background:var(--purple-light);margin-bottom:0.75rem">&#128100; Log in to My Stories</a>
+    <p style="font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin:0">Already bought a story? Log in with the email you used at checkout.</p>
+    <p style="font-size:0.65rem;color:var(--text-muted);margin-top:1rem">&copy; 2026 Storytold. All rights reserved.</p>
   </div>
 </div>
 
