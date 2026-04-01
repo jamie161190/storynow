@@ -1717,9 +1717,10 @@ const bgMusic = {
 
     this.audio.volume = 0;
     this.audio.play().then(() => {
+      console.log('[bgMusic] Playing:', category, 'target:', this.targetVolume);
       this.fadeTo(this.targetVolume);
     }).catch(e => {
-      console.log('Background music skipped:', e.message);
+      console.log('[bgMusic] BLOCKED:', e.message);
     });
   },
 
