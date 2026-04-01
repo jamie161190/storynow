@@ -174,7 +174,7 @@ export default async (req) => {
       try {
         // Check if they already have a story (they purchased successfully)
         const storyCheck = await fetch(
-          `${supabaseUrl}/rest/v1/stories?customer_email=eq.${encodeURIComponent(email)}&select=id&limit=1`,
+          `${supabaseUrl}/rest/v1/stories?email=eq.${encodeURIComponent(email)}&select=id&limit=1`,
           { headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey } }
         );
         if (storyCheck.ok) {

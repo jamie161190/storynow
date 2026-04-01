@@ -339,7 +339,7 @@ export default async (req) => {
               'Prefer': 'return=representation'
             },
             body: JSON.stringify({
-              customer_email: customerEmail,
+              email: customerEmail,
               child_name: storyData.childName,
               category: storyData.category,
               audio_url: audioUrl,
