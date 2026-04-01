@@ -2985,21 +2985,28 @@ async function generatePreview() {
     audio.volume = 0.75;
     audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
 
-    // Wire up progress bar
-    audio.addEventListener('loadedmetadata', function() {
+    // Remove stale listeners before adding new ones (prevents accumulation on regenerate)
+    if (audio._stMeta) audio.removeEventListener('loadedmetadata', audio._stMeta);
+    if (audio._stTime) audio.removeEventListener('timeupdate', audio._stTime);
+    if (audio._stEnd) audio.removeEventListener('ended', audio._stEnd);
+
+    audio._stMeta = function() {
       document.getElementById('previewDuration').textContent = formatTime(audio.duration);
-    });
-    audio.addEventListener('timeupdate', function() {
+    };
+    audio._stTime = function() {
       if (audio.duration) {
         const pct = (audio.currentTime / audio.duration) * 100;
         document.getElementById('previewProgress').style.width = pct + '%';
         document.getElementById('previewTime').textContent = formatTime(audio.currentTime);
       }
-    });
-    audio.addEventListener('ended', function() {
+    };
+    audio._stEnd = function() {
       document.getElementById('previewPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
       bgMusic.stop();
-    });
+    };
+    audio.addEventListener('loadedmetadata', audio._stMeta);
+    audio.addEventListener('timeupdate', audio._stTime);
+    audio.addEventListener('ended', audio._stEnd);
 
     // Personalise unlock button with child's name
     document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story for £19.99';
@@ -3138,22 +3145,25 @@ async function handleStripeReturn() {
   let saved = sessionStorage.getItem('storytold_story');
   if (!saved) {
     // sessionStorage was wiped during redirect (common on mobile browsers)
-    // Recover from server-side backup
-    try {
-      goTo('screenLoading');
-      document.querySelector('.loading-text').textContent = 'Restoring your story...';
-      document.querySelector('.loading-sub').textContent = 'Just a moment.';
-      const pendingRes = await fetch('/api/get-pending-story', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId })
-      });
-      const pendingData = await pendingRes.json();
-      if (pendingData.success) {
-        saved = JSON.stringify(pendingData);
+    // Recover from server-side backup with retries
+    goTo('screenLoading');
+    document.querySelector('.loading-text').textContent = 'Restoring your story...';
+    document.querySelector('.loading-sub').textContent = 'Just a moment.';
+    for (let attempt = 0; attempt < 3 && !saved; attempt++) {
+      try {
+        if (attempt > 0) await new Promise(r => setTimeout(r, attempt * 2000));
+        const pendingRes = await fetch('/api/get-pending-story', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId })
+        });
+        const pendingData = await pendingRes.json();
+        if (pendingData.success) {
+          saved = JSON.stringify(pendingData);
+        }
+      } catch (e) {
+        console.error('Pending story recovery attempt ' + (attempt + 1) + ' failed:', e);
       }
-    } catch (e) {
-      console.error('Failed to recover pending story:', e);
     }
   }
   if (!saved) {
@@ -3169,7 +3179,7 @@ async function handleStripeReturn() {
   Object.assign(storyData, savedData);
   previewStoryText = savedPreview || savedStory || '';
   fullStoryText = savedStory || savedPreview || '';
-  selectedVoiceId = savedVoice;
+  selectedVoiceId = savedVoice || 'EXAVITQu4vr4xnSDxMaL';
   applyCategoryTheme(storyData.category);
 
   // Verify payment
