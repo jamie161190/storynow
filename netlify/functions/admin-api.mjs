@@ -267,8 +267,10 @@ export default async (req) => {
         ).catch(() => ({ ok: false }))
       ]);
 
-      const stories = Array.isArray(await storiesRes.json().catch(() => [])) ? await storiesRes.clone().json() : [];
-      const attempts = Array.isArray(await attemptsRes.json().catch(() => [])) ? await attemptsRes.clone().json() : [];
+      const storiesData = await storiesRes.json().catch(() => []);
+      const stories = Array.isArray(storiesData) ? storiesData : [];
+      const attemptsData = await attemptsRes.json().catch(() => []);
+      const attempts = Array.isArray(attemptsData) ? attemptsData : [];
       let views = [];
       if (viewsRes.ok) {
         const vData = await viewsRes.json().catch(() => []);
