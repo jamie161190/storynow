@@ -184,8 +184,9 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
   const safeEmail = esc(customerEmail);
   const lengthLabel = '~15 min';
   const categoryLabel = category === 'learning' ? 'Learning Adventure' : category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
-  const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}` : 'https://storytold.ai';
-  const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai`);
+  const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}&utm_source=email&utm_medium=purchase_email&utm_campaign=story_delivery` : 'https://storytold.ai';
+  const waShareUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}&utm_source=share&utm_medium=whatsapp&utm_campaign=purchase_email_share` : 'https://storytold.ai';
+  const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${waShareUrl}\n\nMade with storytold.ai`);
 
   return `
 <!DOCTYPE html>

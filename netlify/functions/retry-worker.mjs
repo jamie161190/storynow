@@ -99,7 +99,83 @@ export default async (req) => {
     // Skip if too many attempts (max 10)
     if (jobData.attempts >= 10) {
       console.error('[RETRY] Job exceeded max attempts, alerting:', jobData.retryId);
-      // TODO: Send alert to Jamie
+
+      const resendKey = process.env.RESEND_API_KEY;
+      if (resendKey) {
+        try {
+          // Send alert to Jamie
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${resendKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'Storytold <hello@storytold.ai>',
+              to: ['hello@storytold.ai'],
+              subject: 'ALERT: Story generation failed after 10 attempts',
+              html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="font-family:Arial,sans-serif;color:#333;">
+  <h2>Story Generation Alert</h2>
+  <p><strong>Customer Email:</strong> ${jobData.customerEmail}</p>
+  <p><strong>Child Name:</strong> ${jobData.childName}</p>
+  <p><strong>Retry ID:</strong> ${jobData.retryId}</p>
+  <p>Story generation has failed after 10 attempts. Manual intervention is needed.</p>
+</body>
+</html>`
+            })
+          });
+          console.log('[RETRY] Alert email sent to hello@storytold.ai');
+        } catch (alertErr) {
+          console.error('[RETRY] Failed to send alert email:', alertErr.message);
+        }
+
+        try {
+          // Send apology email to customer
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${resendKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'Storytold <hello@storytold.ai>',
+              to: [jobData.customerEmail],
+              subject: 'We are working on your story',
+              html: `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
+    <div style="text-align:center;margin-bottom:32px;">
+      <h1 style="color:#7C5CFC;font-size:28px;margin:0;">Storytold</h1>
+    </div>
+    <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">We are working on your story</h2>
+      <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
+        ${jobData.childName}'s story is taking a bit longer than expected, but our team is on it. You will receive it shortly.
+      </p>
+      <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
+        If you need any help or have questions, please email us at hello@storytold.ai and we will get back to you as soon as possible.
+      </p>
+      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
+        Thank you for your patience.
+      </p>
+    </div>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
+  </div>
+</body>
+</html>`
+            })
+          });
+          console.log('[RETRY] Apology email sent to:', jobData.customerEmail);
+        } catch (custErr) {
+          console.error('[RETRY] Failed to send customer email:', custErr.message);
+        }
+      }
+
       continue;
     }
 
@@ -271,13 +347,14 @@ export default async (req) => {
       if (customerEmail) {
         const resendKey = process.env.RESEND_API_KEY;
         if (resendKey) {
-          const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}` : 'https://storytold.ai';
+          const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}&utm_source=email&utm_medium=retry_email&utm_campaign=story_delivery` : 'https://storytold.ai';
           const safeChild = (childName || 'Your child').replace(/[<>&"']/g, '');
 
           try {
             const safeEmail = (customerEmail || '').replace(/[<>&"']/g, '');
             const categoryLabel = storyData.category === 'learning' ? 'Learning Adventure' : storyData.category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
-            const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai`);
+            const waShareUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}&utm_source=share&utm_medium=whatsapp&utm_campaign=retry_email_share` : 'https://storytold.ai';
+            const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${waShareUrl}\n\nMade with storytold.ai`);
 
             await fetch('https://api.resend.com/emails', {
               method: 'POST',

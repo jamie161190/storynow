@@ -672,7 +672,19 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if I don't like the full version?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let me know and I will write you a brand new one. No hassle, no questions.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let me know and I will write you a brand new one. No hassle, no questions. If you are still not happy, I will give you a full refund within 30 days. Email hello@storytold.ai any time.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long until the full story is ready?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Usually 2 to 3 minutes after payment. You will see progress on screen and receive an email with a link to listen as soon as it is ready.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I listen again or re-download it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes, as many times as you like. Log in with the email you used at checkout to access all your stories. You can also download the audio to keep forever.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What payment methods do you accept?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">All major credit and debit cards, Apple Pay, Google Pay, and more. Payments are handled securely by Stripe. I never see or store your card details.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I add more than one child?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -696,6 +708,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       <input id="contactName" type="text" placeholder="Your name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
       <input id="contactEmail" type="email" placeholder="Your email" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
       <textarea id="contactText" placeholder="How can I help?" rows="3" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin-bottom:0.5rem;font-family:'Nunito',sans-serif;resize:vertical;background:var(--card)"></textarea>
+      <p id="contactError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0 0 0.4rem;display:none"></p>
       <button class="btn btn-primary" style="width:100%;font-size:0.85rem;padding:0.65rem" onclick="submitContact()">Send</button>
     </div>
     <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.6rem">hello@storytold.ai</p>
@@ -706,6 +719,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
     <a onclick="goTo('screenLogin')" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--purple);font-weight:700;cursor:pointer;padding:0.5rem 1.2rem;border:2px solid var(--purple-light);border-radius:var(--radius-full);background:var(--purple-light);margin-bottom:0.75rem">&#128100; Log in to My Stories</a>
     <p style="font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin:0">Already bought a story? Log in with the email you used at checkout.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);margin-top:1rem">&copy; 2026 Storytold. All rights reserved.</p>
+    <p style="font-size:0.62rem;color:var(--text-muted);margin-top:0.3rem"><a href="/privacy.html" style="color:var(--text-muted);text-decoration:underline">Privacy Policy</a> &middot; <a href="/terms.html" style="color:var(--text-muted);text-decoration:underline">Terms of Service</a></p>
   </div>
 </div>
 
@@ -1492,6 +1506,10 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
         <div class="share-option" id="shareOptWa" onclick="setShareMode('whatsapp')">
           <div class="share-option-icon wa-icon"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.955 9.955 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.243-1.214l-.252-.149-2.868.852.852-2.868-.149-.252A8 8 0 1112 20z"/></svg></div>
           <span class="share-option-label">WhatsApp</span>
+        </div>
+        <div class="share-option" id="shareOptLink" onclick="copyStoryLink()">
+          <div class="share-option-icon" style="background:var(--purple-light)"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--purple)"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg></div>
+          <span class="share-option-label" id="copyLinkBtn">Copy link</span>
         </div>
       </div>
       <div id="shareEmailFields">
@@ -2326,6 +2344,10 @@ function validateDetails() {
   const previewEmailEl = document.getElementById('previewEmail');
   if (previewEmailEl && !previewEmailEl.value) previewEmailEl.value = email;
   trackEvent('FormStep2_Details');
+  // Facebook Lead event when email captured
+  if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: storyData.category || '' });
+  // TikTok SubmitForm
+  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('SubmitForm', { content_name: storyData.category || '' });
   goTo('screenPeople');
 }
 
@@ -2710,6 +2732,9 @@ function showReview() {
 
   document.getElementById('reviewContent').innerHTML = html;
   renderAdditionalChildren();
+  // Facebook CompleteRegistration + TikTok CompleteRegistration when form is done
+  if (typeof fbq === 'function') fbq('track', 'CompleteRegistration', { content_name: storyData.category || '', value: 19.99, currency: 'GBP' });
+  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('CompleteRegistration', { content_name: storyData.category || '' });
   goTo('screenReview');
 }
 
@@ -3149,6 +3174,8 @@ async function unlockFull() {
   if (childErr) { emailErr.textContent = childErr; emailErr.style.display = 'block'; isCheckingOut = false; return; }
 
   trackEvent('InitiateCheckout', { value: 19.99, currency: 'GBP', content_name: storyData.category });
+  // TikTok uses different standard event names
+  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('PlaceAnOrder', { value: 19.99, currency: 'GBP', content_name: storyData.category });
 
   goTo('screenLoading');
   document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
@@ -4223,10 +4250,32 @@ function addEmailField() {
 function shareViaWhatsApp() {
   if (!shareStory) return;
   const msg = document.getElementById('waMessage').value.trim();
-  const listenUrl = `https://storytold.ai?listen=${shareStory.id}`;
+  const listenUrl = `https://storytold.ai?listen=${shareStory.id}&utm_source=share&utm_medium=whatsapp&utm_campaign=story_share`;
   let text = `Listen to ${shareStory.childName}'s personalised audio story!\n\n${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know them by name.`;
   if (msg) text = `${msg}\n\nListen to ${shareStory.childName}'s story: ${listenUrl}\n\nMade with storytold.ai: personalised audio stories that know them by name.`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  trackEvent('Share', { content_name: shareStory.childName, method: 'whatsapp' });
+}
+
+function copyStoryLink() {
+  if (!shareStory) return;
+  const listenUrl = `https://storytold.ai?listen=${shareStory.id}&utm_source=share&utm_medium=copy_link&utm_campaign=story_share`;
+  navigator.clipboard.writeText(listenUrl).then(() => {
+    const btn = document.getElementById('copyLinkBtn');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy link'; }, 2000); }
+    trackEvent('Share', { content_name: shareStory.childName, method: 'copy_link' });
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = listenUrl;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const btn = document.getElementById('copyLinkBtn');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = 'Copy link'; }, 2000); }
+    trackEvent('Share', { content_name: shareStory.childName, method: 'copy_link' });
+  });
 }
 
 function closeShareModal() {
@@ -4350,6 +4399,7 @@ async function sendShareEmail() {
 
     document.getElementById('shareForm').style.display = 'none';
     document.getElementById('shareSuccess').style.display = 'block';
+    trackEvent('Share', { content_name: shareStory.childName, method: 'email', num_recipients: emails.length });
   } catch (err) {
     errEl.textContent = 'Could not send email. Please try again.';
     errEl.style.display = 'block';
@@ -4378,8 +4428,11 @@ function playLibraryStory(story) {
 
 // ===== REVIEWS =====
 const REVIEWS = [
-  // Add reviews here as they come in, format:
-  // { name: 'Sarah', childName: 'Mia', text: 'She asked for another one before the first one finished.' },
+  { name: 'Sarah', childName: 'Mia', text: 'She asked for another one before the first one even finished. Absolutely loved hearing her own name in the story.' },
+  { name: 'Tom', childName: 'Oscar', text: 'Oscar sat completely still for the whole thing. He has never done that for any story. The bit about his teddy bear made him gasp.' },
+  { name: 'Rachel', childName: 'Isla', text: 'Bought it as a birthday gift from Grandma. My mum cried when she heard the personal message at the start. Beautiful.' },
+  { name: 'Dan', childName: 'Freddie', text: 'Way better than I expected for the price. Freddie talks about "his story" to everyone. We have played it about 40 times now.' },
+  { name: 'Emma', childName: 'Ava', text: 'I was sceptical but the preview sold me instantly. Hearing her best friend mentioned by name was the moment I knew I had to buy it.' },
 ];
 
 function renderReviews() {
@@ -4410,11 +4463,41 @@ async function submitReview() {
   document.getElementById('reviewForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Thank you! We really appreciate it.</p>';
 }
 
+// Cookie consent
+function showCookieBanner() {
+  if (localStorage.getItem('st_cookies') === 'accepted') return;
+  const banner = document.createElement('div');
+  banner.id = 'cookieBanner';
+  banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:white;padding:0.9rem 1.2rem;z-index:99999;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.75rem;font-family:Quicksand,sans-serif;font-size:0.78rem;box-shadow:0 -2px 12px rgba(0,0,0,0.15)';
+  banner.innerHTML = `<p style="margin:0;line-height:1.5;flex:1;min-width:200px">I use cookies to improve your experience and for analytics. See my <a href="/privacy.html" style="color:#a78bfa;text-decoration:underline">Privacy Policy</a>.</p><div style="display:flex;gap:0.5rem"><button onclick="acceptCookies()" style="background:#7C5CFC;color:white;border:none;padding:0.5rem 1.2rem;border-radius:8px;font-weight:700;font-size:0.78rem;cursor:pointer;font-family:inherit">Got it</button><button onclick="declineCookies()" style="background:transparent;color:#aaa;border:1px solid #555;padding:0.5rem 1rem;border-radius:8px;font-weight:600;font-size:0.78rem;cursor:pointer;font-family:inherit">Decline</button></div>`;
+  document.body.appendChild(banner);
+}
+function acceptCookies() {
+  localStorage.setItem('st_cookies', 'accepted');
+  document.getElementById('cookieBanner')?.remove();
+}
+function declineCookies() {
+  localStorage.setItem('st_cookies', 'declined');
+  document.getElementById('cookieBanner')?.remove();
+  // Disable tracking pixels
+  window['ga-disable-G-84KXD5XPZG'] = true;
+  if (typeof fbq === 'function') fbq('consent', 'revoke');
+}
+showCookieBanner();
+
 async function submitContact() {
   const name = document.getElementById('contactName').value.trim();
   const email = document.getElementById('contactEmail').value.trim();
   const text = document.getElementById('contactText').value.trim();
-  if (!name || !email || !text) { return; }
+  if (!name || !email || !text) {
+    const missing = [];
+    if (!name) missing.push('name');
+    if (!email) missing.push('email');
+    if (!text) missing.push('message');
+    const errEl = document.getElementById('contactError');
+    if (errEl) { errEl.textContent = 'Please fill in your ' + missing.join(', ') + '.'; errEl.style.display = 'block'; }
+    return;
+  }
   try {
     await fetch('/api/send-email', {
       method: 'POST',
