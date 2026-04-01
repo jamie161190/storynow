@@ -10,22 +10,33 @@ const { execSync } = require('child_process');
 const ELEVENLABS_KEY = '8deae6fba15696db876cfa1f3b824318140ece878b0d02c6717358895dbe148e';
 const VOICE_ID = 'onwK4e9ZLuTAKqWW03F9'; // Daniel - calm, deep, British
 
-// ~75 words. Tight 30-second cut. Every sentence earns its place.
-const SCRIPT = `Chase pressed his nose against the window. And there it was.
+// ~80 words. Comedy beats baked into the sentence structure.
+// Short fragments = TTS pauses. Single-word lines = punch.
+// Questions = natural pitch change. Contrast = drama.
+const SCRIPT = `Chase was not supposed to be awake. But the ground was shaking.
 
-A T-Rex. A real one. Standing in the garden. Chewing Daddy's roses.
+He looked out the window. A T-Rex. In the garden. Eating Daddy's roses.
 
-"Ellis!" Chase whispered. "Wake up."
+"Ellis," he whispered. "Whatever you do, don't move."
 
-They crept outside, Mr Flopsy tucked under one arm. The dinosaur lowered its enormous head and rumbled.
+Ellis immediately moved.
 
-"Someone has stolen every egg from the volcano. And the someone. Is your Daddy."
+The dinosaur looked up. It had a rose hanging out of its mouth. It looked completely ridiculous.
 
-Chase looked at Ellis. "That does sound like something he'd do."`;
+"Are you Chase?" it said.
+
+"Maybe," said Chase, pulling Mr Flopsy a little closer.
+
+"Your Daddy stole my eggs. Every single one. I need them back."
+
+Chase looked at Ellis. "Yeah. That does sound like him."`;
 
 async function main() {
-  console.log('Generating narration with ElevenLabs (Daniel voice)...');
+  console.log('Generating narration with ElevenLabs (Daniel voice, multilingual v2)...');
 
+  // Using eleven_multilingual_v2 for maximum expression and tone variation.
+  // Low stability (0.30) = more dramatic range between whispers, rumbles,
+  // and cheeky dialogue. Higher similarity (0.80) keeps the voice consistent.
   const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
     method: 'POST',
     headers: {
@@ -34,8 +45,13 @@ async function main() {
     },
     body: JSON.stringify({
       text: SCRIPT,
-      model_id: 'eleven_flash_v2_5',
-      voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      model_id: 'eleven_multilingual_v2',
+      voice_settings: {
+        stability: 0.30,
+        similarity_boost: 0.80,
+        style: 0.45,
+        use_speaker_boost: true
+      }
     })
   });
 
@@ -55,7 +71,7 @@ async function main() {
   } catch {
     console.log('\nffmpeg not found. Install it with: brew install ffmpeg');
     console.log('Then run this script again to mix with background music.');
-    console.log('Or just rename sample-narration.mp3 to sample-story.mp3 for narration only.');
+    console.log('Or rename public/sample-narration.mp3 to public/sample-story.mp3 for narration only.');
     return;
   }
 
@@ -68,9 +84,8 @@ async function main() {
   const duration = parseFloat(durationOut);
   console.log(`Mixing with background music (narration: ${duration.toFixed(1)}s)...`);
 
-  // 1s music intro before narration starts, then fade music out at the end
-  // Music at 0.02 volume (Jamie's preference), narration at 0.75
-  const totalDuration = duration + 2.5; // 1s intro + 1.5s tail
+  // 1s music intro, narration at 0.75, music at 0.02, fade out at end
+  const totalDuration = duration + 2.5;
 
   execSync(`ffmpeg -y \
     -i "${narrationPath}" \
