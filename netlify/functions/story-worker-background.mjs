@@ -40,6 +40,15 @@ PACING AND PAUSES (critical for audio):
 - Avoid parentheses, asterisks, em dashes, or any visual formatting.
 - No chapter titles or headings unless specifically requested.
 
+AUDIO TAGS (for emotional expression):
+The narrator supports audio tags in square brackets. Use them SPARINGLY at key emotional moments (8 to 12 per story max):
+- [whispers] before a secret or quiet reveal
+- [laughs softly] during genuinely funny moments
+- [gasps] before a big surprise
+- [sighs] for moments of relief or contentment
+- [excitedly] before exciting dialogue
+- Place them at the START of the sentence. Never more than one per paragraph.
+
 7. NEVER INVENT WHAT THE PARENT ALREADY DESCRIBED
 If the parent told you something is yellow, it is yellow. NEVER add colours, sizes, breeds, or details the parent did not provide.
 
@@ -190,16 +199,15 @@ export const handler = async (event) => {
         method: 'POST',
         headers: {
           'x-api-key': anthropicKey,
-          'anthropic-version': '2023-06-01',
+          'anthropic-version': '2025-04-14',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
+          max_tokens: 16000,
           temperature: 1,
           thinking: {
-            type: 'enabled',
-            budget_tokens: 1024
+            type: 'adaptive'
           },
           system: SYSTEM_PROMPT,
           messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
@@ -257,8 +265,8 @@ export const handler = async (event) => {
       },
       body: JSON.stringify({
         text: ttsText,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: { stability: 0.35, similarity_boost: 0.80, style: 0.40, use_speaker_boost: true }
+        model_id: 'eleven_v3',
+        voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 }
       })
     });
 

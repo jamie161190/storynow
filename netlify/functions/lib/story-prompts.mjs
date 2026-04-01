@@ -1,5 +1,32 @@
 // Shared story prompts and helpers used by both preview and full generation
 
+// Sanitise user inputs to prevent prompt injection
+export function sanitiseInput(text) {
+  if (!text || typeof text !== 'string') return text;
+  // Strip anything that looks like prompt injection
+  const dangerous = /ignore (previous|all|above|prior) instructions|system\s*:|assistant\s*:|<\/?(?:system|prompt|instruction|override)>|you are now|forget everything|new instructions|disregard|override|jailbreak/gi;
+  let cleaned = text.replace(dangerous, '');
+  // Strip excessive newlines (more than 2 in a row)
+  cleaned = cleaned.replace(/\n{3,}/g, '\n\n');
+  // Strip backticks and angle brackets that could be used for formatting attacks
+  cleaned = cleaned.replace(/[`<>]/g, '');
+  // Limit length per field to 500 chars (generous but bounded)
+  return cleaned.slice(0, 500).trim();
+}
+
+// Sanitise all user-facing fields in story data
+export function sanitiseStoryData(d) {
+  const s = { ...d };
+  const textFields = ['childName', 'friendName', 'sidekickName', 'petName', 'petType', 'favTeddy',
+    'villainName', 'familyMembers', 'teacherName', 'interest', 'themeDetail', 'setting',
+    'extraDetails', 'personalMessage', 'giftFrom', 'giftMessage', 'proudOf', 'subject',
+    'learningGoal', 'customTheme', 'customWhere'];
+  for (const f of textFields) {
+    if (s[f]) s[f] = sanitiseInput(s[f]);
+  }
+  return s;
+}
+
 export const WORD_COUNTS = { standard: 2200, long: 2200, epic: 2200 };
 
 // Age-adjusted word counts: younger children need shorter stories
@@ -55,6 +82,19 @@ PACING AND PAUSES (critical for audio):
 - Avoid parentheses, asterisks, em dashes, or any visual formatting.
 - No chapter titles or headings unless specifically requested.
 - No "Chapter 1" labels. If you need to separate sections, use a natural transition in the prose with a pause ( ... ) to mark the shift.
+
+AUDIO TAGS (for emotional expression):
+The narrator supports audio tags in square brackets that control how it speaks. Use them SPARINGLY at key emotional moments, no more than 8 to 12 per full story, placed at the moments that matter most:
+- [whispers] before a secret, a bedtime moment, or a quiet reveal. Example: "[whispers] And do you know what he found?"
+- [laughs softly] or [laughs] during genuinely funny moments. Example: "And then the penguin sat right on his head. [laughs softly]"
+- [gasps] before a big reveal or surprise. Example: "[gasps] It was the biggest dragon Chase had ever seen."
+- [sighs] for moments of relief, contentment, or gentle emotion. Example: "[sighs] Finally, they were home."
+- [excitedly] before exciting dialogue or action. Example: "[excitedly] They did it! They actually did it!"
+- Place audio tags at the START of the sentence or clause they apply to, not in the middle of words.
+- NEVER use more than one audio tag per paragraph. Less is more. A single well placed [whispers] at the story's emotional peak is worth more than ten scattered throughout.
+- For bedtime stories: favour [whispers] and [sighs] in the second half as the story winds down.
+- For adventure stories: favour [gasps] and [excitedly] during action, [whispers] during quiet character moments.
+- For learning stories: favour [excitedly] when the child gets an answer right.
 
 7. NEVER INVENT WHAT THE PARENT ALREADY DESCRIBED
 If the parent told you something is yellow, it is yellow. If they said the pet is a golden retriever, it is a golden retriever, not a Labrador. If they described a toy, blanket, or object, use their exact description. NEVER add colours, sizes, breeds, or details the parent did not provide. When no description was given, keep it vague ("the blanket", "the teddy") rather than inventing details that could be wrong. A child who sees their blue blanket described as red will lose all trust in the story instantly.
@@ -415,38 +455,82 @@ Write the story now. Start immediately with action or discovery.`,
 
 };
 
+// Age-band specific writing style for previews
+function getPreviewAgeBand(age) {
+  const a = parseInt(age);
+  if (a <= 4) return `AGE STYLE (${a} years old): Use very short sentences, max 8 to 10 words each. Include at least one sound effect or repeated pattern (Splash! Whoosh! Clip-clop!). Repetition is magic at this age. Simple words only. The preview should sound like a CBeebies narrator performing it.`;
+  if (a <= 7) return `AGE STYLE (${a} years old): Clear, accessible language. Sentences can be 12 to 15 words. Include one moment of wonder or gentle humour. The friend should sound like a real kid.`;
+  if (a <= 10) return `AGE STYLE (${a} years old): Richer vocabulary, 15 to 20 word sentences are fine. Include wit or humour. The friend has personality and opinions. Make the child feel clever, not babied.`;
+  return `AGE STYLE (${a} years old): Young adult tone. Use dialogue fragments like real teens ("Wait, what?" "No way."). Complex emotion is welcome. Respect their intelligence. Do not write like an adult pretending to be a teenager.`;
+}
+
+// Category-specific preview selling formulas
+const PREVIEW_FORMULAS = {
+  bedtime: (d) => `
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them feel the warmth and magic.
+
+BEDTIME PREVIEW FORMULA:
+This is a BEDTIME story preview. It must feel intimate, warm, and safe. NOT adventurous or high energy.
+1. FIRST SENTENCE: The child's name in a quiet, sensory moment. Something gentle is happening. A soft glow, a whisper, a familiar comfort. Example: "${d.childName} pulled the blanket up to their chin, and that is when the ceiling began to sparkle."
+2. SECOND SENTENCE: Their best friend (${d.friendName}) is there, close and comforting. A whispered word, a shared glance, a warm presence.
+3. NEXT 2 TO 3 SENTENCES: Build a sensory world. Warmth, soft light, gentle sounds. Weave in ONE personal detail (pet, teddy, or interest) naturally. Every sentence should include something the child can feel, hear, or see. Do NOT introduce more than 2 named characters total.
+4. FINAL SENTENCE: A gentle moment of wonder that makes the parent lean in. Not a cliffhanger, but a soft invitation. The listener wants to know where this gentle journey leads.
+
+${getPreviewAgeBand(d.age)}`,
+
+  journey: (d) => `
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them cry, gasp, or smile so wide they cannot say no.
+
+JOURNEY PREVIEW FORMULA:
+1. FIRST SENTENCE: The child's name in a moment of wonder or emotion, not walking or waking up. Something is already happening TO them or BECAUSE of them. Example: "${d.childName} could not believe what just landed in the garden."
+2. SECOND SENTENCE: Their best friend (${d.friendName}) reacts, speaks, or does something that proves this story KNOWS this child's world.
+3. NEXT 2 TO 3 SENTENCES: Stack personal details fast. The pet does something memorable. The interest or theme becomes the world around them.${d.hasVillain && d.villainName ? ' Hint at the villain (' + d.villainName + ') with playful menace.' : ''} Every sentence should make the parent think "how does it know all this?"
+4. FINAL SENTENCE: Stop mid-action at an impossible, wonderful moment. The child is about to discover, face, or unlock something extraordinary. The listener MUST need to know what happens next.
+
+${getPreviewAgeBand(d.age)}`,
+
+  learning: (d) => `
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to prove this story teaches AND entertains.
+
+LEARNING PREVIEW FORMULA:
+This preview must signal that this is an INTERACTIVE learning story about ${d.subject || 'the subject'}.
+1. FIRST SENTENCE: The child's name in an exciting discovery moment where ${d.subject || 'knowledge'} is clearly the key to the adventure.
+2. SECOND SENTENCE: Their best friend (${d.friendName}) reacts with excitement or curiosity. The subject (${d.subject || 'learning'}) is woven into the world naturally.
+3. NEXT 2 TO 3 SENTENCES: Build the adventure world where learning IS the superpower. Include ONE interactive moment: pose a question to the listener, then write "Can you work it out?" or "What do you think?" This signals the story talks directly to the child.
+4. FINAL SENTENCE: A challenge or discovery that makes the listener want to hear more. The child is about to use their knowledge to unlock something amazing.
+
+${getPreviewAgeBand(d.age)}`
+};
+
 // Build a short preview prompt from the full story prompt
-// Asks for just the opening ~200 words instead of the full 2200
 export function buildPreviewPrompt(storyData) {
-  const promptFn = STORY_PROMPTS[storyData.category];
-  if (!promptFn) throw new Error('Invalid category: ' + storyData.category);
-  const fullPrompt = promptFn(storyData);
+  const safe = sanitiseStoryData(storyData);
+  const promptFn = STORY_PROMPTS[safe.category];
+  if (!promptFn) throw new Error('Invalid category: ' + safe.category);
+  const fullPrompt = promptFn(safe);
 
-  return fullPrompt + `
+  const formulaFn = PREVIEW_FORMULAS[safe.category] || PREVIEW_FORMULAS.journey;
+  const categoryFormula = formulaFn(safe);
 
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening of the story, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them cry, gasp, or smile so wide they cannot say no.
-
-THE FORMULA THAT SELLS:
-1. FIRST SENTENCE: The child's name in a moment of wonder or emotion, not walking or waking up. Something is already happening TO them or BECAUSE of them. Example: "Chase could not believe his eyes" or "The moment Isla whispered the secret word, everything changed."
-2. SECOND SENTENCE: Their best friend reacts, speaks, or does something that proves this story KNOWS this child's world. Use the friend's name in dialogue or action.
-3. NEXT 2 TO 3 SENTENCES: Stack personal details fast. The pet does something memorable. The interest or theme becomes the world around them. A family member is referenced naturally. Every sentence should make the parent think "how does it know all this?"
-4. FINAL SENTENCE: Stop mid-action at an impossible, wonderful, or terrifying moment. The child is about to discover, face, or unlock something extraordinary. The listener MUST need to know what happens next.
+  return fullPrompt + categoryFormula + `
 
 RULES:
 - The child's name appears at least 3 times
-- Include one natural pause ( ... ) for the narrator
+- Include one natural pause ( ... ) for the narrator to breathe
 - NO generic openings (no "once upon a time", no waking up, no "it was a [adjective] day")
 - NO resolution, NO wrapping up, NO moral lessons
 - The preview must feel like the story already knows and loves this child
+- Use [whispers] or [laughs softly] audio tags at ONE emotionally appropriate moment
 
 Write ONLY the opening now. Absolutely no more than 80 words.`;
 }
 
 // Build the full story prompt that continues from the preview opening
 export function buildFullStoryPrompt(storyData, previewStory) {
-  const promptFn = STORY_PROMPTS[storyData.category];
-  if (!promptFn) throw new Error('Invalid category: ' + storyData.category);
-  const fullPrompt = promptFn(storyData);
+  const safe = sanitiseStoryData(storyData);
+  const promptFn = STORY_PROMPTS[safe.category];
+  if (!promptFn) throw new Error('Invalid category: ' + safe.category);
+  const fullPrompt = promptFn(safe);
 
   return fullPrompt + `
 
@@ -462,10 +546,11 @@ Continue this story now. Write the REMAINING portion (approximately ${getWordCou
 
 // Build a complete story prompt from scratch (used for admin-generated stories)
 export function buildCompleteStoryPrompt(storyData) {
-  const promptFn = STORY_PROMPTS[storyData.category];
-  if (!promptFn) throw new Error('Invalid category: ' + storyData.category);
-  const fullPrompt = promptFn(storyData);
-  const wordCount = getWordCount(storyData.length, storyData.age);
+  const safe = sanitiseStoryData(storyData);
+  const promptFn = STORY_PROMPTS[safe.category];
+  if (!promptFn) throw new Error('Invalid category: ' + safe.category);
+  const fullPrompt = promptFn(safe);
+  const wordCount = getWordCount(safe.length, safe.age);
 
   return fullPrompt + `
 

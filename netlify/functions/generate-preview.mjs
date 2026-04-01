@@ -49,4 +49,11 @@ export default async (req) => {
   });
 };
 
-export const config = { path: '/api/generate-preview' };
+export const config = {
+  path: '/api/generate-preview',
+  rateLimit: {
+    windowSize: 60,
+    windowLimit: 3,
+    aggregateBy: ['ip']
+  }
+};

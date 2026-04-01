@@ -111,7 +111,7 @@ fbq('track', 'PageView');
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Can I hear a Storytold story before I pay?",
+      "name": "Can I hear it before I pay?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Yes. You get a free preview of the opening of your story before you spend anything. Only pay if you love it."
@@ -127,10 +127,10 @@ fbq('track', 'PageView');
     },
     {
       "@type": "Question",
-      "name": "Can I share the story with family?",
+      "name": "Can I share it with family?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "One tap. Hit share and send the story to grandparents, aunties, uncles, or anyone you like by email or WhatsApp. They get a link, they tap play, done. You can also download the audio and save it straight to your phone. No extra cost, no limits."
+        "text": "One tap. That is all it takes. Hit share and send the story to grandparents, aunties, uncles, or anyone you like by email or WhatsApp. They get a link, they tap play, done. You can also download the audio and save it straight to your phone. No extra cost, no limits on who you share it with."
       }
     },
     {
@@ -151,10 +151,10 @@ fbq('track', 'PageView');
     },
     {
       "@type": "Question",
-      "name": "What ages does Storytold work for?",
+      "name": "What ages does this work for?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Storytold creates stories for children aged 2 to 14. The language, themes, and complexity automatically adapt to the child's age."
+        "text": "Ages 2 to 14. Stories automatically adapt to the child's age. Toddlers get simple language with sound effects and repetition. Older children get richer plots, real dialogue, and deeper themes."
       }
     },
     {
@@ -162,7 +162,7 @@ fbq('track', 'PageView');
       "name": "Can I listen to it more than once?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "As many times as you like, forever. The story lives in your personal library. You can also download the audio file and save it to your phone, tablet, or computer. No expiry, no limits."
+        "text": "As many times as you like, forever. The story lives in your personal library on this site. You can also download the audio file and save it to your phone, tablet, or computer. No expiry, no limits."
       }
     },
     {
@@ -170,7 +170,7 @@ fbq('track', 'PageView');
       "name": "How long does the full story take to generate?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Usually about 60 to 90 seconds after payment. You will see a progress screen while it is being written and narrated."
+        "text": "Usually a few minutes after payment. You will see a progress screen while it is being written and narrated. If anything takes longer than expected, you will get an email with a direct link as soon as it is ready."
       }
     }
   ]
@@ -688,7 +688,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long does the full story take to generate?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Usually about 60 to 90 seconds after payment. You will see a progress screen while it is being written and narrated. If anything takes longer than expected, you will get an email with a direct link as soon as it is ready.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Usually a few minutes after payment. You will see a progress screen while it is being written and narrated. If anything takes longer than expected, you will get an email with a direct link as soon as it is ready.</p>
       </details>
     </div>
   </div>
@@ -1975,7 +1975,7 @@ goTo = function(id, skipHistory) {
   // Preview screen: show email as confirmation if already filled, or as input if empty
   if (id === 'screenPreview') {
     const email = document.getElementById('previewEmail').value.trim();
-    if (email && email.includes('@')) {
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       document.getElementById('previewEmailDisplay').textContent = email;
       document.getElementById('previewEmailConfirm').style.display = 'block';
       document.getElementById('previewEmailEdit').style.display = 'none';
@@ -4034,7 +4034,7 @@ async function sendGiftEmail() {
   const errEl = document.getElementById('giftSendError');
   errEl.style.display = 'none';
 
-  if (!email || !email.includes('@')) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errEl.textContent = 'Please enter a valid email address';
     errEl.style.display = 'block';
     return;
@@ -4093,13 +4093,13 @@ async function sendShareEmail() {
   errEl.style.display = 'none';
 
   if (!fromName) { errEl.textContent = 'Please enter your name'; errEl.style.display = 'block'; return; }
-  if (!mainEmail || !mainEmail.includes('@')) { errEl.textContent = 'Please enter a valid email address'; errEl.style.display = 'block'; return; }
+  if (!mainEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mainEmail)) { errEl.textContent = 'Please enter a valid email address'; errEl.style.display = 'block'; return; }
 
   // Gather all emails
   const emails = [mainEmail];
   document.querySelectorAll('.share-extra-email').forEach(input => {
     const val = input.value.trim();
-    if (val && val.includes('@')) emails.push(val);
+    if (val && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) emails.push(val);
   });
 
   const btn = document.getElementById('shareSendBtn');

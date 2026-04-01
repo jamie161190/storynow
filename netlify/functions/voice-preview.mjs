@@ -67,8 +67,8 @@ export default async (req) => {
       },
       body: JSON.stringify({
         text: sampleText,
-        model_id: 'eleven_multilingual_v2',
-        voice_settings: { stability: 0.35, similarity_boost: 0.80, style: 0.40, use_speaker_boost: true }
+        model_id: 'eleven_v3',
+        voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 }
       })
     });
 

@@ -318,4 +318,11 @@ function shareEmail(childName, fromName, message, storyId) {
 </html>`;
 }
 
-export const config = { path: '/api/send-email' };
+export const config = {
+  path: '/api/send-email',
+  rateLimit: {
+    windowSize: 60,
+    windowLimit: 10,
+    aggregateBy: ['ip']
+  }
+};

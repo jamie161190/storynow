@@ -89,7 +89,11 @@ export default async (request, context) => {
 
     return new Response(html, {
       status: 200,
-      headers: { 'Content-Type': 'text/html; charset=utf-8' }
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        'CDN-Cache-Control': 'public, max-age=86400'
+      }
     });
 
   } catch (err) {

@@ -114,4 +114,11 @@ export default async (req) => {
   }
 };
 
-export const config = { path: '/api/send-login-code' };
+export const config = {
+  path: '/api/send-login-code',
+  rateLimit: {
+    windowSize: 60,
+    windowLimit: 5,
+    aggregateBy: ['ip']
+  }
+};

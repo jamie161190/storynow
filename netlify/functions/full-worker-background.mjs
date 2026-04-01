@@ -203,12 +203,12 @@ export const handler = async (event) => {
         return { statusCode: 200 };
       }
 
-      // Call Anthropic API with full thinking for best quality (retry on 429/529/5xx)
+      // Call Anthropic API with adaptive thinking for best quality (retry on 429/529/5xx)
       const previewApiBody = JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 16000,
         temperature: 1,
-        thinking: { type: 'enabled', budget_tokens: 1024 },
+        thinking: { type: 'adaptive' },
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]
       });
@@ -219,7 +219,7 @@ export const handler = async (event) => {
           method: 'POST',
           headers: {
             'x-api-key': process.env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01',
+            'anthropic-version': '2025-04-14',
             'Content-Type': 'application/json'
           },
           body: previewApiBody
@@ -278,8 +278,8 @@ export const handler = async (event) => {
         },
         body: JSON.stringify({
           text: ttsPreviewText,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: { stability: 0.35, similarity_boost: 0.80, style: 0.40, use_speaker_boost: true }
+          model_id: 'eleven_v3',
+          voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 }
         })
       });
 
@@ -313,16 +313,15 @@ export const handler = async (event) => {
           method: 'POST',
           headers: {
             'x-api-key': process.env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01',
+            'anthropic-version': '2025-04-14',
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-6',
+            model: 'claude-opus-4-6',
             max_tokens: 16000,
             temperature: 1,
             thinking: {
-              type: 'enabled',
-              budget_tokens: 5000
+              type: 'adaptive'
             },
             system: SYSTEM_PROMPT,
             messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
@@ -417,8 +416,8 @@ export const handler = async (event) => {
           },
           body: JSON.stringify({
             text: chunk,
-            model_id: 'eleven_multilingual_v2',
-            voice_settings: { stability: 0.35, similarity_boost: 0.80, style: 0.40, use_speaker_boost: true }
+            model_id: 'eleven_v3',
+            voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 }
           })
         }).then(async (res) => {
           if (!res.ok) {

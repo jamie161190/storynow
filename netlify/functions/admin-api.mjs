@@ -7,14 +7,39 @@ export default async (req) => {
     return json({ error: 'Admin not configured' }, 500);
   }
 
-  // Check admin auth
-  const authHeader = req.headers.get('x-admin-secret');
-  if (authHeader !== adminSecret) {
-    return json({ error: 'Unauthorized' }, 401);
-  }
-
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SECRET_KEY;
+
+  // Brute-force protection: max 5 failed auth attempts per IP per hour
+  const clientIP = req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const authHeader = req.headers.get('x-admin-secret');
+
+  if (authHeader !== adminSecret) {
+    // Record failed attempt
+    if (supabaseUrl && supabaseKey) {
+      try {
+        // Check if IP is locked out
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const rlCheck = await fetch(
+          `${supabaseUrl}/rest/v1/rate_limits?key=eq.${encodeURIComponent('admin_fail_' + clientIP)}&created_at=gte.${oneHourAgo}&select=id`,
+          { headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey } }
+        );
+        if (rlCheck.ok) {
+          const failures = await rlCheck.json();
+          if (failures.length >= 5) {
+            return json({ error: 'Too many failed attempts. Locked for 1 hour.' }, 429);
+          }
+        }
+        // Log this failed attempt
+        await fetch(`${supabaseUrl}/rest/v1/rate_limits`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: 'admin_fail_' + clientIP, created_at: new Date().toISOString() })
+        });
+      } catch (e) { /* best effort */ }
+    }
+    return json({ error: 'Unauthorized' }, 401);
+  }
   if (!supabaseUrl || !supabaseKey) {
     return json({ error: 'Database not configured' }, 500);
   }
@@ -386,4 +411,11 @@ function enc(str) {
   return encodeURIComponent(str);
 }
 
-export const config = { path: '/api/admin' };
+export const config = {
+  path: '/api/admin',
+  rateLimit: {
+    windowSize: 60,
+    windowLimit: 30,
+    aggregateBy: ['ip']
+  }
+};
