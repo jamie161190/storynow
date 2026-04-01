@@ -367,7 +367,7 @@ export const handler = async (event) => {
       messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
     }
 
-    // For from-scratch stories (additional children), the continuation IS the full story
+    // For from-scratch stories, the continuation IS the full story
     const storyBody = fromScratch
       ? messageIntro + continuationText
       : messageIntro + previewStory + '\n\n' + continuationText;
