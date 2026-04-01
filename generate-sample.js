@@ -2,6 +2,7 @@
 // Run: node generate-sample.js
 // Requires: brew install ffmpeg (if not already installed)
 // Generates the homepage sample story audio with background music
+// Uses ElevenLabs v3 with audio tags for expressive narration
 
 const fs = require('fs');
 const path = require('path');
@@ -11,11 +12,12 @@ const ELEVENLABS_KEY = '8deae6fba15696db876cfa1f3b824318140ece878b0d02c671735889
 const VOICE_ID = 'onwK4e9ZLuTAKqWW03F9'; // Daniel - calm, deep, British
 
 // ~78 words. Space theme. Daddy as the villain. 30 seconds.
+// Audio tags tell v3 HOW to perform each moment.
 const SCRIPT = `Chase couldn't sleep. Something outside the window was glowing.
 
-He looked out. A spaceship. In the garden. Right on top of Daddy's flowers.
+He looked out. [gasps] A spaceship. In the garden. Right on top of Daddy's flowers.
 
-"Ellis," he whispered. "You need to see this."
+[whispers] "Ellis," he whispered. "You need to see this."
 
 A hatch opened. A small green alien poked its head out. "Are you Chase?"
 
@@ -23,10 +25,10 @@ Chase pulled Mr Flopsy closer. "Who's asking?"
 
 "Someone has stolen every star from the sky. And the someone, is your Daddy."
 
-Chase looked at Ellis. "Sounds about right. Let's go."`;
+Chase looked at Ellis. [laughs softly] "Sounds about right. Let's go."`;
 
 async function main() {
-  console.log('Generating narration with ElevenLabs (Daniel voice, multilingual v2)...');
+  console.log('Generating narration with ElevenLabs v3 (Daniel voice, audio tags)...');
 
   const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
     method: 'POST',
@@ -36,12 +38,11 @@ async function main() {
     },
     body: JSON.stringify({
       text: SCRIPT,
-      model_id: 'eleven_multilingual_v2',
+      model_id: 'eleven_v3',
       voice_settings: {
-        stability: 0.30,
-        similarity_boost: 0.80,
-        style: 0.45,
-        use_speaker_boost: true
+        stability: 0.50,
+        similarity_boost: 0.75,
+        style: 0
       }
     })
   });
