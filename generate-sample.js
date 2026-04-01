@@ -76,7 +76,7 @@ async function main() {
   const duration = parseFloat(durationOut);
   console.log(`Mixing with background music (narration: ${duration.toFixed(1)}s)...`);
 
-  // 1s music intro, narration at 0.75, music at 0.02, fade out at end
+  // 1s music intro, narration at 0.75, music at 0.06 (audible on mobile speakers), fade out at end
   const totalDuration = duration + 2.5;
 
   execSync(`ffmpeg -y \
@@ -84,7 +84,7 @@ async function main() {
     -i "${musicPath}" \
     -filter_complex "\
       [0:a]adelay=1000|1000,volume=0.75[narr];\
-      [1:a]atrim=0:${totalDuration},volume=0.02,afade=t=out:st=${totalDuration - 2}:d=2[music];\
+      [1:a]atrim=0:${totalDuration},volume=0.06,afade=t=out:st=${totalDuration - 2}:d=2[music];\
       [music][narr]amix=inputs=2:duration=longest:dropout_transition=2[out]\
     " \
     -map "[out]" \

@@ -3605,25 +3605,121 @@ async function showNextStoryBanner(email, existingCode, existingPercent) {
 async function downloadStory() {
   const audio = document.getElementById('fullStoryAudio');
   if(!audio.src) return;
+
+  const displayedFor = document.getElementById('fullStoryFor')?.textContent || '';
+  const dlName = displayedFor.replace('A story for ', '').trim() || storyData.childName || 'story';
+
+  // If music is enabled, mix narration + music into one file for download
+  if (bgMusicEnabled && currentPlayingCategory) {
+    try {
+      const musicUrl = bgMusic.tracks[currentPlayingCategory] || bgMusic.tracks.journey;
+      const [narrationBuf, musicBuf] = await Promise.all([
+        fetch(audio.src).then(r => r.arrayBuffer()),
+        fetch(musicUrl).then(r => r.arrayBuffer())
+      ]);
+
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AC();
+      const [narrationAudio, musicAudio] = await Promise.all([
+        ctx.decodeAudioData(narrationBuf),
+        ctx.decodeAudioData(musicBuf)
+      ]);
+
+      // Render offline: narration length + 2s fade out
+      const totalSamples = narrationAudio.length + Math.floor(2 * narrationAudio.sampleRate);
+      const offline = new OfflineAudioContext(1, totalSamples, narrationAudio.sampleRate);
+
+      // Narration at 0.75 volume
+      const narrSrc = offline.createBufferSource();
+      narrSrc.buffer = narrationAudio;
+      const narrGain = offline.createGain();
+      narrGain.gain.value = 0.75;
+      narrSrc.connect(narrGain);
+      narrGain.connect(offline.destination);
+      narrSrc.start(0);
+
+      // Music looped, at 0.08 volume, fading out at the end
+      const musicSrc = offline.createBufferSource();
+      musicSrc.buffer = musicAudio;
+      musicSrc.loop = true;
+      const musicGain = offline.createGain();
+      musicGain.gain.value = 0.08;
+      // Fade out music in last 3 seconds
+      const fadeStart = (totalSamples - 3 * narrationAudio.sampleRate) / narrationAudio.sampleRate;
+      const fadeEnd = totalSamples / narrationAudio.sampleRate;
+      musicGain.gain.setValueAtTime(0.08, fadeStart);
+      musicGain.gain.linearRampToValueAtTime(0, fadeEnd);
+      musicSrc.connect(musicGain);
+      musicGain.connect(offline.destination);
+      musicSrc.start(0);
+
+      const rendered = await offline.startRendering();
+      ctx.close();
+
+      // Encode as WAV
+      const wavBlob = audioBufferToWav(rendered);
+      const url = URL.createObjectURL(wavBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = dlName + ' - Storytold.wav';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return;
+    } catch(mixErr) {
+      console.log('[download] Music mix failed, falling back to narration only:', mixErr.message);
+    }
+  }
+
+  // Fallback: download narration only
   try {
-    // For Supabase URLs (cross-origin), fetch the file and create a blob download
     const res = await fetch(audio.src);
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    // Use the currently displayed child's name (from tab or primary)
-    const displayedFor = document.getElementById('fullStoryFor')?.textContent || '';
-    const dlName = displayedFor.replace('A story for ', '').trim() || storyData.childName || 'story';
     a.download = dlName + ' - Storytold.mp3';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   } catch(e) {
-    // Fallback: open in new tab
     window.open(audio.src, '_blank');
   }
+}
+
+// Encode an AudioBuffer to a WAV Blob
+function audioBufferToWav(buffer) {
+  const numChannels = 1;
+  const sampleRate = buffer.sampleRate;
+  const samples = buffer.getChannelData(0);
+  const dataLength = samples.length * 2;
+  const bufferOut = new ArrayBuffer(44 + dataLength);
+  const view = new DataView(bufferOut);
+
+  function writeStr(offset, str) { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); }
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + dataLength, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * 2, true);
+  view.setUint16(32, numChannels * 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, dataLength, true);
+
+  let offset = 44;
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    offset += 2;
+  }
+  return new Blob([bufferOut], { type: 'audio/wav' });
 }
 
 async function sendGift() {
