@@ -42,7 +42,7 @@ export default async (req) => {
   // ═══════════════════════════════════════════════════════════
   const testSessionId = stripeSessionId || 'audit_test_' + Date.now();
   const testPendingData = JSON.stringify({
-    storyData: { childName: 'AuditChild', category: 'bedtime', age: '5', gender: 'neutral', friendName: 'TestFriend', themes: ['space'], additionalChildren: [] },
+    storyData: { childName: 'AuditChild', category: 'bedtime', age: '5', gender: 'neutral', friendName: 'TestFriend', themes: ['space'] },
     previewStoryText: 'Once upon a time, AuditChild looked up at the stars and wondered what was out there.',
     selectedVoiceId: 'EXAVITQu4vr4xnSDxMaL'
   });
@@ -124,7 +124,7 @@ export default async (req) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        storyData: { childName: 'AuditChild', category: 'bedtime', age: '5', gender: 'neutral', friendName: 'TestFriend', themes: ['space'], additionalChildren: [], hasPet: false },
+        storyData: { childName: 'AuditChild', category: 'bedtime', age: '5', gender: 'neutral', friendName: 'TestFriend', themes: ['space'], hasPet: false },
         previewStory: 'Once upon a time, AuditChild looked up at the stars and wondered what was out there. The night sky sparkled with a thousand tiny lights.',
         voiceId: 'EXAVITQu4vr4xnSDxMaL',
         childName: 'AuditChild',

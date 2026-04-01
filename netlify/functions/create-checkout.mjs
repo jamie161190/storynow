@@ -12,8 +12,6 @@ export default async (req) => {
     const customerEmail = body.customerEmail || null;
     const previewStoryText = body.previewStoryText || body.fullStoryText || '';
     const selectedVoiceId = body.selectedVoiceId || '';
-    const additionalChildren = body.additionalChildren || storyData.additionalChildren || [];
-
     // UTM and tracking params forwarded from the frontend
     const utmSource = body.utm_source || '';
     const utmMedium = body.utm_medium || '';
@@ -39,9 +37,7 @@ export default async (req) => {
             currency: 'gbp',
             product_data: {
               name: 'Storytold: Personalised Audio Story',
-              description: additionalChildren.length > 0
-                ? `Personalised stories for ${childName}, ${additionalChildren.map(c => c.childName).join(', ')}`
-                : `A personalised story for ${childName}`
+              description: `A personalised story for ${childName}`
             },
             unit_amount: 1999
           },
@@ -57,7 +53,6 @@ export default async (req) => {
         childName: childName,
         category: storyData.category || '',
         length: storyData.length || '',
-        additionalChildren: additionalChildren.map(c => c.childName).join(', ') || '',
         utm_source: utmSource,
         utm_medium: utmMedium,
         utm_campaign: utmCampaign,
@@ -75,7 +70,7 @@ export default async (req) => {
 
     if (supabaseUrl && supabaseKey && previewStoryText) {
       try {
-        const pendingData = JSON.stringify({ storyData: { ...storyData, additionalChildren }, previewStoryText, selectedVoiceId });
+        const pendingData = JSON.stringify({ storyData, previewStoryText, selectedVoiceId });
         const fileName = `pending/${session.id}.json`;
 
         await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {

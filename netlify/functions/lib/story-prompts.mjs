@@ -188,6 +188,20 @@ ${d.petType ? `IMPORTANT: You know what ${d.petType}s are really like. Use that 
 This item should appear in the story. Give it a role, a moment, a reason to matter. CRITICAL: Use ONLY the description the parent gave. If they said "yellow blanket," it is yellow. If they said "small white bunny," it is small and white. NEVER invent colours, sizes, or details the parent did not mention. If no colour or description was given, describe it without visual details (e.g. "the blanket" not "the soft blue blanket").`;
   }
 
+  if (d.hasVillain && d.villainName) {
+    block += `\n\nVILLAIN: ${d.villainName}
+This is the story's cheeky antagonist, chosen by the parent. They cause trouble, create obstacles, and make the adventure exciting. But they are NOT truly evil or scary. Think mischievous, silly, or bumbling rather than threatening. The villain should:
+- Appear at least 3 times throughout the story, escalating each time
+- Have a funny catchphrase or signature move
+- Underestimate ${d.childName} every single time
+- Be defeated or outsmarted in a satisfying, clever way at the climax
+- For ages 2 to 4: the villain is extremely gentle and silly, more of a nuisance than a threat. Think of a grumpy cloud that keeps blocking the sun, or a cheeky monkey stealing bananas.
+- For ages 5 to 7: the villain is comedic and bumbling, always one step behind. Think classic cartoon villain.
+- For ages 8 to 10: the villain can be more cunning and provide real challenge, but humour undercuts any genuine menace.
+- For ages 11 to 14: the villain can have depth, maybe even a sympathetic motivation, but ${d.childName} still comes out on top.
+IMPORTANT: If the villain is a real person (like "Daddy" or "Mrs Thompson"), make it CLEARLY playful and affectionate. The "villain" version of a real person should be so over the top silly that the child laughs, never feels genuinely scared. Think pantomime villain energy.`;
+  }
+
   if (d.extraDetails) {
     block += `\n\nEXTRA DETAILS FROM THE PARENT (these are gold, weave them in naturally):
 ${d.extraDetails}`;
@@ -250,6 +264,12 @@ ENGAGEMENT TECHNIQUES:
 - THE IMPOSSIBLE CHOICE: At around the 60% mark, ${d.childName} faces a decision where both options have consequences. This is where the story gets personal and the child leans in.
 - SENSORY WORLD BUILDING: The story must paint vivid sensory pictures. Not "they entered a cave" but "The air turned cold. Water dripped somewhere in the dark. And then, from deep inside the cave, a sound. A low rumble. Like breathing."
 - END WITH A DOOR OPEN: The final line should hint that there could be another adventure. Not a cliffhanger, but a promise. The child should turn to their parent and say "Can I get another one?"
+
+${d.hasVillain && d.villainName ? `VILLAIN STRUCTURE: ${d.villainName} is the story's antagonist. Build their presence across all 4 acts:
+- Act 1: Introduce the villain or their handiwork. Something is wrong, and it is ${d.villainName}'s doing.
+- Act 2: ${d.villainName} confronts or obstructs ${d.childName} directly. They are confident, cocky, and sure they will win.
+- Act 3: ${d.villainName}'s biggest move. The stakes are highest. But ${d.childName} spots the weakness the villain missed.
+- Act 4: ${d.childName} outsmarts ${d.villainName} in a satisfying, clever way. The villain's reaction should be funny, not sad.` : ''}
 
 EMOTIONAL CORE: Every great adventure story needs a heart. Somewhere in the middle, there should be a quiet moment between ${d.childName} and ${d.friendName}. A moment of honesty, doubt, encouragement, or laughter. This is what the child will remember even more than the action. It makes the adventure feel real.
 
@@ -463,7 +483,7 @@ ${previewStory}
 Continue this story now. Write the REMAINING portion (approximately ${getWordCount(storyData.length, storyData.age) - 80} words) to complete the full story. The listener will hear the opening above followed immediately by what you write now, so the transition must be seamless. Do not repeat the opening. Do not summarise what happened. Just continue.`;
 }
 
-// Build a complete story prompt from scratch (used for additional children in multi-kid orders)
+// Build a complete story prompt from scratch (used for admin-generated stories)
 export function buildCompleteStoryPrompt(storyData) {
   const promptFn = STORY_PROMPTS[storyData.category];
   if (!promptFn) throw new Error('Invalid category: ' + storyData.category);
