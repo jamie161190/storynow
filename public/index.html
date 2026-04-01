@@ -563,6 +563,13 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 </style>
 </head>
 <body>
+<script>
+// Detect Stripe return BEFORE page renders to prevent homepage flash
+if (new URLSearchParams(window.location.search).get('session_id')) {
+  document.documentElement.style.setProperty('--stripe-returning', '1');
+  document.write('<style>#screenLanding{display:none!important}#screenLoading{display:flex!important}</style>');
+}
+</script>
 <!-- Google Tag Manager (noscript): uncomment when GTM ID is set -->
 <!-- <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript> -->
 
@@ -1212,7 +1219,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
   <!-- Jamie message -->
   <div style="display:flex;align-items:center;gap:0.75rem;background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);padding:0.85rem 1rem;margin-bottom:1.5rem;max-width:400px;width:100%;box-shadow:var(--shadow)">
     <img src="/jamie-chase.jpg" alt="Jamie" style="width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0">
-    <p style="margin:0;font-size:0.82rem;color:var(--text);line-height:1.5;font-weight:500" id="genJamieMsg"><strong style="color:var(--purple)">Jamie here.</strong> I'm writing the full story now. This is the big one. Give me a few minutes.</p>
+    <p style="margin:0;font-size:0.82rem;color:var(--text);line-height:1.5;font-weight:500" id="genJamieMsg"><strong style="color:var(--purple)">Jamie here.</strong> I'm writing the full story now. This takes around 5 minutes because every word is written from scratch and then performed, not just read. It's worth the wait, I promise.</p>
   </div>
 
   <!-- Stage progress -->
@@ -1256,6 +1263,13 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
   <!-- Fun fact / reassurance rotating -->
   <div style="max-width:400px;width:100%;margin-top:1rem;text-align:center">
     <p id="genFunFact" style="font-size:0.78rem;color:var(--text-soft);font-style:italic;line-height:1.5;font-weight:500;transition:opacity 0.5s"></p>
+  </div>
+
+  <!-- Mini game: Emoji Memory Match -->
+  <div id="genGameWrap" style="max-width:400px;width:100%;margin-top:1.25rem;display:none">
+    <p style="text-align:center;font-size:0.82rem;font-weight:700;color:var(--text);margin:0 0 0.6rem">While you wait, find the matching pairs!</p>
+    <div id="genGameBoard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;max-width:280px;margin:0 auto"></div>
+    <p id="genGameScore" style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin:0.5rem 0 0;font-weight:600"></p>
   </div>
 
   <!-- Safety net -->
@@ -1905,6 +1919,22 @@ function goTo(id, skipHistory) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+
+  // If narration is still playing in the background, keep music alive
+  if (bgMusicEnabled && bgMusic.isPlaying) {
+    const narrations = ['fullStoryAudio', 'sharedAudio', 'previewAudio'];
+    let stillPlaying = false;
+    for (const nid of narrations) {
+      const a = document.getElementById(nid);
+      if (a && !a.paused) { stillPlaying = true; break; }
+    }
+    if (stillPlaying) {
+      if (bgMusic.ctx && bgMusic.ctx.state === 'suspended') bgMusic.ctx.resume().catch(() => {});
+      if (bgMusic.audio.paused) {
+        bgMusic.audio.play().then(() => bgMusic.fadeTo(bgMusic.targetVolume, 800)).catch(() => {});
+      }
+    }
+  }
 
   // Track screen views for funnel analysis
   trackEvent('ScreenView', { screen_name: id, content_name: storyData.category || '' });
@@ -3504,7 +3534,7 @@ function startGeneratingScreen(childName) {
   // Personalise Jamie's message
   const jamie = document.getElementById('genJamieMsg');
   if (jamie && childName) {
-    jamie.innerHTML = `<strong style="color:var(--purple)">Jamie here.</strong> I'm writing ${escHtml(childName)}'s full story now. This is the big one. Give me a few minutes.`;
+    jamie.innerHTML = `<strong style="color:var(--purple)">Jamie here.</strong> I'm writing ${escHtml(childName)}'s full story now. This takes around 5 minutes because every word is written from scratch and then performed, not just read. It's worth the wait.`;
   }
 
   // Timer
@@ -3525,17 +3555,19 @@ function startGeneratingScreen(childName) {
   let pct = 0;
   if (genProgressInterval) clearInterval(genProgressInterval);
   genProgressInterval = setInterval(() => {
-    // Slow climb, never reaches 100 until done
-    if (pct < 30) pct += Math.random() * 3 + 1;
-    else if (pct < 60) pct += Math.random() * 2 + 0.5;
-    else if (pct < 85) pct += Math.random() * 1.5 + 0.3;
-    else if (pct < 92) pct += Math.random() * 0.5;
+    // Very slow climb over ~5 minutes, never reaches 100 until done
+    if (pct < 20) pct += Math.random() * 1.5 + 0.5;
+    else if (pct < 40) pct += Math.random() * 1 + 0.3;
+    else if (pct < 60) pct += Math.random() * 0.8 + 0.2;
+    else if (pct < 80) pct += Math.random() * 0.5 + 0.1;
+    else if (pct < 90) pct += Math.random() * 0.3;
     if (pct > 92) pct = 92;
     bar.style.width = pct + '%';
-    if (pct < 35) label.textContent = 'Writing the story...';
-    else if (pct < 65) label.textContent = 'Recording narration...';
+    if (pct < 30) label.textContent = 'Writing the story...';
+    else if (pct < 55) label.textContent = 'Recording narration...';
+    else if (pct < 80) label.textContent = 'Adding expression and emotion...';
     else label.textContent = 'Almost ready...';
-  }, 2000);
+  }, 3000);
 
   // Stage animations (timed to roughly match real generation)
   // Stage 1 starts active immediately
@@ -3545,36 +3577,41 @@ function startGeneratingScreen(childName) {
   s1.style.opacity = '1'; s1.style.borderColor = 'var(--purple)'; s1.style.background = 'var(--purple-light)';
   document.getElementById('genIcon1').textContent = '\u23F3'; // hourglass
 
-  // Stage 2 activates around 60s (story text is done, TTS begins)
+  // Stage 2 activates around 120s (story text done with Opus, TTS begins)
   if (genStageTimeout1) clearTimeout(genStageTimeout1);
   genStageTimeout1 = setTimeout(() => {
     s1.style.borderColor = 'var(--green)'; s1.style.background = 'var(--green-light)';
     document.getElementById('genIcon1').textContent = '\u2705';
     s2.style.opacity = '1'; s2.style.borderColor = 'var(--purple)'; s2.style.background = 'var(--purple-light)';
     document.getElementById('genIcon2').textContent = '\u23F3';
-  }, 60000);
+  }, 120000);
 
-  // Stage 3 activates around 150s (TTS mostly done, combining)
+  // Stage 3 activates around 240s (TTS mostly done, combining)
   if (genStageTimeout2) clearTimeout(genStageTimeout2);
   genStageTimeout2 = setTimeout(() => {
     s2.style.borderColor = 'var(--green)'; s2.style.background = 'var(--green-light)';
     document.getElementById('genIcon2').textContent = '\u2705';
     s3.style.opacity = '1'; s3.style.borderColor = 'var(--purple)'; s3.style.background = 'var(--purple-light)';
     document.getElementById('genIcon3').textContent = '\u23F3';
-  }, 150000);
+  }, 240000);
 
   // Fun facts / reassurance messages
+  const cn = childName ? escHtml(childName) : 'Your child';
   const facts = [
     `Every story is unique. No two children will ever hear the same thing.`,
     `The narrator is recording every line with real emotion and expression.`,
-    `${childName ? escHtml(childName) + "'s" : "Their"} name will appear at least 8 times throughout the story.`,
+    `${cn}'s name will appear at least 8 times throughout the story.`,
     `The story has been planned from start to finish before a single word was written.`,
     `Every detail you shared is being woven into the plot, not just mentioned once.`,
     `The best friend gets their own personality, dialogue, and at least 3 standout moments.`,
-    `You can download, share, and replay this story as many times as you like. It's yours forever.`,
+    `You can share and replay this story as many times as you like. It's yours forever.`,
     `If it's not magical enough, I'll rewrite it for free. That's a genuine promise.`,
     `Stories are written for the ear, not the eye. Pauses, rhythm, and pacing are all built in.`,
-    `Almost there. Something special is taking shape.`
+    `The narrator whispers, laughs, and gasps at all the right moments.`,
+    `${cn}'s story is one of a kind. The exact same story will never be created again.`,
+    `We write for how it sounds, not how it reads. Every sentence is crafted for the voice.`,
+    `The full story is around 15 to 20 minutes of narrated audio.`,
+    `Nearly there. Something special is taking shape.`
   ];
   let factIdx = 0;
   const factEl = document.getElementById('genFunFact');
@@ -3589,7 +3626,114 @@ function startGeneratingScreen(childName) {
       factEl.textContent = facts[factIdx];
       factEl.style.opacity = '1';
     }, 400);
-  }, 12000);
+  }, 15000);
+
+  // Show the mini game after 15 seconds
+  setTimeout(() => {
+    const wrap = document.getElementById('genGameWrap');
+    if (wrap) { wrap.style.display = 'block'; startMemoryGame(); }
+  }, 15000);
+}
+
+// ── Emoji Memory Game (plays during story generation) ──
+let memoryGameInterval = null;
+function startMemoryGame() {
+  const board = document.getElementById('genGameBoard');
+  const scoreEl = document.getElementById('genGameScore');
+  if (!board) return;
+
+  const allEmoji = ['🐉','🧙','🦄','🏰','🌙','⚡','🗝️','🧜','🦊','🐻','🌈','🎭','👑','🔮','💎','🪄','🧚','🐲','🦁','🐺','🌟','🎪','🏔️','🧸'];
+  let level = 1;
+  let totalMatches = 0;
+  let totalTime = 0;
+  const levelConfigs = [
+    { pairs: 4, cols: 4 }, // 4x2 = 8 cards
+    { pairs: 6, cols: 4 }, // 4x3 = 12 cards
+    { pairs: 8, cols: 4 }, // 4x4 = 16 cards
+    { pairs: 10, cols: 5 }, // 5x4 = 20 cards
+    { pairs: 12, cols: 4 }, // 4x6 = 24 cards
+  ];
+
+  function startLevel() {
+    const config = levelConfigs[Math.min(level - 1, levelConfigs.length - 1)];
+    board.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
+    const picked = allEmoji.sort(() => Math.random() - 0.5).slice(0, config.pairs);
+    const cards = [...picked, ...picked].sort(() => Math.random() - 0.5);
+
+    let flipped = [];
+    let matched = 0;
+    let locked = false;
+
+    scoreEl.textContent = `Level ${level} \u2022 ${totalMatches} pairs found`;
+    board.innerHTML = '';
+
+    cards.forEach((emoji, i) => {
+      const card = document.createElement('div');
+      card.style.cssText = 'aspect-ratio:1;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;transition:all 0.3s;user-select:none;border:2px solid var(--purple-light)';
+      card.textContent = '?';
+      card.dataset.emoji = emoji;
+      card.dataset.idx = i;
+
+      card.addEventListener('click', () => {
+        if (locked || card.dataset.matched || flipped.includes(card)) return;
+
+        // Reveal
+        card.textContent = emoji;
+        card.style.background = 'var(--card)';
+        card.style.borderColor = 'var(--purple)';
+        flipped.push(card);
+
+        if (flipped.length === 2) {
+          locked = true;
+          const [a, b] = flipped;
+
+          if (a.dataset.emoji === b.dataset.emoji) {
+            // Match
+            a.dataset.matched = b.dataset.matched = '1';
+            a.style.borderColor = 'var(--green)';
+            b.style.borderColor = 'var(--green)';
+            a.style.background = 'var(--green-light)';
+            b.style.background = 'var(--green-light)';
+            matched++;
+            totalMatches++;
+            scoreEl.textContent = `Level ${level} \u2022 ${totalMatches} pairs found`;
+            flipped = [];
+            locked = false;
+
+            if (matched === config.pairs) {
+              // Level complete
+              setTimeout(() => {
+                level++;
+                if (level <= levelConfigs.length) {
+                  scoreEl.textContent = `Nice! Level ${level} starting...`;
+                  setTimeout(startLevel, 1200);
+                } else {
+                  scoreEl.textContent = `Champion! ${totalMatches} pairs matched across all levels!`;
+                  board.innerHTML = '<p style="grid-column:1/-1;text-align:center;font-size:1.5rem;padding:1rem">🎉🏆🎉</p>';
+                }
+              }, 600);
+            }
+          } else {
+            // No match, flip back
+            setTimeout(() => {
+              a.textContent = '?';
+              a.style.background = 'var(--purple)';
+              a.style.borderColor = 'var(--purple-light)';
+              b.textContent = '?';
+              b.style.background = 'var(--purple)';
+              b.style.borderColor = 'var(--purple-light)';
+              flipped = [];
+              locked = false;
+            }, 700);
+          }
+        }
+      });
+
+      board.appendChild(card);
+    });
+  }
+
+  startLevel();
 }
 
 function stopGeneratingScreen() {
