@@ -119,10 +119,10 @@ fbq('track', 'PageView');
     },
     {
       "@type": "Question",
-      "name": "How much does a Storytold story cost?",
+      "name": "How long is the full story?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "£19.99 for a personalised audio story. No subscription, no hidden costs. You own it forever."
+        "text": "Around 15 minutes of narrated audio. Long enough for bedtime, a rainy afternoon, or quiet time. Every story is unique and written from scratch."
       }
     },
     {
@@ -130,23 +130,23 @@ fbq('track', 'PageView');
       "name": "Can I share the story with family?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Share it by email or WhatsApp in seconds. Grandparents, aunties, uncles, whoever you like. You can also save the audio straight to your phone. No extra cost."
+        "text": "Tap share and send it by email or WhatsApp in seconds. You can also save the audio straight to your phone."
       }
     },
     {
       "@type": "Question",
-      "name": "Can I gift a Storytold story?",
+      "name": "What if I don't like the full version?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Toggle the gift option on the extras step, enter the recipient's email, and I send them a beautifully designed email with the story inside."
+        "text": "Just let me know and I will write you a brand new one. No hassle, no questions. If you would rather just get your money back, drop me an email within 24 hours and I will sort it out, provided the story has not been downloaded or shared yet."
       }
     },
     {
       "@type": "Question",
-      "name": "Can I create stories for other children?",
+      "name": "I have more than one child. Can they all be in it?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Each child gets their own unique story. After your first purchase you will receive a discount code for your next one."
+        "text": "Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase."
       }
     },
     {
@@ -155,6 +155,38 @@ fbq('track', 'PageView');
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Storytold creates stories for children aged 2 to 14. The language, themes, and complexity automatically adapt to the child's age."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the child's information safe?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Completely. The child's details are only used to write their story. Nothing is shared, sold, or used for advertising. Payment is processed securely by Stripe."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How is the story written?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every story is written from scratch using AI that has been carefully trained and tested with real families. It is not a template with names swapped in. The details you share shape the plot, the dialogue, and the ending."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I listen to it more than once?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As many times as you like, forever. The story lives in your personal library. You can also download the audio file and save it to your phone, tablet, or computer. No expiry, no limits."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does the full story take to generate?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Usually about 60 to 90 seconds after payment. You will see a progress screen while it is being written and narrated."
       }
     }
   ]
@@ -646,11 +678,18 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
     <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;font-weight:600;font-style:italic">Lisa, mum to Livvie (age 4)</p>
   </div>
 
+  <!-- REVIEWS -->
+  <div id="reviewsSection" style="display:none;width:100%;max-width:440px;margin-top:1.5rem">
+    <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.75rem;text-align:center">What parents are saying</p>
+    <div id="reviewsList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
+  </div>
+
   <!-- SECOND CTA -->
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Add siblings, friends, and family. Everyone gets a real role.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.2rem 0 0">&#128274; Secure payment via Stripe. No subscription. You own it forever.</p>
   </div>
 
@@ -685,6 +724,18 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is the child's information safe?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
         <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Completely. The child's details are only used to write their story. Nothing is shared, sold, or used for advertising. Payment is processed securely by Stripe. I take this seriously.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How is the story written?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Every story is written from scratch using AI that I have carefully trained and tested with real families. It is not a template with names swapped in. The details you share (interests, friends, fears, personality) shape the plot, the dialogue, and the ending. I personally review the system regularly to make sure the quality stays high.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I listen to it more than once?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">As many times as you like, forever. The story lives in your personal library on this site. You can also download the audio file and save it to your phone, tablet, or computer. No expiry, no limits.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long does the full story take to generate?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Usually about 60 to 90 seconds after payment. You will see a progress screen while it is being written and narrated. If anything takes longer than expected, you will get an email with a direct link as soon as it is ready.</p>
       </details>
     </div>
   </div>
