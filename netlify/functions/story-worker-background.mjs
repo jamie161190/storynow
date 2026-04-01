@@ -115,7 +115,6 @@ const STORY_PROMPTS = {
   bedtime: (d) => `STORY TYPE: Bedtime\nTONE: Warm, calming, soothing.\n\n${characterBlock(d)}\n\nBEDTIME STRUCTURE: Journey home, winding down, sleep.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`,
   journey: (d) => `STORY TYPE: Journey / Adventure\nTONE: Exciting, gripping, with emotional range.\n\n${characterBlock(d)}\n\nSTRUCTURE: 4 acts, 5-6 scenes, at least 2 twists.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`,
   learning: (d) => `STORY TYPE: Learning Adventure\nTONE: Exciting, immersive, secretly educational.\nSUBJECT: ${d.subject}\n${d.learningGoal ? 'LEARNING GOAL: ' + d.learningGoal : ''}\n${d.confidence ? 'CONFIDENCE: ' + d.confidence : ''}\n\n${characterBlock(d)}\n\nInclude 8-10 interactive pause moments. Build difficulty gradually.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`,
-  custom: (d) => `STORY TYPE: Custom\nTONE: Warm, personalised, emotionally intelligent.\nSCENARIO: "${d.customScenario}"\n\n${characterBlock(d)}\n\nAddress the scenario through metaphor and adventure.\n\nLENGTH: ~${WORD_COUNTS[d.length] || 2200} words.\n\n${getAgeBand(d.age)}\n\nWrite the story now.`
 };
 
 function buildPreviewPrompt(storyData) {

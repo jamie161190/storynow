@@ -343,23 +343,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .cat-learning.selected{border-color:#00B4A0;background:linear-gradient(135deg,#EDFAF8,#D4F1EE)}
 .cat-learning:hover{border-color:#4DD9C9}
 
-/* Custom: pink/rose */
-.cat-custom{border-color:#FFCCD8}
-.cat-custom::before{background:linear-gradient(180deg,#FF6B9D,#E04D7D)}
-.cat-custom.selected{border-color:#FF6B9D;background:linear-gradient(135deg,#FFF0F4,#FFE4EE)}
-.cat-custom:hover{border-color:#FF9DB8}
 
 .cat-icon{font-size:2rem;width:58px;height:58px;display:flex;align-items:center;justify-content:center;border-radius:16px;flex-shrink:0;transition:transform 0.3s}
 .cat-card:hover .cat-icon{transform:scale(1.08)}
 .cat-bedtime .cat-icon{background:linear-gradient(135deg,#E8E0FF,#C8B8FF);box-shadow:0 4px 12px rgba(124,92,252,0.15)}
 .cat-journey .cat-icon{background:linear-gradient(135deg,#FFE5D0,#FFC8A0);box-shadow:0 4px 12px rgba(255,140,66,0.15)}
 .cat-learning .cat-icon{background:linear-gradient(135deg,#D4F1EE,#A8E6DF);box-shadow:0 4px 12px rgba(0,180,160,0.15)}
-.cat-custom .cat-icon{background:linear-gradient(135deg,#FFE4EE,#FFC8D8);box-shadow:0 4px 12px rgba(255,107,157,0.15)}
 .cat-info h3{font-family:'Nunito',sans-serif;font-size:1.08rem;font-weight:800;margin-bottom:0.15rem}
 .cat-bedtime .cat-info h3{color:#5B3FD4}
 .cat-journey .cat-info h3{color:#D4660F}
 .cat-learning .cat-info h3{color:#008F7F}
-.cat-custom .cat-info h3{color:#D44070}
 .cat-info p{font-size:0.82rem;color:var(--text-soft);line-height:1.45;font-weight:500}
 .cat-tag{display:inline-block;font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;padding:0.2rem 0.55rem;border-radius:20px;margin-top:0.35rem}
 .cat-bedtime .cat-tag{background:#E8E0FF;color:#5B3FD4}
@@ -398,16 +391,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .toggle::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
 .toggle.on::after{transform:translateX(20px)}
 .toggle-label{font-size:0.9rem;color:var(--text);font-weight:600}
-
-/* ===== LENGTH CARDS ===== */
-.length-cards{display:flex;gap:0.75rem;width:100%;margin-bottom:1.5rem}
-.length-card{flex:1;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1.25rem 0.5rem;cursor:pointer;text-align:center;transition:all 0.25s;box-shadow:var(--shadow)}
-.length-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.length-card.selected{border-color:var(--cat-accent,var(--purple));background:var(--cat-accent-light,var(--purple-light))}
-.length-card .len-emoji{font-size:1.8rem;margin-bottom:0.4rem}
-.length-card .len-name{font-size:0.88rem;font-weight:800;color:var(--text);font-family:'Nunito',sans-serif}
-.length-card .len-time{font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-top:0.15rem}
-.length-card .len-price{font-size:0.95rem;font-weight:800;color:var(--cat-accent,var(--purple));margin-top:0.35rem;font-family:'Nunito',sans-serif}
 
 /* ===== VOICE CARDS ===== */
 .voice-cards{display:flex;flex-direction:column;gap:0.75rem;width:100%}
@@ -763,16 +746,6 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
         <span class="cat-tag">Education disguised as magic</span>
       </div>
     </div>
-    <!-- Make My Own: hidden for launch, backend ready -->
-    <!--
-    <div class="cat-card cat-custom" onclick="selectCategory('custom',this)">
-      <div class="cat-icon">&#9999;&#65039;</div>
-      <div class="cat-info">
-        <h3>Make My Own</h3>
-        <p>Describe any situation and I will write a story around it. Dentist trip, first day at school, anything.</p>
-      </div>
-    </div>
-    -->
   </div>
   <div style="background:linear-gradient(135deg,#F8F5FF,#FFF0F5);border:2px solid var(--purple-light);border-radius:12px;padding:0.65rem 0.9rem;margin-top:0.75rem;display:flex;align-items:center;gap:0.5rem;max-width:440px;width:100%">
     <span style="font-size:1.2rem">&#128118;</span>
@@ -1111,11 +1084,6 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
     <p class="form-hint">Be as specific as you can. The narrator will pause and let them answer before revealing the answer in the story.</p>
   </div>
 
-  <div class="form-group" id="customScenarioGroup" style="display:none">
-    <label>What is the story about?</label>
-    <textarea id="customScenario" placeholder="e.g. Chase has a trip to the dentist tomorrow and is feeling nervous. I want to help him feel brave."></textarea>
-    <p class="form-hint">Describe the situation, the goal, or the feeling you want the story to create.</p>
-  </div>
 
   <div class="form-group">
     <label>Anything else I should know? (optional)</label>
@@ -1132,7 +1100,6 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep7_Extras');goToLength()">Continue</button>
 </div>
 
-<!-- LENGTH screen removed: all stories are 15 min at £19.99 -->
 
 <!-- VOICE -->
 <div class="screen" id="screenVoice">
@@ -1416,6 +1383,16 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
         <textarea id="feedbackImproveText" placeholder="What would make it better? I read every single one of these." style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Quicksand',sans-serif;resize:none;height:70px;background:var(--card);box-sizing:border-box"></textarea>
         <button onclick="submitFeedback('improve')" style="background:var(--cat-accent,var(--purple));color:#fff;border:none;border-radius:50px;padding:0.5rem 1.2rem;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;margin-top:0.4rem;width:100%">Send feedback</button>
       </div>
+      <div id="feedbackReviewBox" style="display:none;margin-top:0.75rem">
+        <p style="font-size:0.9rem;font-weight:700;color:var(--text);margin:0 0 0.5rem">That makes my day! Would you mind leaving a quick review?</p>
+        <input type="text" id="reviewName" placeholder="Your first name" style="width:100%;padding:0.55rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box;margin-bottom:0.4rem">
+        <textarea id="reviewText" placeholder="e.g. My daughter asked to hear it three times before bed! She couldn't believe the story knew her name." style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.95rem;font-family:'Quicksand',sans-serif;resize:none;height:80px;background:var(--card);box-sizing:border-box"></textarea>
+        <label style="display:flex;align-items:center;gap:0.4rem;margin:0.4rem 0 0.5rem;cursor:pointer;font-size:0.78rem;color:var(--text-muted);font-weight:600">
+          <input type="checkbox" id="reviewConsent" checked style="width:16px;height:16px;accent-color:var(--purple)"> Happy for me to share this on the website
+        </label>
+        <button onclick="submitReview()" style="background:var(--cat-accent,var(--purple));color:#fff;border:none;border-radius:50px;padding:0.55rem 1.2rem;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:'Quicksand',sans-serif;width:100%">Send my review</button>
+        <button onclick="skipReview()" style="background:none;border:none;color:var(--text-muted);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Quicksand',sans-serif;margin-top:0.3rem;padding:0.3rem">No thanks, skip</button>
+      </div>
       <div id="feedbackThanks" style="display:none;margin-top:0.75rem">
         <p style="font-size:0.85rem;color:var(--green);font-weight:700;margin:0">Thank you! Your feedback helps me make better stories.</p>
       </div>
@@ -1588,30 +1565,30 @@ let currentPlayingCategory = '';
 // preview_url will be populated from ElevenLabs API on first load
 const ALL_VOICES = [
   // FEMALE VOICES
-  { id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Warm, gentle, and nurturing', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['bedtime','custom'] },
-  { id:'XB0fDUnXU5powFXDhCwa', name:'Charlotte', desc:'Soft and kind, like a favourite aunt', gender:'female', accent:'british', age:'middle', emoji:'\u{1F469}' , best:['bedtime','custom'] },
+  { id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Warm, gentle, and nurturing', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['bedtime'] },
+  { id:'XB0fDUnXU5powFXDhCwa', name:'Charlotte', desc:'Soft and kind, like a favourite aunt', gender:'female', accent:'british', age:'middle', emoji:'\u{1F469}' , best:['bedtime'] },
   { id:'ThT5KcBeYPX3keUQqHPh', name:'Dorothy', desc:'Encouraging and patient', gender:'female', accent:'british', age:'senior', emoji:'\u{1F475}', best:['learning','bedtime'] },
   { id:'oWAxZDx7w5VEj9dCyTzz', name:'Grace', desc:'Clear and reassuring', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['learning','journey'] },
   { id:'jBpfuIE2acCO8z3wKNLl', name:'Gigi', desc:'Animated and playful', gender:'female', accent:'american', age:'young', emoji:'\u{1F467}', best:['journey','learning'] },
   { id:'z9fAnlkpzviPz146aGWa', name:'Glinda', desc:'Bright and magical', gender:'female', accent:'american', age:'middle', emoji:'\u{2728}', best:['bedtime','journey'] },
-  { id:'piTKgcLEGmPE4e6mEKli', name:'Nicole', desc:'Warm and expressive storyteller', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey','custom'] },
-  { id:'FGY2WhTYpPnrIDTdsKH5', name:'Laura', desc:'Gentle with a soft Irish lilt', gender:'female', accent:'irish', age:'young', emoji:'\u{2618}\u{FE0F}', best:['bedtime','custom'] },
+  { id:'piTKgcLEGmPE4e6mEKli', name:'Nicole', desc:'Warm and expressive storyteller', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey'] },
+  { id:'FGY2WhTYpPnrIDTdsKH5', name:'Laura', desc:'Gentle with a soft Irish lilt', gender:'female', accent:'irish', age:'young', emoji:'\u{2618}\u{FE0F}', best:['bedtime'] },
   { id:'pFZP5JQG7iQjIQuC4Bku', name:'Lily', desc:'Sweet and soothing', gender:'female', accent:'british', age:'young', emoji:'\u{1F338}', best:['bedtime','learning'] },
   { id:'XrExE9yKIg1WjnnlVkGX', name:'Matilda', desc:'Warm and friendly, great for adventures', gender:'female', accent:'american', age:'young', emoji:'\u{1F31F}', best:['journey','learning'] },
-  { id:'cgSgspJ2msm6clMCkdW9', name:'Jessica', desc:'Smooth and confident', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey','custom'] },
+  { id:'cgSgspJ2msm6clMCkdW9', name:'Jessica', desc:'Smooth and confident', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey'] },
   { id:'Xb7hH8MSUJpSbSDYk0k2', name:'Alice', desc:'Confident with a warm Australian tone', gender:'female', accent:'australian', age:'middle', emoji:'\u{1F998}', best:['journey','learning'] },
 
   // MALE VOICES
-  { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm, deep, and soothing', gender:'male', accent:'british', age:'middle', emoji:'\u{1F468}', best:['bedtime','custom'] },
-  { id:'IKne3meq5aSn9XLyUdCD', name:'Charlie', desc:'Gentle and warm', gender:'male', accent:'australian', age:'middle', emoji:'\u{1F9D4}', best:['bedtime','custom'] },
+  { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm, deep, and soothing', gender:'male', accent:'british', age:'middle', emoji:'\u{1F468}', best:['bedtime'] },
+  { id:'IKne3meq5aSn9XLyUdCD', name:'Charlie', desc:'Gentle and warm', gender:'male', accent:'australian', age:'middle', emoji:'\u{1F9D4}', best:['bedtime'] },
   { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh', desc:'Energetic and adventurous', gender:'male', accent:'american', age:'young', emoji:'\u{1F9D7}', best:['journey','learning'] },
-  { id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Bold and expressive', gender:'male', accent:'american', age:'young', emoji:'\u{1F9B8}', best:['journey','custom'] },
+  { id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Bold and expressive', gender:'male', accent:'american', age:'young', emoji:'\u{1F9B8}', best:['journey'] },
   { id:'VR6AewLTigWG4xSOukaG', name:'Arnold', desc:'Strong and commanding', gender:'male', accent:'american', age:'middle', emoji:'\u{1F4AA}', best:['journey','learning'] },
   { id:'pNInz6obpgDQGcFmaJgB', name:'Adam', desc:'Deep and dramatic', gender:'male', accent:'american', age:'middle', emoji:'\u{1F3AD}', best:['journey','bedtime'] },
   { id:'g5CIjZEefAph4nQFvHAz', name:'Ethan', desc:'Fun and enthusiastic', gender:'male', accent:'american', age:'young', emoji:'\u{1F52C}', best:['learning','journey'] },
   { id:'ZQe5CZNOzWyzPSCn5a3c', name:'James', desc:'Wise and distinguished', gender:'male', accent:'australian', age:'senior', emoji:'\u{1F393}', best:['learning','bedtime'] },
   { id:'N2lVS1w4EtoT3dr4eOWO', name:'Callum', desc:'Warm, friendly, Scottish charm', gender:'male', accent:'british', age:'young', emoji:'\u{1F3F4}', best:['journey','bedtime'] },
-  { id:'bIHbv24MWmeRgasZH58o', name:'Will', desc:'Friendly and conversational', gender:'male', accent:'american', age:'young', emoji:'\u{1F468}', best:['learning','custom'] },
+  { id:'bIHbv24MWmeRgasZH58o', name:'Will', desc:'Friendly and conversational', gender:'male', accent:'american', age:'young', emoji:'\u{1F468}', best:['learning'] },
   { id:'cjVigY5qzO86Huf0OWal', name:'Eric', desc:'Friendly with a natural Irish warmth', gender:'male', accent:'irish', age:'middle', emoji:'\u{2618}\u{FE0F}', best:['bedtime','journey'] },
   { id:'TX3LPaxmHKxFdv7VOQHJ', name:'Liam', desc:'Articulate and engaging', gender:'male', accent:'american', age:'young', emoji:'\u{1F468}', best:['learning','journey'] },
 ];
@@ -1712,7 +1689,6 @@ const bgMusic = {
     bedtime:  '/music/bedtime-ambient.mp3?v=4',
     journey:  '/music/adventure-ambient.mp3?v=4',
     learning: '/music/learning-ambient.mp3?v=4',
-    custom:   '/music/adventure-ambient.mp3?v=4'
   },
 
   init() {
@@ -1923,12 +1899,11 @@ function goTo(id, skipHistory) {
   if(id === 'screenDetails') restoreDetails();
   if(id === 'screenPeople') {
     document.getElementById('teacherGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
-    // Show villain toggle for adventure and custom stories
-    const showVillain = storyData.category === 'journey' || storyData.category === 'custom';
+    // Show villain toggle for adventure stories
+    const showVillain = storyData.category === 'journey';
     document.getElementById('villainSection').style.display = showVillain ? 'block' : 'none';
   }
-  if(id === 'screenLength') restoreLength();
-  if(id === 'screenLearningSetup') restoreLearningSetup();
+if(id === 'screenLearningSetup') restoreLearningSetup();
   if(id === 'screenTheme') {
     const sub = document.getElementById('themeSubtext');
     if (storyData.category === 'learning') {
@@ -1954,7 +1929,7 @@ history.replaceState({ screen: 'screenLanding' }, '', '');
 
 // ===== FORM STATE PERSISTENCE =====
 // Save form inputs so interrupted parents don't lose progress
-const FORM_FIELDS = ['childName','age','gender','proudOf','earlyEmail','friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','customTheme','themeDetail','customWhere','favTeddy','extraDetails','personalMessage','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2','customScenario'];
+const FORM_FIELDS = ['childName','age','gender','proudOf','earlyEmail','friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','customTheme','themeDetail','customWhere','favTeddy','extraDetails','personalMessage','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2'];
 
 function saveFormState() {
   try {
@@ -2014,7 +1989,7 @@ goTo = function(id, skipHistory) {
 function restoreCategory() {
   if (!storyData.category) return;
   document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('selected'));
-  const map = { bedtime: '.cat-bedtime', journey: '.cat-journey', learning: '.cat-learning', custom: '.cat-custom' };
+  const map = { bedtime: '.cat-bedtime', journey: '.cat-journey', learning: '.cat-learning' };
   const el = document.querySelector(map[storyData.category]);
   if (el) el.classList.add('selected');
 }
@@ -2038,7 +2013,6 @@ function restoreDetails() {
   if (storyData.customWhere) document.getElementById('customWhere').value = storyData.customWhere;
   if (storyData.subject) document.getElementById('subject').value = storyData.subject;
   if (storyData.learningGoal) document.getElementById('learningGoal').value = storyData.learningGoal;
-  if (storyData.customScenario) document.getElementById('customScenario').value = storyData.customScenario;
   if (storyData.extraDetails) document.getElementById('extraDetails').value = storyData.extraDetails;
   if (storyData.personalMessage) document.getElementById('personalMessage').value = storyData.personalMessage;
   if (storyData.hasPet) {
@@ -2080,16 +2054,6 @@ function restoreDetails() {
   }
 }
 
-function restoreLength() {
-  if (!storyData.length) return;
-  document.querySelectorAll('.length-card').forEach(c => c.classList.remove('selected'));
-  const labels = { standard: 'Short', long: 'Medium', epic: 'Long' };
-  document.querySelectorAll('.length-card').forEach(c => {
-    const name = c.querySelector('.len-name');
-    if (name && name.textContent === labels[storyData.length]) c.classList.add('selected');
-  });
-}
-
 function restoreLearningSetup() {
   if (!selectedSubject) return;
   document.querySelectorAll('#subjectGrid .theme-tile').forEach(t => {
@@ -2112,7 +2076,6 @@ const CAT_THEMES = {
   bedtime:  { accent: '#7C5CFC', accentLight: '#E8E0FF', accentDark: '#5B3FD4', glow: 'rgba(124,92,252,0.12)', label: 'Bedtime Story' },
   journey:  { accent: '#FF8C42', accentLight: '#FFE5D0', accentDark: '#D4660F', glow: 'rgba(255,140,66,0.12)', label: 'Adventure' },
   learning: { accent: '#00B4A0', accentLight: '#D4F1EE', accentDark: '#008F7F', glow: 'rgba(0,180,160,0.12)', label: 'Learning Adventure' },
-  custom:   { accent: '#FF6B9D', accentLight: '#FFE4EE', accentDark: '#D44070', glow: 'rgba(255,107,157,0.12)', label: 'Custom Story' }
 };
 
 function applyCategoryTheme(cat) {
@@ -2186,7 +2149,6 @@ function updateExtrasVisibility() {
   // Learning subject/goal are now collected on screenLearningSetup, so hide them on Extras
   document.getElementById('subjectGroup').style.display = 'none';
   document.getElementById('learningGoalGroup').style.display = 'none';
-  document.getElementById('customScenarioGroup').style.display = storyData.category === 'custom' ? 'block' : 'none';
   // Hide personal message if gift is selected (gift message replaces it)
   document.getElementById('personalMessageGroup').style.display = isGiftMode ? 'none' : 'block';
 }
@@ -2444,7 +2406,6 @@ function goToLength() {
     storyData.subject = document.getElementById('subject').value;
     storyData.learningGoal = document.getElementById('learningGoal').value.trim();
   }
-  storyData.customScenario = document.getElementById('customScenario').value.trim();
   storyData.extraDetails = document.getElementById('extraDetails').value.trim();
   storyData.isGift = isGiftMode;
   if(storyData.isGift) {
@@ -2458,12 +2419,6 @@ function goToLength() {
     storyData.personalMessage = document.getElementById('personalMessage').value.trim();
   }
   goTo('screenVoice');
-}
-
-function selectLength(len, el) {
-  storyData.length = len;
-  document.querySelectorAll('.length-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
 }
 
 function setFilter(type, val, btn) {
@@ -2631,7 +2586,7 @@ async function previewVoice(voiceId, btn) {
 }
 
 function showVoices() {
-  const subtexts = { bedtime:'Who tucks them in tonight?', journey:'Who leads the adventure?', learning:'Who teaches the lesson?', custom:'Who tells their story?' };
+  const subtexts = { bedtime:'Who tucks them in tonight?', journey:'Who leads the adventure?', learning:'Who teaches the lesson?' };
   document.getElementById('voiceSubtext').textContent = subtexts[storyData.category] || 'Pick the voice that feels right.';
 
   // Reset filters
@@ -2674,8 +2629,8 @@ function showVoices() {
 function showReview() {
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
   const d = storyData;
-  const catEmoji = { bedtime:'&#127769;', journey:'&#127757;', learning:'&#128218;', custom:'&#9999;&#65039;' };
-  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story', custom:'Custom Story' };
+  const catEmoji = { bedtime:'&#127769;', journey:'&#127757;', learning:'&#128218;' };
+  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
   const pencil = (screen) => `<span onclick="goTo('${screen}')" style="cursor:pointer;font-size:0.78rem;color:var(--purple);font-weight:700;float:right" title="Edit">Edit</span>`;
 
   // Helper: build a grouped card
@@ -2732,7 +2687,6 @@ function showReview() {
 
   // Extras card
   const extraItems = [];
-  if (d.customScenario) extraItems.push(['Story idea', d.customScenario]);
   if (d.extraDetails) extraItems.push(['Extra details', d.extraDetails]);
   if (!d.isGift && d.personalMessage) extraItems.push(['Personal message', d.personalMessage]);
   if (extraItems.length) html += card('Extras', 'screenExtras', extraItems);
@@ -2854,7 +2808,7 @@ async function generatePreview() {
   // Animated detail pills: show each personal detail appearing one by one
   const detailsWrap = document.getElementById('loadingDetails');
   detailsWrap.innerHTML = '';
-  const catLabelsLoading = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story', custom:'Custom story' };
+  const catLabelsLoading = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story' };
   const pills = [];
   pills.push(escHtml(d.childName));
   if (d.age) pills.push('Age ' + escHtml(String(d.age)));
@@ -3337,10 +3291,44 @@ function submitFeedback(rating) {
   trackEvent('StoryFeedback', { rating: rating, content_name: storyData.category, feedback_text: improveText });
   document.getElementById('feedbackButtons').style.display = 'none';
   document.getElementById('feedbackImproveBox').style.display = 'none';
+  if (rating === 'loved') {
+    document.getElementById('feedbackReviewBox').style.display = 'block';
+    return;
+  }
   document.getElementById('feedbackThanks').style.display = 'block';
   if (rating === 'improve') {
     document.getElementById('feedbackThanks').innerHTML = '<p style="font-size:0.85rem;color:var(--purple);font-weight:700;margin:0 0 0.3rem">Thank you, I read every one of these.</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0">If you want me to rewrite it for free, email <a href="mailto:hello@storytold.ai" style="color:var(--purple);font-weight:700">hello@storytold.ai</a> and I will sort it out.</p>';
   }
+}
+
+function submitReview() {
+  const name = (document.getElementById('reviewName').value || '').trim();
+  const text = (document.getElementById('reviewText').value || '').trim();
+  const consent = document.getElementById('reviewConsent').checked;
+  if (!name || !text) {
+    alert('Please add your name and a quick review.');
+    return;
+  }
+  trackEvent('ReviewSubmitted', { content_name: storyData.category, consent: consent });
+  document.getElementById('feedbackReviewBox').style.display = 'none';
+  document.getElementById('feedbackThanks').style.display = 'block';
+  document.getElementById('feedbackThanks').innerHTML = '<p style="font-size:0.9rem;font-weight:800;margin:0 0 0.2rem">&#10024; You are a star. Thank you!</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0">Your review means the world to me.</p>';
+  fetch('/api/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'review',
+      reviewName: name,
+      reviewChildName: storyData.childName || '',
+      reviewText: text + (consent ? '\n\n[CONSENT: Happy to share on website]' : '\n\n[NO CONSENT: Private feedback only]')
+    })
+  }).catch(() => {});
+}
+
+function skipReview() {
+  document.getElementById('feedbackReviewBox').style.display = 'none';
+  document.getElementById('feedbackThanks').style.display = 'block';
+  document.getElementById('feedbackThanks').innerHTML = '<p style="font-size:0.85rem;color:var(--green);font-weight:700;margin:0">Thank you! Glad they loved it.</p>';
 }
 
 function seekAudio(audioId, delta) {
@@ -3851,10 +3839,10 @@ function renderLibrary(stories) {
   document.getElementById('libCount').textContent = stories.length + (stories.length === 1 ? ' story' : ' stories');
   document.getElementById('libraryCta').style.display = 'block';
 
-  const catEmoji = { bedtime:'\u{1F319}', journey:'\u{2728}', learning:'\u{1F4DA}', custom:'\u{2728}' };
-  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure', custom:'Custom Story' };
-  const catColor = { bedtime:'#7C6BC4', journey:'#FF8C42', learning:'#00B4A0', custom:'#9B59B6' };
-  const catBg = { bedtime:'#F0ECFF', journey:'#FFF3E8', learning:'#E8F8F5', custom:'#F5EEFF' };
+  const catEmoji = { bedtime:'\u{1F319}', journey:'\u{2728}', learning:'\u{1F4DA}' };
+  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure' };
+  const catColor = { bedtime:'#7C6BC4', journey:'#FF8C42', learning:'#00B4A0' };
+  const catBg = { bedtime:'#F0ECFF', journey:'#FFF3E8', learning:'#E8F8F5' };
 
   const list = document.getElementById('libraryList');
   list.innerHTML = '';
@@ -3904,7 +3892,7 @@ async function loadSharedStory(storyId) {
     if (!data.success) throw new Error(data.error);
 
     const s = data.story;
-    const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure', custom:'Custom Story' };
+    const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure' };
 
     document.getElementById('sharedTitle').textContent = s.childName + "'s story";
     document.getElementById('sharedFor').textContent = catLabel[s.category] || 'A personalised story';
@@ -4211,9 +4199,10 @@ showCookieBanner();
 })();
 
 // Track screen transitions for funnel analysis
-const _origGoTo = typeof goTo === 'function' ? goTo : null;
-if (_origGoTo) {
-  const _trackScreen = (screenId) => {
+(function() {
+  if (typeof goTo !== 'function') return;
+  const _prevGoTo = goTo;
+  window.goTo = function(screenId) {
     try {
       fetch('/api/track-pageview', {
         method: 'POST',
@@ -4225,14 +4214,9 @@ if (_origGoTo) {
         })
       }).catch(() => {});
     } catch(e) {}
+    return _prevGoTo.apply(this, arguments);
   };
-  // Patch goTo to also track screen views
-  const _realGoTo = goTo;
-  window.goTo = function(screenId) {
-    _trackScreen(screenId);
-    return _realGoTo.apply(this, arguments);
-  };
-}
+})();
 
 async function submitContact() {
   const name = document.getElementById('contactName').value.trim();

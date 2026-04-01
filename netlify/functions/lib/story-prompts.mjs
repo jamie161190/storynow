@@ -413,29 +413,6 @@ ${getAgeBand(d.age)}
 
 Write the story now. Start immediately with action or discovery.`,
 
-  custom: (d) => `STORY TYPE: Custom / Parent Defined
-TONE: Warm, personalised, emotionally intelligent. The parent has described a specific situation they want this story to address.
-
-${characterBlock(d)}
-
-THE SCENARIO THE PARENT DESCRIBED:
-"${d.customScenario}"
-
-YOUR JOB: Write a story that helps ${d.childName} feel prepared, brave, calm, or excited about this situation. Do not lecture. Do not moralise. Let the story do the emotional work. The child should finish the story feeling empowered and positive. The scenario should be woven into a narrative, not addressed head on like a therapy session.
-
-HOW TO STRUCTURE THIS:
-- Use the same 4 act structure as any other story. Act 1: hook them. Act 2: deepen the adventure. Act 3: the twist, the real emotional challenge. Act 4: resolution with growth.
-- At least 40% dialogue. Characters talking to each other holds the child's attention far better than narration.
-- Change scenes at least every 300 words. The ear needs fresh stimulus.
-- Plant a detail early that pays off later. This makes the child feel the story was designed for them.
-- ${d.friendName} must have at least 3 distinct moments and should help ${d.childName} through the emotional core of the story.
-- The scenario should be addressed through METAPHOR and ADVENTURE, not directly. If the child is nervous about the dentist, the story might involve a brave explorer who has to enter a mysterious cave where a friendly giant checks everyone's teeth. The child should see themselves in the character without feeling like they are being lectured.
-
-LENGTH: Approximately ${getWordCount(d.length, d.age)} words.
-
-${getAgeBand(d.age)}
-
-Write the story now. Start immediately.`
 };
 
 // Build a short preview prompt from the full story prompt

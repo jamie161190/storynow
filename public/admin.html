@@ -116,7 +116,6 @@ audio { width: 100%; margin-top: 0.5rem; }
       <option value="bedtime">Bedtime Story</option>
       <option value="journey">Adventure Story</option>
       <option value="learning">Learning Adventure</option>
-      <option value="custom">Custom</option>
     </select>
     <label>Gender</label>
     <select id="genGender">
@@ -255,7 +254,7 @@ function renderCustomers(customers) {
     html += '<div class="card-header"><span class="card-title">' + esc(c.email) + '</span><span class="badge badge-purple">' + c.storyCount + ' stories</span></div>';
     for (const s of c.stories) {
       const date = new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning', custom: 'Custom' }[s.category] || s.category;
+      const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning' }[s.category] || s.category;
       html += '<div class="card-detail">' + esc(s.child_name) + ' &middot; ' + cat + ' &middot; ' + date;
       if (s.audio_url) html += ' <span class="badge badge-green">Audio ready</span>';
       else html += ' <span class="badge badge-orange">No audio</span>';
@@ -281,7 +280,7 @@ function renderAttempts(attempts) {
   for (const a of attempts) {
     const date = new Date(a.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     const sd = a.story_data || {};
-    const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning', custom: 'Custom' }[sd.category || a.category] || (sd.category || a.category || 'Unknown');
+    const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning' }[sd.category || a.category] || (sd.category || a.category || 'Unknown');
 
     html += '<div class="card">';
     html += '<div class="card-header"><span class="card-title">' + esc(a.child_name || sd.childName || 'Unknown') + '</span><span class="card-meta">' + date + '</span></div>';

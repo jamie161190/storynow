@@ -328,8 +328,8 @@ function renderDashboard(data) {
 
   // Category doughnut
   const cats = data.categories || {};
-  const catLabels = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning', custom:'Custom' };
-  const catColors = { bedtime:'#7C6BC4', journey:'#FF8C42', learning:'#00B4A0', custom:'#9B59B6' };
+  const catLabels = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' };
+  const catColors = { bedtime:'#7C6BC4', journey:'#FF8C42', learning:'#00B4A0' };
   const catKeys = Object.keys(cats);
 
   if (catKeys.length > 0) {

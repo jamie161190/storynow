@@ -219,7 +219,7 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
         <p style="margin:0;font-size:16px;font-weight:700;color:#7C5CFC;">${safeEmail}</p>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        We hope ${safeChild} loves every second of it.
+        I hope ${safeChild} loves every second of it.
       </p>
       ${discountCode ? `
       <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
