@@ -112,6 +112,35 @@ audio { width: 100%; margin-top: 0.5rem; }
 .funnel-step .fs-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #7C5CFC, #A78BFA); display: flex; align-items: center; padding-left: 0.6rem; }
 .funnel-step .fs-label { font-size: 0.78rem; font-weight: 700; color: #555; min-width: 80px; text-align: right; }
 .funnel-step .fs-count { font-size: 0.72rem; font-weight: 800; color: #fff; }
+
+/* Live Dashboard */
+@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes fade-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+.live-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
+.live-header h2 { font-size: 1rem; color: #7C5CFC; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
+.live-header .live-pulse { width: 10px; height: 10px; background: #4CAF50; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
+.live-header .live-ago { font-size: 0.72rem; color: #999; font-weight: 600; }
+
+.live-big-number { text-align: center; margin-bottom: 1.5rem; }
+.live-big-number .big { font-size: 3.5rem; font-weight: 800; color: #7C5CFC; line-height: 1; }
+.live-big-number .big-label { font-size: 0.82rem; color: #999; font-weight: 600; margin-top: 0.3rem; }
+
+.live-funnel { margin-bottom: 1.25rem; }
+.live-funnel h3 { font-size: 0.88rem; color: #7C5CFC; margin-bottom: 0.75rem; }
+.live-stage { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.live-stage .ls-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.live-stage .ls-name { font-size: 0.82rem; font-weight: 700; color: #2D2844; flex: 1; }
+.live-stage .ls-count { font-size: 1rem; font-weight: 800; color: #2D2844; min-width: 30px; text-align: right; }
+.live-stage .ls-bar-wrap { flex: 2; height: 8px; background: #F0ECF5; border-radius: 4px; overflow: hidden; }
+.live-stage .ls-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+
+.live-feed { margin-top: 1.25rem; }
+.live-feed h3 { font-size: 0.88rem; color: #7C5CFC; margin-bottom: 0.75rem; }
+.live-event { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; background: #fff; border-radius: 10px; margin-bottom: 0.4rem; border: 1px solid #F0ECF5; animation: fade-in 0.3s ease; font-size: 0.8rem; }
+.live-event .le-icon { font-size: 1rem; flex-shrink: 0; }
+.live-event .le-text { flex: 1; color: #555; font-weight: 600; }
+.live-event .le-time { color: #bbb; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -137,6 +166,7 @@ audio { width: 100%; margin-top: 0.5rem; }
     <div class="tab" onclick="switchTab('retry')">Retry Queue</div>
     <div class="tab" onclick="switchTab('errors')" id="errorsTab">Errors <span id="errorBadge" style="display:none;background:#FF6B9D;color:#fff;font-size:0.65rem;padding:0.1rem 0.45rem;border-radius:50px;margin-left:0.3rem;vertical-align:middle"></span></div>
     <div class="tab" onclick="switchTab('analytics')">Analytics</div>
+    <div class="tab" onclick="switchTab('live')" id="liveTab">Live <span id="liveDot" style="display:inline-block;width:8px;height:8px;background:#4CAF50;border-radius:50%;margin-left:0.3rem;vertical-align:middle;animation:pulse-dot 1.5s infinite"></span></div>
   </div>
 
   <div class="search-bar">
@@ -253,11 +283,12 @@ function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   event.target.classList.add('active');
-  if (tab === 'customers') renderCustomers(allCustomers);
-  else if (tab === 'attempts') renderAttempts(allAttempts);
-  else if (tab === 'retry') loadRetryQueue();
-  else if (tab === 'errors') loadErrors();
-  else if (tab === 'analytics') loadMetrics();
+  if (tab === 'customers') { renderCustomers(allCustomers); stopLiveRefresh(); }
+  else if (tab === 'attempts') { renderAttempts(allAttempts); stopLiveRefresh(); }
+  else if (tab === 'retry') { loadRetryQueue(); stopLiveRefresh(); }
+  else if (tab === 'errors') { loadErrors(); stopLiveRefresh(); }
+  else if (tab === 'analytics') { loadMetrics(); stopLiveRefresh(); }
+  else if (tab === 'live') { loadLive(); startLiveRefresh(); }
 }
 
 // ── Search ──
@@ -700,6 +731,133 @@ function renderMetrics(data) {
 
 function summaryCard(value, label, colorClass) {
   return '<div class="summary-card"><div class="sc-value ' + colorClass + '">' + value + '</div><div class="sc-label">' + label + '</div></div>';
+}
+
+// ── Live Dashboard ──
+let liveInterval = null;
+
+function startLiveRefresh() {
+  stopLiveRefresh();
+  liveInterval = setInterval(() => { if (currentTab === 'live') loadLive(true); }, 10000);
+}
+
+function stopLiveRefresh() {
+  if (liveInterval) { clearInterval(liveInterval); liveInterval = null; }
+}
+
+async function loadLive(silent) {
+  if (!silent) document.getElementById('content').innerHTML = '<div class="loading">Loading live data...</div>';
+  const data = await api('live', { params: { minutes: 5 } });
+  if (data.error) {
+    document.getElementById('content').innerHTML = '<div class="empty">Could not load live data: ' + esc(data.error) + '</div>';
+    return;
+  }
+  renderLive(data);
+}
+
+function renderLive(data) {
+  const screens = data.screens || {};
+  const devices = data.devices || {};
+  const events = data.recentEvents || [];
+  const total = data.totalHits || 0;
+
+  // Ordered funnel stages with labels, colors, and emoji
+  const stageConfig = [
+    { key: 'landing', label: 'Homepage', color: '#7C5CFC', emoji: '🏠' },
+    { key: 'screenHow', label: 'How It Works', color: '#A78BFA', emoji: '📖' },
+    { key: 'screenSample', label: 'Sample Story', color: '#9B59B6', emoji: '🎧' },
+    { key: 'screenStart', label: 'Start Creating', color: '#FF8C42', emoji: '✏️' },
+    { key: 'screenDetails', label: 'Child Details', color: '#FF8C42', emoji: '👶' },
+    { key: 'screenThemes', label: 'Choosing Themes', color: '#FF8C42', emoji: '🎨' },
+    { key: 'screenVoice', label: 'Voice Selection', color: '#FF8C42', emoji: '🎙️' },
+    { key: 'screenLoading', label: 'Generating Preview', color: '#E67E22', emoji: '⏳' },
+    { key: 'screenPreview', label: 'Listening to Preview', color: '#E67E22', emoji: '▶️' },
+    { key: 'screenUnlock', label: 'Unlock / Checkout', color: '#FF6B9D', emoji: '💳' },
+    { key: 'screenGenerating', label: 'Full Story Generating', color: '#4CAF50', emoji: '🔄' },
+    { key: 'screenFull', label: 'Playing Full Story', color: '#4CAF50', emoji: '🎉' },
+    { key: 'screenLogin', label: 'Login', color: '#999', emoji: '🔑' },
+    { key: 'screenLibrary', label: 'My Stories', color: '#999', emoji: '📚' },
+    { key: 'screenShared', label: 'Shared Link', color: '#00B4A0', emoji: '🔗' }
+  ];
+
+  const maxCount = Math.max(...Object.values(screens), 1);
+
+  let html = '';
+
+  // Header
+  html += '<div class="live-header">';
+  html += '<h2><span class="live-pulse"></span> Live Activity</h2>';
+  html += '<span class="live-ago">Last 5 minutes · auto refreshes every 10s</span>';
+  html += '</div>';
+
+  // Big number
+  html += '<div class="live-big-number">';
+  html += '<div class="big">' + total + '</div>';
+  html += '<div class="big-label">page views in the last 5 minutes</div>';
+  html += '</div>';
+
+  // Device split inline
+  const devParts = [];
+  if (devices.mobile) devParts.push('📱 ' + devices.mobile + ' mobile');
+  if (devices.desktop) devParts.push('💻 ' + devices.desktop + ' desktop');
+  if (devices.tablet) devParts.push('📟 ' + devices.tablet + ' tablet');
+  if (devParts.length) {
+    html += '<div style="text-align:center;font-size:0.78rem;color:#999;font-weight:600;margin-bottom:1.5rem">' + devParts.join(' &nbsp;·&nbsp; ') + '</div>';
+  }
+
+  // Funnel stages
+  html += '<div class="chart-card live-funnel"><h3>Where People Are Right Now</h3>';
+  let hasAny = false;
+  for (const stage of stageConfig) {
+    const count = screens[stage.key] || 0;
+    if (count === 0) continue;
+    hasAny = true;
+    const pct = Math.max(Math.round((count / maxCount) * 100), 6);
+    html += '<div class="live-stage">';
+    html += '<div class="ls-dot" style="background:' + stage.color + '"></div>';
+    html += '<span class="ls-name">' + stage.emoji + ' ' + stage.label + '</span>';
+    html += '<div class="ls-bar-wrap"><div class="ls-bar-fill" style="width:' + pct + '%;background:' + stage.color + '"></div></div>';
+    html += '<span class="ls-count">' + count + '</span>';
+    html += '</div>';
+  }
+
+  // Show any unknown screens
+  for (const [key, count] of Object.entries(screens)) {
+    if (stageConfig.some(s => s.key === key) || !count) continue;
+    hasAny = true;
+    const pct = Math.max(Math.round((count / maxCount) * 100), 6);
+    html += '<div class="live-stage">';
+    html += '<div class="ls-dot" style="background:#ccc"></div>';
+    html += '<span class="ls-name">' + esc(key) + '</span>';
+    html += '<div class="ls-bar-wrap"><div class="ls-bar-fill" style="width:' + pct + '%;background:#ccc"></div></div>';
+    html += '<span class="ls-count">' + count + '</span>';
+    html += '</div>';
+  }
+
+  if (!hasAny) html += '<div style="color:#999;font-size:0.82rem;padding:1rem 0;text-align:center">No activity right now</div>';
+  html += '</div>';
+
+  // Live event feed
+  html += '<div class="chart-card live-feed"><h3>Live Feed</h3>';
+  if (events.length) {
+    for (const ev of events) {
+      const stageInfo = stageConfig.find(s => s.key === ev.screen) || { emoji: '·', label: ev.screen };
+      const timeLabel = ev.secondsAgo < 60 ? ev.secondsAgo + 's ago' : Math.round(ev.secondsAgo / 60) + 'm ago';
+      const deviceIcon = ev.device === 'mobile' ? '📱' : ev.device === 'tablet' ? '📟' : '💻';
+      html += '<div class="live-event">';
+      html += '<span class="le-icon">' + stageInfo.emoji + '</span>';
+      html += '<span class="le-text">' + deviceIcon + ' ' + esc(stageInfo.label);
+      if (ev.source && ev.source !== 'direct') html += ' <span style="color:#bbb">via ' + esc(ev.source) + '</span>';
+      html += '</span>';
+      html += '<span class="le-time">' + timeLabel + '</span>';
+      html += '</div>';
+    }
+  } else {
+    html += '<div style="color:#999;font-size:0.82rem;padding:1rem 0;text-align:center">No recent events</div>';
+  }
+  html += '</div>';
+
+  document.getElementById('content').innerHTML = html;
 }
 
 function esc(str) {

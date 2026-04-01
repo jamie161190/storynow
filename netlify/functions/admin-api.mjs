@@ -246,6 +246,57 @@ export default async (req) => {
       return json({ queue });
     }
 
+    // ── LIVE VISITORS: real-time page view activity ──
+    if (action === 'live') {
+      const minutes = parseInt(url.searchParams.get('minutes') || '5');
+      const since = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+
+      const viewsRes = await fetch(
+        `${supabaseUrl}/rest/v1/page_views?created_at=gte.${enc(since)}&select=screen_name,device,referrer,utm_source,created_at&order=created_at.desc&limit=500`,
+        { headers: sbHeaders(supabaseKey) }
+      ).catch(() => ({ ok: false }));
+
+      let views = [];
+      if (viewsRes.ok) {
+        const vData = await viewsRes.json().catch(() => []);
+        views = Array.isArray(vData) ? vData : [];
+      }
+
+      // Group by screen, showing count at each stage
+      const screenCounts = {};
+      const deviceCounts = {};
+      const recentEvents = [];
+      const seenMinutes = new Set();
+
+      for (const v of views) {
+        const sn = v.screen_name || 'unknown';
+        screenCounts[sn] = (screenCounts[sn] || 0) + 1;
+        deviceCounts[v.device || 'unknown'] = (deviceCounts[v.device || 'unknown'] || 0) + 1;
+        // Track unique minutes as proxy for unique visitors
+        const min = v.created_at?.slice(0, 16);
+        if (min) seenMinutes.add(min + '_' + (v.device || ''));
+      }
+
+      // Get the 20 most recent events for the live feed
+      for (const v of views.slice(0, 20)) {
+        const ago = Math.round((Date.now() - new Date(v.created_at).getTime()) / 1000);
+        recentEvents.push({
+          screen: v.screen_name || 'unknown',
+          device: v.device || 'unknown',
+          source: v.utm_source || (v.referrer ? 'referral' : 'direct'),
+          secondsAgo: ago
+        });
+      }
+
+      return json({
+        totalHits: views.length,
+        screens: screenCounts,
+        devices: deviceCounts,
+        recentEvents,
+        window: minutes
+      });
+    }
+
     // ── METRICS DASHBOARD: aggregated sales, visitors, conversions ──
     if (action === 'metrics') {
       const days = parseInt(url.searchParams.get('days') || '30');
