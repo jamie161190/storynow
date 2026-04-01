@@ -4333,6 +4333,8 @@ function playLibraryStory(story) {
   document.getElementById('sendGiftBtn').style.display = 'none';
   document.getElementById('giftSentMsg').style.display = 'none';
   document.getElementById('fullTitle').textContent = story.childName + "'s story";
+  // Set story ID so share button works from library playback
+  lastSavedStoryId = story.id;
   goTo('screenFull');
   audio.play();
   bgMusic.play(currentPlayingCategory, audio);
