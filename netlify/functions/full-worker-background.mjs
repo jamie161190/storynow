@@ -4,6 +4,7 @@
 // Uses direct fetch() calls - ZERO SDK dependencies.
 
 import { SYSTEM_PROMPT, buildPreviewPrompt, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
+import { logError } from './lib/log-error.mjs';
 
 // TTS chunk helper: splits text into chunks at sentence boundaries
 function splitIntoChunks(text, maxChars = 4000) {
@@ -220,6 +221,7 @@ export const handler = async (event) => {
       if (!apiResponse.ok) {
         const errBody = await apiResponse.text();
         console.error('[PREVIEW-BG] Anthropic error after retries:', apiResponse.status, errBody);
+        await logError({ source: 'preview-worker', message: 'Anthropic API failed after retries: ' + apiResponse.status, severity: 'error', childName: storyData?.childName, jobId, details: { status: apiResponse.status, body: errBody.slice(0, 500) } });
         await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Story generation is temporarily busy. Please try again in a moment.' });
         return { statusCode: 200 };
       }
@@ -266,6 +268,7 @@ export const handler = async (event) => {
 
       if (!ttsResponse.ok) {
         console.error('[PREVIEW-BG] TTS error:', ttsResponse.status);
+        await logError({ source: 'preview-worker', message: 'ElevenLabs TTS failed: ' + ttsResponse.status, severity: 'error', childName: storyData?.childName, jobId });
         await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Voice generation failed. Please try again.' });
         return { statusCode: 200 };
       }
@@ -333,6 +336,7 @@ export const handler = async (event) => {
       console.log('[FULL-BG] Story continuation generated in', Date.now() - storyStart, 'ms, words:', continuationText.split(' ').length);
     } catch (apiErr) {
       console.error('[FULL-BG] Anthropic API error:', apiErr.message);
+      await logError({ source: 'full-worker', message: 'Anthropic API error: ' + apiErr.message, severity: 'critical', childName, customerEmail, jobId, details: { fromScratch, category: storyData?.category } });
       // Queue for automatic retry so the customer gets their story
       const retryId = await queueForRetry(supabaseUrl, supabaseKey, {
         storyData, previewStory, voiceId, childName, sessionId, jobId, fromScratch, customerEmail,
@@ -500,6 +504,7 @@ export const handler = async (event) => {
     return { statusCode: 200 };
   } catch (err) {
     console.error('[FULL-BG] Error:', err.message, err.stack);
+    await logError({ source: 'full-worker', message: err.message, severity: 'critical', childName: jobId, jobId, details: { stack: (err.stack || '').slice(0, 1000) } });
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     if (jobId && supabaseUrl && supabaseKey) {

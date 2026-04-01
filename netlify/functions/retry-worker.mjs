@@ -4,6 +4,7 @@
 // emails the customer when their story is ready.
 
 import { SYSTEM_PROMPT, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
+import { logError } from './lib/log-error.mjs';
 
 function splitIntoChunks(text, maxChars = 4000) {
   const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
@@ -99,6 +100,7 @@ export default async (req) => {
     // Skip if too many attempts (max 10)
     if (jobData.attempts >= 10) {
       console.error('[RETRY] Job exceeded max attempts, alerting:', jobData.retryId);
+      await logError({ source: 'retry-worker', message: 'Story failed after 10 retry attempts', severity: 'critical', childName: jobData.childName, customerEmail: jobData.customerEmail, jobId: jobData.retryId, details: { attempts: jobData.attempts } });
 
       const resendKey = process.env.RESEND_API_KEY;
       if (resendKey) {
@@ -427,6 +429,7 @@ export default async (req) => {
 
     } catch (retryErr) {
       console.error('[RETRY] Failed attempt for', jobData.retryId, ':', retryErr.message);
+      await logError({ source: 'retry-worker', message: 'Retry attempt failed: ' + retryErr.message, severity: 'warning', childName: jobData.childName, customerEmail: jobData.customerEmail, jobId: jobData.retryId, details: { attempt: jobData.attempts } });
       // Job stays in queue, will be retried on next run
     }
   }

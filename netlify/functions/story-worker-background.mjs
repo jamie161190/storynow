@@ -185,7 +185,7 @@ export const handler = async (event) => {
           temperature: 1,
           thinking: {
             type: 'enabled',
-            budget_tokens: 500
+            budget_tokens: 1024
           },
           system: SYSTEM_PROMPT,
           messages: [{ role: 'user', content: buildPreviewPrompt(storyData) }]

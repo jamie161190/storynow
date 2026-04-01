@@ -67,7 +67,7 @@ export default async (req) => {
         model: 'claude-sonnet-4-6',
         max_tokens: 100,
         temperature: 1,
-        thinking: { type: 'enabled', budget_tokens: 100 },
+        thinking: { type: 'enabled', budget_tokens: 1024 },
         messages: [{ role: 'user', content: 'Say OK' }]
       })
     });

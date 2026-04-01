@@ -88,6 +88,7 @@ audio { width: 100%; margin-top: 0.5rem; }
     <div class="tab active" onclick="switchTab('customers')">Customers</div>
     <div class="tab" onclick="switchTab('attempts')">Attempts</div>
     <div class="tab" onclick="switchTab('retry')">Retry Queue</div>
+    <div class="tab" onclick="switchTab('errors')" id="errorsTab">Errors <span id="errorBadge" style="display:none;background:#FF6B9D;color:#fff;font-size:0.65rem;padding:0.1rem 0.45rem;border-radius:50px;margin-left:0.3rem;vertical-align:middle"></span></div>
   </div>
 
   <div class="search-bar">
@@ -179,8 +180,9 @@ function adminLogin() {
       allCustomers = data.customers || [];
       renderCustomers(allCustomers);
       updateStats();
-      // Pre-load attempts
+      // Pre-load attempts and error count
       api('attempts').then(d => { allAttempts = d.attempts || []; });
+      loadErrorBadge();
     }
   });
 }
@@ -207,6 +209,7 @@ function switchTab(tab) {
   if (tab === 'customers') renderCustomers(allCustomers);
   else if (tab === 'attempts') renderAttempts(allAttempts);
   else if (tab === 'retry') loadRetryQueue();
+  else if (tab === 'errors') loadErrors();
 }
 
 // ── Search ──
@@ -442,6 +445,48 @@ async function submitGenerate() {
     document.getElementById('genStatus').textContent = 'Error: ' + (data.error || 'Unknown error');
     document.getElementById('genStatus').style.color = '#FF6B9D';
   }
+}
+
+// ── Errors ──
+async function loadErrors() {
+  document.getElementById('content').innerHTML = '<div class="loading">Loading errors...</div>';
+  const data = await api('errors');
+  const errors = data.errors || [];
+  if (!errors.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No errors in the last 7 days. All clear!</div>';
+    return;
+  }
+  let html = '<p style="font-size:0.78rem;color:#999;margin-bottom:1rem">Last 7 days, newest first</p>';
+  for (const e of errors) {
+    const date = new Date(e.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    const sevBadge = e.severity === 'critical' ? 'badge-red' : e.severity === 'warning' ? 'badge-orange' : 'badge-purple';
+    html += '<div class="card">';
+    html += '<div class="card-header"><span class="card-title">' + esc(e.source) + '</span><span class="badge ' + sevBadge + '">' + esc(e.severity) + '</span></div>';
+    html += '<div class="card-detail" style="font-weight:600;color:#2D2844">' + esc(e.message) + '</div>';
+    if (e.child_name) html += '<div class="card-detail">Child: ' + esc(e.child_name) + '</div>';
+    if (e.customer_email) html += '<div class="card-detail">Email: ' + esc(e.customer_email) + '</div>';
+    if (e.job_id) html += '<div class="card-detail">Job: ' + esc(e.job_id) + '</div>';
+    html += '<div class="card-meta">' + date + '</div>';
+    if (e.details) {
+      html += '<details style="margin-top:0.4rem"><summary style="font-size:0.75rem;color:#7C5CFC;cursor:pointer;font-weight:600">Details</summary>';
+      html += '<pre style="font-size:0.72rem;background:#F8F5FF;padding:0.5rem;border-radius:8px;margin-top:0.3rem;overflow-x:auto;white-space:pre-wrap">' + esc(JSON.stringify(e.details, null, 2)) + '</pre></details>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+async function loadErrorBadge() {
+  try {
+    const data = await api('error-count');
+    const badge = document.getElementById('errorBadge');
+    if (data.count > 0) {
+      badge.textContent = data.count;
+      badge.style.display = 'inline';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch (e) { /* silent */ }
 }
 
 function esc(str) {

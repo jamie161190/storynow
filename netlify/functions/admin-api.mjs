@@ -175,6 +175,28 @@ export default async (req) => {
       return json({ success: true });
     }
 
+    // ── ERROR LOGS ──
+    if (action === 'errors') {
+      const since = url.searchParams.get('since') || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/error_logs?created_at=gte.${enc(since)}&order=created_at.desc&limit=100`,
+        { headers: sbHeaders(supabaseKey) }
+      );
+      const errors = await res.json();
+      return json({ errors: Array.isArray(errors) ? errors : [] });
+    }
+
+    // ── ERROR COUNT (for badge) ──
+    if (action === 'error-count') {
+      const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/error_logs?created_at=gte.${enc(since)}&select=id`,
+        { headers: { ...sbHeaders(supabaseKey), 'Prefer': 'count=exact' } }
+      );
+      const count = parseInt(res.headers.get('content-range')?.split('/')[1] || '0');
+      return json({ count });
+    }
+
     // ── RETRY QUEUE STATUS ──
     if (action === 'retry-queue') {
       const listRes = await fetch(`${supabaseUrl}/storage/v1/object/list/stories`, {
