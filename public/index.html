@@ -3073,6 +3073,16 @@ async function generatePreview() {
     if (storyData.themes && storyData.themes.length) summary += `, featuring ${escHtml(storyData.themes.join(', ').toLowerCase())}`;
     if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${escHtml(storyData.setting.toLowerCase())}`;
     summary += `.</p>`;
+    // Add personalised message reassurance if they wrote one
+    const hasPersonalMsg = storyData.isGift ? (storyData.giftMessage && storyData.giftMessage.trim()) : (storyData.personalMessage && storyData.personalMessage.trim());
+    if (hasPersonalMsg) {
+      const childFirst = escHtml(storyData.childName);
+      if (storyData.isGift && storyData.giftFrom) {
+        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; ${childFirst} will hear your message from ${escHtml(storyData.giftFrom)} the moment their story begins.</p>`;
+      } else {
+        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; ${childFirst} will hear your personal message the moment their story begins.</p>`;
+      }
+    }
     document.getElementById('previewSummary').innerHTML = summary;
 
     // Show the preview story text below the player
