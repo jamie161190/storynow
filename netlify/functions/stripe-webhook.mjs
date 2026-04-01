@@ -155,6 +155,8 @@ export default async (req) => {
 
     // ── Referral conversion tracking ──
     const refCode = metadata.ref_code;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     if (refCode && supabaseUrl && supabaseKey) {
       try {
         const refLookup = await fetch(
