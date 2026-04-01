@@ -25,6 +25,7 @@ export default async (req) => {
       utm_campaign: (body.utm_campaign || '').slice(0, 100),
       device: (body.device || 'unknown').slice(0, 20),
       screen_name: (body.screen_name || '').slice(0, 50),
+      visitor_id: (body.visitor_id || '').slice(0, 50),
       created_at: new Date().toISOString()
     };
 

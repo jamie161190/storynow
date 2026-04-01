@@ -252,7 +252,7 @@ export default async (req) => {
       const since = new Date(Date.now() - minutes * 60 * 1000).toISOString();
 
       const viewsRes = await fetch(
-        `${supabaseUrl}/rest/v1/page_views?created_at=gte.${enc(since)}&select=screen_name,device,referrer,utm_source,created_at&order=created_at.desc&limit=500`,
+        `${supabaseUrl}/rest/v1/page_views?created_at=gte.${enc(since)}&select=screen_name,device,referrer,utm_source,created_at,visitor_id&order=created_at.desc&limit=500`,
         { headers: sbHeaders(supabaseKey) }
       ).catch(() => ({ ok: false }));
 
@@ -266,15 +266,13 @@ export default async (req) => {
       const screenCounts = {};
       const deviceCounts = {};
       const recentEvents = [];
-      const seenMinutes = new Set();
+      const uniqueVisitors = new Set();
 
       for (const v of views) {
         const sn = v.screen_name || 'unknown';
         screenCounts[sn] = (screenCounts[sn] || 0) + 1;
         deviceCounts[v.device || 'unknown'] = (deviceCounts[v.device || 'unknown'] || 0) + 1;
-        // Track unique minutes as proxy for unique visitors
-        const min = v.created_at?.slice(0, 16);
-        if (min) seenMinutes.add(min + '_' + (v.device || ''));
+        if (v.visitor_id) uniqueVisitors.add(v.visitor_id);
       }
 
       // Get the 20 most recent events for the live feed
@@ -290,6 +288,7 @@ export default async (req) => {
 
       return json({
         totalHits: views.length,
+        uniqueVisitors: uniqueVisitors.size,
         screens: screenCounts,
         devices: deviceCounts,
         recentEvents,

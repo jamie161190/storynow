@@ -772,6 +772,7 @@ function renderLive(data) {
   const devices = data.devices || {};
   const events = data.recentEvents || [];
   const total = data.totalHits || 0;
+  const unique = data.uniqueVisitors || 0;
 
   // Ordered funnel stages with labels, colors, and emoji
   const stageConfig = [
@@ -817,11 +818,12 @@ function renderLive(data) {
   html += '<span class="live-ago">Last 5 minutes · auto refreshes every 10s</span>';
   html += '</div>';
 
-  // Big number
-  html += '<div class="live-big-number">';
-  html += '<div class="big">' + total + '</div>';
-  html += '<div class="big-label">page views in the last 5 minutes</div>';
+  // Big numbers
+  html += '<div style="display:flex;gap:1.5rem;justify-content:center;align-items:center;margin-bottom:0.5rem">';
+  html += '<div class="live-big-number" style="margin-bottom:0"><div class="big">' + total + '</div><div class="big-label">page views</div></div>';
+  html += '<div class="live-big-number" style="margin-bottom:0"><div class="big" style="color:#4CAF50">' + unique + '</div><div class="big-label">unique visitors</div></div>';
   html += '</div>';
+  html += '<div style="text-align:center;font-size:0.72rem;color:#999;margin-bottom:1rem">last 5 minutes</div>';
 
   // Device split inline
   const devParts = [];
