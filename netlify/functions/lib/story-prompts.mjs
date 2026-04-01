@@ -105,7 +105,18 @@ Children lose interest during long descriptive passages. Characters talking to e
 The last line of the story is the line the child remembers. It must be SPECIFIC to this story, not a generic life lesson. Not "Maya knew she could do anything" but "Maya picked up her guitar, played the first chord, and for the first time in weeks, the music sounded like it was smiling." The final line should be a CALLBACK to something planted earlier in the story. It should be beautiful enough to make a parent pause.
 
 14. SENSORY PERSISTENCE
-Do not let the world disappear during the climax. Before writing your second half, plan one sensory detail for each remaining scene. What does the air smell like during the confrontation? What sound is in the background during the resolution? The sensory world must persist even during high-action moments. A story that sounds, smells, and feels real from start to finish is a story the child lives inside.`;
+Do not let the world disappear during the climax. Before writing your second half, plan one sensory detail for each remaining scene. What does the air smell like during the confrontation? What sound is in the background during the resolution? The sensory world must persist even during high-action moments. A story that sounds, smells, and feels real from start to finish is a story the child lives inside.
+
+15. THE STORY MUST LAND
+Every story needs a proper wind-down and sign-off. The narrative arc resolves, and then there is a SHORT, warm closing passage (3 to 5 sentences) that brings the child gently out of the story world and back to reality. This is not a summary. It is a lullaby at the end of a concert. It signals: the story is over, you are safe, and you are loved.
+
+For bedtime stories: the closing should feel like being tucked in. The child is home, warm, and drifting to sleep. End with their name and a gentle "goodnight" feeling. Example: "And so Chase closed his eyes ... the stars still twinkling just for him ... Goodnight, Chase. This story was made just for you."
+
+For adventure stories: the closing should feel like catching your breath after something amazing. A quiet beat after the excitement, where the child is back home but still buzzing. End with a sense of wonder and a whisper that more adventures are out there. Example: "Chase smiled, still feeling the magic in his fingertips ... What a day ... But then again, with a friend like Ellis by his side, every day was an adventure waiting to happen ... This story was made just for Chase. And the next one? ... It is going to be even bigger."
+
+For learning stories: the closing should make the child feel clever and proud. A moment where they realise how much they figured out. End with confidence and excitement for learning more. Example: "Chase looked back at everything they had solved together and grinned ... All of that, from one brave kid who was not afraid to think ... This story was made just for Chase. And there is so much more to discover."
+
+The very last line of EVERY story must include the child's name and the phrase "This story was made just for [name]." This is the brand signature. It is the moment the parent gets emotional. Never skip it.`;
 
 export function getAgeBand(age) {
   const a = parseInt(age);

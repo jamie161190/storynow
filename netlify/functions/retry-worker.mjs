@@ -173,9 +173,13 @@ export default async (req) => {
         messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
       }
 
-      const fullStoryText = fromScratch
+      const storyBody = fromScratch
         ? messageIntro + continuationText
         : messageIntro + previewStory + '\n\n' + continuationText;
+
+      // Branded outro: a warm sign-off after the story ends
+      const outro = ` ... ... A Storytold original ... made with love.`;
+      const fullStoryText = storyBody + outro;
 
       // ── Step 3: Generate TTS ──
       const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';

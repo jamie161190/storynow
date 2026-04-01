@@ -364,9 +364,13 @@ export const handler = async (event) => {
     }
 
     // For from-scratch stories (additional children), the continuation IS the full story
-    const fullStoryText = fromScratch
+    const storyBody = fromScratch
       ? messageIntro + continuationText
       : messageIntro + previewStory + '\n\n' + continuationText;
+
+    // Branded outro: a warm sign-off after the story ends
+    const outro = ` ... ... A Storytold original ... made with love.`;
+    const fullStoryText = storyBody + outro;
     console.log('[FULL-BG] Complete story:', fullStoryText.split(' ').length, 'words');
 
     // ── Step 3: Generate TTS for the complete story ──
