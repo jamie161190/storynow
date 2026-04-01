@@ -1668,11 +1668,32 @@ function playSample() {
 (function() {
   const sa = document.getElementById('sampleAudio');
   if (!sa) return;
+  var sampleMilestones = {};
+  var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
+  function trackSampleEvent(screenName) {
+    fetch('/api/track-pageview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page: '/', screen_name: screenName, device: device })
+    }).catch(function() {});
+  }
   sa.addEventListener('timeupdate', () => {
     if (sa.duration) {
       document.getElementById('sampleFill').style.width = (sa.currentTime / sa.duration * 100) + '%';
       const t = Math.floor(sa.currentTime);
       document.getElementById('sampleTime').textContent = Math.floor(t/60) + ':' + (t%60 < 10 ? '0' : '') + (t%60);
+      // Track listen milestones
+      var pct = Math.floor((sa.currentTime / sa.duration) * 100);
+      if (pct >= 25 && !sampleMilestones['25']) { sampleMilestones['25'] = true; trackSampleEvent('sample_25pct'); }
+      if (pct >= 50 && !sampleMilestones['50']) { sampleMilestones['50'] = true; trackSampleEvent('sample_50pct'); }
+      if (pct >= 75 && !sampleMilestones['75']) { sampleMilestones['75'] = true; trackSampleEvent('sample_75pct'); }
+    }
+  });
+  sa.addEventListener('pause', () => {
+    if (sa.duration && sa.currentTime > 0 && sa.currentTime < sa.duration) {
+      var secs = Math.round(sa.currentTime);
+      var pct = Math.round((sa.currentTime / sa.duration) * 100);
+      trackSampleEvent('sample_stop_' + secs + 's_' + pct + 'pct');
     }
   });
   sa.addEventListener('ended', () => {
@@ -1680,6 +1701,7 @@ function playSample() {
     document.getElementById('sampleFill').style.width = '0%';
     document.getElementById('sampleTime').textContent = '0:00';
     bgMusic.stop();
+    if (!sampleMilestones['100']) { sampleMilestones['100'] = true; trackSampleEvent('sample_100pct'); }
   });
   sa.addEventListener('error', () => {
     document.getElementById('samplePlayer').style.display = 'none';
