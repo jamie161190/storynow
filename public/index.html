@@ -3456,6 +3456,17 @@ function formatTime(s) {
     const v = params.get(k);
     if (v) sessionStorage.setItem('st_' + k, v);
   });
+  // Capture referral code
+  const refCode = params.get('ref');
+  if (refCode) {
+    sessionStorage.setItem('st_ref', refCode);
+    // Fire and forget: increment visit count
+    fetch('/api/referral-track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref: refCode, type: 'visit' })
+    }).catch(() => {});
+  }
   // Capture Meta browser cookies (_fbc, _fbp) if present
   const cookies = document.cookie.split(';').reduce((acc, c) => {
     const [k, v] = c.trim().split('=');
@@ -3474,6 +3485,8 @@ function getTrackingParams() {
     if (v) params[k] = v;
   });
   params.user_agent = navigator.userAgent;
+  const ref = sessionStorage.getItem('st_ref');
+  if (ref) params.ref_code = ref;
   return params;
 }
 

@@ -441,6 +441,77 @@ export default async (req) => {
       });
     }
 
+    // ── REFERRALS: list all referral links ──
+    if (action === 'referrals') {
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/referrals?select=*&order=created_at.desc`,
+        { headers: sbHeaders(supabaseKey) }
+      );
+      const referrals = res.ok ? await res.json() : [];
+      return json({ referrals: Array.isArray(referrals) ? referrals : [] });
+    }
+
+    // ── CREATE REFERRAL: generate a new referral link ──
+    if (action === 'create-referral') {
+      const body = await req.json().catch(() => ({}));
+      const name = (body.name || '').trim();
+      const email = (body.email || '').trim();
+      if (!name) return json({ error: 'Name is required' }, 400);
+
+      // Generate a clean ref code from the name
+      let refCode = name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20);
+      if (!refCode) refCode = 'ref' + Date.now();
+
+      // Check for duplicates and add suffix if needed
+      const existing = await fetch(
+        `${supabaseUrl}/rest/v1/referrals?ref_code=eq.${enc(refCode)}&select=id`,
+        { headers: sbHeaders(supabaseKey) }
+      );
+      if (existing.ok) {
+        const rows = await existing.json();
+        if (rows.length > 0) {
+          refCode = refCode + Math.floor(Math.random() * 999);
+        }
+      }
+
+      const insertRes = await fetch(`${supabaseUrl}/rest/v1/referrals`, {
+        method: 'POST',
+        headers: {
+          ...sbHeaders(supabaseKey),
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify({
+          referrer_name: name,
+          referrer_email: email || null,
+          ref_code: refCode,
+          visits: 0,
+          conversions: 0,
+          revenue: 0,
+          referred_emails: []
+        })
+      });
+
+      if (!insertRes.ok) {
+        const errText = await insertRes.text();
+        return json({ error: 'Failed to create referral: ' + errText }, 500);
+      }
+
+      const created = await insertRes.json();
+      return json({ success: true, referral: created[0] || { ref_code: refCode } });
+    }
+
+    // ── DELETE REFERRAL ──
+    if (action === 'delete-referral') {
+      const refId = url.searchParams.get('id');
+      if (!refId) return json({ error: 'ID required' }, 400);
+      await fetch(
+        `${supabaseUrl}/rest/v1/referrals?id=eq.${enc(refId)}`,
+        { method: 'DELETE', headers: sbHeaders(supabaseKey) }
+      );
+      return json({ success: true });
+    }
+
     return json({ error: 'Unknown action: ' + action }, 400);
 
   } catch (err) {

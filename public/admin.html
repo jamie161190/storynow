@@ -167,6 +167,7 @@ audio { width: 100%; margin-top: 0.5rem; }
     <div class="tab" onclick="switchTab('errors')" id="errorsTab">Errors <span id="errorBadge" style="display:none;background:#FF6B9D;color:#fff;font-size:0.65rem;padding:0.1rem 0.45rem;border-radius:50px;margin-left:0.3rem;vertical-align:middle"></span></div>
     <div class="tab" onclick="switchTab('analytics')">Analytics</div>
     <div class="tab" onclick="switchTab('live')" id="liveTab">Live <span id="liveDot" style="display:inline-block;width:8px;height:8px;background:#4CAF50;border-radius:50%;margin-left:0.3rem;vertical-align:middle;animation:pulse-dot 1.5s infinite"></span></div>
+    <div class="tab" onclick="switchTab('referrals')">Referrals</div>
   </div>
 
   <div class="search-bar">
@@ -289,6 +290,7 @@ function switchTab(tab) {
   else if (tab === 'errors') { loadErrors(); stopLiveRefresh(); }
   else if (tab === 'analytics') { loadMetrics(); stopLiveRefresh(); }
   else if (tab === 'live') { loadLive(); startLiveRefresh(); }
+  else if (tab === 'referrals') { loadReferrals(); stopLiveRefresh(); }
 }
 
 // ── Search ──
@@ -858,6 +860,135 @@ function renderLive(data) {
   html += '</div>';
 
   document.getElementById('content').innerHTML = html;
+}
+
+// ── Referrals ──
+async function loadReferrals() {
+  document.getElementById('content').innerHTML = '<div class="loading">Loading referrals...</div>';
+  const data = await api('referrals');
+  if (data.error) {
+    document.getElementById('content').innerHTML = '<div class="empty">Could not load referrals: ' + esc(data.error) + '</div>';
+    return;
+  }
+  renderReferrals(data.referrals || []);
+}
+
+function renderReferrals(referrals) {
+  const siteUrl = 'https://storytold.ai';
+  let html = '';
+
+  // Create new referral form
+  html += '<div class="card" style="margin-bottom:1.25rem">';
+  html += '<h3 style="font-size:0.9rem;color:#7C5CFC;margin-bottom:0.75rem">Create Referral Link</h3>';
+  html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">';
+  html += '<input type="text" id="refName" placeholder="Name (e.g. Sarah)" style="flex:1;min-width:120px;padding:0.6rem 0.8rem;border:2px solid #E8E0F0;border-radius:10px;font-size:0.9rem;font-family:inherit">';
+  html += '<input type="email" id="refEmail" placeholder="Email (optional)" style="flex:1;min-width:160px;padding:0.6rem 0.8rem;border:2px solid #E8E0F0;border-radius:10px;font-size:0.9rem;font-family:inherit">';
+  html += '<button class="btn btn-purple" onclick="createReferral()">Create Link</button>';
+  html += '</div>';
+  html += '<p id="refError" style="color:#FF6B9D;font-size:0.82rem;margin-top:0.5rem;display:none"></p>';
+  html += '<p id="refSuccess" style="color:#4CAF50;font-size:0.82rem;margin-top:0.5rem;display:none"></p>';
+  html += '</div>';
+
+  // Summary
+  const totalVisits = referrals.reduce((s, r) => s + (r.visits || 0), 0);
+  const totalConversions = referrals.reduce((s, r) => s + (r.conversions || 0), 0);
+  const totalRevenue = referrals.reduce((s, r) => s + (r.revenue || 0), 0);
+
+  html += '<div class="summary-grid" style="margin-bottom:1.25rem">';
+  html += summaryCard(referrals.length, 'Referral Links', '');
+  html += summaryCard(totalVisits, 'Total Visits', '');
+  html += summaryCard(totalConversions, 'Conversions', 'green');
+  html += summaryCard('£' + totalRevenue.toFixed(2), 'Referral Revenue', 'green');
+  html += '</div>';
+
+  // Referral list
+  if (!referrals.length) {
+    html += '<div class="empty">No referral links yet. Create one above.</div>';
+  } else {
+    for (const r of referrals) {
+      const link = siteUrl + '?ref=' + encodeURIComponent(r.ref_code);
+      const date = new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      const convRate = r.visits > 0 ? ((r.conversions / r.visits) * 100).toFixed(1) : '0.0';
+
+      html += '<div class="card">';
+      html += '<div class="card-header">';
+      html += '<span class="card-title">' + esc(r.referrer_name) + '</span>';
+      html += '<span class="badge ' + (r.conversions > 0 ? 'badge-green' : 'badge-purple') + '">' + r.conversions + ' sales</span>';
+      html += '</div>';
+
+      if (r.referrer_email) html += '<div class="card-detail">' + esc(r.referrer_email) + '</div>';
+      html += '<div class="card-detail" style="margin-top:0.3rem">';
+      html += '<span style="font-weight:700;color:#2D2844">Link:</span> ';
+      html += '<code style="background:#F8F5FF;padding:0.2rem 0.5rem;border-radius:6px;font-size:0.78rem;word-break:break-all">' + esc(link) + '</code>';
+      html += ' <button class="btn btn-outline" style="padding:0.2rem 0.6rem;font-size:0.7rem;margin-left:0.3rem" onclick="copyRefLink(\'' + esc(link) + '\')">Copy</button>';
+      html += '</div>';
+
+      html += '<div style="display:flex;gap:1.5rem;margin-top:0.5rem;font-size:0.8rem">';
+      html += '<span style="color:#666"><strong>' + (r.visits || 0) + '</strong> visits</span>';
+      html += '<span style="color:#666"><strong>' + (r.conversions || 0) + '</strong> conversions</span>';
+      html += '<span style="color:#666"><strong>' + convRate + '%</strong> rate</span>';
+      html += '<span style="color:#666"><strong>£' + (r.revenue || 0).toFixed(2) + '</strong> revenue</span>';
+      html += '</div>';
+
+      if (r.referred_emails && r.referred_emails.length > 0) {
+        html += '<details style="margin-top:0.4rem"><summary style="font-size:0.75rem;color:#7C5CFC;cursor:pointer;font-weight:600">Referred customers (' + r.referred_emails.length + ')</summary>';
+        html += '<div style="font-size:0.78rem;color:#666;padding:0.4rem 0">' + r.referred_emails.map(e => esc(e)).join(', ') + '</div></details>';
+      }
+
+      html += '<div class="card-actions">';
+      html += '<button class="btn btn-outline" onclick="deleteReferral(\'' + r.id + '\')">Delete</button>';
+      html += '</div>';
+      html += '<div class="card-meta">' + date + '</div>';
+      html += '</div>';
+    }
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+async function createReferral() {
+  const name = document.getElementById('refName').value.trim();
+  const email = document.getElementById('refEmail').value.trim();
+  const errEl = document.getElementById('refError');
+  const successEl = document.getElementById('refSuccess');
+  errEl.style.display = 'none';
+  successEl.style.display = 'none';
+
+  if (!name) {
+    errEl.textContent = 'Enter a name for this referral link';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const data = await api('create-referral', { body: { name, email } });
+  if (data.error) {
+    errEl.textContent = data.error;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const link = 'https://storytold.ai?ref=' + encodeURIComponent(data.referral.ref_code);
+  successEl.innerHTML = 'Created! Link: <code style="background:#E8F5E9;padding:0.15rem 0.4rem;border-radius:4px">' + esc(link) + '</code>';
+  successEl.style.display = 'block';
+  document.getElementById('refName').value = '';
+  document.getElementById('refEmail').value = '';
+
+  // Refresh the list
+  loadReferrals();
+}
+
+async function deleteReferral(id) {
+  if (!confirm('Delete this referral link?')) return;
+  await api('delete-referral', { params: { id } });
+  loadReferrals();
+}
+
+function copyRefLink(link) {
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  }).catch(() => {});
 }
 
 function esc(str) {

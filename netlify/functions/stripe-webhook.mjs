@@ -152,6 +152,44 @@ export default async (req) => {
     }
 
     console.log(`Server-side conversion tracking complete for session ${sessionId}`);
+
+    // ── Referral conversion tracking ──
+    const refCode = metadata.ref_code;
+    if (refCode && supabaseUrl && supabaseKey) {
+      try {
+        const refLookup = await fetch(
+          `${supabaseUrl}/rest/v1/referrals?ref_code=eq.${encodeURIComponent(refCode)}&select=id,conversions,revenue,referred_emails`,
+          { headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey } }
+        );
+        if (refLookup.ok) {
+          const refs = await refLookup.json();
+          if (refs.length > 0) {
+            const r = refs[0];
+            const updatedEmails = [...(r.referred_emails || [])];
+            if (email && !updatedEmails.includes(email)) updatedEmails.push(email);
+            await fetch(
+              `${supabaseUrl}/rest/v1/referrals?id=eq.${r.id}`,
+              {
+                method: 'PATCH',
+                headers: {
+                  'Authorization': `Bearer ${supabaseKey}`,
+                  'apikey': supabaseKey,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  conversions: (r.conversions || 0) + 1,
+                  revenue: (r.revenue || 0) + (amountTotal / 100),
+                  referred_emails: updatedEmails
+                })
+              }
+            );
+            console.log(`Referral conversion recorded for code: ${refCode}`);
+          }
+        }
+      } catch (refErr) {
+        console.error('Referral tracking error:', refErr.message);
+      }
+    }
   }
 
   // ─── ABANDONED CART: recovery email ───

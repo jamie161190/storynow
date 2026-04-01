@@ -20,6 +20,7 @@ export default async (req) => {
     const fbc = body.fbc || '';
     const fbp = body.fbp || '';
     const userAgent = body.user_agent || '';
+    const refCode = body.ref_code || '';
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
 
@@ -59,7 +60,8 @@ export default async (req) => {
         fbclid: fbclid,
         fbc: fbc,
         fbp: fbp,
-        user_agent: userAgent
+        user_agent: userAgent,
+        ref_code: refCode
       }
     });
 
