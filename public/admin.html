@@ -65,6 +65,53 @@ body { font-family: 'Quicksand', sans-serif; background: #FEFBF6; color: #2D2844
 .modal textarea { height: 80px; resize: vertical; }
 .modal .modal-actions { display: flex; gap: 0.5rem; margin-top: 1.25rem; }
 audio { width: 100%; margin-top: 0.5rem; }
+
+/* Analytics Dashboard */
+.metrics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
+.metrics-header h2 { font-size: 1rem; color: #7C5CFC; margin: 0; }
+.period-select { padding: 0.4rem 0.8rem; border: 2px solid #E8E0F0; border-radius: 50px; font-family: inherit; font-weight: 700; font-size: 0.78rem; background: #fff; color: #2D2844; cursor: pointer; }
+
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+.summary-card { background: #fff; border-radius: 12px; padding: 1rem; box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid #F0ECF5; text-align: center; }
+.summary-card .sc-value { font-size: 1.6rem; font-weight: 800; color: #7C5CFC; line-height: 1.2; }
+.summary-card .sc-value.green { color: #4CAF50; }
+.summary-card .sc-value.orange { color: #FF8C42; }
+.summary-card .sc-label { font-size: 0.72rem; color: #999; font-weight: 600; margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.03em; }
+
+.chart-card { background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid #F0ECF5; margin-bottom: 1rem; }
+.chart-card h3 { font-size: 0.88rem; color: #7C5CFC; margin-bottom: 1rem; }
+.chart-row { display: flex; align-items: flex-end; gap: 2px; height: 140px; padding-bottom: 1.5rem; position: relative; overflow-x: auto; }
+.chart-bar-group { flex: 1; min-width: 14px; display: flex; flex-direction: column; align-items: center; gap: 1px; height: 100%; justify-content: flex-end; position: relative; }
+.chart-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; transition: height 0.3s; cursor: pointer; position: relative; }
+.chart-bar.sales { background: #7C5CFC; }
+.chart-bar.visitors { background: #E8E0F0; }
+.chart-bar.previews { background: #FF8C42; opacity: 0.7; }
+.chart-bar-label { font-size: 0.55rem; color: #bbb; writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); position: absolute; bottom: -1.4rem; white-space: nowrap; }
+.chart-legend { display: flex; gap: 1rem; margin-top: 0.5rem; justify-content: center; flex-wrap: wrap; }
+.chart-legend span { font-size: 0.72rem; color: #666; display: flex; align-items: center; gap: 0.3rem; }
+.chart-legend .dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+.chart-tooltip { position: absolute; background: #2D2844; color: #fff; padding: 0.4rem 0.6rem; border-radius: 8px; font-size: 0.7rem; z-index: 10; pointer-events: none; white-space: nowrap; bottom: 100%; left: 50%; transform: translateX(-50%); display: none; }
+.chart-bar-group:hover .chart-tooltip { display: block; }
+
+.breakdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+@media (max-width: 600px) { .breakdown-grid { grid-template-columns: 1fr; } }
+
+.breakdown-card { background: #fff; border-radius: 12px; padding: 1rem 1.25rem; box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid #F0ECF5; }
+.breakdown-card h3 { font-size: 0.85rem; color: #7C5CFC; margin-bottom: 0.75rem; }
+.breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 0.35rem 0; border-bottom: 1px solid #F8F5FF; font-size: 0.82rem; }
+.breakdown-row:last-child { border-bottom: none; }
+.breakdown-row .br-label { color: #555; font-weight: 600; max-width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.breakdown-row .br-value { font-weight: 800; color: #2D2844; }
+.breakdown-bar { height: 6px; background: #F0ECF5; border-radius: 3px; margin-top: 0.2rem; }
+.breakdown-bar-fill { height: 100%; border-radius: 3px; background: #7C5CFC; }
+
+.funnel-steps { display: flex; flex-direction: column; gap: 0.4rem; }
+.funnel-step { display: flex; align-items: center; gap: 0.75rem; }
+.funnel-step .fs-bar { flex: 1; height: 28px; background: #F0ECF5; border-radius: 8px; position: relative; overflow: hidden; }
+.funnel-step .fs-fill { height: 100%; border-radius: 8px; background: linear-gradient(90deg, #7C5CFC, #A78BFA); display: flex; align-items: center; padding-left: 0.6rem; }
+.funnel-step .fs-label { font-size: 0.78rem; font-weight: 700; color: #555; min-width: 80px; text-align: right; }
+.funnel-step .fs-count { font-size: 0.72rem; font-weight: 800; color: #fff; }
 </style>
 </head>
 <body>
@@ -89,6 +136,7 @@ audio { width: 100%; margin-top: 0.5rem; }
     <div class="tab" onclick="switchTab('attempts')">Attempts</div>
     <div class="tab" onclick="switchTab('retry')">Retry Queue</div>
     <div class="tab" onclick="switchTab('errors')" id="errorsTab">Errors <span id="errorBadge" style="display:none;background:#FF6B9D;color:#fff;font-size:0.65rem;padding:0.1rem 0.45rem;border-radius:50px;margin-left:0.3rem;vertical-align:middle"></span></div>
+    <div class="tab" onclick="switchTab('analytics')">Analytics</div>
   </div>
 
   <div class="search-bar">
@@ -209,6 +257,7 @@ function switchTab(tab) {
   else if (tab === 'attempts') renderAttempts(allAttempts);
   else if (tab === 'retry') loadRetryQueue();
   else if (tab === 'errors') loadErrors();
+  else if (tab === 'analytics') loadMetrics();
 }
 
 // ── Search ──
@@ -486,6 +535,171 @@ async function loadErrorBadge() {
       badge.style.display = 'none';
     }
   } catch (e) { /* silent */ }
+}
+
+// ── Analytics ──
+let metricsDays = 30;
+
+async function loadMetrics(days) {
+  if (days) metricsDays = days;
+  document.getElementById('content').innerHTML = '<div class="loading">Loading analytics...</div>';
+  const data = await api('metrics', { params: { days: metricsDays } });
+  if (data.error) {
+    document.getElementById('content').innerHTML = '<div class="empty">Could not load metrics: ' + esc(data.error) + '</div>';
+    return;
+  }
+  renderMetrics(data);
+}
+
+function renderMetrics(data) {
+  const t = data.totals || {};
+  const daily = data.daily || [];
+  const cats = data.categories || {};
+  const refs = data.topReferrers || [];
+  const utms = data.topUtm || [];
+  const devices = data.devices || {};
+  const funnel = data.funnel || {};
+
+  let html = '';
+
+  // Period selector
+  html += '<div class="metrics-header">';
+  html += '<h2>Analytics Dashboard</h2>';
+  html += '<select class="period-select" onchange="loadMetrics(parseInt(this.value))">';
+  [7, 14, 30, 60, 90].forEach(d => {
+    html += '<option value="' + d + '"' + (d === metricsDays ? ' selected' : '') + '>' + d + ' days</option>';
+  });
+  html += '</select></div>';
+
+  // Summary cards
+  html += '<div class="summary-grid">';
+  html += summaryCard(t.sales || 0, 'Total Sales', '');
+  html += summaryCard('£' + ((t.revenue || 0).toFixed(2)), 'Revenue', 'green');
+  html += summaryCard(t.visitors || 0, 'Page Views', '');
+  html += summaryCard(t.previews || 0, 'Previews', 'orange');
+  html += summaryCard(t.uniqueCustomers || 0, 'Unique Customers', '');
+  html += summaryCard((t.conversionRate || 0) + '%', 'Preview to Sale', 'green');
+  html += '</div>';
+
+  // Daily chart
+  if (daily.length) {
+    const maxSales = Math.max(...daily.map(d => d.sales), 1);
+    const maxVisitors = Math.max(...daily.map(d => d.visitors), 1);
+    const maxPreviews = Math.max(...daily.map(d => d.previews), 1);
+    const maxVal = Math.max(maxSales, maxVisitors, maxPreviews, 1);
+
+    html += '<div class="chart-card">';
+    html += '<h3>Daily Activity (last ' + metricsDays + ' days)</h3>';
+    html += '<div class="chart-row">';
+
+    for (const d of daily) {
+      const sH = Math.max((d.sales / maxVal) * 120, d.sales > 0 ? 4 : 0);
+      const vH = Math.max((d.visitors / maxVal) * 120, d.visitors > 0 ? 3 : 0);
+      const pH = Math.max((d.previews / maxVal) * 120, d.previews > 0 ? 3 : 0);
+      const dateLabel = d.date.slice(5); // MM-DD
+      const revForDay = (d.sales * 19.99).toFixed(2);
+
+      html += '<div class="chart-bar-group">';
+      html += '<div class="chart-tooltip">' + d.date + '<br>' + d.sales + ' sales (£' + revForDay + ')<br>' + d.visitors + ' views, ' + d.previews + ' previews</div>';
+      html += '<div class="chart-bar visitors" style="height:' + vH + 'px" title="' + d.visitors + ' views"></div>';
+      html += '<div class="chart-bar previews" style="height:' + pH + 'px" title="' + d.previews + ' previews"></div>';
+      html += '<div class="chart-bar sales" style="height:' + sH + 'px" title="' + d.sales + ' sales"></div>';
+      html += '<span class="chart-bar-label">' + dateLabel + '</span>';
+      html += '</div>';
+    }
+
+    html += '</div>';
+    html += '<div class="chart-legend">';
+    html += '<span><span class="dot" style="background:#E8E0F0"></span> Page Views</span>';
+    html += '<span><span class="dot" style="background:#FF8C42;opacity:0.7"></span> Previews</span>';
+    html += '<span><span class="dot" style="background:#7C5CFC"></span> Sales</span>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  // Breakdowns: 2x2 grid
+  html += '<div class="breakdown-grid">';
+
+  // Category breakdown
+  html += '<div class="breakdown-card"><h3>Story Categories</h3>';
+  const catEntries = Object.entries(cats).sort((a, b) => b[1] - a[1]);
+  const catMax = catEntries.length ? catEntries[0][1] : 1;
+  const catLabels = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning' };
+  if (catEntries.length) {
+    for (const [cat, count] of catEntries) {
+      const pct = Math.round((count / catMax) * 100);
+      html += '<div class="breakdown-row"><span class="br-label">' + esc(catLabels[cat] || cat) + '</span><span class="br-value">' + count + '</span></div>';
+      html += '<div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:' + pct + '%"></div></div>';
+    }
+  } else {
+    html += '<div style="color:#999;font-size:0.82rem;padding:0.5rem 0">No data yet</div>';
+  }
+  html += '</div>';
+
+  // Device breakdown
+  html += '<div class="breakdown-card"><h3>Devices</h3>';
+  const devEntries = Object.entries(devices).sort((a, b) => b[1] - a[1]);
+  const devMax = devEntries.length ? devEntries[0][1] : 1;
+  if (devEntries.length) {
+    for (const [device, count] of devEntries) {
+      const pct = Math.round((count / devMax) * 100);
+      html += '<div class="breakdown-row"><span class="br-label">' + esc(device.charAt(0).toUpperCase() + device.slice(1)) + '</span><span class="br-value">' + count + '</span></div>';
+      html += '<div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:' + pct + '%;background:#FF8C42"></div></div>';
+    }
+  } else {
+    html += '<div style="color:#999;font-size:0.82rem;padding:0.5rem 0">No data yet</div>';
+  }
+  html += '</div>';
+
+  // Top referrers
+  html += '<div class="breakdown-card"><h3>Top Referrers</h3>';
+  if (refs.length) {
+    for (const r of refs.slice(0, 8)) {
+      const pct = Math.round((r.count / (refs[0]?.count || 1)) * 100);
+      html += '<div class="breakdown-row"><span class="br-label">' + esc(r.source) + '</span><span class="br-value">' + r.count + '</span></div>';
+      html += '<div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:' + pct + '%;background:#4CAF50"></div></div>';
+    }
+  } else {
+    html += '<div style="color:#999;font-size:0.82rem;padding:0.5rem 0">No referrer data yet</div>';
+  }
+  html += '</div>';
+
+  // UTM campaigns
+  html += '<div class="breakdown-card"><h3>UTM Campaigns</h3>';
+  if (utms.length) {
+    for (const u of utms.slice(0, 8)) {
+      const pct = Math.round((u.count / (utms[0]?.count || 1)) * 100);
+      html += '<div class="breakdown-row"><span class="br-label">' + esc(u.campaign) + '</span><span class="br-value">' + u.count + '</span></div>';
+      html += '<div class="breakdown-bar"><div class="breakdown-bar-fill" style="width:' + pct + '%;background:#A78BFA"></div></div>';
+    }
+  } else {
+    html += '<div style="color:#999;font-size:0.82rem;padding:0.5rem 0">No UTM data yet</div>';
+  }
+  html += '</div>';
+
+  html += '</div>'; // close breakdown-grid
+
+  // Funnel
+  const funnelEntries = Object.entries(funnel).sort((a, b) => b[1] - a[1]);
+  if (funnelEntries.length) {
+    const funnelMax = funnelEntries[0][1] || 1;
+    html += '<div class="chart-card"><h3>Funnel Steps</h3>';
+    html += '<div class="funnel-steps">';
+    for (const [step, count] of funnelEntries) {
+      const pct = Math.max(Math.round((count / funnelMax) * 100), 5);
+      html += '<div class="funnel-step">';
+      html += '<span class="fs-label">' + esc(step) + '</span>';
+      html += '<div class="fs-bar"><div class="fs-fill" style="width:' + pct + '%"><span class="fs-count">' + count + '</span></div></div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  document.getElementById('content').innerHTML = html;
+}
+
+function summaryCard(value, label, colorClass) {
+  return '<div class="summary-card"><div class="sc-value ' + colorClass + '">' + value + '</div><div class="sc-label">' + label + '</div></div>';
 }
 
 function esc(str) {
