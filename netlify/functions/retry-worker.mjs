@@ -283,8 +283,8 @@ export default async (req) => {
           },
           body: JSON.stringify({
             text: chunk,
-            model_id: 'eleven_turbo_v2_5',
-            voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.35, similarity_boost: 0.80, style: 0.40, use_speaker_boost: true }
           })
         }).then(async (res) => {
           if (!res.ok) throw new Error(`TTS failed: ${res.status}`);
