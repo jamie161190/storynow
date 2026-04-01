@@ -588,7 +588,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- HERO -->
-  <div class="logo-wrap">
+  <div class="logo-wrap" id="sectionHero">
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
   <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-bottom:0.6rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
@@ -622,7 +622,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- FIRST CTA (after the proof) -->
-  <div class="cta-group">
+  <div class="cta-group" id="sectionCta1">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Siblings, friends, and family can all appear in the story.</p>
@@ -630,7 +630,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- HOW IT WORKS (concrete example only, no numbered steps) -->
-  <div class="how-it-works">
+  <div class="how-it-works" id="sectionHowItWorks">
     <p class="how-title">Here is what happens</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
@@ -644,7 +644,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- REAL PARENT TESTIMONIAL -->
-  <div style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
+  <div id="sectionTestimonial" style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
     <p style="font-size:0.82rem;color:var(--text);font-weight:600;margin:0 0 0.5rem">Lisa was one of the first people to try Storytold. The next morning, she sent me this.</p>
     <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);border:2px solid var(--border)">
       <img src="/lisa-testimonial.png" alt="WhatsApp message from Lisa: Livvie's woken up asking me for another story, I blame you" style="width:100%;display:block">
@@ -653,7 +653,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- SECOND CTA -->
-  <div class="cta-group">
+  <div class="cta-group" id="sectionCta2">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Add siblings, friends, and family. Everyone gets a real role.</p>
@@ -662,7 +662,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- FAQ -->
-  <div style="width:100%;max-width:440px;margin-top:1.5rem">
+  <div id="sectionFaq" style="width:100%;max-width:440px;margin-top:1.5rem">
     <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.75rem;text-align:center">Common questions</p>
     <div style="display:flex;flex-direction:column;gap:0.5rem">
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
@@ -701,7 +701,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- CONTACT -->
-  <div style="width:100%;max-width:440px;margin-top:1.2rem;text-align:center">
+  <div id="sectionContact" style="width:100%;max-width:440px;margin-top:1.2rem;text-align:center">
     <p style="font-size:0.8rem;color:var(--text-muted);cursor:pointer;font-weight:600" onclick="document.getElementById('contactForm').style.display='block';this.style.display='none'">Questions? Get in touch</p>
     <div id="contactForm" style="display:none;margin-top:0.75rem;text-align:left">
       <input id="contactName" type="text" placeholder="Your name" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;margin-bottom:0.4rem;font-family:'Nunito',sans-serif;background:var(--card)">
@@ -714,7 +714,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- FOOTER -->
-  <div style="width:100%;max-width:440px;margin-top:2rem;padding-top:1.25rem;border-top:2px solid var(--border);text-align:center">
+  <div id="sectionFooter" style="width:100%;max-width:440px;margin-top:2rem;padding-top:1.25rem;border-top:2px solid var(--border);text-align:center">
     <a onclick="goTo('screenLogin')" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--purple);font-weight:700;cursor:pointer;padding:0.5rem 1.2rem;border:2px solid var(--purple-light);border-radius:var(--radius-full);background:var(--purple-light);margin-bottom:0.75rem">&#128100; Log in to My Stories</a>
     <p style="font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin:0">Already bought a story? Log in with the email you used at checkout.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);margin-top:1rem">&copy; 2026 Storytold. All rights reserved.</p>
@@ -1643,6 +1643,16 @@ function playSample() {
   if (audio.paused) {
     audio.play();
     trackEvent('SamplePlay', { content_name: 'homepage_sample' });
+    // Track in page_views table so it shows in admin dashboard
+    fetch('/api/track-pageview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        page: '/',
+        screen_name: 'sample_play',
+        device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'
+      })
+    }).catch(() => {});
     // Always play music on the homepage demo regardless of toggle state
     const wasEnabled = bgMusicEnabled;
     bgMusicEnabled = true;
@@ -4450,6 +4460,46 @@ async function submitContact() {
   } catch(e) {}
   document.getElementById('contactForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Sent! I will get back to you soon.</p>';
 }
+
+// ── Homepage scroll dropoff tracking ──
+// Fires a page_view event once per session when each section scrolls into view
+(function() {
+  if (!('IntersectionObserver' in window)) return;
+  var tracked = {};
+  var sections = [
+    { id: 'sectionHero', screen: 'hp_hero' },
+    { id: 'samplePlayer', screen: 'hp_sample' },
+    { id: 'sectionCta1', screen: 'hp_cta1' },
+    { id: 'sectionHowItWorks', screen: 'hp_how_it_works' },
+    { id: 'sectionTestimonial', screen: 'hp_testimonial' },
+    { id: 'sectionCta2', screen: 'hp_cta2' },
+    { id: 'sectionFaq', screen: 'hp_faq' },
+    { id: 'sectionContact', screen: 'hp_contact' },
+    { id: 'sectionFooter', screen: 'hp_footer' }
+  ];
+  var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (!entry.isIntersecting) return;
+      var screenName = entry.target.dataset.trackScreen;
+      if (!screenName || tracked[screenName]) return;
+      tracked[screenName] = true;
+      fetch('/api/track-pageview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page: '/', screen_name: screenName, device: device })
+      }).catch(function() {});
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(function(s) {
+    var el = document.getElementById(s.id);
+    if (el) {
+      el.dataset.trackScreen = s.screen;
+      observer.observe(el);
+    }
+  });
+})();
 </script>
 </body>
 </html>

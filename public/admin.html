@@ -713,6 +713,15 @@ function renderMetrics(data) {
   html += '</div>'; // close breakdown-grid
 
   // Funnel
+  const funnelLabels = {
+    landing: 'Homepage', hp_hero: 'Saw Hero', hp_sample: 'Saw Sample Player', sample_play: 'Played Sample',
+    hp_cta1: 'Saw First CTA', hp_how_it_works: 'Saw How It Works', hp_testimonial: 'Saw Testimonial',
+    hp_cta2: 'Saw Second CTA', hp_faq: 'Saw FAQ', hp_contact: 'Saw Contact', hp_footer: 'Reached Footer',
+    screenCategory: 'Choosing Category', screenDetails: 'Child Details', screenTheme: 'Choosing Theme',
+    screenVoice: 'Voice Selection', screenLoading: 'Generating Preview', screenPreview: 'Preview',
+    screenUnlock: 'Checkout', screenGenerating: 'Full Generating', screenFull: 'Full Story',
+    screenLogin: 'Login', screenLibrary: 'My Stories'
+  };
   const funnelEntries = Object.entries(funnel).sort((a, b) => b[1] - a[1]);
   if (funnelEntries.length) {
     const funnelMax = funnelEntries[0][1] || 1;
@@ -721,7 +730,7 @@ function renderMetrics(data) {
     for (const [step, count] of funnelEntries) {
       const pct = Math.max(Math.round((count / funnelMax) * 100), 5);
       html += '<div class="funnel-step">';
-      html += '<span class="fs-label">' + esc(step) + '</span>';
+      html += '<span class="fs-label">' + esc(funnelLabels[step] || step) + '</span>';
       html += '<div class="fs-bar"><div class="fs-fill" style="width:' + pct + '%"><span class="fs-count">' + count + '</span></div></div>';
       html += '</div>';
     }
@@ -766,6 +775,17 @@ function renderLive(data) {
   // Ordered funnel stages with labels, colors, and emoji
   const stageConfig = [
     { key: 'landing', label: 'Homepage', color: '#7C5CFC', emoji: '🏠' },
+    { key: 'hp_hero', label: 'Saw Hero', color: '#7C5CFC', emoji: '👀' },
+    { key: 'hp_sample', label: 'Saw Sample Player', color: '#7C5CFC', emoji: '🎵' },
+    { key: 'sample_play', label: 'Played Sample', color: '#7C5CFC', emoji: '▶️' },
+    { key: 'hp_cta1', label: 'Saw First CTA', color: '#A78BFA', emoji: '🟢' },
+    { key: 'hp_how_it_works', label: 'Saw How It Works', color: '#A78BFA', emoji: '📖' },
+    { key: 'hp_testimonial', label: 'Saw Testimonial', color: '#A78BFA', emoji: '💬' },
+    { key: 'hp_cta2', label: 'Saw Second CTA', color: '#9B59B6', emoji: '🟢' },
+    { key: 'hp_faq', label: 'Saw FAQ', color: '#9B59B6', emoji: '❓' },
+    { key: 'hp_contact', label: 'Saw Contact', color: '#9B59B6', emoji: '✉️' },
+    { key: 'hp_footer', label: 'Reached Footer', color: '#9B59B6', emoji: '🏁' },
+    { key: 'screenCategory', label: 'Choosing Category', color: '#FF8C42', emoji: '📂' },
     { key: 'screenHow', label: 'How It Works', color: '#A78BFA', emoji: '📖' },
     { key: 'screenSample', label: 'Sample Story', color: '#9B59B6', emoji: '🎧' },
     { key: 'screenStart', label: 'Start Creating', color: '#FF8C42', emoji: '✏️' },
