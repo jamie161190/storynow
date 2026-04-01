@@ -179,17 +179,26 @@ async function savePreviewResult(supabaseUrl, supabaseKey, jobId, result) {
 }
 
 export const handler = async (event) => {
+  console.log('[FULL-BG] Handler started. ENV check:', {
+    hasSupabaseUrl: !!process.env.SUPABASE_URL,
+    hasSupabaseKey: !!process.env.SUPABASE_SECRET_KEY,
+    hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+    hasElevenLabsKey: !!process.env.ELEVENLABS_API_KEY,
+    bodyLength: event.body?.length || 0
+  });
+
   let jobId;
   try {
     const parsed = JSON.parse(event.body);
     const { storyData, previewStory, voiceId, childName, sessionId, jobId: jid, fromScratch, mode, customerEmail } = parsed;
     jobId = jid;
+    console.log('[FULL-BG] Parsed request. Mode:', mode, 'JobId:', jobId, 'Child:', childName || storyData?.childName);
 
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      console.error('[FULL-BG] Storage not configured');
+      console.error('[FULL-BG] Storage not configured. SUPABASE_URL:', !!supabaseUrl, 'SUPABASE_SECRET_KEY:', !!supabaseKey);
       return { statusCode: 200 };
     }
 

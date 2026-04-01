@@ -1679,7 +1679,7 @@ const bgMusic = {
   gainNode: null,
   source: null,
   fadeInterval: null,
-  targetVolume: 0.19,
+  targetVolume: 0.28,
   currentVolume: 0,
   currentNarration: null,
   isPlaying: false,
@@ -2769,9 +2769,9 @@ async function pollForFull(jobId) {
       const res = await fetch('/api/check-full?jobId=' + jobId);
       const data = await res.json();
       if (data.ready && data.success) { clearInterval(msgTimer); return data; }
-      if (data.ready && data.success === false && data.error) {
+      if (data.ready && data.success === false) {
         clearInterval(msgTimer);
-        return { success: false, error: data.error };
+        return data;
       }
     } catch(e) { /* keep polling */ }
   }
