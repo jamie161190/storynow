@@ -221,6 +221,148 @@ export default async (req) => {
       return json({ queue });
     }
 
+    // ── METRICS DASHBOARD: aggregated sales, visitors, conversions ──
+    if (action === 'metrics') {
+      const days = parseInt(url.searchParams.get('days') || '30');
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+      // Fetch stories (sales), attempts (funnels), and page views in parallel
+      const [storiesRes, attemptsRes, viewsRes] = await Promise.all([
+        fetch(
+          `${supabaseUrl}/rest/v1/stories?created_at=gte.${enc(since)}&select=id,email,child_name,category,created_at&order=created_at.desc`,
+          { headers: sbHeaders(supabaseKey) }
+        ),
+        fetch(
+          `${supabaseUrl}/rest/v1/story_attempts?created_at=gte.${enc(since)}&select=id,child_name,category,status,created_at&order=created_at.desc`,
+          { headers: sbHeaders(supabaseKey) }
+        ),
+        fetch(
+          `${supabaseUrl}/rest/v1/page_views?created_at=gte.${enc(since)}&select=page,referrer,utm_source,utm_medium,utm_campaign,device,screen_name,created_at&order=created_at.desc`,
+          { headers: sbHeaders(supabaseKey) }
+        ).catch(() => ({ ok: false }))
+      ]);
+
+      const stories = Array.isArray(await storiesRes.json().catch(() => [])) ? await storiesRes.clone().json() : [];
+      const attempts = Array.isArray(await attemptsRes.json().catch(() => [])) ? await attemptsRes.clone().json() : [];
+      let views = [];
+      if (viewsRes.ok) {
+        const vData = await viewsRes.json().catch(() => []);
+        views = Array.isArray(vData) ? vData : [];
+      }
+
+      // Aggregate by day
+      const dailyMap = {};
+      const now = new Date();
+      for (let i = 0; i < days; i++) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        dailyMap[key] = { date: key, sales: 0, revenue: 0, visitors: 0, previews: 0, checkouts: 0 };
+      }
+
+      for (const s of stories) {
+        const key = s.created_at?.slice(0, 10);
+        if (dailyMap[key]) {
+          dailyMap[key].sales++;
+          dailyMap[key].revenue += 19.99;
+        }
+      }
+
+      for (const a of attempts) {
+        const key = a.created_at?.slice(0, 10);
+        if (dailyMap[key]) {
+          dailyMap[key].previews++;
+        }
+      }
+
+      for (const v of views) {
+        const key = v.created_at?.slice(0, 10);
+        if (dailyMap[key]) {
+          dailyMap[key].visitors++;
+        }
+      }
+
+      const daily = Object.values(dailyMap).sort((a, b) => a.date.localeCompare(b.date));
+
+      // Category breakdown
+      const catCount = {};
+      for (const s of stories) {
+        catCount[s.category || 'unknown'] = (catCount[s.category || 'unknown'] || 0) + 1;
+      }
+
+      // Top referrers
+      const refCount = {};
+      for (const v of views) {
+        if (v.referrer) {
+          try {
+            const host = new URL(v.referrer).hostname.replace('www.', '');
+            refCount[host] = (refCount[host] || 0) + 1;
+          } catch { /* skip invalid */ }
+        }
+      }
+      const topReferrers = Object.entries(refCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([source, count]) => ({ source, count }));
+
+      // UTM breakdown
+      const utmCount = {};
+      for (const v of views) {
+        if (v.utm_source) {
+          const key = [v.utm_source, v.utm_medium, v.utm_campaign].filter(Boolean).join(' / ');
+          utmCount[key] = (utmCount[key] || 0) + 1;
+        }
+      }
+      const topUtm = Object.entries(utmCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10)
+        .map(([campaign, count]) => ({ campaign, count }));
+
+      // Device breakdown
+      const deviceCount = {};
+      for (const v of views) {
+        deviceCount[v.device || 'unknown'] = (deviceCount[v.device || 'unknown'] || 0) + 1;
+      }
+
+      // Funnel screen breakdown
+      const screenCount = {};
+      for (const v of views) {
+        if (v.screen_name) {
+          screenCount[v.screen_name] = (screenCount[v.screen_name] || 0) + 1;
+        }
+      }
+
+      // Unique customers
+      const uniqueEmails = new Set(stories.map(s => s.email).filter(Boolean));
+
+      // Totals
+      const totalSales = stories.length;
+      const totalRevenue = stories.length * 19.99;
+      const totalVisitors = views.length;
+      const totalPreviews = attempts.length;
+      const conversionRate = totalPreviews > 0 ? ((totalSales / totalPreviews) * 100).toFixed(1) : '0.0';
+      const visitorToPreview = totalVisitors > 0 ? ((totalPreviews / totalVisitors) * 100).toFixed(1) : '0.0';
+
+      return json({
+        period: { days, since },
+        totals: {
+          sales: totalSales,
+          revenue: Math.round(totalRevenue * 100) / 100,
+          visitors: totalVisitors,
+          previews: totalPreviews,
+          uniqueCustomers: uniqueEmails.size,
+          conversionRate: parseFloat(conversionRate),
+          visitorToPreview: parseFloat(visitorToPreview)
+        },
+        daily,
+        categories: catCount,
+        topReferrers,
+        topUtm,
+        devices: deviceCount,
+        funnel: screenCount
+      });
+    }
+
     return json({ error: 'Unknown action: ' + action }, 400);
 
   } catch (err) {

@@ -130,7 +130,7 @@ fbq('track', 'PageView');
       "name": "Can I share the story with family?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Tap share and send it by email or WhatsApp in seconds. You can also save the audio straight to your phone."
+        "text": "One tap. Hit share and send the story to grandparents, aunties, uncles, or anyone you like by email or WhatsApp. They get a link, they tap play, done. You can also download the audio and save it straight to your phone. No extra cost, no limits."
       }
     },
     {
@@ -155,22 +155,6 @@ fbq('track', 'PageView');
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Storytold creates stories for children aged 2 to 14. The language, themes, and complexity automatically adapt to the child's age."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is the child's information safe?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Completely. The child's details are only used to write their story. Nothing is shared, sold, or used for advertising. Payment is processed securely by Stripe."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How is the story written?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Every story is written from scratch using AI that has been carefully trained and tested with real families. It is not a template with names swapped in. The details you share shape the plot, the dialogue, and the ending."
       }
     },
     {
@@ -678,12 +662,6 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
     <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;font-weight:600;font-style:italic">Lisa, mum to Livvie (age 4)</p>
   </div>
 
-  <!-- REVIEWS -->
-  <div id="reviewsSection" style="display:none;width:100%;max-width:440px;margin-top:1.5rem">
-    <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.75rem;text-align:center">What parents are saying</p>
-    <div id="reviewsList" style="display:flex;flex-direction:column;gap:0.5rem"></div>
-  </div>
-
   <!-- SECOND CTA -->
   <div class="cta-group">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
@@ -707,7 +685,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I share it with family?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Tap share and send it by email or WhatsApp in seconds. You can also save the audio straight to your phone.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">One tap. That is all it takes. Hit share and send the story to grandparents, aunties, uncles, or anyone you like by email or WhatsApp. They get a link, they tap play, done. You can also download the audio and save it straight to your phone. No extra cost, no limits on who you share it with.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if I don't like the full version?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -720,14 +698,6 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What ages does this work for?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
         <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Ages 2 to 14. Stories automatically adapt to the child's age. Toddlers get simple language with sound effects and repetition. Older children get richer plots, real dialogue, and deeper themes.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Is the child's information safe?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Completely. The child's details are only used to write their story. Nothing is shared, sold, or used for advertising. Payment is processed securely by Stripe. I take this seriously.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How is the story written?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Every story is written from scratch using AI that I have carefully trained and tested with real families. It is not a template with names swapped in. The details you share (interests, friends, fears, personality) shape the plot, the dialogue, and the ending. I personally review the system regularly to make sure the quality stays high.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I listen to it more than once?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -3972,7 +3942,6 @@ let shareMode = 'email';
 function shareFromFullScreen() {
   if (!lastSavedStoryId) {
     return; // Story still saving, button will re-enable when done
-    return;
   }
   // Use the currently displayed child's name (from tab), not always the primary child
   const displayedFor = document.getElementById('fullStoryFor')?.textContent || '';
@@ -4197,43 +4166,6 @@ function playLibraryStory(story) {
   document.getElementById('fullPlayIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
 }
 
-// ===== REVIEWS =====
-const REVIEWS = [
-  { name: 'Sarah', childName: 'Mia', text: 'She asked for another one before the first one even finished. Absolutely loved hearing her own name in the story.' },
-  { name: 'Tom', childName: 'Oscar', text: 'Oscar sat completely still for the whole thing. He has never done that for any story. The bit about his teddy bear made him gasp.' },
-  { name: 'Rachel', childName: 'Isla', text: 'Bought it as a birthday gift from Grandma. My mum cried when she heard the personal message at the start. Beautiful.' },
-  { name: 'Dan', childName: 'Freddie', text: 'Way better than I expected for the price. Freddie talks about "his story" to everyone. We have played it about 40 times now.' },
-  { name: 'Emma', childName: 'Ava', text: 'I was sceptical but the preview sold me instantly. Hearing her best friend mentioned by name was the moment I knew I had to buy it.' },
-];
-
-function renderReviews() {
-  if (REVIEWS.length === 0) return;
-  document.getElementById('reviewsSection').style.display = 'block';
-  const list = document.getElementById('reviewsList');
-  list.innerHTML = REVIEWS.map(r => `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow)">
-      <p style="font-size:0.88rem;color:var(--text);line-height:1.6;margin:0 0 0.4rem">"${r.text}"</p>
-      <p style="font-size:0.78rem;color:var(--text-muted);margin:0;font-weight:700">${r.name}${r.childName ? ', ' + r.childName + '\u2019s parent' : ''}</p>
-    </div>
-  `).join('');
-}
-renderReviews();
-
-async function submitReview() {
-  const name = document.getElementById('reviewName').value.trim();
-  const childName = document.getElementById('reviewChildName').value.trim();
-  const text = document.getElementById('reviewText').value.trim();
-  if (!name || !text) { return; }
-  try {
-    await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'review', to: 'jamie@builtsmarter.co.uk', reviewName: name, reviewChildName: childName, reviewText: text })
-    });
-  } catch(e) {}
-  document.getElementById('reviewForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Thank you! We really appreciate it.</p>';
-}
-
 // Cookie consent
 function showCookieBanner() {
   if (localStorage.getItem('st_cookies') === 'accepted') return;
@@ -4255,6 +4187,52 @@ function declineCookies() {
   if (typeof fbq === 'function') fbq('consent', 'revoke');
 }
 showCookieBanner();
+
+// ===== LIGHTWEIGHT PAGE VIEW TRACKING =====
+(function trackPageView() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const isMobile = window.innerWidth < 768;
+    const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+    fetch('/api/track-pageview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        page: window.location.pathname,
+        referrer: document.referrer || '',
+        utm_source: params.get('utm_source') || '',
+        utm_medium: params.get('utm_medium') || '',
+        utm_campaign: params.get('utm_campaign') || '',
+        device: isMobile ? 'mobile' : isTablet ? 'tablet' : 'desktop',
+        screen_name: 'landing'
+      })
+    }).catch(() => {});
+  } catch(e) {}
+})();
+
+// Track screen transitions for funnel analysis
+const _origGoTo = typeof goTo === 'function' ? goTo : null;
+if (_origGoTo) {
+  const _trackScreen = (screenId) => {
+    try {
+      fetch('/api/track-pageview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page: window.location.pathname,
+          screen_name: screenId,
+          device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop'
+        })
+      }).catch(() => {});
+    } catch(e) {}
+  };
+  // Patch goTo to also track screen views
+  const _realGoTo = goTo;
+  window.goTo = function(screenId) {
+    _trackScreen(screenId);
+    return _realGoTo.apply(this, arguments);
+  };
+}
 
 async function submitContact() {
   const name = document.getElementById('contactName').value.trim();
