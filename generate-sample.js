@@ -10,33 +10,24 @@ const { execSync } = require('child_process');
 const ELEVENLABS_KEY = '8deae6fba15696db876cfa1f3b824318140ece878b0d02c6717358895dbe148e';
 const VOICE_ID = 'onwK4e9ZLuTAKqWW03F9'; // Daniel - calm, deep, British
 
-// ~80 words. Comedy beats baked into the sentence structure.
-// Short fragments = TTS pauses. Single-word lines = punch.
-// Questions = natural pitch change. Contrast = drama.
-const SCRIPT = `Chase was not supposed to be awake. But the ground was shaking.
+// ~78 words. Space theme. Daddy as the villain. 30 seconds.
+const SCRIPT = `Chase couldn't sleep. Something outside the window was glowing.
 
-He looked out the window. A T-Rex. In the garden. Eating Daddy's roses.
+He looked out. A spaceship. In the garden. Right on top of Daddy's flowers.
 
-"Ellis," he whispered. "Whatever you do, don't move."
+"Ellis," he whispered. "You need to see this."
 
-Ellis immediately moved.
+A hatch opened. A small green alien poked its head out. "Are you Chase?"
 
-The dinosaur looked up. It had a rose hanging out of its mouth. It looked completely ridiculous.
+Chase pulled Mr Flopsy closer. "Who's asking?"
 
-"Are you Chase?" it said.
+"Someone has stolen every star from the sky. And the someone, is your Daddy."
 
-"Maybe," said Chase, pulling Mr Flopsy a little closer.
-
-"Your Daddy stole my eggs. Every single one. I need them back."
-
-Chase looked at Ellis. "Yeah. That does sound like him."`;
+Chase looked at Ellis. "Sounds about right. Let's go."`;
 
 async function main() {
   console.log('Generating narration with ElevenLabs (Daniel voice, multilingual v2)...');
 
-  // Using eleven_multilingual_v2 for maximum expression and tone variation.
-  // Low stability (0.30) = more dramatic range between whispers, rumbles,
-  // and cheeky dialogue. Higher similarity (0.80) keeps the voice consistent.
   const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
     method: 'POST',
     headers: {
