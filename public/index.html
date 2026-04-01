@@ -1694,7 +1694,26 @@ const bgMusic = {
   init() {
     this.audio = new Audio();
     this.audio.loop = true;
-    this.audio.preload = 'none';
+    this.audio.preload = 'auto';
+
+    // Fallback: if loop fails on mobile, restart manually
+    this.audio.addEventListener('ended', () => {
+      if (this.isPlaying) {
+        this.audio.currentTime = 0;
+        this.audio.play().catch(() => {});
+      }
+    });
+
+    // Keep AudioContext alive: check every 3s while music should be playing
+    setInterval(() => {
+      if (!this.isPlaying || !bgMusicEnabled) return;
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+      if (this.audio.paused && this.isPlaying) {
+        this.audio.play().catch(() => {});
+      }
+    }, 3000);
   },
 
   // Create Web Audio context on first user gesture for iOS volume control.
@@ -1803,6 +1822,24 @@ const bgMusic = {
   }
 };
 bgMusic.init();
+
+// Keep music alive when mobile screen locks or tab loses focus
+document.addEventListener('visibilitychange', () => {
+  if (!bgMusicEnabled || !bgMusic.currentNarration) return;
+  if (document.visibilityState === 'visible') {
+    // Screen unlocked or tab refocused: resume AudioContext and music
+    if (bgMusic.ctx && bgMusic.ctx.state === 'suspended') {
+      bgMusic.ctx.resume().catch(() => {});
+    }
+    if (!bgMusic.isPlaying && bgMusic.audio.src) {
+      bgMusic.setVolume(0);
+      bgMusic.audio.play().then(() => {
+        bgMusic.isPlaying = true;
+        bgMusic.fadeTo(bgMusic.targetVolume, 800);
+      }).catch(() => {});
+    }
+  }
+});
 
 let bgMusicEnabled = true;
 
@@ -2751,17 +2788,21 @@ async function pollForFull(jobId) {
     'Writing the full story now...',
     'Weaving in every personal detail...',
     'The story is taking shape...',
+    'Building each scene from scratch...',
     'Now recording the narration...',
     'Adding emotion and expression to every line...',
+    'The narrator is performing, not just reading...',
+    'Crafting whispers, laughs, and gasps...',
     'Making sure every detail sounds perfect...',
-    'Nearly there, just polishing the final moments...'
+    'Almost done, polishing the final moments...',
+    'Just putting the finishing touches on...',
+    'Your story is nearly ready...'
   ];
   let msgIdx = 0;
   const msgTimer = setInterval(() => {
     msgIdx++;
     if (msgIdx < pollingMsgs.length) loadingText.textContent = pollingMsgs[msgIdx];
-    else clearInterval(msgTimer);
-  }, 15000);
+  }, 20000);
 
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise(r => setTimeout(r, 3000));
