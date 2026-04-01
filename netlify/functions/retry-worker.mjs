@@ -6,6 +6,15 @@
 import { SYSTEM_PROMPT, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
 import { logError } from './lib/log-error.mjs';
 
+function prepareTTSText(text) {
+  text = text.replace(/\.\s*\.\.\s*\.\.\./g, '.\n\n');
+  text = text.replace(/\.\.\.\s*\.\.\./g, '.\n\n');
+  text = text.replace(/\s*\.\.\.\s*/g, '. ');
+  text = text.replace(/\.\s*\.\s+/g, '. ');
+  text = text.replace(/\s{3,}/g, ' ');
+  return text.trim();
+}
+
 function splitIntoChunks(text, maxChars = 4000) {
   const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
   const chunks = [];
@@ -258,10 +267,11 @@ export default async (req) => {
       // Branded outro: a warm sign-off after the story ends
       const outro = ` ... ... A Storytold original ... made with love.`;
       const fullStoryText = storyBody + outro;
+      const ttsText = prepareTTSText(fullStoryText);
 
       // ── Step 3: Generate TTS ──
       const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
-      const chunks = splitIntoChunks(fullStoryText);
+      const chunks = splitIntoChunks(ttsText);
 
       const audioBuffers = [];
       const results = await Promise.all(chunks.map((chunk) =>

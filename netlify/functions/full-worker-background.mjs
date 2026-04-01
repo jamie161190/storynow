@@ -6,6 +6,22 @@
 import { SYSTEM_PROMPT, buildPreviewPrompt, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
 import { logError } from './lib/log-error.mjs';
 
+// Preprocess story text so ElevenLabs TTS creates natural pauses
+// The ellipsis (...) the story writer uses barely registers as a pause.
+// Replacing them with sentence breaks + short silence phrases forces
+// the TTS engine to breathe at the right moments.
+function prepareTTSText(text) {
+  // Double pause (scene changes / big reveals) → long breath
+  text = text.replace(/\.\s*\.\.\s*\.\.\./g, '.\n\n');
+  text = text.replace(/\.\.\.\s*\.\.\./g, '.\n\n');
+  // Single pause → sentence break (period forces a stop, newline adds breath)
+  text = text.replace(/\s*\.\.\.\s*/g, '. ');
+  // Clean up any resulting double periods or awkward spacing
+  text = text.replace(/\.\s*\.\s+/g, '. ');
+  text = text.replace(/\s{3,}/g, ' ');
+  return text.trim();
+}
+
 // TTS chunk helper: splits text into chunks at sentence boundaries
 function splitIntoChunks(text, maxChars = 4000) {
   const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
@@ -245,6 +261,7 @@ export const handler = async (event) => {
       }
 
       const fullPreviewText = messageIntro + previewText + ' ... ... To hear what happens next, unlock the full story.';
+      const ttsPreviewText = prepareTTSText(fullPreviewText);
 
       // Save partial result before TTS
       await savePreviewResult(supabaseUrl, supabaseKey, jobId, {
@@ -260,7 +277,7 @@ export const handler = async (event) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          text: fullPreviewText,
+          text: ttsPreviewText,
           model_id: 'eleven_flash_v2_5',
           voice_settings: { stability: 0.5, similarity_boost: 0.75 }
         })
@@ -375,11 +392,12 @@ export const handler = async (event) => {
     // Branded outro: a warm sign-off after the story ends
     const outro = ` ... ... A Storytold original ... made with love.`;
     const fullStoryText = storyBody + outro;
+    const ttsText = prepareTTSText(fullStoryText);
     console.log('[FULL-BG] Complete story:', fullStoryText.split(' ').length, 'words');
 
     // ── Step 3: Generate TTS for the complete story ──
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
-    const chunks = splitIntoChunks(fullStoryText);
+    const chunks = splitIntoChunks(ttsText);
     console.log(`[FULL-BG] Split into ${chunks.length} TTS chunks`);
 
     const audioBuffers = [];

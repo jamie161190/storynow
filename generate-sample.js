@@ -10,26 +10,21 @@ const { execSync } = require('child_process');
 const ELEVENLABS_KEY = '8deae6fba15696db876cfa1f3b824318140ece878b0d02c6717358895dbe148e';
 const VOICE_ID = 'onwK4e9ZLuTAKqWW03F9'; // Daniel - calm, deep, British
 
-const SCRIPT = `Chase pressed his nose against the window ... and that was when he saw it. A real, actual, living, breathing T-Rex ... standing right there in the garden, chewing Daddy's roses.
+// ~75 words. Tight 30-second cut. Every sentence earns its place.
+const SCRIPT = `Chase pressed his nose against the window. And there it was.
 
-"Ellis!" Chase whispered. "Ellis, wake up."
+A T-Rex. A real one. Standing in the garden. Chewing Daddy's roses.
 
-Ellis opened one eye. "Chase, it is the middle of the ..." He stopped. "Whoa."
+"Ellis!" Chase whispered. "Wake up."
 
-Mr Flopsy's little ears twitched. Chase tucked him tighter under one arm. "Don't worry Flops. I've got you."
+They crept outside, Mr Flopsy tucked under one arm. The dinosaur lowered its enormous head and rumbled.
 
-They crept downstairs, past the creaky step ... through the kitchen ... and out into the moonlit garden. The T-Rex lowered its enormous head and huffed warm breath right across Chase's face.
+"Someone has stolen every egg from the volcano. And the someone. Is your Daddy."
 
-"I need your help," the dinosaur rumbled. "Someone has stolen every single egg from the volcano ... and the someone ... is your Daddy."
-
-Chase looked at Ellis. Ellis looked at Chase.
-
-"That does sound like something he'd do," Chase whispered.
-
-And just like that ... the adventure began.`;
+Chase looked at Ellis. "That does sound like something he'd do."`;
 
 async function main() {
-  console.log('🎙️  Generating narration with ElevenLabs (Daniel voice)...');
+  console.log('Generating narration with ElevenLabs (Daniel voice)...');
 
   const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
     method: 'POST',
@@ -52,13 +47,13 @@ async function main() {
   const audioBuffer = Buffer.from(await ttsRes.arrayBuffer());
   const narrationPath = path.join(__dirname, 'public', 'sample-narration.mp3');
   fs.writeFileSync(narrationPath, audioBuffer);
-  console.log(`✅  Narration saved (${(audioBuffer.length / 1024).toFixed(0)} KB)`);
+  console.log(`Narration saved (${(audioBuffer.length / 1024).toFixed(0)} KB)`);
 
   // Check for ffmpeg
   try {
     execSync('which ffmpeg', { stdio: 'ignore' });
   } catch {
-    console.log('\n⚠️  ffmpeg not found. Install it with: brew install ffmpeg');
+    console.log('\nffmpeg not found. Install it with: brew install ffmpeg');
     console.log('Then run this script again to mix with background music.');
     console.log('Or just rename sample-narration.mp3 to sample-story.mp3 for narration only.');
     return;
@@ -71,19 +66,18 @@ async function main() {
   // Get narration duration
   const durationOut = execSync(`ffprobe -v error -show_entries format=duration -of csv=p=0 "${narrationPath}"`).toString().trim();
   const duration = parseFloat(durationOut);
-  console.log(`🎵  Mixing with background music (narration: ${duration.toFixed(1)}s)...`);
+  console.log(`Mixing with background music (narration: ${duration.toFixed(1)}s)...`);
 
-  // Add 1.5s silence at start for music intro, then mix
-  // Music at 0.02 volume (per Jamie's preference), narration at 0.75
-  // Fade music out over last 3 seconds
-  const totalDuration = duration + 3; // extra 1.5s intro + 1.5s outro
+  // 1s music intro before narration starts, then fade music out at the end
+  // Music at 0.02 volume (Jamie's preference), narration at 0.75
+  const totalDuration = duration + 2.5; // 1s intro + 1.5s tail
 
   execSync(`ffmpeg -y \
     -i "${narrationPath}" \
     -i "${musicPath}" \
     -filter_complex "\
-      [0:a]adelay=1500|1500,volume=0.75[narr];\
-      [1:a]atrim=0:${totalDuration},volume=0.02,afade=t=out:st=${totalDuration - 3}:d=3[music];\
+      [0:a]adelay=1000|1000,volume=0.75[narr];\
+      [1:a]atrim=0:${totalDuration},volume=0.02,afade=t=out:st=${totalDuration - 2}:d=2[music];\
       [music][narr]amix=inputs=2:duration=longest:dropout_transition=2[out]\
     " \
     -map "[out]" \
@@ -94,8 +88,8 @@ async function main() {
   fs.unlinkSync(narrationPath);
 
   const finalSize = fs.statSync(outputPath).size;
-  console.log(`\n🎉  Done! sample-story.mp3 updated (${(finalSize / 1024).toFixed(0)} KB)`);
-  console.log('   Commit and push to go live.');
+  console.log(`\nDone! sample-story.mp3 updated (${(finalSize / 1024).toFixed(0)} KB)`);
+  console.log('Commit and push to go live.');
 }
 
 main().catch(err => { console.error(err); process.exit(1); });

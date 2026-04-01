@@ -137,6 +137,16 @@ Do NOT wrap up or resolve anything. Stop at a cliffhanger.
 Write ONLY the opening now. No more than 200 words.`;
 }
 
+// Preprocess story text so ElevenLabs TTS creates natural pauses
+function prepareTTSText(text) {
+  text = text.replace(/\.\s*\.\.\s*\.\.\./g, '.\n\n');
+  text = text.replace(/\.\.\.\s*\.\.\./g, '.\n\n');
+  text = text.replace(/\s*\.\.\.\s*/g, '. ');
+  text = text.replace(/\.\s*\.\s+/g, '. ');
+  text = text.replace(/\s{3,}/g, ' ');
+  return text.trim();
+}
+
 // Helper to save result to Supabase
 async function saveResult(supabaseUrl, supabaseKey, jobId, data) {
   await fetch(`${supabaseUrl}/storage/v1/object/stories/preview-jobs/${jobId}.json`, {
@@ -227,6 +237,7 @@ export const handler = async (event) => {
     }
 
     const previewText = messageIntro + previewStory + ' ... ... To hear what happens next, unlock the full story.';
+    const ttsText = prepareTTSText(previewText);
 
     // ── Generate TTS ──
     const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
@@ -240,7 +251,7 @@ export const handler = async (event) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        text: previewText,
+        text: ttsText,
         model_id: 'eleven_flash_v2_5',
         voice_settings: { stability: 0.5, similarity_boost: 0.75 }
       })
