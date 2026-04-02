@@ -633,6 +633,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase and Ellis discover a coin that won't stop glowing, and Daddy is one step ahead. An adventure that keeps them guessing until the very end.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.35rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
     <audio id="sampleAudio" src="https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3" preload="auto"></audio>
+    <audio id="sampleMusic" loop preload="none"></audio>
   </div>
 
   <!-- FIRST CTA (after the proof) -->
@@ -1671,12 +1672,18 @@ var sampleData = {
   adventure: { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3', name: "The Pikachu Coin",      music: 'journey',  desc: "Chase and Ellis discover a coin that won\u2019t stop glowing, and Daddy is one step ahead. An adventure that keeps them guessing until the very end." },
   learning:  { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-learning.mp3',  name: "The Wrong Card",        music: 'learning', desc: "Chase picks the wrong card and the whole game changes. Now he has to spot patterns, think fast, and figure out what he missed before time runs out." }
 };
+var sampleMusicTracks = {
+  bedtime:  '/music/bedtime-ambient.mp3?v=6',
+  adventure: '/music/adventure-ambient.mp3?v=6',
+  learning: '/music/learning-ambient.mp3?v=6'
+};
 function switchSample(type, btn) {
   if (type === currentSample) return;
   var audio = document.getElementById('sampleAudio');
+  var music = document.getElementById('sampleMusic');
   var wasPlaying = !audio.paused;
   audio.pause();
-  bgMusic.stop();
+  music.pause();
   currentSample = type;
   var data = sampleData[type];
   audio.src = data.src;
@@ -1694,8 +1701,9 @@ function switchSample(type, btn) {
   if (wasPlaying) { playSample(); }
 }
 function playSample() {
-  const audio = document.getElementById('sampleAudio');
-  const icon = document.getElementById('sampleIcon');
+  var audio = document.getElementById('sampleAudio');
+  var music = document.getElementById('sampleMusic');
+  var icon = document.getElementById('sampleIcon');
   audio.volume = 0.75;
   if (audio.paused) {
     audio.play();
@@ -1710,15 +1718,20 @@ function playSample() {
         visitor_id: stVisitorId
       })
     }).catch(() => {});
-    var musicType = sampleData[currentSample].music;
-    const wasEnabled = bgMusicEnabled;
-    bgMusicEnabled = true;
-    bgMusic.play(musicType, audio);
-    bgMusicEnabled = wasEnabled;
+    // Play background music directly via DOM audio element
+    var trackKey = currentSample === 'adventure' ? 'adventure' : currentSample;
+    var musicSrc = sampleMusicTracks[trackKey];
+    if (music.getAttribute('data-track') !== trackKey) {
+      music.src = musicSrc;
+      music.setAttribute('data-track', trackKey);
+    }
+    music.currentTime = 0;
+    music.volume = 0.25;
+    music.play().catch(function(e) { console.log('[sampleMusic] ' + e.message); });
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
   } else {
     audio.pause();
-    bgMusic.pause();
+    music.pause();
     icon.innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
   }
 }
@@ -1757,7 +1770,7 @@ var sampleMilestones = {};
     document.getElementById('sampleIcon').innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
     document.getElementById('sampleFill').style.width = '0%';
     document.getElementById('sampleTime').textContent = '0:00';
-    bgMusic.stop();
+    var sm = document.getElementById('sampleMusic'); if (sm) { sm.pause(); sm.currentTime = 0; }
     if (!sampleMilestones['100']) { sampleMilestones['100'] = true; trackSampleEvent('sample_100pct'); }
   });
   sa.addEventListener('error', () => {
