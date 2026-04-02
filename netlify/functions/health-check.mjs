@@ -2,6 +2,15 @@
 // Hit /api/health-check in browser to diagnose issues
 
 export default async (req) => {
+  // Require admin auth to prevent public probing of service status
+  const adminSecret = process.env.ADMIN_SECRET;
+  const authHeader = req.headers.get('x-admin-secret');
+  if (!adminSecret || authHeader !== adminSecret) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401, headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   const results = {
     timestamp: new Date().toISOString(),
     stripe: { status: 'untested' },
@@ -15,7 +24,7 @@ export default async (req) => {
   // Check which env vars exist (don't reveal values)
   const vars = ['STRIPE_SECRET_KEY', 'ANTHROPIC_API_KEY', 'ELEVENLABS_API_KEY', 'SUPABASE_URL', 'SUPABASE_SECRET_KEY', 'META_CAPI_TOKEN', 'TIKTOK_EVENTS_TOKEN'];
   for (const v of vars) {
-    results.env_vars[v] = process.env[v] ? 'SET (' + process.env[v].slice(0, 6) + '...)' : 'MISSING';
+    results.env_vars[v] = process.env[v] ? 'SET' : 'MISSING';
   }
 
   // Test Stripe

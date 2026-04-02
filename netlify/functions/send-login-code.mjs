@@ -34,7 +34,8 @@ export default async (req) => {
     );
     const stories = await checkRes.json();
     if (!stories.length) {
-      return new Response(JSON.stringify({ error: 'No stories found for this email. Create a story first!' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
+      // Return success even if no stories exist to prevent email enumeration
+      return new Response(JSON.stringify({ success: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
 
     // Rate limit: max 3 code requests per email per hour

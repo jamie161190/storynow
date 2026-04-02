@@ -488,7 +488,7 @@ export const handler = async (event) => {
     const result = { success: true, audioUrl };
 
     // Save to stories table if we have a stripe session
-    if (sessionId && !sessionId.startsWith('bypass-')) {
+    if (sessionId) {
       try {
         const existingCheck = await fetch(
           `${supabaseUrl}/rest/v1/stories?stripe_session_id=eq.${encodeURIComponent(sessionId)}&select=id&limit=1`,

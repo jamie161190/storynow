@@ -1817,6 +1817,11 @@ const bgMusic = {
     // Keep AudioContext alive: check every 3s while music should be playing
     setInterval(() => {
       if (!this.isPlaying || !bgMusicEnabled) return;
+      // Only keep music alive if its paired narration is still playing
+      if (this.currentNarration && this.currentNarration.paused) {
+        this.pause();
+        return;
+      }
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().catch(() => {});
       }
@@ -1907,6 +1912,7 @@ const bgMusic = {
 
   pause() {
     if (this.isPlaying) {
+      this.currentNarration = null;
       this.fadeTo(0, 800);
     }
   },
@@ -1937,6 +1943,9 @@ bgMusic.init();
 document.addEventListener('visibilitychange', () => {
   if (!bgMusicEnabled || !bgMusic.currentNarration) return;
   if (document.visibilityState === 'visible') {
+    // Only resume music if the narration it was paired with is still playing
+    const narration = bgMusic.currentNarration;
+    if (!narration || narration.paused) return;
     // Screen unlocked or tab refocused: resume AudioContext and music
     if (bgMusic.ctx && bgMusic.ctx.state === 'suspended') {
       bgMusic.ctx.resume().catch(() => {});
@@ -1988,6 +1997,7 @@ function toggleBgMusic() {
     for (const id of narrations) {
       const a = document.getElementById(id);
       if (a && !a.paused) {
+        bgMusic.currentNarration = a;
         bgMusic.resume();
         break;
       }

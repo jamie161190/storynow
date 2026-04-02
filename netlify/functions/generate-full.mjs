@@ -56,7 +56,7 @@ export default async (req) => {
     }
 
     // Check if this session already generated audio (prevent replay)
-    if (sessionId && !sessionId.startsWith('bypass-')) {
+    if (sessionId) {
       const existingCheck = await fetch(
         `${supabaseUrl}/rest/v1/stories?stripe_session_id=eq.${encodeURIComponent(sessionId)}&select=id,audio_url&limit=1`,
         {
