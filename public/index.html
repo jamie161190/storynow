@@ -483,8 +483,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* Action buttons */
 .post-actions{display:flex;flex-direction:column;gap:0.6rem;width:100%;margin-top:1rem}
 .post-actions .btn-primary{box-shadow:0 4px 14px rgba(139,92,246,0.3)}
-.post-actions-row{display:flex;gap:0.6rem;width:100%}
-.post-actions-row .btn-gift{flex:1}
+.post-actions-row{display:flex;gap:0.6rem;width:100%;flex-wrap:wrap}
+.post-actions-row .btn-gift{flex:1;min-width:0}
+
+/* ===== STORY CARD ===== */
+.story-card{position:relative;background:linear-gradient(145deg,var(--cat-accent-light,#F8F5FF),#fff);border:2px solid var(--border);border-radius:20px;padding:1.75rem 1.5rem 1.5rem;margin-bottom:1rem;overflow:hidden;text-align:center}
+.story-card::before{content:'';position:absolute;top:-60px;right:-60px;width:160px;height:160px;background:var(--cat-accent,var(--purple));opacity:0.06;border-radius:50%}
+.story-card::after{content:'';position:absolute;bottom:-40px;left:-40px;width:100px;height:100px;background:var(--cat-accent-dark,var(--pink));opacity:0.05;border-radius:50%}
+.story-card-emoji{font-size:2.5rem;margin-bottom:0.5rem;position:relative;z-index:1}
+.story-card-name{font-family:'Nunito',sans-serif;font-size:1.5rem;font-weight:900;color:var(--text);position:relative;z-index:1;margin:0 0 0.2rem}
+.story-card-type{font-size:0.85rem;font-weight:700;color:var(--cat-accent,var(--purple));position:relative;z-index:1;margin:0 0 0.6rem;text-transform:uppercase;letter-spacing:0.5px}
+.story-card-featuring{font-size:0.8rem;color:var(--text-muted);font-weight:600;position:relative;z-index:1;margin:0;line-height:1.5}
+.story-card-stars{position:relative;z-index:1;margin-top:0.6rem;font-size:0.7rem;color:var(--text-muted);letter-spacing:6px}
+
+/* ===== CONFETTI ===== */
+@keyframes confetti-fall{0%{transform:translateY(-100vh) rotate(0deg);opacity:1}80%{opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.confetti-piece{position:fixed;width:10px;height:10px;top:0;z-index:99999;pointer-events:none;animation:confetti-fall 3s ease-in forwards}
+
+/* ===== READ ALONG ===== */
+.read-along-wrap{background:var(--card);border:2px solid var(--border);border-radius:16px;margin-top:1rem;overflow:hidden;transition:all 0.3s}
+.read-along-toggle{width:100%;padding:0.75rem 1rem;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-family:'Quicksand',sans-serif;font-size:0.85rem;font-weight:700;color:var(--text-muted);transition:color 0.2s}
+.read-along-toggle:hover{color:var(--text)}
+.read-along-content{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
+.read-along-content.open{max-height:2000px}
+.read-along-text{padding:0 1.25rem 1.25rem;font-size:0.88rem;line-height:1.85;color:var(--text-soft);font-weight:500;text-align:left;white-space:pre-wrap}
+
+/* ===== QR CODE MODAL ===== */
+.qr-modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:99998;display:none;align-items:center;justify-content:center;padding:1rem}
+.qr-modal-overlay.active{display:flex}
+.qr-modal{background:var(--bg);border-radius:20px;padding:2rem 1.5rem;text-align:center;max-width:340px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,0.2)}
+.qr-modal canvas{border-radius:12px;margin:1rem auto;display:block}
+.qr-modal-close{background:none;border:none;position:absolute;top:0.75rem;right:0.75rem;font-size:1.3rem;cursor:pointer;color:var(--text-muted);padding:0.25rem}
+
+/* ===== LIBRARY PLAY COUNT ===== */
+.lib-plays{font-size:0.72rem;color:var(--text-muted);font-weight:600;margin-top:0.15rem;display:flex;align-items:center;gap:0.3rem}
+.lib-plays svg{width:12px;height:12px;fill:var(--text-muted)}
 
 /* Discount banner */
 .next-story-banner{background:linear-gradient(135deg, #FFF3E0, #FFF8F0);border:2px solid #FFE0B2;border-radius:16px;padding:1.15rem;margin-top:1.25rem;text-align:center;position:relative;overflow:hidden}
@@ -1361,6 +1394,15 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <p class="full-for" id="fullStoryFor"></p>
     </div>
 
+    <!-- Story Card -->
+    <div class="story-card" id="storyCard" style="display:none">
+      <div class="story-card-emoji" id="storyCardEmoji"></div>
+      <p class="story-card-name" id="storyCardName"></p>
+      <p class="story-card-type" id="storyCardType"></p>
+      <p class="story-card-featuring" id="storyCardFeaturing"></p>
+      <div class="story-card-stars">&#10026; &#10026; &#10026;</div>
+    </div>
+
     <!-- Player controls card -->
     <div class="full-controls">
       <div style="display:flex;align-items:center;gap:1.2rem;justify-content:center">
@@ -1387,11 +1429,23 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </div>
     </div>
 
+    <!-- Read Along -->
+    <div class="read-along-wrap" id="readAlongWrap" style="display:none">
+      <button class="read-along-toggle" onclick="toggleReadAlong()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>
+        <span id="readAlongLabel">Read along</span>
+      </button>
+      <div class="read-along-content" id="readAlongContent">
+        <div class="read-along-text" id="readAlongText"></div>
+      </div>
+    </div>
+
     <!-- Post purchase actions -->
     <div class="post-actions">
       <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">&#127911; Download MP3</button>
       <div class="post-actions-row">
         <button class="btn btn-gift" onclick="shareFromFullScreen()">Share with family</button>
+        <button class="btn btn-gift" style="background:transparent;border:2px solid var(--border);color:var(--text)" onclick="showQrCode()">QR Code</button>
         <button class="btn btn-gift" id="sendGiftBtn" onclick="sendGift()">Send to recipient</button>
       </div>
     </div>
@@ -1568,6 +1622,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <p style="color:var(--text-muted);margin-top:0.5rem">They will receive an email with a link to listen.</p>
       <button class="share-send-btn" style="margin-top:1rem" onclick="closeShareModal()">Done</button>
     </div>
+  </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="qr-modal-overlay" id="qrOverlay" onclick="if(event.target===this)closeQrModal()">
+  <div class="qr-modal" style="position:relative">
+    <button class="qr-modal-close" onclick="closeQrModal()">&times;</button>
+    <p style="font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:800;color:var(--text);margin:0 0 0.25rem">Scan to listen</p>
+    <p style="font-size:0.8rem;color:var(--text-muted);font-weight:600;margin:0 0 0.5rem">Perfect for a birthday card or gift tag</p>
+    <canvas id="qrCanvas" width="200" height="200"></canvas>
+    <p style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin:0.5rem 0 0" id="qrChildLabel"></p>
   </div>
 </div>
 
@@ -3462,6 +3527,12 @@ async function handleStripeReturn() {
       document.getElementById('savedEmailNote').style.display = 'block';
     }
 
+    // Story card, read along, confetti, play count (post-purchase enhancements)
+    populateStoryCard(storyData.childName, storyData.category, storyData);
+    setupReadAlong(fullStoryText);
+    if (lastSavedStoryId) incrementPlayCount(lastSavedStoryId);
+    launchConfetti();
+
     // Everything worked: clean URL and clear saved session
     window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('storytold_story');
@@ -4186,12 +4257,14 @@ function renderLibrary(stories) {
     const bg = catBg[s.category] || '#F5EEFF';
     const card = document.createElement('div');
     card.className = 'library-card';
+    const plays = getPlayCount(s.id);
     card.innerHTML = `
       <div class="lib-cat-stripe" style="background:${color}"></div>
       <div class="lib-icon" style="background:${bg}">${catEmoji[s.category] || '\u{2728}'}</div>
       <div class="lib-info">
         <div class="lib-name">${escHtml(s.childName)}'s ${catLabel[s.category] || 'Story'}</div>
         <div class="lib-meta">${date}</div>
+        ${plays > 0 ? '<div class="lib-plays"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Played ' + plays + (plays === 1 ? ' time' : ' times') + '</div>' : ''}
         ${giftUnsent ? '<span class="lib-badge" style="background:#FF8C42">Gift: not sent yet</span>' : ''}
         ${s.isGift && s.giftSent ? '<span class="lib-badge" style="background:#00B4A0">Gift sent</span>' : ''}
       </div>
@@ -4483,10 +4556,143 @@ function playLibraryStory(story) {
   document.getElementById('fullTitle').textContent = story.childName + "'s story";
   // Set story ID so share button works from library playback
   lastSavedStoryId = story.id;
+  // Story card and play count for library playback
+  populateStoryCard(story.childName, story.category, story);
+  setupReadAlong(story.storyText || '');
+  incrementPlayCount(story.id);
   goTo('screenFull');
   audio.play();
   bgMusic.play(currentPlayingCategory, audio);
   document.getElementById('fullPlayIcon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+}
+
+// ===== STORY CARD =====
+function populateStoryCard(childName, category, extras) {
+  const card = document.getElementById('storyCard');
+  if (!card) return;
+  const catEmoji = { bedtime:'\u{1F319}', journey:'\u{2728}', learning:'\u{1F4DA}' };
+  const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure' };
+  document.getElementById('storyCardEmoji').textContent = catEmoji[category] || '\u{2728}';
+  document.getElementById('storyCardName').textContent = childName + "'s Story";
+  document.getElementById('storyCardType').textContent = catLabel[category] || 'Story';
+  // Build featuring line from extras
+  var parts = [];
+  if (extras && extras.friendName) parts.push(extras.friendName);
+  if (extras && extras.petName) parts.push(extras.petName + (extras.petType ? ' the ' + extras.petType : ''));
+  if (extras && extras.villainName) parts.push(extras.villainName);
+  if (extras && extras.familyMembers) parts.push(extras.familyMembers);
+  var featuring = document.getElementById('storyCardFeaturing');
+  if (parts.length > 0) {
+    featuring.textContent = 'Featuring ' + parts.join(', ');
+    featuring.style.display = 'block';
+  } else {
+    featuring.style.display = 'none';
+  }
+  card.style.display = 'block';
+}
+
+// ===== CONFETTI =====
+function launchConfetti() {
+  var colors = ['#7C5CFC','#FF8C42','#FF6B9D','#00B4A0','#FFD700','#9B7CFF'];
+  for (var i = 0; i < 40; i++) {
+    var piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random() * 100) + 'vw';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 0.8) + 's';
+    document.body.appendChild(piece);
+    setTimeout(function(el) { el.remove(); }.bind(null, piece), 5000);
+  }
+}
+
+// ===== READ ALONG =====
+function toggleReadAlong() {
+  var content = document.getElementById('readAlongContent');
+  var label = document.getElementById('readAlongLabel');
+  if (content.classList.contains('open')) {
+    content.classList.remove('open');
+    label.textContent = 'Read along';
+  } else {
+    content.classList.add('open');
+    label.textContent = 'Close story text';
+  }
+}
+function setupReadAlong(text) {
+  var wrap = document.getElementById('readAlongWrap');
+  var textEl = document.getElementById('readAlongText');
+  var content = document.getElementById('readAlongContent');
+  var label = document.getElementById('readAlongLabel');
+  if (!text || !text.trim()) { wrap.style.display = 'none'; return; }
+  textEl.textContent = text;
+  content.classList.remove('open');
+  label.textContent = 'Read along';
+  wrap.style.display = 'block';
+}
+
+// ===== PLAY COUNT =====
+function incrementPlayCount(storyId) {
+  if (!storyId) return;
+  var key = 'st_plays_' + storyId;
+  var count = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+  localStorage.setItem(key, count);
+  return count;
+}
+function getPlayCount(storyId) {
+  if (!storyId) return 0;
+  return parseInt(localStorage.getItem('st_plays_' + storyId) || '0', 10);
+}
+
+// ===== QR CODE =====
+// Minimal QR code generator (alphanumeric URLs only, version 4 or less)
+function generateQR(canvas, text) {
+  // Use a simple approach: load qrcode lib from CDN if not present
+  if (typeof QRCode === 'undefined') {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    s.onload = function() { renderQR(canvas, text); };
+    document.head.appendChild(s);
+  } else {
+    renderQR(canvas, text);
+  }
+}
+function renderQR(canvas, text) {
+  // qrcodejs uses a div, so we create a temp div, render, then draw to canvas
+  var tmp = document.createElement('div');
+  tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px';
+  document.body.appendChild(tmp);
+  new QRCode(tmp, { text: text, width: 200, height: 200, colorDark: '#1a1a2e', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  setTimeout(function() {
+    var img = tmp.querySelector('img') || tmp.querySelector('canvas');
+    if (img) {
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, 200, 200);
+      if (img.tagName === 'CANVAS') {
+        ctx.drawImage(img, 0, 0, 200, 200);
+      } else {
+        var i2 = new Image();
+        i2.onload = function() { ctx.drawImage(i2, 0, 0, 200, 200); };
+        i2.src = img.src;
+      }
+    }
+    tmp.remove();
+  }, 100);
+}
+function showQrCode() {
+  if (!lastSavedStoryId) return;
+  var url = window.location.origin + '/?story=' + lastSavedStoryId;
+  var canvas = document.getElementById('qrCanvas');
+  generateQR(canvas, url);
+  var displayedFor = document.getElementById('fullStoryFor')?.textContent || '';
+  var name = displayedFor.replace('A story for ', '').trim();
+  document.getElementById('qrChildLabel').textContent = name ? name + "'s story" : 'Their story';
+  document.getElementById('qrOverlay').classList.add('active');
+}
+function closeQrModal() {
+  document.getElementById('qrOverlay').classList.remove('active');
 }
 
 // Cookie consent
@@ -4527,7 +4733,7 @@ if (!stVisitorId) {
 
   fetch('/api/story-count').then(function(r) { return r.json(); }).then(function(data) {
     var target = data.count || 0;
-    if (target < 1) return;
+    if (target < 50) return;
     counterEl.style.display = 'block';
 
     // Count up animation when element scrolls into view
