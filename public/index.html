@@ -1695,7 +1695,17 @@ function switchSample(type, btn) {
   sampleMilestones = {};
   var howEl = document.getElementById('howItWorksExample');
   if (howEl && data.howit) { howEl.textContent = data.howit; }
-  if (wasPlaying) { playSample(); }
+  if (wasPlaying) {
+    var trackKey = type;
+    var musicSrc = sampleMusicTracks[trackKey];
+    music.src = musicSrc;
+    music.setAttribute('data-track', trackKey);
+    music.load();
+    music.volume = 0.25;
+    audio.play();
+    music.play().catch(function(e) { console.log('[sampleMusic switch] ' + e.message); });
+    document.getElementById('sampleIcon').innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
+  }
 }
 function playSample() {
   var audio = document.getElementById('sampleAudio');
@@ -1721,6 +1731,7 @@ function playSample() {
     if (music.getAttribute('data-track') !== trackKey) {
       music.src = musicSrc;
       music.setAttribute('data-track', trackKey);
+      music.load();
     }
     music.currentTime = 0;
     music.volume = 0.25;
