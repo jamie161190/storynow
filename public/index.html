@@ -1848,8 +1848,15 @@ const bgMusic = {
   },
 
   play(category, narrationEl) {
-    if (!bgMusicEnabled) return;
-    var newAudio = this.audioEls[category] || this.audioEls.journey;
+    var dbg = document.getElementById('bgMusicDebug');
+    if (!dbg) { dbg = document.createElement('div'); dbg.id = 'bgMusicDebug'; dbg.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:black;color:lime;font-size:11px;padding:6px 10px;z-index:99999;font-family:monospace;max-height:120px;overflow:auto;'; document.body.appendChild(dbg); }
+    function log(msg) { dbg.innerHTML += msg + '<br>'; dbg.scrollTop = dbg.scrollHeight; }
+    log('play(' + category + ') enabled=' + bgMusicEnabled);
+    if (!bgMusicEnabled) { log('BLOCKED: bgMusicEnabled=false'); return; }
+    var newAudio = this.audioEls[category];
+    log('audioEl exists: ' + !!newAudio + ' | keys: ' + Object.keys(this.audioEls).join(','));
+    if (!newAudio) { newAudio = this.audioEls.journey; log('FALLBACK to journey'); }
+    log('src: ' + (newAudio ? newAudio.src : 'none') + ' | readyState: ' + (newAudio ? newAudio.readyState : 'n/a'));
     this.currentNarration = narrationEl;
     if (this.fadeInterval) clearInterval(this.fadeInterval);
 
@@ -1865,10 +1872,11 @@ const bgMusic = {
     this.setVolume(0);
     var self = this;
     newAudio.play().then(function() {
+      log('PLAY OK! fading to ' + self.targetVolume);
       self.isPlaying = true;
       self.fadeTo(self.targetVolume);
     }).catch(function(e) {
-      console.log('[bgMusic] blocked:', e.message);
+      log('PLAY FAILED: ' + e.name + ': ' + e.message);
     });
   },
 
