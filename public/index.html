@@ -254,6 +254,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ===== SAMPLE PLAYER ===== */
 .sample-player{width:100%;max-width:380px;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;box-shadow:var(--shadow);margin:0.25rem auto 0}
+.sample-pills{display:flex;gap:0.35rem;margin-bottom:0.7rem}
+.sample-pill{flex:1;padding:0.45rem 0.3rem;border:2px solid var(--border);border-radius:var(--radius-full);font-size:0.7rem;font-weight:700;font-family:'Quicksand',sans-serif;color:var(--text-soft);background:var(--card);cursor:pointer;transition:all 0.2s;text-align:center}
+.sample-pill:hover{border-color:var(--purple-soft);color:var(--purple)}
+.sample-pill.active{background:var(--purple);border-color:var(--purple);color:white}
 .sample-label{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem}
 .sample-row{display:flex;align-items:center;gap:0.85rem}
 .sample-play-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--purple),#9B7CFF);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(124,92,252,0.3);transition:transform 0.2s}
@@ -595,7 +599,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
     <div style="padding:1rem 1.2rem">
       <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
-      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I built something where he could. Now every child can have the same thing.</p>
+      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend Ellis, his Pikachu. So I built something where he could. Now every child can have the same thing.</p>
     </div>
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">them</span> by name.</h1>
@@ -603,7 +607,12 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer">
-    <div class="sample-label">I built this for my son. Press play and hear what happened.</div>
+    <div class="sample-label">I built these for my son Chase. Press play.</div>
+    <div class="sample-pills">
+      <button class="sample-pill active" onclick="switchSample('bedtime',this)">Bedtime</button>
+      <button class="sample-pill" onclick="switchSample('adventure',this)">Adventure</button>
+      <button class="sample-pill" onclick="switchSample('learning',this)">Learning</button>
+    </div>
     <div class="sample-row">
       <button class="sample-play-btn" id="samplePlayBtn" onclick="playSample()">
         <svg id="sampleIcon" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
@@ -611,14 +620,14 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <div class="sample-wave">
         <div class="sample-progress-bar"><div class="sample-progress-fill" id="sampleFill"></div></div>
         <div class="sample-meta">
-          <span class="sample-name">Chase Goes to Space</span>
+          <span class="sample-name" id="sampleName">The Moon's Secret</span>
           <span class="sample-time" id="sampleTime">0:00</span>
         </div>
       </div>
     </div>
     <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Make one for a child you love. Or give one as a gift they will never forget.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.2rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
-    <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
+    <audio id="sampleAudio" preload="auto"></audio>
   </div>
 
   <!-- FIRST CTA (after the proof) -->
@@ -634,10 +643,10 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p class="how-title">Here is what happens</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
-        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">5</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they love <strong style="color:var(--purple)">dinosaurs</strong>, sleep with a bunny called <strong style="color:var(--purple)">Mr Flopsy</strong>, are scared of the dark but pretend they are not, and <strong style="color:var(--purple)">Daddy is the villain</strong>.
+        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they have a <strong style="color:var(--purple)">Pikachu</strong> they take everywhere, are scared of the dark but pretend they are not, and <strong style="color:var(--purple)">Daddy is the villain</strong>.
       </p>
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
-        I write a story where a spaceship lands in the garden, a small green alien tells Chase that Daddy has stolen every star from the sky, and now Chase and Ellis have to go to space to get them back, Mr Flopsy tucked under one arm. Narrated in the voice you choose. Ready in a few minutes.
+        I write a story where the moon whispers a secret only Chase can hear, Pikachu's ears twitch in the dark, and now Chase and Ellis have to figure out what Daddy has been hiding before morning. Narrated in the voice you choose. Ready in a few minutes.
       </p>
       <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
     </div>
@@ -1636,28 +1645,52 @@ function trackEvent(eventName, params, options) {
 }
 
 // Landing page sample player
+var currentSample = 'bedtime';
+var sampleData = {
+  bedtime:   { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-bedtime.mp3',   name: "The Moon's Secret",    music: 'bedtime' },
+  adventure: { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3', name: "The Pikachu Coin",      music: 'journey' },
+  learning:  { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-learning.mp3',  name: "The Wrong Card",        music: 'learning' }
+};
+function switchSample(type, btn) {
+  if (type === currentSample) return;
+  var audio = document.getElementById('sampleAudio');
+  var wasPlaying = !audio.paused;
+  audio.pause();
+  bgMusic.stop();
+  currentSample = type;
+  var data = sampleData[type];
+  audio.src = data.src;
+  document.getElementById('sampleName').textContent = data.name;
+  document.getElementById('sampleFill').style.width = '0%';
+  document.getElementById('sampleTime').textContent = '0:00';
+  document.getElementById('sampleIcon').innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
+  var pills = document.querySelectorAll('.sample-pill');
+  pills.forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+  sampleMilestones = {};
+  if (wasPlaying) { audio.play(); playSample(); }
+}
 function playSample() {
   const audio = document.getElementById('sampleAudio');
   const icon = document.getElementById('sampleIcon');
   audio.volume = 0.75;
   if (audio.paused) {
     audio.play();
-    trackEvent('SamplePlay', { content_name: 'homepage_sample' });
-    // Track in page_views table so it shows in admin dashboard
+    trackEvent('SamplePlay', { content_name: 'homepage_sample_' + currentSample });
     fetch('/api/track-pageview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         page: '/',
-        screen_name: 'sample_play',
+        screen_name: 'sample_play_' + currentSample,
         device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
         visitor_id: stVisitorId
       })
     }).catch(() => {});
-    // Always play music on the homepage demo regardless of toggle state
+    var musicType = sampleData[currentSample].music;
     const wasEnabled = bgMusicEnabled;
     bgMusicEnabled = true;
-    bgMusic.play('journey', audio);
+    bgMusic.play(musicType, audio);
     bgMusicEnabled = wasEnabled;
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
   } else {
@@ -1666,10 +1699,10 @@ function playSample() {
     icon.innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
   }
 }
+var sampleMilestones = {};
 (function() {
   const sa = document.getElementById('sampleAudio');
   if (!sa) return;
-  var sampleMilestones = {};
   var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
   function trackSampleEvent(screenName) {
     fetch('/api/track-pageview', {
