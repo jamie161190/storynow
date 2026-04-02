@@ -608,7 +608,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">them</span> by name.</h1>
-  <p class="hero-text">Bedtime, adventure, or learning. Their name, their best friend, their world, woven into every scene. You choose the voice, the story type, and who appears. Ready in minutes.</p>
+  <p class="hero-text">Bedtime, adventure, or learning. Their name, their world, and everyone in it, woven into every scene. Ready in minutes.</p>
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer" data-cat="adventure">
@@ -657,7 +657,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p class="how-title">Here is what happens</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
-        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they have a <strong style="color:var(--purple)">Pikachu</strong> they take everywhere, and <strong style="color:var(--purple)">Daddy is the villain</strong>. Then you pick a story type.
+        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they have a <strong style="color:var(--purple)">Pikachu</strong> they take everywhere, and <strong style="color:var(--purple)">Daddy is the villain</strong>. You add whoever matters to them. Then you pick a story type.
       </p>
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
         <strong style="color:#5B3FD4">&#127769; Bedtime:</strong> the moon whispers a secret only Chase can hear, Pikachu's ears droop, and everything winds down until they drift off feeling safe.<br>
@@ -1785,6 +1785,7 @@ const bgMusic = {
   targetVolume: 0.28,
   currentVolume: 0,
   currentNarration: null,
+  currentTrack: null,
   isPlaying: false,
   useWebAudio: false,
 
@@ -1795,28 +1796,64 @@ const bgMusic = {
   },
 
   init() {
-    this.audio = new Audio();
-    this.audio.loop = true;
-    this.audio.preload = 'auto';
-
-    // Fallback: if loop fails on mobile, restart manually
-    this.audio.addEventListener('ended', () => {
-      if (this.isPlaying) {
-        this.audio.currentTime = 0;
-        this.audio.play().catch(() => {});
-      }
-    });
-
     // Keep AudioContext alive: check every 3s while music should be playing
     setInterval(() => {
       if (!this.isPlaying || !bgMusicEnabled) return;
       if (this.ctx && this.ctx.state === 'suspended') {
         this.ctx.resume().catch(() => {});
       }
-      if (this.audio.paused && this.isPlaying) {
+      if (this.audio && this.audio.paused && this.isPlaying) {
         this.audio.play().catch(() => {});
       }
     }, 3000);
+  },
+
+  // Build a fresh Audio element and wire it into the Web Audio graph.
+  // This avoids the mobile bug where changing src on a MediaElementSource
+  // silently kills playback.
+  _createAudio(trackUrl) {
+    // Tear down old audio element completely
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.removeAttribute('src');
+      this.audio.load();
+    }
+    if (this.source) {
+      try { this.source.disconnect(); } catch(e) {}
+      this.source = null;
+    }
+
+    const a = new Audio();
+    a.loop = true;
+    a.preload = 'auto';
+    a.crossOrigin = 'anonymous';
+    a.src = trackUrl;
+
+    // Fallback: if loop fails on mobile, restart manually
+    a.addEventListener('ended', () => {
+      if (this.isPlaying) {
+        a.currentTime = 0;
+        a.play().catch(() => {});
+      }
+    });
+
+    this.audio = a;
+
+    // Connect to Web Audio graph for iOS volume control
+    if (this.ctx) {
+      try {
+        if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+        this.source = this.ctx.createMediaElementSource(a);
+        this.source.connect(this.gainNode);
+        this.useWebAudio = true;
+        a.volume = 1;
+      } catch(e) {
+        console.log('[bgMusic] Web Audio connect failed, using fallback:', e.message);
+        this.useWebAudio = false;
+      }
+    }
+
+    return a;
   },
 
   // Create Web Audio context on first user gesture for iOS volume control.
@@ -1833,15 +1870,8 @@ const bgMusic = {
       this.gainNode = this.ctx.createGain();
       this.gainNode.gain.value = 0;
       this.gainNode.connect(this.ctx.destination);
-      this.source = this.ctx.createMediaElementSource(this.audio);
-      this.source.connect(this.gainNode);
-      this.useWebAudio = true;
-      // On iOS the audio element volume is ignored, so set to 1
-      // and let the gainNode handle actual volume
-      this.audio.volume = 1;
     } catch (e) {
-      console.log('[bgMusic] Web Audio init failed, using fallback:', e.message);
-      this.useWebAudio = false;
+      console.log('[bgMusic] Web Audio init failed:', e.message);
     }
   },
 
@@ -1850,7 +1880,7 @@ const bgMusic = {
     this.currentVolume = Math.max(0, Math.min(1, v));
     if (this.useWebAudio && this.gainNode) {
       this.gainNode.gain.value = this.currentVolume;
-    } else {
+    } else if (this.audio) {
       this.audio.volume = this.currentVolume;
     }
   },
@@ -1870,7 +1900,7 @@ const bgMusic = {
         clearInterval(this.fadeInterval);
         this.fadeInterval = null;
         this.setVolume(target);
-        if (target === 0) {
+        if (target === 0 && this.audio) {
           this.audio.pause();
           this.isPlaying = false;
         }
@@ -1886,25 +1916,19 @@ const bgMusic = {
     this.currentNarration = narrationEl;
     if (this.fadeInterval) clearInterval(this.fadeInterval);
 
-    const self = this;
-    const startPlayback = function() {
-      self.setVolume(0);
-      self.audio.play().then(function() {
-        self.isPlaying = true;
-        self.fadeTo(self.targetVolume);
-      }).catch(function(e) {
-        console.log('[bgMusic] blocked:', e.message);
-      });
-    };
-
-    const fullUrl = new URL(trackUrl, location.origin).href;
-    if (this.audio.src !== fullUrl) {
-      this.audio.src = trackUrl;
-      this.audio.addEventListener('canplay', startPlayback, { once: true });
-      this.audio.load();
-    } else {
-      startPlayback();
+    // Only rebuild the audio element if the track actually changed
+    if (this.currentTrack !== category) {
+      this._createAudio(trackUrl);
+      this.currentTrack = category;
     }
+
+    this.setVolume(0);
+    this.audio.play().then(() => {
+      this.isPlaying = true;
+      this.fadeTo(this.targetVolume);
+    }).catch(e => {
+      console.log('[bgMusic] blocked:', e.message);
+    });
   },
 
   pause() {
@@ -1914,7 +1938,7 @@ const bgMusic = {
   },
 
   resume() {
-    if (!this.isPlaying && this.audio.src) {
+    if (!this.isPlaying && this.audio && this.audio.src) {
       this.ensureContext();
       this.setVolume(0);
       this.audio.play().then(() => {
@@ -1926,8 +1950,10 @@ const bgMusic = {
 
   stop() {
     if (this.fadeInterval) clearInterval(this.fadeInterval);
-    this.audio.pause();
-    this.audio.currentTime = 0;
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.currentTime = 0;
+    }
     this.setVolume(0);
     this.isPlaying = false;
     this.currentNarration = null;
