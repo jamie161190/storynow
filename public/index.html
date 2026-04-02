@@ -1777,17 +1777,14 @@ function escHtml(str) {
 // Uses a separate Audio element that syncs with the narration.
 // ============================================================
 const bgMusic = {
-  audio: null,
-  ctx: null,
-  gainNode: null,
-  source: null,
+  audioEls: {},
+  activeAudio: null,
   fadeInterval: null,
   targetVolume: 0.28,
   currentVolume: 0,
   currentNarration: null,
   currentTrack: null,
   isPlaying: false,
-  useWebAudio: false,
 
   tracks: {
     bedtime:  '/music/bedtime-ambient.mp3?v=5',
@@ -1796,137 +1793,81 @@ const bgMusic = {
   },
 
   init() {
-    // Keep AudioContext alive: check every 3s while music should be playing
-    setInterval(() => {
-      if (!this.isPlaying || !bgMusicEnabled) return;
-      if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume().catch(() => {});
-      }
-      if (this.audio && this.audio.paused && this.isPlaying) {
-        this.audio.play().catch(() => {});
+    // Pre-create one Audio element per track so we never swap src
+    var self = this;
+    Object.keys(this.tracks).forEach(function(key) {
+      var a = new Audio();
+      a.loop = true;
+      a.preload = 'auto';
+      a.volume = 0;
+      a.src = self.tracks[key];
+      a.addEventListener('ended', function() {
+        if (self.isPlaying && self.activeAudio === a) {
+          a.currentTime = 0;
+          a.play().catch(function() {});
+        }
+      });
+      self.audioEls[key] = a;
+    });
+
+    // Keep music alive on mobile: check every 3s
+    setInterval(function() {
+      if (!self.isPlaying || !bgMusicEnabled || !self.activeAudio) return;
+      if (self.activeAudio.paused && self.isPlaying) {
+        self.activeAudio.play().catch(function() {});
       }
     }, 3000);
   },
 
-  // Build a fresh Audio element and wire it into the Web Audio graph.
-  // This avoids the mobile bug where changing src on a MediaElementSource
-  // silently kills playback.
-  _createAudio(trackUrl) {
-    // Tear down old audio element completely
-    if (this.audio) {
-      this.audio.pause();
-      this.audio.removeAttribute('src');
-      this.audio.load();
-    }
-    if (this.source) {
-      try { this.source.disconnect(); } catch(e) {}
-      this.source = null;
-    }
-
-    const a = new Audio();
-    a.loop = true;
-    a.preload = 'auto';
-    a.crossOrigin = 'anonymous';
-    a.src = trackUrl;
-
-    // Fallback: if loop fails on mobile, restart manually
-    a.addEventListener('ended', () => {
-      if (this.isPlaying) {
-        a.currentTime = 0;
-        a.play().catch(() => {});
-      }
-    });
-
-    this.audio = a;
-
-    // Connect to Web Audio graph for iOS volume control
-    if (this.ctx) {
-      try {
-        if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
-        this.source = this.ctx.createMediaElementSource(a);
-        this.source.connect(this.gainNode);
-        this.useWebAudio = true;
-        a.volume = 1;
-      } catch(e) {
-        console.log('[bgMusic] Web Audio connect failed, using fallback:', e.message);
-        this.useWebAudio = false;
-      }
-    }
-
-    return a;
-  },
-
-  // Create Web Audio context on first user gesture for iOS volume control.
-  // Falls back to audio.volume on desktop if Web Audio fails.
-  ensureContext() {
-    if (this.ctx) {
-      if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
-      return;
-    }
-    try {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      this.ctx = new AC();
-      this.gainNode = this.ctx.createGain();
-      this.gainNode.gain.value = 0;
-      this.gainNode.connect(this.ctx.destination);
-    } catch (e) {
-      console.log('[bgMusic] Web Audio init failed:', e.message);
-    }
-  },
-
-  // Set volume through whichever method works
   setVolume(v) {
     this.currentVolume = Math.max(0, Math.min(1, v));
-    if (this.useWebAudio && this.gainNode) {
-      this.gainNode.gain.value = this.currentVolume;
-    } else if (this.audio) {
-      this.audio.volume = this.currentVolume;
-    }
+    if (this.activeAudio) this.activeAudio.volume = this.currentVolume;
   },
 
-  // Fade volume smoothly
   fadeTo(target, duration) {
     if (this.fadeInterval) clearInterval(this.fadeInterval);
-    const steps = 30;
-    const stepTime = (duration || 1500) / steps;
-    const startVal = this.currentVolume;
-    const diff = (target - startVal) / steps;
-    let step = 0;
-    this.fadeInterval = setInterval(() => {
+    var steps = 30;
+    var stepTime = (duration || 1500) / steps;
+    var startVal = this.currentVolume;
+    var diff = (target - startVal) / steps;
+    var step = 0;
+    var self = this;
+    this.fadeInterval = setInterval(function() {
       step++;
-      this.setVolume(startVal + diff * step);
+      self.setVolume(startVal + diff * step);
       if (step >= steps) {
-        clearInterval(this.fadeInterval);
-        this.fadeInterval = null;
-        this.setVolume(target);
-        if (target === 0 && this.audio) {
-          this.audio.pause();
-          this.isPlaying = false;
+        clearInterval(self.fadeInterval);
+        self.fadeInterval = null;
+        self.setVolume(target);
+        if (target === 0 && self.activeAudio) {
+          self.activeAudio.pause();
+          self.isPlaying = false;
         }
       }
     }, stepTime);
   },
 
-  // Start background music for a given category
   play(category, narrationEl) {
     if (!bgMusicEnabled) return;
-    this.ensureContext();
-    const trackUrl = this.tracks[category] || this.tracks.journey;
+    var newAudio = this.audioEls[category] || this.audioEls.journey;
     this.currentNarration = narrationEl;
     if (this.fadeInterval) clearInterval(this.fadeInterval);
 
-    // Only rebuild the audio element if the track actually changed
-    if (this.currentTrack !== category) {
-      this._createAudio(trackUrl);
-      this.currentTrack = category;
+    // If switching tracks, stop the old one
+    if (this.activeAudio && this.activeAudio !== newAudio) {
+      this.activeAudio.pause();
+      this.activeAudio.currentTime = 0;
+      this.activeAudio.volume = 0;
     }
 
+    this.activeAudio = newAudio;
+    this.currentTrack = category;
     this.setVolume(0);
-    this.audio.play().then(() => {
-      this.isPlaying = true;
-      this.fadeTo(this.targetVolume);
-    }).catch(e => {
+    var self = this;
+    newAudio.play().then(function() {
+      self.isPlaying = true;
+      self.fadeTo(self.targetVolume);
+    }).catch(function(e) {
       console.log('[bgMusic] blocked:', e.message);
     });
   },
@@ -1938,21 +1879,21 @@ const bgMusic = {
   },
 
   resume() {
-    if (!this.isPlaying && this.audio && this.audio.src) {
-      this.ensureContext();
+    if (!this.isPlaying && this.activeAudio) {
       this.setVolume(0);
-      this.audio.play().then(() => {
-        this.isPlaying = true;
-        this.fadeTo(this.targetVolume, 800);
-      }).catch(() => {});
+      var self = this;
+      this.activeAudio.play().then(function() {
+        self.isPlaying = true;
+        self.fadeTo(self.targetVolume, 800);
+      }).catch(function() {});
     }
   },
 
   stop() {
     if (this.fadeInterval) clearInterval(this.fadeInterval);
-    if (this.audio) {
-      this.audio.pause();
-      this.audio.currentTime = 0;
+    if (this.activeAudio) {
+      this.activeAudio.pause();
+      this.activeAudio.currentTime = 0;
     }
     this.setVolume(0);
     this.isPlaying = false;
@@ -1966,12 +1907,9 @@ document.addEventListener('visibilitychange', () => {
   if (!bgMusicEnabled || !bgMusic.currentNarration) return;
   if (document.visibilityState === 'visible') {
     // Screen unlocked or tab refocused: resume AudioContext and music
-    if (bgMusic.ctx && bgMusic.ctx.state === 'suspended') {
-      bgMusic.ctx.resume().catch(() => {});
-    }
-    if (!bgMusic.isPlaying && bgMusic.audio.src) {
+    if (!bgMusic.isPlaying && bgMusic.activeAudio) {
       bgMusic.setVolume(0);
-      bgMusic.audio.play().then(() => {
+      bgMusic.activeAudio.play().then(() => {
         bgMusic.isPlaying = true;
         bgMusic.fadeTo(bgMusic.targetVolume, 800);
       }).catch(() => {});
@@ -2053,9 +1991,8 @@ function goTo(id, skipHistory) {
       if (a && !a.paused) { stillPlaying = true; break; }
     }
     if (stillPlaying) {
-      if (bgMusic.ctx && bgMusic.ctx.state === 'suspended') bgMusic.ctx.resume().catch(() => {});
-      if (bgMusic.audio.paused) {
-        bgMusic.audio.play().then(() => bgMusic.fadeTo(bgMusic.targetVolume, 800)).catch(() => {});
+      if (bgMusic.activeAudio && bgMusic.activeAudio.paused) {
+        bgMusic.activeAudio.play().then(() => bgMusic.fadeTo(bgMusic.targetVolume, 800)).catch(() => {});
       }
     }
   }
