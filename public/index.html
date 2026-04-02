@@ -146,7 +146,7 @@ fbq('track', 'PageView');
       "name": "I have more than one child. Can they all be in it?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. You can also make a completely separate story where another child is the hero."
+        "text": "Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase."
       }
     },
     {
@@ -264,6 +264,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .sample-meta{display:flex;justify-content:space-between;align-items:center;margin-top:0.4rem}
 .sample-name{font-size:0.78rem;font-weight:700;color:var(--text);font-family:'Nunito',sans-serif}
 .sample-time{font-size:0.72rem;color:var(--text-muted);font-weight:600}
+.sample-pills{display:flex;gap:0.4rem;margin-bottom:0.7rem}
+.sample-pill{font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;padding:0.3rem 0.85rem;border-radius:999px;border:2px solid var(--border);background:var(--bg);color:var(--text-muted);cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.03em}
+.sample-pill:hover{border-color:var(--purple-soft);color:var(--text)}
+.sample-pill.active[data-cat="bedtime"]{background:linear-gradient(135deg,var(--purple),#9B7CFF);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(124,92,252,0.25)}
+.sample-pill.active[data-cat="adventure"]{background:linear-gradient(135deg,#E06B20,#FF8C42);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(255,140,66,0.25)}
 
 .trust-row{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:0.5rem}
 .trust-item{display:flex;align-items:center;gap:0.3rem;font-size:0.78rem;color:var(--text-muted);font-weight:600}
@@ -591,26 +596,37 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div class="logo-wrap" id="sectionHero">
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
+  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-bottom:0.6rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
+    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
+    <div style="padding:1rem 1.2rem">
+      <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
+      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I built something where he could. Now every child can have the same thing.</p>
+    </div>
+  </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">them</span> by name.</h1>
   <p class="hero-text">A bedtime story where they are the hero. Their name, their best friend, their pet, even you as the villain. All woven into the adventure. Narrated by a voice you choose, ready in minutes.</p>
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
-  <div class="sample-player" id="samplePlayer">
-    <div class="sample-label">I built this for my son. Press play and hear what happened.</div>
+  <div class="sample-player" id="samplePlayer" data-cat="bedtime">
+    <div class="sample-label">I made these for my son Chase. Press play.</div>
+    <div class="sample-pills">
+      <button class="sample-pill active" data-cat="bedtime" onclick="switchSample('bedtime',this)">Bedtime</button>
+      <button class="sample-pill" data-cat="adventure" onclick="switchSample('adventure',this)">Adventure</button>
+    </div>
     <div class="sample-row">
-      <button class="sample-play-btn" id="samplePlayBtn" onclick="playSample()">
+      <button class="sample-play-btn" id="samplePlayBtn" data-cat="bedtime" onclick="playSample()">
         <svg id="sampleIcon" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
       </button>
       <div class="sample-wave">
         <div class="sample-progress-bar"><div class="sample-progress-fill" id="sampleFill"></div></div>
         <div class="sample-meta">
-          <span class="sample-name">Chase Goes to Space</span>
+          <span class="sample-name" id="sampleName">Chase Goes to Space</span>
           <span class="sample-time" id="sampleTime">0:00</span>
         </div>
       </div>
     </div>
-    <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Make one for a child you love. Or give one as a gift they will never forget.</p>
-    <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.2rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
+    <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase and Ellis are in bed when something appears in the room. A gentle story to fall asleep to.</p>
+    <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.35rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
 
@@ -620,15 +636,6 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Siblings, friends, and family can all appear in the story.</p>
     <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
-  </div>
-
-  <!-- FOUNDER STORY (trust builder after first CTA) -->
-  <div id="sectionFounder" style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
-    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
-    <div style="padding:1rem 1.2rem">
-      <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
-      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I built something where he could. Now every child can have the same thing.</p>
-    </div>
   </div>
 
   <!-- HOW IT WORKS (concrete example only, no numbered steps) -->
@@ -685,7 +692,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have more than one child. Can they all be in it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. You can also make a completely separate story where another child is the hero.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What ages does this work for?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -1638,20 +1645,72 @@ function trackEvent(eventName, params, options) {
 }
 
 // Landing page sample player
+var sampleData = {
+  bedtime: {
+    src: '/sample-story.mp3',
+    name: 'Chase Goes to Space',
+    desc: 'Chase and Ellis are in bed when something appears in the room. A gentle story to fall asleep to.',
+    track: 'journey'
+  },
+  adventure: {
+    src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3',
+    name: 'The Pikachu Coin',
+    desc: 'Chase, Ellis, a glowing coin, and Daddy one step ahead the whole time.',
+    track: 'journey'
+  }
+};
+var currentSample = 'bedtime';
+
+function switchSample(cat, btn) {
+  if (cat === currentSample) return;
+  var audio = document.getElementById('sampleAudio');
+  var wasPlaying = !audio.paused;
+  // Stop current playback
+  if (wasPlaying) {
+    audio.pause();
+    bgMusic.stop();
+  }
+  // Reset player state
+  audio.currentTime = 0;
+  document.getElementById('sampleIcon').innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
+  document.getElementById('sampleFill').style.width = '0%';
+  document.getElementById('sampleTime').textContent = '0:00';
+  // Update pill styles
+  document.querySelectorAll('.sample-pill').forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+  // Switch content
+  var data = sampleData[cat];
+  audio.src = data.src;
+  document.getElementById('sampleName').textContent = data.name;
+  document.getElementById('sampleDesc').textContent = data.desc;
+  document.getElementById('samplePlayer').dataset.cat = cat;
+  document.getElementById('samplePlayBtn').dataset.cat = cat;
+  currentSample = cat;
+  // Update play button color
+  var playBtn = document.getElementById('samplePlayBtn');
+  if (cat === 'adventure') {
+    playBtn.style.background = 'linear-gradient(135deg,#E06B20,#FF8C42)';
+    playBtn.style.boxShadow = '0 3px 12px rgba(255,140,66,0.3)';
+  } else {
+    playBtn.style.background = 'linear-gradient(135deg,var(--purple),#9B7CFF)';
+    playBtn.style.boxShadow = '0 3px 12px rgba(124,92,252,0.3)';
+  }
+}
+
 function playSample() {
   const audio = document.getElementById('sampleAudio');
   const icon = document.getElementById('sampleIcon');
   audio.volume = 0.75;
   if (audio.paused) {
     audio.play();
-    trackEvent('SamplePlay', { content_name: 'homepage_sample' });
+    trackEvent('SamplePlay', { content_name: 'homepage_sample_' + currentSample });
     // Track in page_views table so it shows in admin dashboard
     fetch('/api/track-pageview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         page: '/',
-        screen_name: 'sample_play',
+        screen_name: 'sample_play_' + currentSample,
         device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
         visitor_id: stVisitorId
       })
@@ -1659,7 +1718,7 @@ function playSample() {
     // Always play music on the homepage demo regardless of toggle state
     const wasEnabled = bgMusicEnabled;
     bgMusicEnabled = true;
-    bgMusic.play('journey', audio);
+    bgMusic.play(sampleData[currentSample].track, audio);
     bgMusicEnabled = wasEnabled;
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
   } else {
@@ -1736,7 +1795,7 @@ const bgMusic = {
 
   tracks: {
     bedtime:  '/music/bedtime-ambient.mp3?v=4',
-    journey:  '/music/adventure-ambient.mp3?v=4',
+    journey:  '/music/adventure-ambient.mp3?v=5',
     learning: '/music/learning-ambient.mp3?v=4',
   },
 
