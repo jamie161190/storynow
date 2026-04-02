@@ -612,12 +612,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer" data-cat="adventure">
-    <div class="sample-label">I made these for my son Chase. Press play.</div>
-    <div class="sample-pills">
-      <button class="sample-pill" data-cat="bedtime" onclick="switchSample('bedtime',this)">Bedtime</button>
-      <button class="sample-pill active" data-cat="adventure" onclick="switchSample('adventure',this)">Adventure</button>
-      <button class="sample-pill" data-cat="learning" onclick="switchSample('learning',this)">Learning</button>
-    </div>
+    <div class="sample-label">I made this for my son Chase. Press play.</div>
     <div class="sample-row">
       <button class="sample-play-btn" id="samplePlayBtn" data-cat="adventure" onclick="playSample()">
         <svg id="sampleIcon" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
@@ -632,6 +627,11 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     </div>
     <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase, Ellis, a glowing coin, and Daddy one step ahead the whole time.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.35rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid var(--border)">
+      <span style="font-size:0.7rem;color:var(--text-muted);font-weight:600">Also available as</span>
+      <span style="font-size:0.68rem;font-weight:700;color:#7C5CFC;background:rgba(124,92,252,0.08);padding:0.2rem 0.55rem;border-radius:20px">Bedtime</span>
+      <span style="font-size:0.68rem;font-weight:700;color:#00B4A0;background:rgba(0,180,160,0.08);padding:0.2rem 0.55rem;border-radius:20px">Learning</span>
+    </div>
     <audio id="sampleAudio" src="https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3" preload="auto"></audio>
     <audio id="sampleMusic" loop preload="none"></audio>
   </div>
@@ -660,7 +660,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
         You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they have a <strong style="color:var(--purple)">Pikachu</strong> they take everywhere, and <strong style="color:var(--purple)">Daddy is the villain</strong>. You add whoever matters to them.
       </p>
-      <p id="howItWorksExample" style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
+      <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
         I write a story where Chase and Ellis race through a world where Pikachu holds the only clue, and Daddy is one step ahead the whole time. Narrated in the voice you choose. Ready in a few minutes.
       </p>
       <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
