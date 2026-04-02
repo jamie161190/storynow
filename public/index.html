@@ -146,7 +146,7 @@ fbq('track', 'PageView');
       "name": "I have more than one child. Can they all be in it?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase."
+        "text": "Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. You can also make a completely separate story where another child is the hero."
       }
     },
     {
@@ -612,7 +612,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer" data-cat="adventure">
-    <div class="sample-label">I built these for my son Chase. Press play.</div>
+    <div class="sample-label">I made these for my son Chase. Press play.</div>
     <div class="sample-pills">
       <button class="sample-pill" data-cat="bedtime" onclick="switchSample('bedtime',this)">Bedtime</button>
       <button class="sample-pill active" data-cat="adventure" onclick="switchSample('adventure',this)">Adventure</button>
@@ -630,7 +630,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         </div>
       </div>
     </div>
-    <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase and Ellis discover a coin that won't stop glowing, and Daddy is one step ahead. An adventure that keeps them guessing until the very end.</p>
+    <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase, Ellis, a glowing coin, and Daddy one step ahead the whole time.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.35rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
     <audio id="sampleAudio" src="https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3" preload="auto"></audio>
     <audio id="sampleMusic" loop preload="none"></audio>
@@ -653,20 +653,15 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     </div>
   </div>
 
-  <!-- HOW IT WORKS -->
+  <!-- HOW IT WORKS (swaps per active sample pill) -->
   <div class="how-it-works" id="sectionHowItWorks">
     <p class="how-title">Here is what happens</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
-        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they have a <strong style="color:var(--purple)">Pikachu</strong> they take everywhere, and <strong style="color:var(--purple)">Daddy is the villain</strong>. You add whoever matters to them. Then you pick a story type.
+        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they have a <strong style="color:var(--purple)">Pikachu</strong> they take everywhere, and <strong style="color:var(--purple)">Daddy is the villain</strong>. You add whoever matters to them.
       </p>
-      <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
-        <strong style="color:#5B3FD4">&#127769; Bedtime:</strong> the moon whispers a secret only Chase can hear, Pikachu's ears droop, and everything winds down until they drift off feeling safe.<br>
-        <strong style="color:#E06B20">&#9968;&#65039; Adventure:</strong> Chase and Ellis race through a world where Pikachu holds the only clue, and Daddy is one step ahead the whole time.<br>
-        <strong style="color:#008F7F">&#128218; Learning:</strong> Chase has to solve real problems, spot patterns, and figure things out before the story lets him move forward.
-      </p>
-      <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
-        Narrated in the voice you choose. Ready in a few minutes.
+      <p id="howItWorksExample" style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
+        I write a story where Chase and Ellis race through a world where Pikachu holds the only clue, and Daddy is one step ahead the whole time. Narrated in the voice you choose. Ready in a few minutes.
       </p>
       <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
     </div>
@@ -684,7 +679,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <!-- SECOND CTA (gift angle for careful scrollers) -->
   <div class="cta-group" id="sectionCta2">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Make one now</button>
-    <p style="font-size:0.82rem;color:var(--text);font-weight:600;text-align:center;margin:-0.15rem 0 0">For your child, your grandchild, your niece, your godson. Or give it as a gift they will never forget.</p>
+    <p style="font-size:0.82rem;color:var(--text);font-weight:600;text-align:center;margin:-0.15rem 0 0">For any child you love. Or give it as a gift they will never forget.</p>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:0.3rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Siblings, friends, and family can all appear in the story.</p>
     <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
@@ -713,7 +708,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have more than one child. Can they all be in it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. You can also make a completely separate story where another child is the hero.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What ages does this work for?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -1668,9 +1663,9 @@ function trackEvent(eventName, params, options) {
 // Landing page sample player
 var currentSample = 'adventure';
 var sampleData = {
-  bedtime:   { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-bedtime.mp3',   name: "The Moon's Secret",    music: 'bedtime',  desc: "The moon whispers a secret only Chase can hear, Pikachu\u2019s ears droop, and everything winds down until he drifts off feeling safe." },
-  adventure: { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3', name: "The Pikachu Coin",      music: 'journey',  desc: "Chase and Ellis discover a coin that won\u2019t stop glowing, and Daddy is one step ahead. An adventure that keeps them guessing until the very end." },
-  learning:  { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-learning.mp3',  name: "The Wrong Card",        music: 'learning', desc: "Chase picks the wrong card and the whole game changes. Now he has to spot patterns, think fast, and figure out what he missed before time runs out." }
+  bedtime:   { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-bedtime.mp3',   name: "The Moon's Secret",    music: 'bedtime',  desc: "Chase, Ellis, Pikachu, and a secret only he can hear. Gentle enough to fall asleep to.", howit: "I write a story where Chase and Ellis follow Pikachu through a moonlit world, with a secret only Chase can hear, while Daddy watches from the shadows. Narrated in the voice you choose. Ready in a few minutes." },
+  adventure: { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3', name: "The Pikachu Coin",      music: 'journey',  desc: "Chase, Ellis, a glowing coin, and Daddy one step ahead the whole time.", howit: "I write a story where Chase and Ellis race through a world where Pikachu holds the only clue, and Daddy is one step ahead the whole time. Narrated in the voice you choose. Ready in a few minutes." },
+  learning:  { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-learning.mp3',  name: "The Wrong Card",        music: 'learning', desc: "Chase picks the wrong card. Now he has to spot patterns and think fast.", howit: "I write a story where Chase picks the wrong card and has to outsmart the puzzle with Ellis and Pikachu by his side, while Daddy sets every trap. Narrated in the voice you choose. Ready in a few minutes." }
 };
 var sampleMusicTracks = {
   bedtime:  '/music/bedtime-ambient.mp3?v=6',
@@ -1698,6 +1693,8 @@ function switchSample(type, btn) {
   pills.forEach(function(p) { p.classList.remove('active'); });
   btn.classList.add('active');
   sampleMilestones = {};
+  var howEl = document.getElementById('howItWorksExample');
+  if (howEl && data.howit) { howEl.textContent = data.howit; }
   if (wasPlaying) { playSample(); }
 }
 function playSample() {
