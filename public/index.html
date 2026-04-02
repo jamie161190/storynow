@@ -1344,9 +1344,10 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div class="preview-container">
     <div class="preview-badge">&#10003; Preview ready</div>
     <p class="preview-title" id="previewTitle">Have a listen</p>
-    <p class="preview-sub" id="previewSub">Here is a taste of their story. If it feels right, unlock the full version.</p>
-    <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.85rem 1rem;margin-bottom:1.5rem;text-align:left;max-width:340px;width:100%"></div>
-    <div class="audio-player" onclick="playPreview()">
+    <p class="preview-sub" id="previewSub">This is just the opening. Press play and hear their name in the story.</p>
+
+    <!-- Player FIRST: the single most important action -->
+    <div class="audio-player" onclick="playPreview()" style="margin-bottom:0.25rem">
       <svg class="play-icon" id="previewPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
     <div style="width:100%;max-width:340px;margin:0.5rem auto 0">
@@ -1354,33 +1355,42 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <div style="display:flex;justify-content:space-between;margin-top:0.2rem"><span id="previewTime" style="font-size:0.7rem;color:var(--text-muted)">0:00</span><span id="previewDuration" style="font-size:0.7rem;color:var(--text-muted)">0:00</span></div>
     </div>
     <audio id="previewAudio"></audio>
-    <div id="storyTextPreview" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin:0.75rem auto 0;max-width:340px;width:100%;text-align:left;font-size:0.88rem;line-height:1.65;color:var(--text);display:none;max-height:200px;overflow:hidden;position:relative">
-      <div id="storyTextContent" style="font-style:italic"></div>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(transparent,var(--card))"></div>
-    </div>
+
+    <!-- Summary of what they built (below player) -->
+    <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.85rem 1rem;margin:1.25rem 0 0;text-align:left;max-width:340px;width:100%"></div>
+
+    <!-- Social proof -->
+    <p id="previewProof" style="font-size:0.78rem;color:var(--text-muted);font-style:italic;font-weight:500;margin:1rem 0 0;line-height:1.5;max-width:340px">"My daughter asked to hear it three times before bed." <span style="font-style:normal;font-weight:700;color:var(--text-soft)">&#11088;</span></p>
+
     <div id="previewError"></div>
-    <div id="previewEmailWrap" style="width:100%;max-width:340px;margin:0.75rem auto 1rem">
+
+    <!-- Guarantee card -->
+    <div style="background:linear-gradient(135deg,#F0FFF4,#F8F5FF);border:2px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin:1.25rem auto 0;max-width:340px;width:100%;text-align:center">
+      <p style="font-size:0.85rem;font-weight:800;color:var(--text);margin:0 0 0.2rem">&#128154; Not magical enough? I will rewrite it for free.</p>
+      <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin:0">No questions asked. You will love it or I will make it right.</p>
+    </div>
+
+    <!-- Email (low friction, just above unlock) -->
+    <div id="previewEmailWrap" style="width:100%;max-width:340px;margin:1.25rem auto 0">
       <div id="previewEmailConfirm" style="display:none;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;text-align:left">
-        <p style="font-size:0.72rem;color:var(--text-muted);margin:0 0 0.15rem;font-weight:600">I'll send the full story to:</p>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin:0 0 0.15rem;font-weight:600">I will send the full story to:</p>
         <div style="display:flex;justify-content:space-between;align-items:center">
           <p id="previewEmailDisplay" style="font-size:0.92rem;font-weight:700;color:var(--purple);margin:0"></p>
           <a onclick="document.getElementById('previewEmailConfirm').style.display='none';document.getElementById('previewEmailEdit').style.display='block';document.getElementById('previewEmail').focus()" style="font-size:0.72rem;color:var(--purple);font-weight:700;cursor:pointer">Change</a>
         </div>
       </div>
       <div id="previewEmailEdit" style="display:none">
-        <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email</label>
+        <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Where should I send the full story?</label>
         <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
-        <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.25rem;text-align:left">I will send the full story here.</p>
       </div>
       <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
     </div>
 
-
-    <p class="unlock-price" id="unlockSub" style="margin-bottom:0.5rem">15 minutes long. Download, share with family, keep forever.</p>
-    <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()">&#128275; Unlock the full story for £19.99</button>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.5rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
-    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.3rem 0 0">&#128274; Secure payment via Stripe. No subscription.</p>
-    <a onclick="goTo('screenReview')" style="font-size:0.78rem;color:var(--purple);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">Want to change something? Go back</a>
+    <!-- Unlock CTA -->
+    <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()" style="margin-top:1rem">&#128275; Unlock the full story for £19.99</button>
+    <p class="unlock-price" id="unlockSub" style="margin-top:0.5rem;margin-bottom:0">The full story is 15 minutes of magic. Download it, share it, keep it forever.</p>
+    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.4rem 0 0">&#128274; Secure payment via Stripe. No subscription, no hidden fees.</p>
+    <a onclick="goTo('screenReview')" style="font-size:0.75rem;color:var(--text-muted);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">&#8592; Edit story details</a>
   </div>
 </div>
 
@@ -3199,7 +3209,7 @@ async function generatePreview() {
     audio.addEventListener('ended', audio._stEnd);
 
     // Personalise unlock button with child's name
-    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story for £19.99';
+    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story &mdash; £19.99';
 
     clearInterval(msgInterval);
     clearInterval(pillInterval);
@@ -3210,8 +3220,8 @@ async function generatePreview() {
     const catLabels = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story' };
     const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
     document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
-    document.getElementById('previewTitle').textContent = `${storyData.childName}'s preview is ready`;
-    document.getElementById('previewSub').textContent = 'Press play to hear a sample. Love it? Unlock the full 15 minute story.';
+    document.getElementById('previewTitle').textContent = `${storyData.childName}'s story is waiting`;
+    document.getElementById('previewSub').textContent = `This is just the opening. The full story is 15 minutes of ${storyData.childName} as the hero.`;
     let summary = `<p style="font-size:0.78rem;color:var(--cat-accent-dark,var(--purple));font-weight:700;margin:0 0 0.4rem">What you built:</p>`;
     summary += `<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500">`;
     summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} for <strong>${escHtml(storyData.childName)}</strong>`;
@@ -3231,14 +3241,6 @@ async function generatePreview() {
       }
     }
     document.getElementById('previewSummary').innerHTML = summary;
-
-    // Show the preview story text below the player
-    const storySnippetText = previewStoryText || fullStoryText;
-    if (storySnippetText) {
-      const paragraphs = storySnippetText.split(/\n\n+/).filter(p => p.trim().length > 0);
-      document.getElementById('storyTextContent').innerHTML = '<p style="margin:0.5rem 0">' + escHtml(paragraphs.slice(0, 3).join('\n\n')).replace(/\n\n/g, '</p><p style="margin:0.5rem 0">') + '</p>';
-      document.getElementById('storyTextPreview').style.display = 'block';
-    }
 
     goTo('screenPreview');
   } catch(err) {
