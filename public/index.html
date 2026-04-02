@@ -3529,17 +3529,17 @@ async function handleStripeReturn() {
       document.getElementById('savedEmailNote').style.display = 'block';
     }
 
-    // Story card, read along, confetti, play count (post-purchase enhancements)
+    // Story card, read along, play count (post-purchase enhancements)
     populateStoryCard(storyData.childName, storyData.category, storyData);
     setupReadAlong(fullStoryText);
     if (lastSavedStoryId) incrementPlayCount(lastSavedStoryId);
-    launchConfetti();
 
     // Everything worked: clean URL and clear saved session
     window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('storytold_story');
     goTo('screenFull');
     showNextStoryBanner(verifyData.customerEmail, discountCode, discountPercent);
+    launchConfetti();
   } catch(err) {
     stopGeneratingScreen();
     console.error('Story generation error:', err.message, err.stack);
@@ -4685,7 +4685,7 @@ function renderQR(canvas, text) {
 }
 function showQrCode() {
   if (!lastSavedStoryId) return;
-  var url = window.location.origin + '/?story=' + lastSavedStoryId;
+  var url = window.location.origin + '/?listen=' + lastSavedStoryId;
   var canvas = document.getElementById('qrCanvas');
   generateQR(canvas, url);
   var displayedFor = document.getElementById('fullStoryFor')?.textContent || '';
