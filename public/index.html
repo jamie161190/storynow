@@ -1777,8 +1777,7 @@ function escHtml(str) {
 // Uses a separate Audio element that syncs with the narration.
 // ============================================================
 const bgMusic = {
-  audioEls: {},
-  activeAudio: null,
+  audio: null,
   fadeInterval: null,
   targetVolume: 0.28,
   currentVolume: 0,
@@ -1793,35 +1792,27 @@ const bgMusic = {
   },
 
   init() {
-    // Pre-create one Audio element per track so we never swap src
     var self = this;
-    Object.keys(this.tracks).forEach(function(key) {
-      var a = new Audio();
-      a.loop = true;
-      a.preload = 'auto';
-      a.volume = 0;
-      a.src = self.tracks[key];
-      a.addEventListener('ended', function() {
-        if (self.isPlaying && self.activeAudio === a) {
-          a.currentTime = 0;
-          a.play().catch(function() {});
-        }
-      });
-      self.audioEls[key] = a;
+    this.audio = new Audio();
+    this.audio.loop = true;
+    this.audio.volume = 0;
+    this.audio.addEventListener('ended', function() {
+      if (self.isPlaying) {
+        self.audio.currentTime = 0;
+        self.audio.play().catch(function() {});
+      }
     });
-
-    // Keep music alive on mobile: check every 3s
     setInterval(function() {
-      if (!self.isPlaying || !bgMusicEnabled || !self.activeAudio) return;
-      if (self.activeAudio.paused && self.isPlaying) {
-        self.activeAudio.play().catch(function() {});
+      if (!self.isPlaying || !bgMusicEnabled) return;
+      if (self.audio.paused && self.isPlaying) {
+        self.audio.play().catch(function() {});
       }
     }, 3000);
   },
 
   setVolume(v) {
     this.currentVolume = Math.max(0, Math.min(1, v));
-    if (this.activeAudio) this.activeAudio.volume = this.currentVolume;
+    if (this.audio) this.audio.volume = this.currentVolume;
   },
 
   fadeTo(target, duration) {
@@ -1839,8 +1830,8 @@ const bgMusic = {
         clearInterval(self.fadeInterval);
         self.fadeInterval = null;
         self.setVolume(target);
-        if (target === 0 && self.activeAudio) {
-          self.activeAudio.pause();
+        if (target === 0) {
+          self.audio.pause();
           self.isPlaying = false;
         }
       }
@@ -1848,35 +1839,26 @@ const bgMusic = {
   },
 
   play(category, narrationEl) {
-    var dbg = document.getElementById('bgMusicDebug');
-    if (!dbg) { dbg = document.createElement('div'); dbg.id = 'bgMusicDebug'; dbg.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:black;color:lime;font-size:11px;padding:6px 10px;z-index:99999;font-family:monospace;max-height:120px;overflow:auto;'; document.body.appendChild(dbg); }
-    function log(msg) { dbg.innerHTML += msg + '<br>'; dbg.scrollTop = dbg.scrollHeight; }
-    log('play(' + category + ') enabled=' + bgMusicEnabled);
-    if (!bgMusicEnabled) { log('BLOCKED: bgMusicEnabled=false'); return; }
-    var newAudio = this.audioEls[category];
-    log('audioEl exists: ' + !!newAudio + ' | keys: ' + Object.keys(this.audioEls).join(','));
-    if (!newAudio) { newAudio = this.audioEls.journey; log('FALLBACK to journey'); }
-    log('src: ' + (newAudio ? newAudio.src : 'none') + ' | readyState: ' + (newAudio ? newAudio.readyState : 'n/a'));
+    if (!bgMusicEnabled) return;
+    var trackUrl = this.tracks[category] || this.tracks.journey;
     this.currentNarration = narrationEl;
     if (this.fadeInterval) clearInterval(this.fadeInterval);
 
-    // If switching tracks, stop the old one
-    if (this.activeAudio && this.activeAudio !== newAudio) {
-      this.activeAudio.pause();
-      this.activeAudio.currentTime = 0;
-      this.activeAudio.volume = 0;
+    var fullUrl = new URL(trackUrl, location.origin).href;
+    if (this.audio.src !== fullUrl) {
+      this.audio.src = trackUrl;
+      this.audio.load();
     }
 
-    this.activeAudio = newAudio;
     this.currentTrack = category;
-    this.setVolume(0);
+    this.audio.volume = 0;
+    this.currentVolume = 0;
     var self = this;
-    newAudio.play().then(function() {
-      log('PLAY OK! fading to ' + self.targetVolume);
+    this.audio.play().then(function() {
       self.isPlaying = true;
       self.fadeTo(self.targetVolume);
     }).catch(function(e) {
-      log('PLAY FAILED: ' + e.name + ': ' + e.message);
+      console.log('[bgMusic] play failed:', e.message);
     });
   },
 
@@ -1887,10 +1869,11 @@ const bgMusic = {
   },
 
   resume() {
-    if (!this.isPlaying && this.activeAudio) {
-      this.setVolume(0);
+    if (!this.isPlaying && this.audio.src) {
+      this.audio.volume = 0;
+      this.currentVolume = 0;
       var self = this;
-      this.activeAudio.play().then(function() {
+      this.audio.play().then(function() {
         self.isPlaying = true;
         self.fadeTo(self.targetVolume, 800);
       }).catch(function() {});
@@ -1899,11 +1882,10 @@ const bgMusic = {
 
   stop() {
     if (this.fadeInterval) clearInterval(this.fadeInterval);
-    if (this.activeAudio) {
-      this.activeAudio.pause();
-      this.activeAudio.currentTime = 0;
-    }
-    this.setVolume(0);
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.audio.volume = 0;
+    this.currentVolume = 0;
     this.isPlaying = false;
     this.currentNarration = null;
   }
@@ -1915,9 +1897,9 @@ document.addEventListener('visibilitychange', () => {
   if (!bgMusicEnabled || !bgMusic.currentNarration) return;
   if (document.visibilityState === 'visible') {
     // Screen unlocked or tab refocused: resume AudioContext and music
-    if (!bgMusic.isPlaying && bgMusic.activeAudio) {
+    if (!bgMusic.isPlaying && bgMusic.audio && bgMusic.audio.src) {
       bgMusic.setVolume(0);
-      bgMusic.activeAudio.play().then(() => {
+      bgMusic.audio.play().then(() => {
         bgMusic.isPlaying = true;
         bgMusic.fadeTo(bgMusic.targetVolume, 800);
       }).catch(() => {});
@@ -1999,8 +1981,8 @@ function goTo(id, skipHistory) {
       if (a && !a.paused) { stillPlaying = true; break; }
     }
     if (stillPlaying) {
-      if (bgMusic.activeAudio && bgMusic.activeAudio.paused) {
-        bgMusic.activeAudio.play().then(() => bgMusic.fadeTo(bgMusic.targetVolume, 800)).catch(() => {});
+      if (bgMusic.audio && bgMusic.audio.paused) {
+        bgMusic.audio.play().then(() => bgMusic.fadeTo(bgMusic.targetVolume, 800)).catch(() => {});
       }
     }
   }
