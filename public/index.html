@@ -172,6 +172,14 @@ fbq('track', 'PageView');
         "@type": "Answer",
         "text": "About 5 minutes from start to finish. You will see a progress screen while it is being written and narrated."
       }
+    },
+    {
+      "@type": "Question",
+      "name": "I have a request or idea for a cool feature.",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "I love hearing ideas. Drop me an email at hello@storytold.ai and tell me what you are thinking. I read every single message and the best ideas get built."
+      }
     }
   ]
 }
@@ -663,6 +671,13 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;font-weight:600;font-style:italic">Lisa, mum to Livvie (age 4)</p>
   </div>
 
+  <!-- STORY COUNTER -->
+  <div id="storyCounter" style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center;display:none">
+    <p style="margin:0"><span id="storyCountNum" style="font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--purple),#9B7CFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0</span></p>
+    <p style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin:0.1rem 0 0">stories created so far</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:500;margin:0.3rem 0 0">Every single one written from scratch. No two are the same.</p>
+  </div>
+
   <!-- SECOND CTA -->
   <div class="cta-group" id="sectionCta2">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Make it for a child you love</button>
@@ -707,6 +722,10 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long does the full story take to generate?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
         <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">About 5 minutes from start to finish. You will see a progress screen while it is being written and narrated.</p>
+      </details>
+      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
+        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have a request or idea for a cool feature.<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">I love hearing ideas. Drop me an email at <a href="mailto:hello@storytold.ai" style="color:var(--purple);font-weight:700">hello@storytold.ai</a> and tell me what you are thinking. I read every single message and the best ideas get built.</p>
       </details>
     </div>
   </div>
@@ -4498,6 +4517,43 @@ if (!stVisitorId) {
   stVisitorId = 'v_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   localStorage.setItem('st_vid', stVisitorId);
 }
+
+// ===== STORY COUNTER =====
+(function loadStoryCount() {
+  var counterEl = document.getElementById('storyCounter');
+  var numEl = document.getElementById('storyCountNum');
+  if (!counterEl || !numEl) return;
+  var counted = false;
+
+  fetch('/api/story-count').then(function(r) { return r.json(); }).then(function(data) {
+    var target = data.count || 0;
+    if (target < 1) return;
+    counterEl.style.display = 'block';
+
+    // Count up animation when element scrolls into view
+    function animateCount() {
+      if (counted) return;
+      var rect = counterEl.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        counted = true;
+        var duration = 1200;
+        var start = performance.now();
+        function tick(now) {
+          var elapsed = now - start;
+          var progress = Math.min(elapsed / duration, 1);
+          // Ease out cubic
+          var eased = 1 - Math.pow(1 - progress, 3);
+          numEl.textContent = Math.floor(eased * target).toLocaleString();
+          if (progress < 1) requestAnimationFrame(tick);
+          else numEl.textContent = target.toLocaleString();
+        }
+        requestAnimationFrame(tick);
+      }
+    }
+    window.addEventListener('scroll', animateCount, { passive: true });
+    animateCount();
+  }).catch(function() {});
+})();
 
 // ===== LIGHTWEIGHT PAGE VIEW TRACKING =====
 (function trackPageView() {
