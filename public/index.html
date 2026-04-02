@@ -146,7 +146,7 @@ fbq('track', 'PageView');
       "name": "I have more than one child. Can they all be in it?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. You can also make a completely separate story where another child is the hero."
+        "text": "Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase."
       }
     },
     {
@@ -254,29 +254,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ===== SAMPLE PLAYER ===== */
 .sample-player{width:100%;max-width:380px;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;box-shadow:var(--shadow);margin:0.25rem auto 0}
-.sample-pills{display:flex;gap:0.35rem;margin-bottom:0.7rem}
-.sample-pill{flex:1;padding:0.45rem 0.3rem;border:2px solid var(--border);border-radius:var(--radius-full);font-size:0.7rem;font-weight:700;font-family:'Quicksand',sans-serif;color:var(--text-soft);background:var(--card);cursor:pointer;transition:all 0.2s;text-align:center}
-.sample-pill:hover{border-color:var(--purple-soft);color:var(--purple)}
-.sample-pill.active{background:var(--purple);border-color:var(--purple);color:white}
-.sample-pill.active[data-cat="bedtime"]{background:#7C5CFC;border-color:#7C5CFC}
-.sample-pill.active[data-cat="adventure"]{background:#FF8C42;border-color:#FF8C42}
-.sample-pill.active[data-cat="learning"]{background:#00B4A0;border-color:#00B4A0}
-.sample-pill:hover[data-cat="bedtime"]{border-color:#7C5CFC;color:#7C5CFC}
-.sample-pill:hover[data-cat="adventure"]{border-color:#FF8C42;color:#FF8C42}
-.sample-pill:hover[data-cat="learning"]{border-color:#00B4A0;color:#00B4A0}
 .sample-label{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem}
 .sample-row{display:flex;align-items:center;gap:0.85rem}
-.sample-play-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--purple),#9B7CFF);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(124,92,252,0.3);transition:all 0.3s}
+.sample-play-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--purple),#9B7CFF);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(124,92,252,0.3);transition:transform 0.2s}
 .sample-play-btn:hover{transform:scale(1.08)}
-.sample-play-btn[data-cat="bedtime"]{background:linear-gradient(135deg,#5B3FD4,#7C5CFC);box-shadow:0 3px 12px rgba(124,92,252,0.3)}
-.sample-play-btn[data-cat="adventure"]{background:linear-gradient(135deg,#E06B20,#FF8C42);box-shadow:0 3px 12px rgba(255,140,66,0.3)}
-.sample-play-btn[data-cat="learning"]{background:linear-gradient(135deg,#008F7F,#00B4A0);box-shadow:0 3px 12px rgba(0,180,160,0.3)}
 .sample-wave{flex:1;min-width:0}
 .sample-progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
 .sample-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--orange));border-radius:3px;transition:width 0.1s linear}
-.sample-player[data-cat="bedtime"] .sample-progress-fill{background:linear-gradient(90deg,#5B3FD4,#B8A9FF)}
-.sample-player[data-cat="adventure"] .sample-progress-fill{background:linear-gradient(90deg,#E06B20,#FFAD6E)}
-.sample-player[data-cat="learning"] .sample-progress-fill{background:linear-gradient(90deg,#008F7F,#4DD9C9)}
 .sample-meta{display:flex;justify-content:space-between;align-items:center;margin-top:0.4rem}
 .sample-name{font-size:0.78rem;font-weight:700;color:var(--text);font-family:'Nunito',sans-serif}
 .sample-time{font-size:0.72rem;color:var(--text-muted);font-weight:600}
@@ -607,33 +591,34 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div class="logo-wrap" id="sectionHero">
     <img src="/logo.svg" alt="Storytold" class="logo-img">
   </div>
+  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-bottom:0.6rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
+    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
+    <div style="padding:1rem 1.2rem">
+      <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
+      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I built something where he could. Now every child can have the same thing.</p>
+    </div>
+  </div>
   <h1 class="tagline">Audio stories that know <span class="highlight">them</span> by name.</h1>
-  <p class="hero-text">Bedtime, adventure, or learning. Their name, their world, and everyone in it, woven into every scene. Ready in minutes.</p>
+  <p class="hero-text">A bedtime story where they are the hero. Their name, their best friend, their pet, even you as the villain. All woven into the adventure. Narrated by a voice you choose, ready in minutes.</p>
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
-  <div class="sample-player" id="samplePlayer" data-cat="adventure">
-    <div class="sample-label">I made this for my son Chase. Press play.</div>
+  <div class="sample-player" id="samplePlayer">
+    <div class="sample-label">I built this for my son. Press play and hear what happened.</div>
     <div class="sample-row">
-      <button class="sample-play-btn" id="samplePlayBtn" data-cat="adventure" onclick="playSample()">
+      <button class="sample-play-btn" id="samplePlayBtn" onclick="playSample()">
         <svg id="sampleIcon" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
       </button>
       <div class="sample-wave">
         <div class="sample-progress-bar"><div class="sample-progress-fill" id="sampleFill"></div></div>
         <div class="sample-meta">
-          <span class="sample-name" id="sampleName">The Pikachu Coin</span>
+          <span class="sample-name">Chase Goes to Space</span>
           <span class="sample-time" id="sampleTime">0:00</span>
         </div>
       </div>
     </div>
-    <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase, Ellis, a glowing coin, and Daddy one step ahead the whole time.</p>
-    <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.35rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
-    <div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin-top:0.65rem;padding-top:0.65rem;border-top:1px solid var(--border)">
-      <span style="font-size:0.7rem;color:var(--text-muted);font-weight:600">Also available as</span>
-      <span style="font-size:0.68rem;font-weight:700;color:#7C5CFC;background:rgba(124,92,252,0.08);padding:0.2rem 0.55rem;border-radius:20px">Bedtime</span>
-      <span style="font-size:0.68rem;font-weight:700;color:#00B4A0;background:rgba(0,180,160,0.08);padding:0.2rem 0.55rem;border-radius:20px">Learning</span>
-    </div>
-    <audio id="sampleAudio" src="https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3" preload="auto"></audio>
-    <audio id="sampleMusic" loop preload="none"></audio>
+    <p style="font-size:0.82rem;color:var(--text);margin-top:0.6rem;text-align:center;font-weight:600">Make one for a child you love. Or give one as a gift they will never forget.</p>
+    <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.2rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
+    <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
 
   <!-- FIRST CTA (after the proof) -->
@@ -644,24 +629,15 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
   </div>
 
-  <!-- FOUNDER STORY (trust builder after first CTA) -->
-  <div id="sectionFounder" style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
-    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
-    <div style="padding:1rem 1.2rem">
-      <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
-      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend Ellis, his Pikachu. So I built something where he could. Now every child can have the same thing.</p>
-    </div>
-  </div>
-
-  <!-- HOW IT WORKS (swaps per active sample pill) -->
+  <!-- HOW IT WORKS (concrete example only, no numbered steps) -->
   <div class="how-it-works" id="sectionHowItWorks">
     <p class="how-title">Here is what happens</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
-        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they have a <strong style="color:var(--purple)">Pikachu</strong> they take everywhere, and <strong style="color:var(--purple)">Daddy is the villain</strong>. You add whoever matters to them.
+        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">5</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they love <strong style="color:var(--purple)">dinosaurs</strong>, sleep with a bunny called <strong style="color:var(--purple)">Mr Flopsy</strong>, are scared of the dark but pretend they are not, and <strong style="color:var(--purple)">Daddy is the villain</strong>.
       </p>
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
-        I write a story where Chase and Ellis race through a world where Pikachu holds the only clue, and Daddy is one step ahead the whole time. Narrated in the voice you choose. Ready in a few minutes.
+        I write a story where a spaceship lands in the garden, a small green alien tells Chase that Daddy has stolen every star from the sky, and now Chase and Ellis have to go to space to get them back, Mr Flopsy tucked under one arm. Narrated in the voice you choose. Ready in a few minutes.
       </p>
       <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
     </div>
@@ -676,12 +652,11 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;font-weight:600;font-style:italic">Lisa, mum to Livvie (age 4)</p>
   </div>
 
-  <!-- SECOND CTA (gift angle for careful scrollers) -->
+  <!-- SECOND CTA -->
   <div class="cta-group" id="sectionCta2">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Make one now</button>
-    <p style="font-size:0.82rem;color:var(--text);font-weight:600;text-align:center;margin:-0.15rem 0 0">For any child you love. Or give it as a gift they will never forget.</p>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:0.3rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Siblings, friends, and family can all appear in the story.</p>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
+    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Add siblings, friends, and family. Everyone gets a real role.</p>
     <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.2rem 0 0">&#128274; Secure payment via Stripe. No subscription. You own it forever.</p>
   </div>
@@ -708,7 +683,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have more than one child. Can they all be in it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. You can also make a completely separate story where another child is the hero.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What ages does this work for?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -1661,92 +1636,40 @@ function trackEvent(eventName, params, options) {
 }
 
 // Landing page sample player
-var currentSample = 'adventure';
-var sampleData = {
-  bedtime:   { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-bedtime.mp3',   name: "The Moon's Secret",    music: 'bedtime',  desc: "Chase and Ellis are in bed when something appears in the room. A gentle story to fall asleep to.", howit: "I write a story where Chase and Ellis are lying in bed, Pikachu between them, when something appears in the corner of the room. Something only Chase can see. And before he knows it, he is following it into a world that feels like a dream. Narrated in the voice you choose. Ready in a few minutes." },
-  adventure: { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-adventure.mp3', name: "The Pikachu Coin",      music: 'journey',  desc: "Chase, Ellis, a glowing coin, and Daddy one step ahead the whole time.", howit: "I write a story where Chase and Ellis race through a world where Pikachu holds the only clue, and Daddy is one step ahead the whole time. Narrated in the voice you choose. Ready in a few minutes." },
-  learning:  { src: 'https://sxypxaahnknqnlqmorjc.supabase.co/storage/v1/object/public/stories/sample-learning.mp3',  name: "The Wrong Card",        music: 'learning', desc: "Three numbers, sixty seconds, and Daddy setting every trap. Chase has to out-think them all.", howit: "I write a story where Chase faces a room full of number puzzles, with Ellis spotting the clues, Pikachu racing ahead, and Daddy setting every trap. Narrated in the voice you choose. Ready in a few minutes." }
-};
-var sampleMusicTracks = {
-  bedtime:  '/music/bedtime-ambient.mp3?v=6',
-  adventure: '/music/adventure-ambient.mp3?v=6',
-  learning: '/music/learning-ambient.mp3?v=6'
-};
-function switchSample(type, btn) {
-  if (type === currentSample) return;
-  var audio = document.getElementById('sampleAudio');
-  var music = document.getElementById('sampleMusic');
-  var wasPlaying = !audio.paused;
-  audio.pause();
-  music.pause();
-  currentSample = type;
-  var data = sampleData[type];
-  audio.src = data.src;
-  document.getElementById('sampleName').textContent = data.name;
-  document.getElementById('sampleDesc').textContent = data.desc;
-  document.getElementById('sampleFill').style.width = '0%';
-  document.getElementById('sampleTime').textContent = '0:00';
-  document.getElementById('sampleIcon').innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
-  document.getElementById('samplePlayer').setAttribute('data-cat', type);
-  document.getElementById('samplePlayBtn').setAttribute('data-cat', type);
-  var pills = document.querySelectorAll('.sample-pill');
-  pills.forEach(function(p) { p.classList.remove('active'); });
-  btn.classList.add('active');
-  sampleMilestones = {};
-  var howEl = document.getElementById('howItWorksExample');
-  if (howEl && data.howit) { howEl.textContent = data.howit; }
-  if (wasPlaying) {
-    var trackKey = type;
-    var musicSrc = sampleMusicTracks[trackKey];
-    music.src = musicSrc;
-    music.setAttribute('data-track', trackKey);
-    music.load();
-    music.volume = 0.25;
-    audio.play();
-    music.play().catch(function(e) { console.log('[sampleMusic switch] ' + e.message); });
-    document.getElementById('sampleIcon').innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
-  }
-}
 function playSample() {
-  var audio = document.getElementById('sampleAudio');
-  var music = document.getElementById('sampleMusic');
-  var icon = document.getElementById('sampleIcon');
+  const audio = document.getElementById('sampleAudio');
+  const icon = document.getElementById('sampleIcon');
   audio.volume = 0.75;
   if (audio.paused) {
     audio.play();
-    trackEvent('SamplePlay', { content_name: 'homepage_sample_' + currentSample });
+    trackEvent('SamplePlay', { content_name: 'homepage_sample' });
+    // Track in page_views table so it shows in admin dashboard
     fetch('/api/track-pageview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         page: '/',
-        screen_name: 'sample_play_' + currentSample,
+        screen_name: 'sample_play',
         device: window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop',
         visitor_id: stVisitorId
       })
     }).catch(() => {});
-    // Play background music directly via DOM audio element
-    var trackKey = currentSample === 'adventure' ? 'adventure' : currentSample;
-    var musicSrc = sampleMusicTracks[trackKey];
-    if (music.getAttribute('data-track') !== trackKey) {
-      music.src = musicSrc;
-      music.setAttribute('data-track', trackKey);
-      music.load();
-    }
-    music.currentTime = 0;
-    music.volume = 0.25;
-    music.play().catch(function(e) { console.log('[sampleMusic] ' + e.message); });
+    // Always play music on the homepage demo regardless of toggle state
+    const wasEnabled = bgMusicEnabled;
+    bgMusicEnabled = true;
+    bgMusic.play('journey', audio);
+    bgMusicEnabled = wasEnabled;
     icon.innerHTML = '<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';
   } else {
     audio.pause();
-    music.pause();
+    bgMusic.pause();
     icon.innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
   }
 }
-var sampleMilestones = {};
 (function() {
   const sa = document.getElementById('sampleAudio');
   if (!sa) return;
+  var sampleMilestones = {};
   var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
   function trackSampleEvent(screenName) {
     fetch('/api/track-pageview', {
@@ -1778,7 +1701,7 @@ var sampleMilestones = {};
     document.getElementById('sampleIcon').innerHTML = '<path d="M8 5v14l11-7z" fill="white"/>';
     document.getElementById('sampleFill').style.width = '0%';
     document.getElementById('sampleTime').textContent = '0:00';
-    var sm = document.getElementById('sampleMusic'); if (sm) { sm.pause(); sm.currentTime = 0; }
+    bgMusic.stop();
     if (!sampleMilestones['100']) { sampleMilestones['100'] = true; trackSampleEvent('sample_100pct'); }
   });
   sa.addEventListener('error', () => {
@@ -1799,87 +1722,123 @@ function escHtml(str) {
 // ============================================================
 const bgMusic = {
   audio: null,
+  ctx: null,
+  gainNode: null,
+  source: null,
   fadeInterval: null,
   targetVolume: 0.28,
   currentVolume: 0,
   currentNarration: null,
-  currentTrack: null,
   isPlaying: false,
+  useWebAudio: false,
 
   tracks: {
-    bedtime:  '/music/bedtime-ambient.mp3?v=6',
-    journey:  '/music/adventure-ambient.mp3?v=6',
-    learning: '/music/learning-ambient.mp3?v=6',
+    bedtime:  '/music/bedtime-ambient.mp3?v=4',
+    journey:  '/music/adventure-ambient.mp3?v=4',
+    learning: '/music/learning-ambient.mp3?v=4',
   },
 
   init() {
-    var self = this;
     this.audio = new Audio();
     this.audio.loop = true;
-    this.audio.volume = 0;
-    this.audio.addEventListener('ended', function() {
-      if (self.isPlaying) {
-        self.audio.currentTime = 0;
-        self.audio.play().catch(function() {});
+    this.audio.preload = 'auto';
+
+    // Fallback: if loop fails on mobile, restart manually
+    this.audio.addEventListener('ended', () => {
+      if (this.isPlaying) {
+        this.audio.currentTime = 0;
+        this.audio.play().catch(() => {});
       }
     });
-    setInterval(function() {
-      if (!self.isPlaying || !bgMusicEnabled) return;
-      if (self.audio.paused && self.isPlaying) {
-        self.audio.play().catch(function() {});
+
+    // Keep AudioContext alive: check every 3s while music should be playing
+    setInterval(() => {
+      if (!this.isPlaying || !bgMusicEnabled) return;
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+      if (this.audio.paused && this.isPlaying) {
+        this.audio.play().catch(() => {});
       }
     }, 3000);
   },
 
-  setVolume(v) {
-    this.currentVolume = Math.max(0, Math.min(1, v));
-    if (this.audio) this.audio.volume = this.currentVolume;
+  // Create Web Audio context on first user gesture for iOS volume control.
+  // Falls back to audio.volume on desktop if Web Audio fails.
+  ensureContext() {
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
+      return;
+    }
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      this.ctx = new AC();
+      this.gainNode = this.ctx.createGain();
+      this.gainNode.gain.value = 0;
+      this.gainNode.connect(this.ctx.destination);
+      this.source = this.ctx.createMediaElementSource(this.audio);
+      this.source.connect(this.gainNode);
+      this.useWebAudio = true;
+      // On iOS the audio element volume is ignored, so set to 1
+      // and let the gainNode handle actual volume
+      this.audio.volume = 1;
+    } catch (e) {
+      console.log('[bgMusic] Web Audio init failed, using fallback:', e.message);
+      this.useWebAudio = false;
+    }
   },
 
+  // Set volume through whichever method works
+  setVolume(v) {
+    this.currentVolume = Math.max(0, Math.min(1, v));
+    if (this.useWebAudio && this.gainNode) {
+      this.gainNode.gain.value = this.currentVolume;
+    } else {
+      this.audio.volume = this.currentVolume;
+    }
+  },
+
+  // Fade volume smoothly
   fadeTo(target, duration) {
     if (this.fadeInterval) clearInterval(this.fadeInterval);
-    var steps = 30;
-    var stepTime = (duration || 1500) / steps;
-    var startVal = this.currentVolume;
-    var diff = (target - startVal) / steps;
-    var step = 0;
-    var self = this;
-    this.fadeInterval = setInterval(function() {
+    const steps = 30;
+    const stepTime = (duration || 1500) / steps;
+    const startVal = this.currentVolume;
+    const diff = (target - startVal) / steps;
+    let step = 0;
+    this.fadeInterval = setInterval(() => {
       step++;
-      self.setVolume(startVal + diff * step);
+      this.setVolume(startVal + diff * step);
       if (step >= steps) {
-        clearInterval(self.fadeInterval);
-        self.fadeInterval = null;
-        self.setVolume(target);
+        clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
+        this.setVolume(target);
         if (target === 0) {
-          self.audio.pause();
-          self.isPlaying = false;
+          this.audio.pause();
+          this.isPlaying = false;
         }
       }
     }, stepTime);
   },
 
+  // Start background music for a given category
   play(category, narrationEl) {
     if (!bgMusicEnabled) return;
-    var trackUrl = this.tracks[category] || this.tracks.journey;
+    this.ensureContext();
+    const trackUrl = this.tracks[category] || this.tracks.journey;
     this.currentNarration = narrationEl;
-    if (this.fadeInterval) clearInterval(this.fadeInterval);
 
-    var fullUrl = new URL(trackUrl, location.origin).href;
-    if (this.audio.src !== fullUrl) {
+    if (this.audio.src !== new URL(trackUrl, location.origin).href) {
       this.audio.src = trackUrl;
-      this.audio.load();
     }
 
-    this.currentTrack = category;
-    this.audio.volume = 0;
-    this.currentVolume = 0;
-    var self = this;
-    this.audio.play().then(function() {
-      self.isPlaying = true;
-      self.fadeTo(self.targetVolume);
-    }).catch(function(e) {
-      console.log('[bgMusic] play failed:', e.message);
+    this.setVolume(0);
+    this.audio.play().then(() => {
+      this.isPlaying = true;
+      this.fadeTo(this.targetVolume);
+    }).catch(e => {
+      console.log('[bgMusic] blocked:', e.message);
     });
   },
 
@@ -1891,13 +1850,12 @@ const bgMusic = {
 
   resume() {
     if (!this.isPlaying && this.audio.src) {
-      this.audio.volume = 0;
-      this.currentVolume = 0;
-      var self = this;
-      this.audio.play().then(function() {
-        self.isPlaying = true;
-        self.fadeTo(self.targetVolume, 800);
-      }).catch(function() {});
+      this.ensureContext();
+      this.setVolume(0);
+      this.audio.play().then(() => {
+        this.isPlaying = true;
+        this.fadeTo(this.targetVolume, 800);
+      }).catch(() => {});
     }
   },
 
@@ -1905,8 +1863,7 @@ const bgMusic = {
     if (this.fadeInterval) clearInterval(this.fadeInterval);
     this.audio.pause();
     this.audio.currentTime = 0;
-    this.audio.volume = 0;
-    this.currentVolume = 0;
+    this.setVolume(0);
     this.isPlaying = false;
     this.currentNarration = null;
   }
@@ -1918,7 +1875,10 @@ document.addEventListener('visibilitychange', () => {
   if (!bgMusicEnabled || !bgMusic.currentNarration) return;
   if (document.visibilityState === 'visible') {
     // Screen unlocked or tab refocused: resume AudioContext and music
-    if (!bgMusic.isPlaying && bgMusic.audio && bgMusic.audio.src) {
+    if (bgMusic.ctx && bgMusic.ctx.state === 'suspended') {
+      bgMusic.ctx.resume().catch(() => {});
+    }
+    if (!bgMusic.isPlaying && bgMusic.audio.src) {
       bgMusic.setVolume(0);
       bgMusic.audio.play().then(() => {
         bgMusic.isPlaying = true;
@@ -2002,7 +1962,8 @@ function goTo(id, skipHistory) {
       if (a && !a.paused) { stillPlaying = true; break; }
     }
     if (stillPlaying) {
-      if (bgMusic.audio && bgMusic.audio.paused) {
+      if (bgMusic.ctx && bgMusic.ctx.state === 'suspended') bgMusic.ctx.resume().catch(() => {});
+      if (bgMusic.audio.paused) {
         bgMusic.audio.play().then(() => bgMusic.fadeTo(bgMusic.targetVolume, 800)).catch(() => {});
       }
     }
