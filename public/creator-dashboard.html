@@ -646,6 +646,13 @@
         <div class="no-data">Loading activity...</div>
       </div>
     </div>
+
+    <!-- Founder Content Briefs -->
+    <h2 class="section-header" style="margin-top: 2rem;">My Content Briefs</h2>
+    <p style="color: var(--text-soft); font-size: 0.9rem; margin-bottom: 1rem;">Your 5 founder pieces. Tap any card to expand the full brief.</p>
+    <div id="founderContent">
+      <div class="no-data">Loading briefs...</div>
+    </div>
   </div>
 
   <script>
@@ -744,6 +751,7 @@
       renderCreatorsTable(creators, takes, referrals);
       renderTakesBreakdown(takes);
       renderActivityFeed(takes);
+      renderFounderContent();
     }
 
     function renderStats(creators, takes, referrals) {
@@ -895,6 +903,69 @@
           renderCreatorsTable(currentData.creators, currentData.takes, currentData.referrals);
         });
       });
+    }
+
+    // ====== FOUNDER CONTENT SECTION ======
+    function renderFounderContent() {
+      var container = document.getElementById('founderContent');
+      if (!container) return;
+
+      var pieces = [
+        { n: 8, title: "Founder Origin Story", length: "45 to 90 seconds",
+          whatToDo: "Film yourself in the car or at home. Talk to camera about why you built Storytold. Keep it raw and honest. \"I built this because I wanted my son Chase to hear himself in a story. Not just any story, HIS story, with his name, his best friend, his world.\" Then cut to footage of Chase hearing his story for the first time.",
+          whatNotToDo: "Don't make it a pitch. Don't talk about features. Don't use marketing language. This is a dad talking about his kid. That's it.",
+          background: "Founder content builds trust and gives the product a face. When people see you built it for your own child, the product stops being an app and becomes something personal.",
+          positioning: "Selfie angle, natural lighting. In the car is fine. At home is fine. Just you, talking.",
+          textOnScreen: "\"I built this for my son\" then \"This is why\" cut to Chase's reaction.",
+          sound: "Your voice. Then the story audio with Chase's reaction." },
+        { n: 9, title: "Daddy Is The Villain", length: "30 to 50 seconds",
+          whatToDo: "Create an Adventure story with Chase as the hero, Ellis as the sidekick, and Daddy as the villain. Play it for Chase. Film his face when he hears Daddy is the villain.",
+          whatNotToDo: "Don't tell Chase anything. Don't prime him. Just press play and film.",
+          background: "Seeing your own kid lose it at your product is the most powerful proof possible.",
+          positioning: "Film Chase from across the room or sitting beside him. Keep both the audio and his face clear.",
+          textOnScreen: "\"Made myself the villain in my son's adventure story...\" then \"His face when he heard Daddy\"",
+          sound: "Full story audio. Chase's reaction." },
+        { n: 10, title: "Chase Car Listen", length: "20 to 40 seconds",
+          whatToDo: "Play Chase's adventure story in the car. Film from the front seat. Capture him listening, absorbed. No big reveal needed. Just a child lost in a story about him.",
+          whatNotToDo: "Don't talk. Don't direct him. Let him listen.",
+          background: "Sometimes the most powerful content is a child sitting quietly, completely absorbed in something made just for them.",
+          positioning: "Front seat looking back. Phone propped or held steady.",
+          textOnScreen: "\"He doesn't know the story is about him yet\" or \"Every journey now he asks for his story\"",
+          sound: "Story audio from car speakers. Natural silence otherwise." },
+        { n: 11, title: "Chase Solo", length: "20 to 35 seconds",
+          whatToDo: "Film Chase at home hearing his adventure story. He's in his room or on the sofa. Story plays, he hears his name, you capture the reaction.",
+          whatNotToDo: "Don't set up elaborate lighting or staging. The more normal it looks, the better.",
+          background: "Home footage from the founder shows the product in its natural habitat. Just a kid in his house hearing a story about himself.",
+          positioning: "Film from across the room. Keep it casual like you just happened to be filming.",
+          textOnScreen: "\"Made my 9 year old the hero of his own story\" then \"This is what happened\"",
+          sound: "Story audio. Chase's natural reaction." },
+        { n: 12, title: "Chase And Sister", length: "25 to 45 seconds",
+          whatToDo: "Create a story with Chase as the hero and his little sister's name as the best friend. Play it for both of them together. Film both. Chase reacts first, then his sister hears her name and goes wild.",
+          whatNotToDo: "Don't tell either of them. Don't pause. Don't replay.",
+          background: "The sibling dynamic is gold. The little sister's reaction to hearing her own name in big brother's story is always massive.",
+          positioning: "Both children in frame. Sitting together on the sofa or in bed.",
+          textOnScreen: "\"Put both my kids in the same story...\" then \"Wait for his sister's reaction\"",
+          sound: "Story audio. Both children's reactions." }
+      ];
+
+      var html = '<div style="display:grid;gap:16px;">';
+      pieces.forEach(function(p) {
+        html += '<div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;" onclick="this.querySelector(\'.founder-detail\').style.display = this.querySelector(\'.founder-detail\').style.display === \'block\' ? \'none\' : \'block\'">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+          '<h4 style="margin:0;">' + p.n + '. ' + p.title + '</h4>' +
+          '<span style="font-size:0.85rem;color:var(--text-soft);">' + p.length + '</span>' +
+          '</div>' +
+          '<div class="founder-detail" style="display:none;margin-top:16px;font-size:0.9rem;line-height:1.7;">' +
+          '<p><strong>What to do:</strong> ' + p.whatToDo + '</p>' +
+          '<p style="margin-top:10px;"><strong>What NOT to do:</strong> <span style="color:#c0392b;">' + p.whatNotToDo + '</span></p>' +
+          '<p style="margin-top:10px;"><strong>Why this works:</strong> ' + p.background + '</p>' +
+          '<p style="margin-top:10px;"><strong>Where to hold your phone:</strong> ' + p.positioning + '</p>' +
+          '<p style="margin-top:10px;"><strong>Text on screen:</strong> ' + p.textOnScreen + '</p>' +
+          '<p style="margin-top:10px;"><strong>Sound:</strong> ' + p.sound + '</p>' +
+          '</div></div>';
+      });
+      html += '</div>';
+      container.innerHTML = html;
     }
 
     function copyToClipboard(text, button) {

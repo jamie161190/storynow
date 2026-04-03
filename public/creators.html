@@ -130,28 +130,6 @@
       display: none;
     }
 
-    .btn-unlock {
-      width: 100%;
-      padding: 14px 24px;
-      background: linear-gradient(135deg, var(--purple) 0%, #9B7CFF 100%);
-      color: white;
-      border: none;
-      border-radius: 16px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .btn-unlock:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .btn-unlock:active {
-      transform: translateY(0);
-    }
-
     /* === SCREEN 2: REGISTER === */
     #screen-register {
       align-items: center;
@@ -203,33 +181,6 @@
       box-shadow: 0 0 0 4px rgba(124,92,252,0.1);
     }
 
-    .children-inputs {
-      margin-bottom: 10px;
-    }
-
-    .add-child-btn {
-      padding: 10px 16px;
-      background: var(--purple-light);
-      color: var(--purple);
-      border: 2px solid var(--purple);
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: 10px;
-      margin-bottom: 20px;
-    }
-
-    .add-child-btn:hover {
-      background: var(--purple);
-      color: white;
-    }
-
-    .add-child-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
 
     .password-note {
       font-size: 12px;
@@ -469,15 +420,10 @@
       overflow: hidden;
     }
 
-    .content-card:hover:not(.locked) {
+    .content-card:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-lg);
       border-color: var(--purple);
-    }
-
-    .content-card.locked {
-      opacity: 0.7;
-      cursor: not-allowed;
     }
 
     .card-badge {
@@ -506,11 +452,6 @@
     }
 
     .badge-parent {
-      background: var(--purple-light);
-      color: var(--purple);
-    }
-
-    .badge-founder {
       background: var(--purple-light);
       color: var(--purple);
     }
@@ -624,20 +565,6 @@
     .share-btn:hover {
       background: var(--purple-light);
       color: var(--purple);
-    }
-
-    .lock-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      background: rgba(255,255,255,0.95);
-      z-index: 10;
     }
 
     /* === MODALS === */
@@ -990,82 +917,6 @@
       background: var(--purple-light);
     }
 
-    /* Founder Lock Prompt */
-    .founder-lock-prompt {
-      max-width: 420px;
-      text-align: center;
-    }
-
-    .founder-lock-prompt p {
-      font-size: 15px;
-      color: var(--text-soft);
-      margin-bottom: 20px;
-    }
-
-    .founder-lock-prompt input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      font-size: 16px;
-      font-family: 'Nunito', sans-serif;
-      margin-bottom: 20px;
-      transition: all 0.2s ease;
-    }
-
-    .founder-lock-prompt input:focus {
-      outline: none;
-      border-color: var(--purple);
-      box-shadow: 0 0 0 4px rgba(124,92,252,0.1);
-    }
-
-    .founder-error {
-      color: #E63946;
-      font-size: 14px;
-      margin-bottom: 15px;
-      display: none;
-    }
-
-    .founder-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .btn-unlock-founder {
-      flex: 1;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, var(--purple) 0%, #9B7CFF 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-unlock-founder:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .btn-close-founder {
-      flex: 1;
-      padding: 12px 24px;
-      background: var(--border);
-      color: var(--text-soft);
-      border: none;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-close-founder:hover {
-      background: var(--purple-light);
-    }
-
     /* Responsive */
     @media (max-width: 768px) {
       .gate-card,
@@ -1361,7 +1212,7 @@
       {
         n: 17, title: "Main Character Walk", cat: "adventure", tags: ["young-creator"],
         founder: false,
-        who: "12 year old girl (Eva). She creates this entirely by herself with her phone.",
+        who: "A young creator (around 12). They create this entirely by themselves with their phone.",
         length: "15 to 25 seconds",
         ratio: "9:16",
         ratioNote: "For newsfeed: duplicate in CapCut, change canvas to 1:1, pinch and reposition.",
@@ -1376,7 +1227,7 @@
       {
         n: 18, title: "Big Sister Surprise", cat: "bedtime", tags: ["young-creator"],
         founder: false,
-        who: "12 year old girl (Eva). She creates this entirely by herself with her phone.",
+        who: "A young creator (around 12). They create this entirely by themselves with their phone.",
         length: "20 to 40 seconds",
         ratio: "9:16",
         ratioNote: "For newsfeed: duplicate in CapCut, change canvas to 1:1, pinch and reposition.",
@@ -1717,7 +1568,7 @@
       <label>Enter your access code</label>
       <input type="password" id="gate-code" placeholder="Access code">
       <div class="gate-error"></div>
-      <button class="btn-unlock" id="btn-unlock">Unlock</button>
+      <button class="btn-unlock" id="btn-unlock" style="width:100%;padding:14px 24px;background:linear-gradient(135deg,var(--purple) 0%,#9B7CFF 100%);color:white;border:none;border-radius:16px;font-size:16px;font-weight:700;cursor:pointer;">Unlock</button>
     </div>
   </div>
 
@@ -1726,11 +1577,17 @@
     <div class="register-card">
       <h1>Welcome to the Creator Hub</h1>
 
-      <label>Your name</label>
-      <input type="text" id="creator-name" placeholder="Your name">
+      <label>First name</label>
+      <input type="text" id="creator-first-name" placeholder="First name">
+
+      <label>Last name</label>
+      <input type="text" id="creator-last-name" placeholder="Last name">
 
       <label>Set a password</label>
       <input type="password" id="creator-password" placeholder="Password">
+
+      <label>Confirm password</label>
+      <input type="password" id="creator-password-confirm" placeholder="Re-enter password">
       <div class="password-note">You'll need this to check your referral earnings</div>
 
       <button class="btn-letsgo" id="btn-letsgo">Let's go</button>
@@ -1748,10 +1605,11 @@
     </div>
 
     <div class="hub-content">
+      <p style="color:var(--text-soft);margin-bottom:1.5rem;font-size:0.95rem;">Browse the ideas below. Tap any one to see exactly how to film it. When you find one you like, hit "I'll make this one" and it's yours.</p>
       <!-- Beginner Guides -->
       <div class="guides-section">
         <div class="guides-header">
-          <h2>New to content creation? Start here</h2>
+          <h2>Never made a video before? Start here</h2>
           <div class="guides-toggle">▼</div>
         </div>
         <div class="guides-content"></div>
@@ -1859,7 +1717,7 @@
         // Check if already registered in this session
         const existing = getCreatorData();
         if (existing && existing.id) {
-          document.querySelector('.hub-greeting').textContent = 'Hey, ' + existing.name;
+          document.querySelector('.hub-greeting').textContent = 'Hey, ' + existing.name.split(' ')[0];
           showScreen('screen-hub');
           initializeHub();
         } else {
@@ -1877,11 +1735,17 @@
 
     // ====== SCREEN 2: REGISTER ======
     document.getElementById('btn-letsgo').addEventListener('click', async function() {
-      const name = document.getElementById('creator-name').value.trim();
+      const firstName = document.getElementById('creator-first-name').value.trim();
+      const lastName = document.getElementById('creator-last-name').value.trim();
       const password = document.getElementById('creator-password').value.trim();
+      const passwordConfirm = document.getElementById('creator-password-confirm').value.trim();
 
-      if (!name) { alert('Please enter your name'); return; }
+      if (!firstName) { alert('Please enter your first name'); return; }
+      if (!lastName) { alert('Please enter your last name'); return; }
       if (!password) { alert('Please set a password'); return; }
+      if (password !== passwordConfirm) { alert('Passwords don\'t match, please try again'); return; }
+
+      const name = firstName + ' ' + lastName;
 
       // Show loading state
       this.textContent = 'Setting up...';
@@ -1910,7 +1774,7 @@
           }
         }
 
-        document.querySelector('.hub-greeting').textContent = 'Hey, ' + name;
+        document.querySelector('.hub-greeting').textContent = 'Hey, ' + firstName;
         showScreen('screen-hub');
         initializeHub();
       } else {
@@ -1942,21 +1806,38 @@
       guidesContent.innerHTML = '<div class="guide-item"><h3>What is 9:16?</h3><p>9:16 means vertical, the way you hold your phone normally. It fills the whole screen on TikTok and Instagram Stories. 1:1 is a square, like an Instagram post in someone\'s feed. 4:5 is slightly taller than a square, used for Instagram feed posts.</p><div class="guide-svg">' + getAspectRatioSVG() + '</div></div><div class="guide-item"><h3>How to adapt 9:16 to newsfeed</h3><ol><li>Open CapCut (free app). Duplicate your project.</li><li>Tap the canvas or ratio button. Change it to 1:1.</li><li>Your video will look zoomed in. Pinch to zoom out and drag to reposition so the important part (usually the face) stays in the centre.</li><li>Export. Now you have two versions: one for Stories/Reels and one for newsfeeds.</li></ol></div><div class="guide-item"><h3>Basic video editing in CapCut</h3><ol><li>Download CapCut (free). Open it and tap New Project. Import your video.</li><li>Trim the start and end: drag the edges of the clip to keep only the good bit.</li><li>Add text: tap Text at the bottom, tap Add Text, type your words, drag to position them on screen, then drag the text bar on the timeline to set when it appears and disappears.</li><li>Add a second text the same way for the reveal moment.</li><li>Tap the export button (top right). Save to your camera roll. Post.</li></ol></div>';
     }
 
+    // Filter mapping: which pieces show for each persona
+    const PERSONA_FILTERS = {
+      'parent': function(p) { return !p.founder && (p.tags.includes('parent') || p.tags.includes('mum') || p.tags.includes('dad') || p.tags.includes('partner')); },
+      'grandparent': function(p) { return !p.founder && p.tags.includes('grandparent'); },
+      'gift': function(p) { return !p.founder && (p.tags.includes('gift') || p.tags.includes('no-kids-needed') || p.tags.includes('no-kids') || p.tags.includes('family')); },
+      'no-face': function(p) { return !p.founder && (p.tags.includes('no-face') || p.tags.includes('no-kids-needed')); },
+      'young-creator': function(p) { return !p.founder && p.tags.includes('young-creator'); },
+      'all': function(p) { return !p.founder; }
+    };
+
     function renderContentGrid() {
-      const grid = document.querySelector('.cards-grid');
       const filters = document.querySelector('.filters');
 
-      const categories = ['all', 'bedtime', 'adventure', 'parent', 'gift', 'young-creator', 'grandparent', 'specialist', 'no-face', 'founder'];
-      filters.innerHTML = '';
-      categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'filter-btn' + (cat === 'all' ? ' active' : '');
-        btn.textContent = cat === 'no-face' ? 'No Face' : cat === 'young-creator' ? 'Young Creator' : cat.charAt(0).toUpperCase() + cat.slice(1);
-        btn.dataset.filter = cat;
+      var personas = [
+        { key: 'parent', label: "I'm a mum or dad" },
+        { key: 'grandparent', label: "I'm a grandparent" },
+        { key: 'gift', label: "I'm buying it as a gift" },
+        { key: 'no-face', label: "I don't want to show kids' faces" },
+        { key: 'young-creator', label: "I'm a young creator" },
+        { key: 'all', label: "Show me everything" }
+      ];
+
+      filters.innerHTML = '<h3 style="margin-bottom:12px;font-size:1rem;color:var(--text);">Which sounds like you?</h3>';
+      personas.forEach(function(p) {
+        var btn = document.createElement('button');
+        btn.className = 'filter-btn' + (p.key === 'all' ? ' active' : '');
+        btn.textContent = p.label;
+        btn.dataset.filter = p.key;
         btn.addEventListener('click', function() {
-          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          filterAndRenderCards(cat);
+          document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          filterAndRenderCards(p.key);
         });
         filters.appendChild(btn);
       });
@@ -1965,57 +1846,37 @@
     }
 
     function filterAndRenderCards(filter) {
-      const grid = document.querySelector('.cards-grid');
-      const creatorData = getCreatorData();
+      var grid = document.querySelector('.cards-grid');
+      var creatorData = getCreatorData();
+      var filterFn = PERSONA_FILTERS[filter] || PERSONA_FILTERS['all'];
 
-      const filtered = filter === 'all' ? PIECES : PIECES.filter(p => {
-        if (filter === 'founder') return p.founder;
-        return p.cat === filter || p.tags.includes(filter);
-      });
+      var filtered = PIECES.filter(filterFn);
 
       grid.innerHTML = '';
-      filtered.forEach(piece => {
-        const card = document.createElement('div');
-        card.className = 'content-card' + (piece.founder ? ' locked' : '');
+      filtered.forEach(function(piece) {
+        var card = document.createElement('div');
+        card.className = 'content-card';
         card.dataset.pieceId = piece.n;
 
-        const taken = creatorData.takenPieces && creatorData.takenPieces.includes(piece.n);
-        const count = takeCounts[piece.n] || 0;
+        var claimed = creatorData.takenPieces && creatorData.takenPieces.includes(piece.n);
 
-        let actionHtml = '';
-        if (piece.founder) {
-          actionHtml = '<button class="btn-take" onclick="event.stopPropagation(); openFounderLock(' + piece.n + ')">Unlock</button>';
-        } else if (taken) {
-          actionHtml = '<div class="badge-taken">Taken</div>';
-        } else {
-          actionHtml = '<button class="btn-take" onclick="event.stopPropagation(); handleTake(' + piece.n + ')">Take this</button>';
-        }
-
-        card.innerHTML = (piece.founder ? '<div class="lock-overlay">🔒</div>' : '') +
+        card.innerHTML =
           '<div class="card-badge badge-' + piece.cat + '">' + piece.cat + '</div>' +
-          '<div class="card-title">' + piece.n + '. ' + piece.title + '</div>' +
+          '<div class="card-title">' + piece.title + '</div>' +
           '<div class="card-subtitle">' + piece.who + '</div>' +
-          '<div class="card-meta">Length: ' + piece.length + '</div>' +
-          '<div class="card-meta">Ratio: ' + piece.ratio + '</div>' +
-          '<div class="card-taken">' + (count > 0 ? count + ' creator' + (count > 1 ? 's' : '') + ' taken this' : 'Available') + '</div>' +
-          '<div class="card-actions">' + actionHtml +
-          '<div class="share-icons">' +
-          '<button class="share-btn" title="Share on WhatsApp" onclick="event.stopPropagation(); shareWhatsApp(' + piece.n + ')">📱</button>' +
-          '<button class="share-btn" title="Share via Email" onclick="event.stopPropagation(); shareEmail(' + piece.n + ')">✉️</button>' +
-          '</div></div>';
+          '<div class="card-meta">' + piece.length + '</div>' +
+          (claimed ? '<div class="badge-taken" style="margin-top:10px;">You\'re making this one</div>' : '<div class="card-tap" style="margin-top:10px;font-size:0.8rem;color:var(--text-muted);">Tap to read the brief</div>');
 
-        card.addEventListener('click', function(e) {
-          if (!e.target.classList.contains('btn-take') && !e.target.classList.contains('share-btn')) {
-            if (piece.founder) {
-              openFounderLock(piece.n);
-            } else {
-              openCardDetail(piece);
-            }
-          }
+        card.addEventListener('click', function() {
+          openCardDetail(piece);
         });
 
         grid.appendChild(card);
       });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No content ideas for this one yet. Try "Show me everything" to see all ideas.</p>';
+      }
     }
 
     // ====== TAKE FUNCTIONALITY ======
@@ -2044,42 +1905,6 @@
     // Make handleTake global for onclick
     window.handleTake = handleTake;
 
-    // ====== FOUNDER LOCK ======
-    function openFounderLock(pieceId) {
-      const overlay = document.querySelector('.modal-overlay');
-      const modal = document.querySelector('.modal');
-
-      modal.innerHTML = '<button class="modal-close" onclick="closeModal()">×</button>' +
-        '<div class="founder-lock-prompt">' +
-        '<h2 style="text-align: center; margin-bottom: 20px;">Founder Content</h2>' +
-        '<p>This content is locked for the Storytold founder. Enter the access code to unlock.</p>' +
-        '<input type="password" id="founder-password" placeholder="Access code" />' +
-        '<div class="founder-error" id="founder-error"></div>' +
-        '<div class="founder-actions">' +
-        '<button class="btn-unlock-founder" onclick="verifyFounderPassword(' + pieceId + ')">Unlock</button>' +
-        '<button class="btn-close-founder" onclick="closeModal()">Cancel</button>' +
-        '</div></div>';
-
-      overlay.classList.add('active');
-      setTimeout(function() { document.getElementById('founder-password').focus(); }, 100);
-    }
-    window.openFounderLock = openFounderLock;
-
-    function verifyFounderPassword(pieceId) {
-      const password = document.getElementById('founder-password').value.trim();
-      const errorEl = document.getElementById('founder-error');
-
-      if (password === 'ChaseAndEllis') {
-        const piece = PIECES.find(p => p.n === pieceId);
-        closeModal();
-        setTimeout(function() { openCardDetail(piece); }, 300);
-      } else {
-        errorEl.style.display = 'block';
-        errorEl.textContent = 'Incorrect password.';
-      }
-    }
-    window.verifyFounderPassword = verifyFounderPassword;
-
     // ====== CARD DETAIL MODAL ======
     function openCardDetail(piece) {
       const overlay = document.querySelector('.modal-overlay');
@@ -2091,26 +1916,26 @@
 
       let actionHtml = '';
       if (taken) {
-        actionHtml = '<button class="btn-modal-take" style="background: var(--green-light); color: var(--green); cursor: default;">Already taken</button>';
+        actionHtml = '<button class="btn-modal-take" style="background: var(--green-light); color: var(--green); cursor: default;">You\'re making this one</button>';
       } else {
-        actionHtml = '<button class="btn-modal-take" onclick="handleTake(' + piece.n + '); closeModal();">Take This Piece</button>';
+        actionHtml = '<button class="btn-modal-take" onclick="handleTake(' + piece.n + '); closeModal();">I\'ll make this one</button>';
       }
 
       modal.innerHTML = '<button class="modal-close" onclick="closeModal()">×</button>' +
         '<h2>' + piece.title + '</h2>' +
-        '<div class="modal-section"><h3>Who This Is For</h3><p>' + piece.who + '</p></div>' +
-        '<div class="modal-section"><h3>Content Length</h3><p>' + piece.length + '</p></div>' +
-        '<div class="modal-section"><h3>Aspect Ratio</h3><p>' + piece.ratio + '</p><p style="font-size:13px;color:var(--text-muted);margin-top:10px;">' + piece.ratioNote + '</p></div>' +
-        '<div class="modal-section"><h3>What To Do</h3><p>' + piece.whatToDo + '</p></div>' +
-        '<div class="modal-section"><h3>What Not To Do</h3><p style="color:#c0392b;">' + piece.whatNotToDo + '</p></div>' +
-        '<div class="modal-section"><h3>Background</h3><p>' + piece.background + '</p></div>' +
-        '<div class="modal-section"><h3>Positioning</h3><p>' + piece.positioningText + '</p><div class="modal-svg">' + positioningSvg + '</div></div>' +
-        '<div class="modal-section"><h3>Text On Screen</h3><p>' + piece.textOnScreen + '</p></div>' +
+        '<div class="modal-section"><h3>Who is this for?</h3><p>' + piece.who + '</p></div>' +
+        '<div class="modal-section"><h3>How long?</h3><p>' + piece.length + '</p></div>' +
+        '<div class="modal-section"><h3>How to hold your phone</h3><p>Film it upright, the normal way you hold your phone. This gives you a vertical video that fills the whole screen on TikTok and Instagram.</p><p style="font-size:13px;color:var(--text-muted);margin-top:10px;background:var(--purple-light);padding:10px 14px;border-radius:10px;"><strong>Want it for newsfeeds too?</strong> ' + piece.ratioNote + '</p></div>' +
+        '<div class="modal-section"><h3>What to do</h3><p>' + piece.whatToDo + '</p></div>' +
+        '<div class="modal-section"><h3>What NOT to do</h3><p style="color:#c0392b;">' + piece.whatNotToDo + '</p></div>' +
+        '<div class="modal-section"><h3>Why this works</h3><p>' + piece.background + '</p></div>' +
+        '<div class="modal-section"><h3>Where to hold your phone</h3><p>' + piece.positioningText + '</p><div class="modal-svg">' + positioningSvg + '</div></div>' +
+        '<div class="modal-section"><h3>Text to put on screen</h3><p>' + piece.textOnScreen + '</p></div>' +
         '<div class="modal-section"><h3>Sound</h3><p>' + piece.sound + '</p></div>' +
         '<div class="modal-actions">' + actionHtml + '</div>' +
         '<div class="modal-share">' +
-        '<button class="modal-share-btn" onclick="shareWhatsApp(' + piece.n + ')">📱 WhatsApp</button>' +
-        '<button class="modal-share-btn" onclick="shareEmail(' + piece.n + ')">✉️ Email</button>' +
+        '<button class="modal-share-btn" onclick="shareWhatsApp(' + piece.n + ')">Share on WhatsApp</button>' +
+        '<button class="modal-share-btn" onclick="shareEmail(' + piece.n + ')">Share via Email</button>' +
         '</div>';
 
       overlay.classList.add('active');
@@ -2205,8 +2030,8 @@
         '<div class="password-verify">' +
         '<p style="font-size:14px;color:var(--text-soft);margin-bottom:15px;">Enter your password to view your earnings.</p>' +
         '<input type="password" id="earnings-password" placeholder="Your password" style="width:100%;padding:0.85rem 1rem;border:2px solid var(--border);border-radius:12px;font-family:Quicksand,sans-serif;margin-bottom:10px;" />' +
-        '<div class="founder-error" id="earnings-error"></div>' +
-        '<button class="btn-unlock-founder" onclick="verifyEarningsPassword()" style="width:100%;margin-top:10px;">View Earnings</button>' +
+        '<div id="earnings-error" style="color:#E63946;font-size:14px;margin-bottom:15px;display:none;"></div>' +
+        '<button onclick="verifyEarningsPassword()" style="width:100%;margin-top:10px;padding:12px 24px;background:linear-gradient(135deg,var(--purple) 0%,#9B7CFF 100%);color:white;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;">View Earnings</button>' +
         '</div>' +
         '<div class="earnings-content" id="earnings-content" style="display:none;"></div>';
 
