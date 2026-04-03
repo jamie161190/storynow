@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Creator Dashboard | Storytold</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --purple: #7C5CFC;
+      --purple-light: #EDE8FF;
+      --orange: #FF8C42;
+      --bg: #FEFBF6;
+      --card: #FFFFFF;
+      --text: #2D2844;
+      --text-soft: #6B6490;
+      --border: #EDE8FF;
+      --shadow: 0 4px 24px rgba(124, 92, 252, 0.08);
+      --radius: 16px;
+      --radius-lg: 24px;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+    }
+
+    button {
+      font-family: 'Quicksand', sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    /* Gate Screen */
+    .gate-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .gate-card {
+      background-color: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .gate-card h1 {
+      margin-bottom: 0.5rem;
+      font-size: 1.75rem;
+      color: var(--text);
+    }
+
+    .gate-card p {
+      color: var(--text-soft);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .logo {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .gate-input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .gate-input-group input {
+      width: 100%;
+      padding: 0.875rem;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-family: 'Quicksand', sans-serif;
+      color: var(--text);
+      transition: border-color 0.3s ease;
+    }
+
+    .gate-input-group input:focus {
+      outline: none;
+      border-color: var(--purple);
+    }
+
+    .unlock-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--purple) 0%, #6B4FDB 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .unlock-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .unlock-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .gate-error {
+      color: #E74C3C;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      display: none;
+      padding: 2rem 1rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .dashboard.active {
+      display: block;
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .header-logo {
+      font-size: 2rem;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2rem;
+      color: var(--text);
+    }
+
+    .logout-btn {
+      padding: 0.75rem 1.5rem;
+      background: var(--purple-light);
+      color: var(--purple);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .logout-btn:hover {
+      background: var(--border);
+    }
+
+    /* Stats Row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background-color: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      color: var(--text-soft);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--purple);
+      font-family: 'Nunito', sans-serif;
+    }
+
+    /* Section Headers */
+    .section-header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    /* Creators Table */
+    .table-container {
+      background-color: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 2.5rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    thead {
+      background-color: var(--purple-light);
+      border-bottom: 2px solid var(--border);
+    }
+
+    th {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      font-weight: 700;
+      color: var(--purple);
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    th:hover {
+      background-color: #DED3FF;
+    }
+
+    th.sortable::after {
+      content: ' ↕';
+      opacity: 0.5;
+    }
+
+    th.sorted-asc::after {
+      content: ' ↑';
+      opacity: 1;
+    }
+
+    th.sorted-desc::after {
+      content: ' ↓';
+      opacity: 1;
+    }
+
+    td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tbody tr:hover {
+      background-color: rgba(124, 92, 252, 0.02);
+    }
+
+    .copy-btn {
+      padding: 0.4rem 0.8rem;
+      background-color: var(--purple-light);
+      color: var(--purple);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--purple);
+      color: white;
+    }
+
+    .copy-btn.copied {
+      background-color: var(--purple);
+      color: white;
+    }
+
+    /* Takes Breakdown */
+    .takes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .piece-card {
+      background-color: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+    }
+
+    .piece-card.unclaimed {
+      opacity: 0.6;
+      background-color: rgba(107, 100, 144, 0.03);
+    }
+
+    .piece-number {
+      display: inline-block;
+      background-color: var(--purple);
+      color: white;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius);
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .piece-card.unclaimed .piece-number {
+      background-color: var(--text-soft);
+    }
+
+    .piece-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+
+    .piece-count {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      margin-bottom: 1rem;
+    }
+
+    .piece-creators {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .creator-tag {
+      display: inline-block;
+      background-color: var(--purple-light);
+      color: var(--purple);
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .unclaimed-text {
+      color: var(--text-soft);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    /* Activity Feed */
+    .activity-feed {
+      background-color: var(--card);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow);
+    }
+
+    .activity-item {
+      display: flex;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-time {
+      color: var(--text-soft);
+      font-weight: 600;
+      min-width: 120px;
+      flex-shrink: 0;
+      font-family: 'Nunito', sans-serif;
+    }
+
+    .activity-text {
+      flex: 1;
+    }
+
+    .activity-creator {
+      font-weight: 700;
+      color: var(--purple);
+    }
+
+    .activity-piece {
+      font-style: italic;
+      color: var(--text-soft);
+    }
+
+    .no-data {
+      color: var(--text-soft);
+      padding: 2rem 1rem;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-soft);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid var(--border);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Error State */
+    .error-message {
+      background-color: #FADBD8;
+      border: 2px solid #E74C3C;
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      color: #C0392B;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .gate-card {
+        padding: 2rem;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .logout-btn {
+        width: 100%;
+      }
+
+      .dashboard-header h1 {
+        font-size: 1.5rem;
+      }
+
+      .stats-row {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+
+      .stat-card {
+        padding: 1.25rem;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+      }
+
+      th, td {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      .takes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .piece-card {
+        padding: 1.25rem;
+      }
+
+      .section-header {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+      }
+
+      .gate-card {
+        padding: 1.5rem;
+        border-radius: var(--radius);
+      }
+
+      .gate-card h1 {
+        font-size: 1.5rem;
+      }
+
+      .dashboard {
+        padding: 1.5rem 1rem;
+      }
+
+      .stats-row {
+        grid-template-columns: 1fr;
+      }
+
+      .takes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-header-left {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .header-logo {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Gate Screen -->
+  <div id="gateScreen" class="gate-container">
+    <div class="gate-card">
+      <div class="logo">📖</div>
+      <h1>Creator Hub</h1>
+      <p>Admin Dashboard</p>
+      <div class="gate-input-group">
+        <input
+          type="password"
+          id="adminCode"
+          placeholder="Enter admin code"
+          autocomplete="off"
+        >
+      </div>
+      <button class="unlock-btn" id="unlockBtn">Unlock Dashboard</button>
+      <div class="gate-error" id="gateError">Incorrect code. Try again.</div>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard">
+    <div class="dashboard-header">
+      <div class="dashboard-header-left">
+        <div class="header-logo">📖</div>
+        <h1>Creator Hub Dashboard</h1>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Sign Out</button>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Creators</div>
+        <div class="stat-value" id="totalCreators">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Takes</div>
+        <div class="stat-value" id="totalTakes">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Referral Visits</div>
+        <div class="stat-value" id="totalVisits">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Conversions</div>
+        <div class="stat-value" id="totalConversions">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value" id="totalRevenue">$0</div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="errorContainer"></div>
+
+    <!-- Creators Table -->
+    <h2 class="section-header">Creators</h2>
+    <div class="table-container">
+      <div class="table-wrapper">
+        <table id="creatorsTable">
+          <thead>
+            <tr>
+              <th class="sortable" data-sort="name">Name</th>
+              <th data-sort="child_names">Child Names</th>
+              <th>Referral Code</th>
+              <th class="sortable" data-sort="created_at">Joined</th>
+              <th class="sortable" data-sort="takes">Takes</th>
+              <th class="sortable" data-sort="visits">Visits</th>
+              <th class="sortable" data-sort="conversions">Conversions</th>
+              <th class="sortable" data-sort="revenue">Revenue</th>
+            </tr>
+          </thead>
+          <tbody id="creatorsBody">
+            <tr><td colspan="8" class="no-data">Loading creators...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Takes Breakdown -->
+    <h2 class="section-header">Content Pieces</h2>
+    <div class="takes-grid" id="takesGrid">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- Activity Feed -->
+    <h2 class="section-header">Recent Activity</h2>
+    <div class="activity-feed">
+      <div id="activityFeed">
+        <div class="no-data">Loading activity...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_CODE = 'StoryToldAdmin2026';
+    const API_URL = '/api/admin-creators';
+
+    const PIECE_TITLES = {
+      1: 'Bedtime Name Drop',
+      2: 'The Hallway Peek',
+      3: 'Bedtime Two Children',
+      4: 'Adventure Name Drop',
+      5: 'Adventure Two Children Villain',
+      6: 'Mum\'s Moment',
+      7: 'Dad\'s Car Moment',
+      8: 'Founder Origin Story',
+      9: 'Daddy Is The Villain',
+      10: 'Chase Car Listen',
+      11: 'Chase Solo',
+      12: 'Chase And Sister',
+      13: 'Background Kids',
+      14: 'Auntie Uncle Gift',
+      15: 'Last Minute Gift',
+      16: 'Godparent Gift',
+      17: 'Main Character Walk',
+      18: 'Big Sister Surprise',
+      19: 'Grandad Alone',
+      20: 'Grandad And Grandchild',
+      21: 'Gym Guy',
+      22: 'Awkward Unboxing',
+      23: 'Group Chat',
+      24: 'Voice Note',
+      25: 'Before And After',
+      26: 'Sofa Snigger',
+      27: 'Behind The Door',
+      28: 'Over The Shoulder',
+      29: 'Screen Glow'
+    };
+
+    let currentData = null;
+    let sortState = {};
+
+    // Gate functionality
+    document.getElementById('unlockBtn').addEventListener('click', handleUnlock);
+    document.getElementById('adminCode').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleUnlock();
+    });
+
+    function handleUnlock() {
+      const code = document.getElementById('adminCode').value;
+      const errorEl = document.getElementById('gateError');
+
+      if (code === ADMIN_CODE) {
+        document.getElementById('gateScreen').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+        loadDashboard();
+      } else {
+        errorEl.style.display = 'block';
+        document.getElementById('adminCode').value = '';
+        setTimeout(() => {
+          errorEl.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      document.getElementById('gateScreen').style.display = 'flex';
+      document.getElementById('dashboard').classList.remove('active');
+      document.getElementById('adminCode').value = '';
+      document.getElementById('adminCode').focus();
+    });
+
+    // Load dashboard data
+    async function loadDashboard() {
+      try {
+        const response = await fetch(`${API_URL}?code=${ADMIN_CODE}`);
+        if (!response.ok) throw new Error('Failed to load data');
+
+        currentData = await response.json();
+        renderDashboard();
+      } catch (error) {
+        showError(`Error loading dashboard: ${error.message}`);
+      }
+    }
+
+    function showError(message) {
+      const container = document.getElementById('errorContainer');
+      container.innerHTML = `<div class="error-message">${message}</div>`;
+    }
+
+    function renderDashboard() {
+      if (!currentData) return;
+
+      const { creators, takes, referrals } = currentData;
+
+      renderStats(creators, takes, referrals);
+      renderCreatorsTable(creators, takes, referrals);
+      renderTakesBreakdown(takes);
+      renderActivityFeed(takes);
+    }
+
+    function renderStats(creators, takes, referrals) {
+      const totalVisits = referrals.reduce((sum, r) => sum + (r.visits || 0), 0);
+      const totalConversions = referrals.reduce((sum, r) => sum + (r.conversions || 0), 0);
+      const totalRevenue = referrals.reduce((sum, r) => sum + (r.revenue || 0), 0);
+
+      document.getElementById('totalCreators').textContent = creators.length;
+      document.getElementById('totalTakes').textContent = takes.length;
+      document.getElementById('totalVisits').textContent = totalVisits.toLocaleString();
+      document.getElementById('totalConversions').textContent = totalConversions.toLocaleString();
+      document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+    }
+
+    function renderCreatorsTable(creators, takes, referrals) {
+      const tbody = document.getElementById('creatorsBody');
+
+      const creatorsWithStats = creators.map(creator => {
+        const creatorTakes = takes.filter(t => t.creator_id === creator.id).length;
+        const referral = referrals.find(r => r.ref_code === creator.referral_code);
+
+        return {
+          ...creator,
+          takes: creatorTakes,
+          visits: referral?.visits || 0,
+          conversions: referral?.conversions || 0,
+          revenue: referral?.revenue || 0
+        };
+      });
+
+      if (creatorsWithStats.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="no-data">No creators yet</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = creatorsWithStats.map(creator => {
+        const joinedDate = new Date(creator.created_at).toLocaleDateString();
+        return `
+          <tr>
+            <td>${escapeHtml(creator.name)}</td>
+            <td>${escapeHtml(creator.child_names || '')}</td>
+            <td>
+              <button class="copy-btn" data-code="${creator.referral_code}" onclick="copyToClipboard('${creator.referral_code}', this)">
+                ${creator.referral_code}
+              </button>
+            </td>
+            <td>${joinedDate}</td>
+            <td>${creator.takes}</td>
+            <td>${creator.visits.toLocaleString()}</td>
+            <td>${creator.conversions.toLocaleString()}</td>
+            <td>$${creator.revenue.toFixed(2)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      // Setup sorting
+      setupTableSorting(creatorsWithStats);
+    }
+
+    function renderTakesBreakdown(takes) {
+      const grid = document.getElementById('takesGrid');
+      const pieceTakes = {};
+
+      takes.forEach(take => {
+        if (!pieceTakes[take.piece_number]) {
+          pieceTakes[take.piece_number] = [];
+        }
+        pieceTakes[take.piece_number].push(take.creator_name);
+      });
+
+      let html = '';
+
+      for (let i = 1; i <= 29; i++) {
+        const creators = pieceTakes[i] || [];
+        const isClaimed = creators.length > 0;
+        const title = PIECE_TITLES[i] || `Piece ${i}`;
+
+        html += `
+          <div class="piece-card ${isClaimed ? '' : 'unclaimed'}">
+            <div class="piece-number">${i}</div>
+            <div class="piece-title">${escapeHtml(title)}</div>
+            <div class="piece-count">${creators.length} creator${creators.length !== 1 ? 's' : ''}</div>
+            <div class="piece-creators">
+              ${isClaimed
+                ? creators.map(name => `<span class="creator-tag">${escapeHtml(name)}</span>`).join('')
+                : '<span class="unclaimed-text">Not yet claimed</span>'
+              }
+            </div>
+          </div>
+        `;
+      }
+
+      grid.innerHTML = html;
+    }
+
+    function renderActivityFeed(takes) {
+      const feed = document.getElementById('activityFeed');
+
+      if (takes.length === 0) {
+        feed.innerHTML = '<div class="no-data">No activity yet</div>';
+        return;
+      }
+
+      const sorted = [...takes].sort((a, b) => new Date(b.taken_at) - new Date(a.taken_at));
+
+      feed.innerHTML = sorted.slice(0, 50).map(activity => {
+        const time = new Date(activity.taken_at).toLocaleString();
+        const title = PIECE_TITLES[activity.piece_number] || `Piece ${activity.piece_number}`;
+
+        return `
+          <div class="activity-item">
+            <div class="activity-time">${time}</div>
+            <div class="activity-text">
+              <span class="activity-creator">${escapeHtml(activity.creator_name)}</span>
+              took <span class="activity-piece">"${escapeHtml(title)}"</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setupTableSorting(data) {
+      const headers = document.querySelectorAll('th.sortable');
+
+      headers.forEach(header => {
+        header.addEventListener('click', () => {
+          const sortKey = header.dataset.sort;
+          const isAsc = sortState[sortKey] !== 'asc';
+          sortState = { [sortKey]: isAsc ? 'asc' : 'desc' };
+
+          data.sort((a, b) => {
+            let valA = a[sortKey];
+            let valB = b[sortKey];
+
+            if (typeof valA === 'string') {
+              valA = valA.toLowerCase();
+              valB = valB.toLowerCase();
+            }
+
+            const comparison = valA < valB ? -1 : valA > valB ? 1 : 0;
+            return isAsc ? comparison : -comparison;
+          });
+
+          headers.forEach(h => {
+            h.classList.remove('sorted-asc', 'sorted-desc');
+          });
+          header.classList.add(isAsc ? 'sorted-asc' : 'sorted-desc');
+
+          renderCreatorsTable(currentData.creators, currentData.takes, currentData.referrals);
+        });
+      });
+    }
+
+    function copyToClipboard(text, button) {
+      navigator.clipboard.writeText(text).then(() => {
+        button.classList.add('copied');
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+          button.classList.remove('copied');
+          button.textContent = text;
+        }, 2000);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Focus on input on load
+    window.addEventListener('load', () => {
+      document.getElementById('adminCode').focus();
+    });
+  </script>
+</body>
+</html>
