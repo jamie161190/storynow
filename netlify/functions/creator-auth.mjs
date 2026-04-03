@@ -40,8 +40,8 @@ export default async (req) => {
     const { action, name, childNames, password } = await req.json();
 
     if (action === 'signup') {
-      if (!name || !childNames || !childNames.length) {
-        return cors({ error: 'Name and child names required' }, 400);
+      if (!name) {
+        return cors({ error: 'Name is required' }, 400);
       }
 
       // Check if creator already exists
@@ -65,7 +65,7 @@ export default async (req) => {
         headers: { ...headers, 'Prefer': 'return=representation' },
         body: JSON.stringify({
           name,
-          child_names: childNames,
+          child_names: childNames || [],
           password_hash: pwHash,
           referral_code: refCode
         })

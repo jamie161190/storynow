@@ -1729,12 +1729,6 @@
       <label>Your name</label>
       <input type="text" id="creator-name" placeholder="Your name">
 
-      <label>Child's name</label>
-      <div class="children-inputs">
-        <input type="text" class="child-input" placeholder="Child's name">
-      </div>
-      <button class="add-child-btn" id="add-child-btn">Add another child (up to 4)</button>
-
       <label>Set a password</label>
       <input type="password" id="creator-password" placeholder="Password">
       <div class="password-note">You'll need this to check your referral earnings</div>
@@ -1882,30 +1876,11 @@
     });
 
     // ====== SCREEN 2: REGISTER ======
-    let childCount = 1;
-
-    document.getElementById('add-child-btn').addEventListener('click', function() {
-      childCount++;
-      if (childCount <= 4) {
-        const container = document.querySelector('.children-inputs');
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Child ' + childCount + "'s name";
-        input.className = 'child-input';
-        container.appendChild(input);
-        if (childCount === 4) this.disabled = true;
-      }
-    });
-
     document.getElementById('btn-letsgo').addEventListener('click', async function() {
       const name = document.getElementById('creator-name').value.trim();
-      const childInputs = document.querySelectorAll('.child-input');
       const password = document.getElementById('creator-password').value.trim();
 
       if (!name) { alert('Please enter your name'); return; }
-
-      const children = Array.from(childInputs).map(i => i.value.trim()).filter(v => v);
-      if (!children.length) { alert("Please enter at least one child's name"); return; }
       if (!password) { alert('Please set a password'); return; }
 
       // Show loading state
@@ -1913,14 +1888,13 @@
       this.disabled = true;
 
       // Call API
-      const result = await apiSignup(name, children, password);
+      const result = await apiSignup(name, [], password);
 
       if (result && result.success && result.creator) {
         const creator = result.creator;
         setCreatorData({
           id: creator.id,
           name: creator.name,
-          children: creator.child_names || children,
           password: password,
           referralCode: creator.referral_code,
           takenPieces: []
