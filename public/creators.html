@@ -1740,25 +1740,48 @@
     </div>
   </div>
 
-  <!-- Screen 2: Register -->
+  <!-- Screen 2: Register / Login -->
   <div id="screen-register" class="screen">
     <div class="register-card">
-      <h1>Welcome to the Creator Hub</h1>
+      <!-- Register form (default) -->
+      <div id="register-form">
+        <h1>Welcome to the Creator Hub</h1>
 
-      <label>First name</label>
-      <input type="text" id="creator-first-name" placeholder="First name">
+        <label>First name</label>
+        <input type="text" id="creator-first-name" placeholder="First name">
 
-      <label>Last name</label>
-      <input type="text" id="creator-last-name" placeholder="Last name">
+        <label>Last name</label>
+        <input type="text" id="creator-last-name" placeholder="Last name">
 
-      <label>Set a password</label>
-      <input type="password" id="creator-password" placeholder="Password">
+        <label>Set a password</label>
+        <input type="password" id="creator-password" placeholder="Password">
 
-      <label>Confirm password</label>
-      <input type="password" id="creator-password-confirm" placeholder="Re-enter password">
-      <div class="password-note">You'll need this to check your referral earnings</div>
+        <label>Confirm password</label>
+        <input type="password" id="creator-password-confirm" placeholder="Re-enter password">
+        <div class="password-note">You'll need this to check your referral earnings</div>
 
-      <button class="btn-letsgo" id="btn-letsgo">Let's go</button>
+        <button class="btn-letsgo" id="btn-letsgo">Let's go</button>
+        <p style="text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--text-soft);">Already have an account? <a href="#" id="show-login" style="color:var(--purple);font-weight:700;text-decoration:none;">Log in</a></p>
+      </div>
+
+      <!-- Login form (hidden by default) -->
+      <div id="login-form" style="display:none;">
+        <h1>Welcome back</h1>
+
+        <label>First name</label>
+        <input type="text" id="login-first-name" placeholder="First name">
+
+        <label>Last name</label>
+        <input type="text" id="login-last-name" placeholder="Last name">
+
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Password">
+
+        <div id="login-error" style="display:none;color:#E63946;font-size:0.85rem;margin-top:0.5rem;text-align:center;"></div>
+
+        <button class="btn-letsgo" id="btn-login">Log in</button>
+        <p style="text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--text-soft);">New here? <a href="#" id="show-register" style="color:var(--purple);font-weight:700;text-decoration:none;">Create an account</a></p>
+      </div>
     </div>
   </div>
 
@@ -1815,6 +1838,20 @@
       }
     }
 
+    async function apiLogin(name, password) {
+      try {
+        const res = await fetch('/api/creator-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'login', name, password })
+        });
+        return await res.json();
+      } catch (e) {
+        console.error('Login error:', e);
+        return null;
+      }
+    }
+
     async function apiTakePiece(creatorId, creatorName, pieceNumber, pieceTitle) {
       try {
         const res = await fetch('/api/content-take', {
@@ -1863,11 +1900,11 @@
     let takeCounts = {}; // { pieceNumber: count }
 
     function getCreatorData() {
-      return JSON.parse(sessionStorage.getItem('creatorData') || '{}');
+      return JSON.parse(localStorage.getItem('creatorData') || '{}');
     }
 
     function setCreatorData(data) {
-      sessionStorage.setItem('creatorData', JSON.stringify(data));
+      localStorage.setItem('creatorData', JSON.stringify(data));
     }
 
     function showScreen(screenId) {
@@ -1950,6 +1987,81 @@
         this.textContent = "Let's go";
         this.disabled = false;
       }
+    });
+
+    // ====== REGISTER / LOGIN TOGGLE ======
+    document.getElementById('show-login').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('register-form').style.display = 'none';
+      document.getElementById('login-form').style.display = 'block';
+    });
+
+    document.getElementById('show-register').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('register-form').style.display = 'block';
+    });
+
+    // ====== LOGIN HANDLER ======
+    document.getElementById('btn-login').addEventListener('click', async function() {
+      const firstName = document.getElementById('login-first-name').value.trim();
+      const lastName = document.getElementById('login-last-name').value.trim();
+      const password = document.getElementById('login-password').value.trim();
+      const errorEl = document.getElementById('login-error');
+      errorEl.style.display = 'none';
+
+      if (!firstName) { errorEl.textContent = 'Please enter your first name'; errorEl.style.display = 'block'; return; }
+      if (!lastName) { errorEl.textContent = 'Please enter your last name'; errorEl.style.display = 'block'; return; }
+      if (!password) { errorEl.textContent = 'Please enter your password'; errorEl.style.display = 'block'; return; }
+
+      const name = firstName + ' ' + lastName;
+
+      this.textContent = 'Logging in...';
+      this.disabled = true;
+
+      const result = await apiLogin(name, password);
+
+      if (result && result.success && result.creator) {
+        const creator = result.creator;
+        setCreatorData({
+          id: creator.id,
+          name: creator.name,
+          password: password,
+          referralCode: creator.referral_code,
+          takenPieces: []
+        });
+
+        // Load their takes
+        const takesResult = await apiGetTakes(creator.id);
+        if (takesResult && takesResult.takes) {
+          const data = getCreatorData();
+          data.takenPieces = takesResult.takes.map(t => t.piece_number);
+          setCreatorData(data);
+        }
+
+        document.querySelector('.hub-greeting').textContent = 'Hey, ' + firstName;
+        showScreen('screen-hub');
+        initializeHub();
+      } else {
+        const msg = (result && result.error) ? result.error : 'Something went wrong. Please try again.';
+        if (msg === 'Creator not found') {
+          errorEl.textContent = 'No account found with that name. Check your spelling or create a new account.';
+        } else if (msg === 'Wrong password') {
+          errorEl.textContent = 'Incorrect password. Please try again.';
+        } else {
+          errorEl.textContent = msg;
+        }
+        errorEl.style.display = 'block';
+        this.textContent = 'Log in';
+        this.disabled = false;
+      }
+    });
+
+    // Allow Enter key on login form
+    ['login-first-name', 'login-last-name', 'login-password'].forEach(function(id) {
+      document.getElementById(id).addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') document.getElementById('btn-login').click();
+      });
     });
 
     // ====== SCREEN 3: HUB ======
