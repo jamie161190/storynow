@@ -222,6 +222,7 @@ body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;heig
 .screen{display:none;min-height:100vh;padding:2rem 1.5rem 3rem;max-width:540px;margin:0 auto;flex-direction:column;align-items:center;position:relative;z-index:1;animation:fadeIn 0.3s ease}
 .screen.active{display:flex}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes genBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 
 /* Accessibility: focus visible */
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.cat-card:focus-visible,.theme-tile:focus-visible,.voice-card:focus-visible{outline:3px solid var(--purple);outline-offset:2px;border-radius:8px}
@@ -1326,6 +1327,12 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <!-- Fun fact / reassurance rotating -->
   <div style="max-width:400px;width:100%;margin-top:1rem;text-align:center">
     <p id="genFunFact" style="font-size:0.78rem;color:var(--text-soft);font-style:italic;line-height:1.5;font-weight:500;transition:opacity 0.5s"></p>
+  </div>
+
+  <!-- Scroll hint (hidden initially, shown just before game) -->
+  <div id="genScrollHint" style="display:none;text-align:center;margin-top:0.75rem;animation:genBounce 1.5s ease infinite">
+    <p style="font-size:0.75rem;color:var(--purple);font-weight:700;margin:0">A game just loaded below</p>
+    <span style="font-size:1.2rem;color:var(--purple)">&#8595;</span>
   </div>
 
   <!-- Mini game: Emoji Memory Match -->
@@ -3540,6 +3547,11 @@ async function handleStripeReturn() {
     goTo('screenFull');
     showNextStoryBanner(verifyData.customerEmail, discountCode, discountPercent);
     launchConfetti();
+    // After confetti, scroll down to the play button so the user knows the story is ready
+    setTimeout(() => {
+      const playBtn = document.getElementById('fullPlayBtn');
+      if (playBtn) playBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 1500);
   } catch(err) {
     stopGeneratingScreen();
     console.error('Story generation error:', err.message, err.stack);
@@ -3849,10 +3861,20 @@ function startGeneratingScreen(childName) {
     }, 400);
   }, 15000);
 
-  // Show the mini game after 15 seconds
+  // Show scroll hint at 12s, then game at 15s with auto-scroll
+  setTimeout(() => {
+    const hint = document.getElementById('genScrollHint');
+    if (hint) hint.style.display = 'block';
+  }, 12000);
   setTimeout(() => {
     const wrap = document.getElementById('genGameWrap');
-    if (wrap) { wrap.style.display = 'block'; startMemoryGame(); }
+    const hint = document.getElementById('genScrollHint');
+    if (wrap) {
+      wrap.style.display = 'block';
+      startMemoryGame();
+      if (hint) hint.style.display = 'none';
+      wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }, 15000);
 }
 
