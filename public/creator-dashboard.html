@@ -266,6 +266,10 @@
     .assignee-tag{display:inline-flex;align-items:center;gap:0.5rem;background:var(--purple);color:white;padding:0.35rem 0.6rem 0.35rem 0.9rem;border-radius:20px;font-size:0.85rem;font-weight:700;font-family:'Nunito',sans-serif}
     .assignee-tag button{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.1rem;cursor:pointer;padding:0 0.2rem;line-height:1}
     .assignee-tag button:hover{color:white}
+    .section-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:2rem;margin-bottom:1rem;flex-wrap:wrap}
+    .section-assign{border:1.5px solid var(--border);border-radius:20px;padding:0.4rem 1rem;font-size:0.8rem;font-family:'Quicksand',sans-serif;color:var(--text);width:180px;outline:none;transition:border-color 0.2s}
+    .section-assign:focus{border-color:var(--purple)}
+    .section-assign::placeholder{color:#ccc}
     .filter-chip{padding:0.4rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:700;border:2px solid var(--border);background:white;color:var(--text-soft);cursor:pointer;transition:all 0.2s;font-family:'Quicksand',sans-serif}
     .filter-chip:hover{border-color:var(--purple);color:var(--purple)}
     .filter-chip.active{background:var(--purple);color:white;border-color:var(--purple)}
@@ -419,29 +423,25 @@
       </div>
     </div>
 
-    <h2 class="section-header" style="margin-top:1rem">Chase Core</h2>
+    <div class="section-row"><h2 class="section-header" style="margin:0">Chase Core</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="phase1" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
     <div id="phase1" class="shoot-grid"></div>
 
-    <h2 class="section-header" style="margin-top:2rem">Cousins + Grandad</h2>
+    <div class="section-row"><h2 class="section-header" style="margin:0">Cousins + Grandad</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="phase2" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
     <div id="phase2" class="shoot-grid"></div>
 
-    <h2 class="section-header" style="margin-top:2rem">Gift Track + Product Proof</h2>
+    <div class="section-row"><h2 class="section-header" style="margin:0">Gift Track + Product Proof</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="phase3" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
     <div id="phase3" class="shoot-grid"></div>
 
-    <h2 class="section-header" style="margin-top:2rem">Founder Clips</h2>
+    <div class="section-row"><h2 class="section-header" style="margin:0">Founder Clips</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="modFounder" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
     <div id="modFounder" class="shoot-grid"></div>
 
-    <h2 class="section-header" style="margin-top:2rem">Process Clips</h2>
+    <div class="section-row"><h2 class="section-header" style="margin:0">Process Clips</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="modProcess" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
     <div id="modProcess" class="shoot-grid"></div>
 
-    <h2 class="section-header" style="margin-top:2rem">No-Kids Couple Brief</h2>
+    <div class="section-row"><h2 class="section-header" style="margin:0">No-Kids Couple Brief</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="friendCreator" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
     <div id="friendCreator" class="shoot-grid"></div>
 
-    <!-- 15 MIN BACKGROUND CLIP -->
-    <div style="display:flex;align-items:center;gap:0.75rem;margin:2.5rem 0 1rem">
-      <div style="background:#1ABC9C;color:white;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;font-family:'Nunito',sans-serif;letter-spacing:0.5px">RAW</div>
-      <h2 class="section-header" style="margin:0">15 Min Background Clip</h2>
-    </div>
+    <div class="section-row"><h2 class="section-header" style="margin:0">15 Min Background Clip</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="bgClips" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
     <div id="bgClips" class="shoot-grid"></div>
   </div>
 
@@ -814,6 +814,25 @@
       const pct = total > 0 ? Math.round((done / total) * 100) : 0;
       document.getElementById('progressText').textContent = done + ' / ' + total;
       document.getElementById('progressBar').style.width = pct + '%';
+    }
+
+    function assignSection(sectionId, value) {
+      if (!value || !value.trim()) return;
+      var name = value.trim();
+      var state = getShootState();
+      var clips = SHOOT_DATA[sectionId] || [];
+      clips.forEach(function(clip) {
+        state[clip.id + '_who'] = name;
+        setAssigneeTag('assignee-' + clip.id, name, clip.id);
+        // Also cascade to children
+        var children = getChildIds(clip.id);
+        children.forEach(function(childId) {
+          state[childId + '_who'] = name;
+          setAssigneeTag('assignee-' + childId, name, childId);
+        });
+      });
+      saveShootState(state);
+      buildFilterChips();
     }
 
     function resetAllData() {
