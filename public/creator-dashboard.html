@@ -979,7 +979,6 @@
                 <div class="shoot-info">
                   <div class="shoot-title">${key}. ${clip.title}</div>
                   <div class="shoot-meta">
-                    <span class="shoot-tag ${clip.type === 'Let It Roll' ? 'let-it-roll' : 'modular'}">${clip.type}</span>
                     <span class="shoot-tag length-tag">${clip.length}</span>
                     <span class="shoot-tag ${clip.priority.toLowerCase()}">${clip.priority}</span>
                   </div>
@@ -996,7 +995,7 @@
               </div>
               <div class="shoot-assignee">
                 <label>Assigned to:</label>
-                <input type="text" placeholder="Who is filming this?" value="${assignee}" onchange="saveAssignee('${key}',this.value)">
+                <input type="text" placeholder="Who is filming this?" value="${assignee}" data-clip-id="${key}" oninput="saveAssignee(this.dataset.clipId,this.value)">
               </div>
             </div>
           `;
@@ -1021,11 +1020,13 @@
       header.closest('.shoot-card').classList.toggle('open');
     }
 
+    let chipTimer = null;
     function saveAssignee(key, value) {
       const state = getShootState();
       state[key + '_who'] = value;
       saveShootState(state);
-      buildFilterChips();
+      clearTimeout(chipTimer);
+      chipTimer = setTimeout(buildFilterChips, 500);
     }
 
     let activeFilter = null;
