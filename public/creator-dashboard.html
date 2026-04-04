@@ -617,56 +617,8 @@
       <button class="logout-btn" id="logoutBtn">Sign Out</button>
     </div>
 
-    <!-- Stats Row -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Total Creators</div>
-        <div class="stat-value" id="totalCreators">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total Takes</div>
-        <div class="stat-value" id="totalTakes">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Referral Visits</div>
-        <div class="stat-value" id="totalVisits">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Conversions</div>
-        <div class="stat-value" id="totalConversions">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total Revenue</div>
-        <div class="stat-value" id="totalRevenue">$0</div>
-      </div>
-    </div>
-
     <!-- Error Message -->
     <div id="errorContainer"></div>
-
-    <!-- Creators Table -->
-    <h2 class="section-header">Creators</h2>
-    <div class="table-container">
-      <div class="table-wrapper">
-        <table id="creatorsTable">
-          <thead>
-            <tr>
-              <th class="sortable" data-sort="name">Name</th>
-              <th data-sort="child_names">Child Names</th>
-              <th>Referral Code</th>
-              <th class="sortable" data-sort="created_at">Joined</th>
-              <th class="sortable" data-sort="takes">Takes</th>
-              <th class="sortable" data-sort="visits">Visits</th>
-              <th class="sortable" data-sort="conversions">Conversions</th>
-              <th class="sortable" data-sort="revenue">Revenue</th>
-            </tr>
-          </thead>
-          <tbody id="creatorsBody">
-            <tr><td colspan="8" class="no-data">Loading creators...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
 
     <!-- CONTENT SHOOT PLAYBOOK -->
     <div style="margin-top:2rem;padding:2rem;background:linear-gradient(135deg,var(--purple),#8B5FC7);border-radius:var(--radius-lg);color:white;text-align:center;margin-bottom:2rem">
@@ -685,46 +637,22 @@
       </div>
     </div>
 
-    <!-- PHASE 1: CHASE CORE -->
-    <div style="display:flex;align-items:center;gap:0.75rem;margin:2rem 0 1rem">
-      <div style="background:var(--purple);color:white;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;font-family:'Nunito',sans-serif;letter-spacing:0.5px">PHASE 1</div>
-      <h2 class="section-header" style="margin:0">Chase Core</h2>
-    </div>
+    <h2 class="section-header" style="margin-top:1rem">Chase Core</h2>
     <div id="phase1" class="shoot-grid"></div>
 
-    <!-- PHASE 2: COUSINS + GRANDAD -->
-    <div style="display:flex;align-items:center;gap:0.75rem;margin:2.5rem 0 1rem">
-      <div style="background:var(--orange);color:white;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;font-family:'Nunito',sans-serif;letter-spacing:0.5px">PHASE 2</div>
-      <h2 class="section-header" style="margin:0">Cousins + Grandad</h2>
-    </div>
+    <h2 class="section-header" style="margin-top:2rem">Cousins + Grandad</h2>
     <div id="phase2" class="shoot-grid"></div>
 
-    <!-- PHASE 3: GIFT TRACK + PRODUCT PROOF -->
-    <div style="display:flex;align-items:center;gap:0.75rem;margin:2.5rem 0 1rem">
-      <div style="background:#2ECC71;color:white;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;font-family:'Nunito',sans-serif;letter-spacing:0.5px">PHASE 3</div>
-      <h2 class="section-header" style="margin:0">Gift Track + Product Proof</h2>
-    </div>
+    <h2 class="section-header" style="margin-top:2rem">Gift Track + Product Proof</h2>
     <div id="phase3" class="shoot-grid"></div>
 
-    <!-- MODULAR FOUNDER CLIPS -->
-    <div style="display:flex;align-items:center;gap:0.75rem;margin:2.5rem 0 1rem">
-      <div style="background:#3498DB;color:white;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;font-family:'Nunito',sans-serif;letter-spacing:0.5px">MODULAR</div>
-      <h2 class="section-header" style="margin:0">Founder Clips</h2>
-    </div>
+    <h2 class="section-header" style="margin-top:2rem">Founder Clips</h2>
     <div id="modFounder" class="shoot-grid"></div>
 
-    <!-- MODULAR PROCESS CLIPS -->
-    <div style="display:flex;align-items:center;gap:0.75rem;margin:2.5rem 0 1rem">
-      <div style="background:#9B59B6;color:white;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;font-family:'Nunito',sans-serif;letter-spacing:0.5px">MODULAR</div>
-      <h2 class="section-header" style="margin:0">Process Clips</h2>
-    </div>
+    <h2 class="section-header" style="margin-top:2rem">Process Clips</h2>
     <div id="modProcess" class="shoot-grid"></div>
 
-    <!-- FRIEND CREATOR BRIEF -->
-    <div style="display:flex;align-items:center;gap:0.75rem;margin:2.5rem 0 1rem">
-      <div style="background:#E67E22;color:white;padding:0.3rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;font-family:'Nunito',sans-serif;letter-spacing:0.5px">CREATOR</div>
-      <h2 class="section-header" style="margin:0">No-Kids Couple Brief</h2>
-    </div>
+    <h2 class="section-header" style="margin-top:2rem">No-Kids Couple Brief</h2>
     <div id="friendCreator" class="shoot-grid"></div>
 
     <!-- 15 MIN BACKGROUND CLIP -->
@@ -1023,7 +951,7 @@
                 <div class="shoot-expand">&#9660;</div>
               </div>
               <div class="shoot-detail">
-                ${clip.hook ? '<p><strong>Hook:</strong> "${clip.hook}"</p>' : ''}
+                ${clip.hook ? '<p><strong>Hook:</strong> "' + clip.hook + '"</p>' : ''}
                 <p><strong>What to do:</strong> ${clip.whatToDo}</p>
                 <p><strong>What NOT to do:</strong> <span class="warn">${clip.whatNot}</span></p>
                 <p><strong>Text on screen:</strong> ${clip.textOverlay}</p>
