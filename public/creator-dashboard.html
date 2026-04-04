@@ -266,10 +266,27 @@
     .assignee-tag{display:inline-flex;align-items:center;gap:0.5rem;background:var(--purple);color:white;padding:0.35rem 0.6rem 0.35rem 0.9rem;border-radius:20px;font-size:0.85rem;font-weight:700;font-family:'Nunito',sans-serif}
     .assignee-tag button{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.1rem;cursor:pointer;padding:0 0.2rem;line-height:1}
     .assignee-tag button:hover{color:white}
-    .section-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:2rem;margin-bottom:1rem;flex-wrap:wrap}
-    .section-assign{border:1.5px solid var(--border);border-radius:20px;padding:0.4rem 1rem;font-size:0.8rem;font-family:'Quicksand',sans-serif;color:var(--text);width:180px;outline:none;transition:border-color 0.2s}
-    .section-assign:focus{border-color:var(--purple)}
-    .section-assign::placeholder{color:#ccc}
+    .sub-clips{margin-top:1rem;padding-top:1rem;border-top:2px dashed var(--border);display:flex;flex-direction:column;gap:0.75rem}
+    .sub-clips-label{font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;color:var(--text-soft);margin-bottom:0.25rem}
+    .sub-card{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:0;overflow:hidden}
+    .sub-card.done{border-color:#2ECC71;opacity:0.7}
+    .sub-header{display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;cursor:pointer}
+    .sub-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:all 0.2s;background:white;font-size:12px}
+    .sub-check:hover{border-color:var(--purple);transform:scale(1.1)}
+    .sub-check.checked{background:var(--purple);border-color:var(--purple)}
+    .sub-check.checked::after{content:'\\2713';color:white;font-weight:700}
+    .sub-card.done .sub-check.checked{background:#2ECC71;border-color:#2ECC71}
+    .sub-title{font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;color:var(--text)}
+    .sub-card.done .sub-title{text-decoration:line-through;opacity:0.6}
+    .sub-expand{color:var(--text-soft);font-size:0.9rem;transition:transform 0.3s;flex-shrink:0;margin-left:auto;padding:0 0.3rem}
+    .sub-card.open .sub-expand{transform:rotate(180deg)}
+    .sub-detail{display:none;padding:0 1rem 0.75rem;font-size:0.85rem;line-height:1.6;color:var(--text)}
+    .sub-card.open .sub-detail{display:block}
+    .sub-detail p{margin:0 0 0.5rem}
+    .sub-assignee{display:flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;border-top:1px solid var(--border);background:rgba(107,47,147,0.02)}
+    .sub-assignee label{font-size:0.75rem;font-weight:600;color:var(--text-soft);white-space:nowrap}
+    .sub-assignee input{flex:1;border:1.5px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.8rem;font-family:'Quicksand',sans-serif;color:var(--text);background:white;outline:none}
+    .sub-assignee input:focus{border-color:var(--purple)}
     .filter-chip{padding:0.4rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:700;border:2px solid var(--border);background:white;color:var(--text-soft);cursor:pointer;transition:all 0.2s;font-family:'Quicksand',sans-serif}
     .filter-chip:hover{border-color:var(--purple);color:var(--purple)}
     .filter-chip.active{background:var(--purple);color:white;border-color:var(--purple)}
@@ -423,25 +440,13 @@
       </div>
     </div>
 
-    <div class="section-row"><h2 class="section-header" style="margin:0">Chase Core</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="phase1" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
-    <div id="phase1" class="shoot-grid"></div>
+    <h2 class="section-header" style="margin-top:1rem">Main Ads</h2>
+    <div id="mainAds" class="shoot-grid"></div>
 
-    <div class="section-row"><h2 class="section-header" style="margin:0">Cousins + Grandad</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="phase2" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
-    <div id="phase2" class="shoot-grid"></div>
-
-    <div class="section-row"><h2 class="section-header" style="margin:0">Gift Track + Product Proof</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="phase3" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
-    <div id="phase3" class="shoot-grid"></div>
-
-    <div class="section-row"><h2 class="section-header" style="margin:0">Founder Clips</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="modFounder" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
-    <div id="modFounder" class="shoot-grid"></div>
-
-    <div class="section-row"><h2 class="section-header" style="margin:0">Process Clips</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="modProcess" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
-    <div id="modProcess" class="shoot-grid"></div>
-
-    <div class="section-row"><h2 class="section-header" style="margin:0">No-Kids Couple Brief</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="friendCreator" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
+    <h2 class="section-header" style="margin-top:2rem">No-Kids Couple Brief</h2>
     <div id="friendCreator" class="shoot-grid"></div>
 
-    <div class="section-row"><h2 class="section-header" style="margin:0">15 Min Background Clip</h2><input type="text" class="section-assign" placeholder="Assign all to..." data-section="bgClips" onkeydown="if(event.key==='Enter'){event.preventDefault();assignSection(this.dataset.section,this.value);this.value=''}"></div>
+    <h2 class="section-header" style="margin-top:2rem">15 Min Background Clip</h2>
     <div id="bgClips" class="shoot-grid"></div>
   </div>
 
@@ -479,376 +484,271 @@
     });
 
     function loadDashboard() {
-      renderShootPlaybook();
+      renderAll();
     }
 
-    // ====== SHOOT PLAYBOOK ======
-    const SHOOT_DATA = {
-      phase1: [
-        { id:'1', title:'Daddy Is The Villain', type:'Let It Roll', length:'30-45s', platform:'Meta + TikTok', priority:'HIGHEST',
-          children:['F2','F4'],
-          hook:'I made myself the villain in my son\'s adventure story',
-          whatToDo:'Build the adventure story in advance with Chase as hero, Ellis as the sidekick, and Daddy as the villain. Have the story ready and queued. You on camera for 3 seconds holding your phone, smiling. Cut to Chase sitting. Story audio plays. Film his full face the moment he hears Daddy is the villain. Do not cut. Do not talk. Let it run.',
-          whatNot:'Do not tell Chase anything beforehand. Do not prime him. Do not say anything during filming. The moment you open your mouth you have killed the clip.',
-          textOverlay:'"I made myself the villain in my son\'s adventure story" then "His face when he heard it" then "storytold.ai"',
-          sound:'Full story audio. Chase\'s reaction.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: You holding phone (3s) then hard cut to Chase. Do NOT cut during his reaction, let it breathe. No music. Story audio is the soundtrack. Text overlays: bold white with dark shadow, appear at top of frame. Hook text first 2 seconds, reaction text when his face changes, URL last 3 seconds. Export: H.264, 30fps. Keep raw story audio loud and clear, do not lower it for overlays.' },
-        { id:'2', title:'He Doesn\'t Know Yet (Car)', type:'Let It Roll', length:'20-35s', platform:'Meta + TikTok', priority:'HIGHEST',
-          children:['F3'],
-          hook:'He doesn\'t know the story is about him yet',
-          whatToDo:'Story loaded and ready. Chase in the back seat. Phone connected to car speakers. Camera propped on front seat pointing back. Press record before you press play. You say nothing. You do not look back. The camera watches Chase. Get the moment his name comes through the speaker.',
-          whatNot:'Do not talk. Do not check on him. Do not direct him. Queue the story to 30 seconds before the first name drop.',
-          textOverlay:'"He doesn\'t know the story is about him yet" then "Every car journey now he asks for his story" then "storytold.ai"',
-          sound:'Story audio from car speakers. Natural silence otherwise.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: No cuts at all. One continuous shot. Trim to start 5s before name drop. No music. Car audio is the entire soundtrack. Text overlays: bold white with shadow at top. Hook text cold open, second overlay when name hits, URL last 3s. Export: H.264, 30fps. If car audio is quiet, boost it in edit but do not add background music.' },
-        { id:'3', title:'Sibling Reaction', type:'Let It Roll', length:'25-40s', platform:'Meta + TikTok', priority:'HIGH',
-          hook:'Put both my kids in the same story. Wait for the second one.',
-          whatToDo:'Build the story with Chase as hero and his sister as best friend. Her name appears within the first 2 minutes. Both children on the sofa or in bed. Camera captures both faces. Chase reacts first, then his sister hears her name. Do not cut between the two reactions. Let it run as one continuous clip.',
-          whatNot:'Do not tell either of them. Do not pause. Do not replay.',
-          textOverlay:'"Put both my kids in the same story" then "Wait for the second one" then "storytold.ai"',
-          sound:'Story audio. Both children\'s reactions.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: One continuous shot, no cuts between the two reactions. The escalation IS the ad. Trim to start just before Chase hears his name. No music. Text overlays: hook text at open, "Wait for the second one" between the two reactions, URL at end. Export: H.264, 30fps.' },
-        { id:'4', title:'Founder Origin Story', type:'Modular', length:'45-70s', platform:'Meta Facebook', priority:'HIGH',
-          children:['F1','F2','F3','F4','F5'],
-          hook:'My son asked me why he was never in any of his stories',
-          whatToDo:'Film every line as a completely separate clip. Selfie angle. Natural light. In the car, at home, wherever. Each clip is 6-12 seconds and standalone. You are building a library of founder pieces that assemble in different orders for different ads.',
-          whatNot:'Do not try to film this as one long monologue. Do not make it a pitch. Do not talk about features. This is a dad talking about his kid.',
-          textOverlay:'Each clip gets its own overlay matching the line spoken.',
-          sound:'Your voice. Then story audio with Chase\'s reaction for the assembled version.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Each modular clip is its own file. For the assembled long ad (45-70s): hard cuts between clips, no transitions. For assembled version add Chase reaction footage between founder clips. Text overlays: bold white with shadow, match spoken line. Export each clip individually AND as assembled versions. H.264, 30fps.' }
-      ],
-      phase2: [
-        { id:'5', title:'All Four Cousins Together', type:'Let It Roll', length:'40-60s', platform:'Meta + TikTok', priority:'HIGHEST',
-          hook:'Put all four cousins in the same story and didn\'t tell any of them',
-          whatToDo:'Build one adventure story with Chase as hero and all three cousins named as characters. Each cousin\'s name appears at a different point for four separate reaction beats. All four sitting together. Camera wide enough for all faces. Do not cut between reactions. Roll for longer than you think.',
-          whatNot:'Keep this completely separate from the grandad piece. Different room, different moment. Do not play this story in front of grandad. He needs his own.',
-          textOverlay:'"Put all four cousins in the same story" then "None of them knew" then "storytold.ai"',
-          sound:'Story audio. All four reactions naturally.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Cut: One continuous shot for the main ad. For a shorter version, cut to the best 2-3 reaction beats (5-8s each) with hard cuts. No music. No transitions. Text overlays: bold white with shadow at top. Keep story audio loud and clear throughout. Export full version AND a 30s cut of best beats. H.264, 30fps.' },
-        { id:'6', title:'One Cousin Close-Up', type:'Let It Roll', length:'15-25s', platform:'Meta + TikTok', priority:'HIGH',
-          hook:'Watch her face when she hears her name',
-          whatToDo:'Pick the youngest cousin. Extreme close-up on their face only. Eyes, mouth, expression. Story plays. The name comes through. Camera stays locked and does not move. Whatever expression appears, that is the ad.',
-          whatNot:'Nothing else in frame. No context. Just the face.',
-          textOverlay:'"Watch her face when she hears her name" then "storytold.ai"',
-          sound:'Story audio. The name drop and reaction.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: No cuts. Trim to start 3s before name drop, end 5s after reaction peaks. No music. No transitions. This is the simplest edit in the playbook. Crop tight on face if the original shot is too wide. Text overlay: hook at top for first 2s, URL last 3s. Export: H.264, 30fps.' },
-        { id:'7', title:'Grandad Listens', type:'Let It Roll', length:'30-50s', platform:'Meta + TikTok', priority:'HIGHEST',
-          hook:'Put my dad in my son\'s story. Didn\'t expect his reaction.',
-          whatToDo:'Build a separate story with Chase as hero and Grandad named as a proper character with weight. Grandad and Chase sitting together. Film primarily Grandad\'s face when he hears his own name in his grandson\'s story. A grandfather hearing himself woven into a child\'s world is something no competitor has captured.',
-          whatNot:'Grandad should not have heard or seen the cousins piece before his own moment. Keep this completely separate.',
-          textOverlay:'"Put my dad in my son\'s story" then "Didn\'t expect his reaction" then "storytold.ai"',
-          sound:'Story audio. Grandad\'s reaction. Chase reacting to grandad if it happens.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Cut: One continuous shot. If both grandad and Chase react, keep both in frame. Do NOT speed up or slow down. No music. The story audio and the raw emotion carry this. Text overlays: hook text first 3s, reaction text when his face changes, URL last 3s. This is your most emotional piece so keep the edit invisible. Export: H.264, 30fps. Also export a 1:1 square crop for Facebook Feed.' }
-      ],
-      phase3: [
-        { id:'8', title:'Chase Buys His Cousin One', type:'Let It Roll', length:'60-90s', platform:'Meta + TikTok', priority:'HIGH',
-          children:['P1','P2','P3'],
-          hook:'My son wanted to buy his cousin a story. He told me exactly what to put in it.',
-          whatToDo:'THREE PARTS. Part A: Chase asks if his cousin can have a story. Film naturally, don\'t script it. Part B: Screen record of the funnel with Chase telling you what to put in. He tells you the name, favourite thing, best friend. Part C: Tomorrow, show the cousin her story. Film her receiving it and pressing play.',
-          whatNot:'Do not script Part A. Let Chase initiate naturally. Each part works standalone too.',
-          textOverlay:'"My son asked if his cousin could have a story like his" then "He told me exactly what to put in it" then "Wait for her face when she hears her name"',
-          sound:'Chase\'s voice giving instructions. Story audio. Cousin\'s reaction.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. This is a multi-part edit. Part A (the ask): trim to the best 10-15s. Hard cut to Part B (screen record): speed up the funnel steps to 1.5x, keep Chase\'s voice at normal speed as voiceover. Hard cut to Part C (cousin reaction): normal speed, let it breathe. Text overlays between each part. No music. Total assembled should be 45-60s for the long version. Export each part standalone AND the full assembled version. H.264, 30fps.' },
-        { id:'9', title:'Funnel Walk-Through', type:'Modular', length:'20-35s', platform:'Meta + Organic', priority:'HIGH',
-          children:['P1','P2','P3','P4','P5'],
-          hook:'Watch how fast this works',
-          whatToDo:'Five screen records: P1 Typing the name in (5-8s), P2 Preview generating (5-8s), P3 Pressing play for the first time (3-5s), P4 WhatsApp link being sent (5-8s), P5 Listen link opening on phone (5-8s). Each is standalone.',
-          whatNot:'No voiceover needed. Captions do the work. Can be filmed anytime, no children required.',
-          textOverlay:'"Watch how fast this works" with captions on each step.',
-          sound:'Typing sounds. Generation sound. Story audio on play.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Screen record on iPhone (Settings > Control Centre > Screen Recording). Speed up typing to 1.5-2x. Hard cuts between each step. Add CapCut auto-captions describing each step. Subtle zoom-in on the name being typed and the play button being pressed. No music. The assembled version stitches all 5 in order. Export: H.264, 30fps.' },
-        { id:'10', title:'Preview Close-Up (Chase)', type:'Let It Roll', length:'15-20s', platform:'Retargeting', priority:'HIGH',
-          hook:'Watch his face when he hears it',
-          whatToDo:'Extreme close-up on Chase\'s eyes and expression only. Story plays. Camera does not move. No cuts. No music. Nothing else in frame. Just his face and the audio. The 3-5 seconds around the name drop is the entire ad.',
-          whatNot:'Do not add music. Do not cut. Do not frame anything else.',
-          textOverlay:'"Watch his face when he hears it" then "storytold.ai"',
-          sound:'Story audio only. The name drop moment.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. No cuts. Trim to the tightest possible window around the name drop. If footage is not close enough, crop and scale in post. No music. No transitions. Text: hook at top first 2s, URL at bottom last 3s. This runs as retargeting so the copy underneath the ad says "You heard the preview. Go finish their story." Export: H.264, 30fps.' }
-      ],
-      modFounder: [
-        { id:'F1', title:'Why I Built It', type:'Modular', length:'8-12s', platform:'All', priority:'HIGH',
-          hook:'I built this because of something my son said to me',
-          whatToDo:'Selfie angle. Natural light. Say the line and stop. This is one Lego brick.',
-          whatNot:'Do not explain the product. Just the line.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
-          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight, no dead air before or after. Add text overlay matching the spoken line in bold white. No music. Export standalone. H.264, 30fps.' },
-        { id:'F2', title:'I Made Myself The Villain', type:'Modular', length:'6-10s', platform:'All', priority:'HIGH',
-          hook:'I made myself the villain in his adventure story',
-          whatToDo:'Selfie. Say the line with a grin. Cut.',
-          whatNot:'Do not explain what happens next.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
-          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight. Bold white text overlay. No music. Export standalone. H.264, 30fps.' },
-        { id:'F3', title:'He Didn\'t Know The Story Was About Him', type:'Modular', length:'6-10s', platform:'All', priority:'HIGH',
-          hook:'He didn\'t know the story was about him',
-          whatToDo:'Selfie. Say it. The mystery in the line does all the work.',
-          whatNot:'Do not reveal what happened.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
-          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight. Bold white text overlay. No music. Export standalone. H.264, 30fps.' },
-        { id:'F4', title:'Now Every Child Can Have One', type:'Modular', length:'4-6s', platform:'All', priority:'MEDIUM',
-          hook:'Now every child can have one',
-          whatToDo:'Selfie. Deliver the line. This is your closer for assembled ads.',
-          whatNot:'Do not add anything after the line.', textOverlay:'"Now every child can have one" + storytold.ai', sound:'Your voice only.',
-          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight. Bold white text overlay + storytold.ai URL at bottom. This clip goes at the END of assembled ads. No music. Export standalone. H.264, 30fps.' },
-        { id:'F5', title:'He Asked Why He Was Never In A Story', type:'Modular', length:'8-12s', platform:'All', priority:'HIGH',
-          hook:'My son asked me why he was never in any of his stories',
-          whatToDo:'Selfie. This is your strongest opening line. Say it with weight.',
-          whatNot:'Do not rush it. Let the line land.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
-          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight but leave a beat of silence after the line lands. Bold white text overlay. No music. This clip goes at the START of assembled ads. Export standalone. H.264, 30fps.' }
-      ],
-      modProcess: [
-        { id:'P1', title:'Typing The Name In', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of typing the child\'s name into the funnel.', whatNot:'No voiceover needed.', textOverlay:'None needed.', sound:'Typing sounds.',
-          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record. Speed up to 1.5x if too slow. Crop to centre on the name field. Export standalone. H.264, 30fps.' },
-        { id:'P2', title:'Preview Generating', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of the preview generating on screen.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'None.',
-          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record. Speed up if the generation takes too long. Show the loading state then the result appearing. Export standalone. H.264, 30fps.' },
-        { id:'P3', title:'Pressing Play For The First Time', type:'Modular', length:'3-5s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of pressing the play button.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'The first second of audio.',
-          edit:'Format: 9:16 vertical. Software: CapCut. Subtle zoom into the play button as finger taps it. Let the first second of story audio play. Cut immediately after. Export standalone. H.264, 30fps.' },
-        { id:'P4', title:'WhatsApp Link Being Sent', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of sending the WhatsApp share link.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'Message send sound.',
-          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record of WhatsApp. Show the message being typed and the send tap. Export standalone. H.264, 30fps.' },
-        { id:'P5', title:'Listen Link Opening On Phone', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of the listen link opening on a phone.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'Story audio beginning.',
-          edit:'Format: 9:16 vertical. Software: CapCut. Show the link being tapped, page loading, player appearing. Let story audio play for 1-2 seconds. Export standalone. H.264, 30fps.' }
-      ],
+    // ====== SUB-CLIP LIBRARY ======
+    var SUB_CLIPS = {
+      F1:{id:'F1',title:'Why I Built It',length:'8-12s',hook:'I built this because of something my son said to me',whatToDo:'Selfie angle. Natural light. Say the line and stop.',whatNot:'Do not explain the product. Just the line.',edit:'CapCut. Trim tight. Bold white text overlay. No music. H.264, 30fps.'},
+      F2:{id:'F2',title:'I Made Myself The Villain',length:'6-10s',hook:'I made myself the villain in his adventure story',whatToDo:'Selfie. Say the line with a grin. Cut.',whatNot:'Do not explain what happens next.',edit:'CapCut. Trim tight. Bold white text overlay. No music. H.264, 30fps.'},
+      F3:{id:'F3',title:'He Didn\'t Know',length:'6-10s',hook:'He didn\'t know the story was about him',whatToDo:'Selfie. Say it. The mystery in the line does all the work.',whatNot:'Do not reveal what happened.',edit:'CapCut. Trim tight. Bold white text overlay. No music. H.264, 30fps.'},
+      F4:{id:'F4',title:'Now Every Child Can',length:'4-6s',hook:'Now every child can have one',whatToDo:'Selfie. Deliver the line. This is your closer.',whatNot:'Do not add anything after.',edit:'CapCut. Trim tight. Text + storytold.ai URL. Goes at END of assembled ads. H.264, 30fps.'},
+      F5:{id:'F5',title:'He Asked Why',length:'8-12s',hook:'My son asked me why he was never in any of his stories',whatToDo:'Selfie. This is your strongest opening line. Say it with weight.',whatNot:'Do not rush it. Let the line land.',edit:'CapCut. Trim tight, leave a beat after. Goes at START of assembled ads. H.264, 30fps.'},
+      P1:{id:'P1',title:'Typing The Name In',length:'5-8s',whatToDo:'Screen record of typing the child\'s name into the funnel.',whatNot:'No voiceover needed.',edit:'CapCut. iPhone screen record. Speed up to 1.5x. H.264, 30fps.'},
+      P2:{id:'P2',title:'Preview Generating',length:'5-8s',whatToDo:'Screen record of the preview generating.',whatNot:'No voiceover.',edit:'CapCut. Speed up if slow. Show loading then result. H.264, 30fps.'},
+      P3:{id:'P3',title:'Pressing Play',length:'3-5s',whatToDo:'Screen record of pressing the play button.',whatNot:'No voiceover.',edit:'CapCut. Subtle zoom into play button. First second of audio. H.264, 30fps.'},
+      P4:{id:'P4',title:'WhatsApp Link Sent',length:'5-8s',whatToDo:'Screen record of sending the WhatsApp share link.',whatNot:'No voiceover.',edit:'CapCut. Show message typed and sent. H.264, 30fps.'},
+      P5:{id:'P5',title:'Listen Link Opening',length:'5-8s',whatToDo:'Screen record of listen link opening on phone.',whatNot:'No voiceover.',edit:'CapCut. Show link tap, page load, player. 1-2s of audio. H.264, 30fps.'}
+    };
+
+    // ====== MAIN ADS (with embedded sub-clip references) ======
+    var MAIN_ADS = [
+      {id:'AD1',title:'Daddy Is The Villain',length:'30-45s',priority:'HIGHEST',subs:['F2','F4'],
+        hook:'I made myself the villain in my son\'s adventure story',
+        whatToDo:'Build the adventure story with Chase as hero, Ellis as sidekick, Daddy as villain. You on camera 3s holding phone. Cut to Chase. Story plays. Film his face when he hears Daddy is the villain. Do not cut. Do not talk. Let it run.',
+        whatNot:'Do not tell Chase anything. Do not prime him. Do not speak during filming.',
+        textOverlay:'"I made myself the villain" then "His face when he heard it" then "storytold.ai"',sound:'Full story audio. Chase\'s reaction.',
+        edit:'9:16, 1080x1920. CapCut. You holding phone (3s) hard cut to Chase. No cuts during reaction. No music. Story audio is soundtrack. Bold white text with shadow. Hook 2s, reaction text on face change, URL last 3s. H.264, 30fps.'},
+      {id:'AD2',title:'He Doesn\'t Know Yet (Car)',length:'20-35s',priority:'HIGHEST',subs:['F3'],
+        hook:'He doesn\'t know the story is about him yet',
+        whatToDo:'Story ready. Chase in back seat. Car speakers. Camera on front seat pointing back. Record before play. Say nothing. Camera watches Chase. Get the name drop moment.',
+        whatNot:'Do not talk. Do not check on him. Queue to 30s before first name drop.',
+        textOverlay:'"He doesn\'t know the story is about him yet" then "Every car journey now he asks" then "storytold.ai"',sound:'Car speakers. Natural silence.',
+        edit:'9:16, 1080x1920. CapCut. No cuts. One continuous shot. Trim to 5s before name drop. No music. Boost car audio if quiet. H.264, 30fps.'},
+      {id:'AD3',title:'Sibling Reaction',length:'25-40s',priority:'HIGH',subs:[],
+        hook:'Put both my kids in the same story. Wait for the second one.',
+        whatToDo:'Story with Chase as hero and sister as best friend. Her name within 2 mins. Both on sofa/bed. Camera captures both. Chase reacts first, then sister. One continuous clip.',
+        whatNot:'Do not tell either. Do not pause. Do not replay.',
+        textOverlay:'"Put both my kids in the same story" then "Wait for the second one" then "storytold.ai"',sound:'Story audio. Both reactions.',
+        edit:'9:16, 1080x1920. CapCut. One continuous shot. No cuts between reactions. The escalation IS the ad. No music. H.264, 30fps.'},
+      {id:'AD4',title:'Founder Origin Story',length:'45-70s',priority:'HIGH',subs:['F1','F2','F3','F4','F5'],
+        hook:'My son asked me why he was never in any of his stories',
+        whatToDo:'Film every line as a separate clip. Selfie. Natural light. Each 6-12s standalone. These are Lego bricks that assemble into different ads.',
+        whatNot:'Do not film as one monologue. Do not pitch. Do not talk features. Dad talking about his kid.',
+        textOverlay:'Each clip gets its own overlay matching the spoken line.',sound:'Your voice. Then story audio with Chase reaction for assembled version.',
+        edit:'9:16, 1080x1920. CapCut. Each clip standalone. Assembled: hard cuts, no transitions. Add Chase reaction between clips. H.264, 30fps.'},
+      {id:'AD5',title:'All Four Cousins Together',length:'40-60s',priority:'HIGHEST',subs:[],
+        hook:'Put all four cousins in the same story and didn\'t tell any of them',
+        whatToDo:'One adventure story, Chase as hero, three cousins named. Each name at different point. All four sitting together. Camera wide. Do not cut. Roll long.',
+        whatNot:'Keep separate from grandad piece. Different room. Do not play in front of grandad.',
+        textOverlay:'"Put all four cousins in the same story" then "None of them knew" then "storytold.ai"',sound:'Story audio. All four reactions.',
+        edit:'9:16, 1080x1920. CapCut. One continuous shot. Also export 30s cut of best 2-3 beats. No music. H.264, 30fps.'},
+      {id:'AD6',title:'One Cousin Close-Up',length:'15-25s',priority:'HIGH',subs:[],
+        hook:'Watch her face when she hears her name',
+        whatToDo:'Youngest cousin. Extreme close-up face only. Story plays. Name comes through. Camera locked. Whatever expression appears, that is the ad.',
+        whatNot:'Nothing else in frame. No context. Just the face.',
+        textOverlay:'"Watch her face when she hears her name" then "storytold.ai"',sound:'Story audio. Name drop and reaction.',
+        edit:'9:16, 1080x1920. CapCut. No cuts. Trim 3s before name, 5s after peak. Crop tight if needed. Simplest edit. H.264, 30fps.'},
+      {id:'AD7',title:'Grandad Listens',length:'30-50s',priority:'HIGHEST',subs:[],
+        hook:'Put my dad in my son\'s story. Didn\'t expect his reaction.',
+        whatToDo:'Separate story, Chase hero, Grandad as proper character. Both sitting together. Film Grandad\'s face hearing his name in grandson\'s story. Nothing like this exists in the market.',
+        whatNot:'Grandad must not have seen cousins piece. Keep completely separate.',
+        textOverlay:'"Put my dad in my son\'s story" then "Didn\'t expect his reaction" then "storytold.ai"',sound:'Story audio. Grandad reaction. Chase reacting to grandad.',
+        edit:'9:16, 1080x1920. CapCut. One continuous shot. No speed changes. No music. Most emotional piece, keep edit invisible. Also export 1:1 for Facebook. H.264, 30fps.'},
+      {id:'AD8',title:'Chase Buys His Cousin One',length:'60-90s',priority:'HIGH',subs:['P1','P2','P3'],
+        hook:'My son wanted to buy his cousin a story. He told me exactly what to put in it.',
+        whatToDo:'THREE PARTS. A: Chase asks for cousin story (natural, not scripted). B: Screen record funnel with Chase directing. C: Cousin receives and plays it.',
+        whatNot:'Do not script Part A. Each part works standalone too.',
+        textOverlay:'"My son asked if his cousin could have one" then "He told me exactly what to put in it" then "Wait for her face"',sound:'Chase\'s voice. Story audio. Cousin reaction.',
+        edit:'9:16, 1080x1920. CapCut. Multi-part: A trim 10-15s, hard cut to B at 1.5x, hard cut to C normal speed. No music. 45-60s assembled. Export parts standalone AND assembled. H.264, 30fps.'},
+      {id:'AD9',title:'Funnel Walk-Through',length:'20-35s',priority:'HIGH',subs:['P1','P2','P3','P4','P5'],
+        hook:'Watch how fast this works',
+        whatToDo:'Five screen records stitched together. Each standalone. No children required.',
+        whatNot:'No voiceover. Captions do the work.',
+        textOverlay:'"Watch how fast this works" with captions each step.',sound:'Typing. Generation. Story audio on play.',
+        edit:'9:16, 1080x1920. CapCut. iPhone screen record. Speed typing 1.5-2x. Hard cuts. Auto-captions. Zoom on name typed and play button. No music. H.264, 30fps.'},
+      {id:'AD10',title:'Preview Close-Up (Chase)',length:'15-20s',priority:'HIGH',subs:[],
+        hook:'Watch his face when he hears it',
+        whatToDo:'Extreme close-up Chase\'s eyes only. Story plays. No cuts. No music. Just face and audio. 3-5 seconds around name drop is the entire ad.',
+        whatNot:'Do not add music. Do not cut. Do not frame anything else.',
+        textOverlay:'"Watch his face when he hears it" then "storytold.ai"',sound:'Story audio only.',
+        edit:'9:16, 1080x1920. CapCut. No cuts. Crop/scale if not close enough. Retargeting ad: copy says "You heard the preview. Go finish their story." H.264, 30fps.'}
+    ];
+
+    // Standalone sections (not nested under a main ad)
+    var STANDALONE = {
       friendCreator: [
-        { id:'FC1', title:'The Decision', type:'Let It Roll', length:'30-45s', platform:'Meta + TikTok', priority:'HIGH',
-          hook:'We don\'t have kids but we just gave the best gift we\'ve ever given',
-          whatToDo:'Both on the sofa. One finds Storytold. They build a story together for a real child in their life. Film them typing the name, choosing the voice, hearing the preview together for the first time. Film both faces when the preview plays.',
-          whatNot:'Do not script the conversation. Let it happen naturally.', textOverlay:'"We don\'t have kids" then "But we just gave the best gift we\'ve ever given"', sound:'Natural conversation. Preview audio.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Trim to the best 30s. Keep their natural conversation audio. Hard cut to the preview playing moment. Text overlays: hook at top, reaction text when preview plays. No music. Export: H.264, 30fps.' },
-        { id:'FC2', title:'The Send', type:'Modular', length:'15-20s', platform:'Meta + TikTok', priority:'HIGH',
-          whatToDo:'Screen record of sending the WhatsApp link to the child\'s parent. The message they type. The moment they hit send.',
-          whatNot:'Nothing extra needed.', textOverlay:'"Sending it now..."', sound:'Message send sound.',
-          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record. Show the message being typed and sent. Simple text overlay. Export standalone. H.264, 30fps.' },
-        { id:'FC3', title:'The Reaction', type:'Let It Roll', length:'20-35s', platform:'Meta + TikTok', priority:'HIGHEST',
-          hook:'This is what happened when she heard it',
-          whatToDo:'The child receiving the story and pressing play. Film the reaction. This closes the three-part journey. Without this the content has no payoff.',
-          whatNot:'The child must be real and filmed. Without the reaction this cannot run as a paid ad.', textOverlay:'"Wait for her face" then "storytold.ai"', sound:'Story audio. Child\'s reaction.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. No cuts during the reaction. Trim to start just before play is pressed. No music. Text overlays: hook first 2s, URL last 3s. For the full 3-part assembled ad, hard cut FC1 > FC2 > FC3 with text overlays between parts. Export standalone AND as part of the full 3-part assembly. H.264, 30fps.' }
+        {id:'FC1',title:'The Decision',length:'30-45s',priority:'HIGH',hook:'We don\'t have kids but we just gave the best gift we\'ve ever given',whatToDo:'Both on sofa. Find Storytold. Build story together. Film both faces when preview plays.',whatNot:'Do not script.',edit:'9:16, 1080x1920. CapCut. Best 30s. Natural audio. No music. H.264, 30fps.'},
+        {id:'FC2',title:'The Send',length:'15-20s',priority:'HIGH',whatToDo:'Screen record sending WhatsApp link. Message typed. Hit send.',whatNot:'Nothing extra.',edit:'9:16. CapCut. iPhone screen record. H.264, 30fps.'},
+        {id:'FC3',title:'The Reaction',length:'20-35s',priority:'HIGHEST',hook:'This is what happened when she heard it',whatToDo:'Child receives story and presses play. Film reaction. Without this, no payoff.',whatNot:'Child must be real and filmed. Non-negotiable.',edit:'9:16, 1080x1920. CapCut. No cuts during reaction. Also export full 3-part assembly FC1>FC2>FC3. H.264, 30fps.'}
       ],
       bgClips: [
-        { id:'BG-A', title:'The Best Single Reaction', type:'Let It Roll', length:'15-25s', platform:'Paid', priority:'HIGH',
-          whatToDo:'Pick the single biggest, cleanest reaction moment in the full 15 minutes. Start the clip 5 seconds before the name hits. End 5 seconds after the peak. Add a text overlay and URL. That is your standalone paid ad.',
-          whatNot:'Do not add music or voiceover.', textOverlay:'Hook text + storytold.ai', sound:'Story audio and reaction.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Trim to the tightest window. Story audio must be clearly audible. No music. No filters. Text overlay: hook at top, URL at bottom. This is a standalone paid ad ready to upload. Export: H.264, 30fps.' },
-        { id:'BG-B', title:'The Compilation', type:'Let It Roll', length:'30-45s', platform:'All', priority:'HIGHEST',
-          whatToDo:'Three or four best reaction moments stitched together. Each beat 5-8 seconds. Name drops in audio, reaction on face, cut to next. No music. No voiceover. Just the story audio and reactions in sequence.',
-          whatNot:'Do not add music. The raw audio is more powerful.', textOverlay:'Minimal. Let the reactions speak.', sound:'Story audio through each beat.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Hard cuts between each reaction beat. No transitions, no fades. Each beat is 5-8s trimmed tight around the name drop. Story audio runs continuous or cuts with the video. No music. Minimal text: just the URL at the end. This is your highest retention piece. Export: H.264, 30fps.' },
-        { id:'BG-C', title:'The Background Atmosphere', type:'Let It Roll', length:'10-15s', platform:'All', priority:'MEDIUM',
-          whatToDo:'A moment where neither child is having a big reaction but the story is clearly audible and both children are just present and absorbed. Normal family scene.',
-          whatNot:'No performance needed. The story playing in the background of normal life is enough.', textOverlay:'"The story was just playing in the background"', sound:'Story audio in background.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Minimal edit. Trim to best 10-15s of calm natural footage. Story audio should be audible but at natural room volume. Text overlay at top. URL at end. No music. Export: H.264, 30fps.' },
-        { id:'BG-D', title:'The Shared Moment', type:'Let It Roll', length:'20-30s', platform:'All', priority:'HIGHEST',
-          whatToDo:'Both children react to the same name or look at each other during the story. Two children sharing a private moment of recognition without adult direction. Prioritise finding this in your timestamp review.',
-          whatNot:'Do not direct them. If it did not happen naturally, skip this clip.', textOverlay:'"They didn\'t know I was filming"', sound:'Story audio. Natural reactions.',
-          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. No cuts. One continuous moment. Trim to start 3s before the shared look/reaction. No music. No filters. Text overlay: hook at top first 2s, URL last 3s. This is raw and unedited on purpose. Export: H.264, 30fps.' }
+        {id:'BG-A',title:'The Best Single Reaction',length:'15-25s',priority:'HIGH',whatToDo:'Single biggest reaction from 15-min clip. Start 5s before name, end 5s after peak.',whatNot:'No music or voiceover.',edit:'9:16, 1080x1920. CapCut. Tightest window. Raw audio. H.264, 30fps.'},
+        {id:'BG-B',title:'The Compilation',length:'30-45s',priority:'HIGHEST',whatToDo:'3-4 best reactions stitched. Each beat 5-8s. Name drops + faces. No music.',whatNot:'Do not add music. Raw is more powerful.',edit:'9:16, 1080x1920. CapCut. Hard cuts. No transitions. Highest retention piece. H.264, 30fps.'},
+        {id:'BG-C',title:'Background Atmosphere',length:'10-15s',priority:'MEDIUM',whatToDo:'Neither child reacting big but story audible. Normal family scene.',whatNot:'No performance needed.',edit:'9:16, 1080x1920. CapCut. Minimal edit. Natural room volume. H.264, 30fps.'},
+        {id:'BG-D',title:'The Shared Moment',length:'20-30s',priority:'HIGHEST',whatToDo:'Both children react to same name or look at each other. Private recognition without adult direction.',whatNot:'Do not direct. Skip if it didn\'t happen naturally.',edit:'9:16, 1080x1920. CapCut. No cuts. Raw and unedited on purpose. H.264, 30fps.'}
       ]
     };
 
-    // LocalStorage persistence for checkboxes and assignees
-    function getShootState() {
-      try { return JSON.parse(localStorage.getItem('storytold_shoot') || '{}'); } catch(e) { return {}; }
-    }
-    function saveShootState(state) {
-      localStorage.setItem('storytold_shoot', JSON.stringify(state));
-    }
+    // ====== STATE ======
+    function getState() { try { return JSON.parse(localStorage.getItem('storytold_shoot2') || '{}'); } catch(e) { return {}; } }
+    function saveState(s) { localStorage.setItem('storytold_shoot2', JSON.stringify(s)); }
 
-    function renderShootPlaybook() {
-      const state = getShootState();
-      Object.keys(SHOOT_DATA).forEach(phase => {
-        const container = document.getElementById(phase);
+    // ====== RENDER ======
+    function renderAll() {
+      var s = getState();
+      // Main Ads
+      var mainHtml = '';
+      MAIN_ADS.forEach(function(ad) {
+        var done = s[ad.id+'_done'] || false;
+        var who = s[ad.id+'_who'] || '';
+        var subsHtml = '';
+        if (ad.subs.length > 0) {
+          subsHtml = '<div class="sub-clips"><div class="sub-clips-label">Individual clips inside this ad:</div>';
+          ad.subs.forEach(function(subId) {
+            var sub = SUB_CLIPS[subId]; if (!sub) return;
+            var sd = s[sub.id+'_done'] || false;
+            var sw = s[sub.id+'_who'] || '';
+            subsHtml += '<div class="sub-card' + (sd?' done':'') + '" data-id="'+sub.id+'">' +
+              '<div class="sub-header" onclick="this.closest(\'.sub-card\').classList.toggle(\'open\')">' +
+              '<div class="sub-check' + (sd?' checked':'') + '" onclick="event.stopPropagation();toggleDone(\''+sub.id+'\',this,\'sub\')"></div>' +
+              '<div style="flex:1"><div class="sub-title">'+sub.id+'. '+sub.title+'</div><span style="font-size:0.75rem;color:var(--text-soft)">'+sub.length+'</span></div>' +
+              '<div class="sub-expand">&#9660;</div></div>' +
+              '<div class="sub-detail">' +
+              (sub.hook ? '<p><strong>Hook:</strong> "'+sub.hook+'"</p>' : '') +
+              '<p><strong>What to do:</strong> '+sub.whatToDo+'</p>' +
+              '<p><strong>What NOT to do:</strong> <span class="warn">'+sub.whatNot+'</span></p>' +
+              (sub.edit ? '<p><strong>Edit:</strong> '+sub.edit+'</p>' : '') +
+              '</div>' +
+              '<div class="sub-assignee" id="assignee-'+sub.id+'">' +
+              (sw ? '<div class="assignee-tag"><span>'+sw+'</span><button onclick="event.stopPropagation();clearAssign(\''+sub.id+'\')">&#215;</button></div>'
+                  : '<input type="text" class="assign-input" placeholder="Assign..." onkeydown="assignKey(event,\''+sub.id+'\')">') +
+              '</div></div>';
+          });
+          subsHtml += '</div>';
+        }
+        mainHtml += '<div class="shoot-card' + (done?' done':'') + '" data-id="'+ad.id+'">' +
+          '<div class="shoot-header" onclick="toggleShootDetail(this)">' +
+          '<div class="shoot-check' + (done?' checked':'') + '" onclick="event.stopPropagation();toggleDone(\''+ad.id+'\',this,\'main\')"></div>' +
+          '<div class="shoot-info"><div class="shoot-title">'+ad.title+'</div>' +
+          '<div class="shoot-meta"><span class="shoot-tag length-tag">'+ad.length+'</span><span class="shoot-tag '+ad.priority.toLowerCase()+'">'+ad.priority+'</span>' +
+          (ad.subs.length > 0 ? '<span class="shoot-tag" style="background:#E8F8F5;color:#1ABC9C">'+ad.subs.length+' clips inside</span>' : '') +
+          '</div></div>' +
+          '<div class="shoot-expand">&#9660;</div></div>' +
+          '<div class="shoot-detail">' +
+          (ad.hook ? '<p><strong>Hook:</strong> "'+ad.hook+'"</p>' : '') +
+          '<p><strong>What to do:</strong> '+ad.whatToDo+'</p>' +
+          '<p><strong>What NOT to do:</strong> <span class="warn">'+ad.whatNot+'</span></p>' +
+          '<p><strong>Text on screen:</strong> '+ad.textOverlay+'</p>' +
+          '<p><strong>Sound:</strong> '+ad.sound+'</p>' +
+          (ad.edit ? '<p style="margin-top:0.5rem;padding-top:0.75rem;border-top:1px dashed var(--border)"><strong>Post-Production:</strong> '+ad.edit+'</p>' : '') +
+          subsHtml + '</div>' +
+          '<div class="shoot-assignee" id="assignee-'+ad.id+'">' +
+          (who ? '<div class="assignee-tag"><span>'+who+'</span><button onclick="event.stopPropagation();clearAssign(\''+ad.id+'\')">&#215;</button></div>'
+              : '<input type="text" class="assign-input" placeholder="Assign to..." onkeydown="assignKey(event,\''+ad.id+'\')">') +
+          '</div></div>';
+      });
+      document.getElementById('mainAds').innerHTML = mainHtml;
+
+      // Standalone sections
+      ['friendCreator','bgClips'].forEach(function(key) {
+        var container = document.getElementById(key);
         if (!container) return;
-        container.innerHTML = SHOOT_DATA[phase].map(clip => {
-          const key = clip.id;
-          const done = state[key + '_done'] || false;
-          const assignee = state[key + '_who'] || '';
-          return `
-            <div class="shoot-card ${done ? 'done' : ''}" data-id="${key}">
-              <div class="shoot-header" onclick="toggleShootDetail(this)">
-                <div class="shoot-check ${done ? 'checked' : ''}" onclick="event.stopPropagation();toggleShootDone('${key}',this)"></div>
-                <div class="shoot-info">
-                  <div class="shoot-title">${key}. ${clip.title}</div>
-                  <div class="shoot-meta">
-                    <span class="shoot-tag length-tag">${clip.length}</span>
-                    <span class="shoot-tag ${clip.priority.toLowerCase()}">${clip.priority}</span>
-                  </div>
-                </div>
-                <div class="shoot-expand">&#9660;</div>
-              </div>
-              <div class="shoot-detail">
-                ${clip.hook ? '<p><strong>Hook:</strong> "' + clip.hook + '"</p>' : ''}
-                <p><strong>What to do:</strong> ${clip.whatToDo}</p>
-                <p><strong>What NOT to do:</strong> <span class="warn">${clip.whatNot}</span></p>
-                <p><strong>Text on screen:</strong> ${clip.textOverlay}</p>
-                <p><strong>Sound:</strong> ${clip.sound}</p>
-                ${clip.edit ? '<p style="margin-top:0.5rem;padding-top:0.75rem;border-top:1px dashed var(--border)"><strong>Post-Production:</strong> ' + clip.edit + '</p>' : ''}
-              </div>
-              <div class="shoot-assignee" id="assignee-${key}">
-                ${assignee
-                  ? '<div class="assignee-tag"><span>' + assignee + '</span><button onclick="event.stopPropagation();handleClearAssign(\x27' + key + '\x27)">\u00d7</button></div>'
-                  : '<input type="text" class="assign-input" placeholder="Type a name and hit enter..." onkeydown="handleAssignKey(event,\x27' + key + '\x27)">'
-                }
-              </div>
-            </div>
-          `;
+        container.innerHTML = STANDALONE[key].map(function(clip) {
+          var done = s[clip.id+'_done'] || false;
+          var who = s[clip.id+'_who'] || '';
+          return '<div class="shoot-card' + (done?' done':'') + '" data-id="'+clip.id+'">' +
+            '<div class="shoot-header" onclick="toggleShootDetail(this)">' +
+            '<div class="shoot-check' + (done?' checked':'') + '" onclick="event.stopPropagation();toggleDone(\''+clip.id+'\',this,\'main\')"></div>' +
+            '<div class="shoot-info"><div class="shoot-title">'+clip.id+'. '+clip.title+'</div>' +
+            '<div class="shoot-meta"><span class="shoot-tag length-tag">'+clip.length+'</span><span class="shoot-tag '+clip.priority.toLowerCase()+'">'+clip.priority+'</span></div></div>' +
+            '<div class="shoot-expand">&#9660;</div></div>' +
+            '<div class="shoot-detail">' +
+            (clip.hook ? '<p><strong>Hook:</strong> "'+clip.hook+'"</p>' : '') +
+            '<p><strong>What to do:</strong> '+clip.whatToDo+'</p>' +
+            '<p><strong>What NOT to do:</strong> <span class="warn">'+clip.whatNot+'</span></p>' +
+            (clip.edit ? '<p><strong>Edit:</strong> '+clip.edit+'</p>' : '') +
+            '</div>' +
+            '<div class="shoot-assignee" id="assignee-'+clip.id+'">' +
+            (who ? '<div class="assignee-tag"><span>'+who+'</span><button onclick="event.stopPropagation();clearAssign(\''+clip.id+'\')">&#215;</button></div>'
+                : '<input type="text" class="assign-input" placeholder="Assign to..." onkeydown="assignKey(event,\''+clip.id+'\')">') +
+            '</div></div>';
         }).join('');
       });
       updateProgress();
-      buildFilterChips();
+      buildChips();
     }
 
-    function toggleShootDone(key, el) {
-      const state = getShootState();
-      const done = !state[key + '_done'];
-      state[key + '_done'] = done;
-      saveShootState(state);
-      el.classList.toggle('checked', done);
-      const card = el.closest('.shoot-card');
-      card.classList.toggle('done', done);
+    // ====== ACTIONS ======
+    function toggleDone(id, el, type) {
+      var s = getState(); s[id+'_done'] = !s[id+'_done']; saveState(s);
+      el.classList.toggle('checked', s[id+'_done']);
+      var card = el.closest(type==='sub' ? '.sub-card' : '.shoot-card');
+      card.classList.toggle('done', s[id+'_done']);
       updateProgress();
     }
 
-    function toggleShootDetail(header) {
-      header.closest('.shoot-card').classList.toggle('open');
-    }
+    function toggleShootDetail(header) { header.closest('.shoot-card').classList.toggle('open'); }
 
-    // Find children for a clip ID
-    function getChildIds(clipId) {
-      var found = [];
-      Object.keys(SHOOT_DATA).forEach(function(phase) {
-        SHOOT_DATA[phase].forEach(function(clip) {
-          if (clip.id === clipId && clip.children) found = clip.children;
-        });
-      });
-      return found;
-    }
-
-    function setAssigneeTag(boxId, value, clipId) {
-      var box = document.getElementById(boxId);
-      if (!box) return;
-      box.innerHTML = '<div class="assignee-tag"><span>' + value + '</span><button onclick="event.stopPropagation();handleClearAssign(\x27' + clipId + '\x27)">\u00d7</button></div>';
-    }
-
-    function setAssigneeInput(boxId, clipId) {
-      var box = document.getElementById(boxId);
-      if (!box) return;
-      box.innerHTML = '<input type="text" class="assign-input" placeholder="Type a name and hit enter..." onkeydown="handleAssignKey(event,\x27' + clipId + '\x27)">';
-    }
-
-    function handleAssignKey(e, clipId) {
+    function assignKey(e, id) {
       if (e.key !== 'Enter') return;
       e.preventDefault();
-      var value = e.target.value.trim();
-      if (!value) return;
-      var state = getShootState();
-      state[clipId + '_who'] = value;
-      setAssigneeTag('assignee-' + clipId, value, clipId);
-      // Cascade to children
-      var children = getChildIds(clipId);
-      children.forEach(function(childId) {
-        state[childId + '_who'] = value;
-        setAssigneeTag('assignee-' + childId, value, childId);
-      });
-      saveShootState(state);
-      buildFilterChips();
+      var val = e.target.value.trim(); if (!val) return;
+      var s = getState();
+      s[id+'_who'] = val;
+      // If main ad, cascade to subs
+      var ad = MAIN_ADS.find(function(a){return a.id===id;});
+      if (ad && ad.subs) ad.subs.forEach(function(subId) { s[subId+'_who'] = val; });
+      saveState(s);
+      renderAll();
     }
 
-    function handleClearAssign(clipId) {
-      var state = getShootState();
-      delete state[clipId + '_who'];
-      setAssigneeInput('assignee-' + clipId, clipId);
-      // Cascade clear to children
-      var children = getChildIds(clipId);
-      children.forEach(function(childId) {
-        delete state[childId + '_who'];
-        setAssigneeInput('assignee-' + childId, childId);
-      });
-      saveShootState(state);
-      buildFilterChips();
+    function clearAssign(id) {
+      var s = getState();
+      delete s[id+'_who'];
+      var ad = MAIN_ADS.find(function(a){return a.id===id;});
+      if (ad && ad.subs) ad.subs.forEach(function(subId) { delete s[subId+'_who']; });
+      saveState(s);
+      renderAll();
     }
 
-    let activeFilter = null;
+    // ====== FILTER CHIPS ======
+    var activeFilter = null;
 
-    function buildFilterChips() {
-      const state = getShootState();
-      const names = new Set();
-      Object.keys(SHOOT_DATA).forEach(phase => {
-        SHOOT_DATA[phase].forEach(clip => {
-          const who = state[clip.id + '_who'];
-          if (who && who.trim()) names.add(who.trim());
-        });
-      });
-      const container = document.getElementById('filterChips');
-      let html = '<button class="filter-chip active" onclick="setFilter(null, this)">All</button>';
-      names.forEach(name => {
-        html += '<button class="filter-chip" onclick="setFilter(\'' + name.replace(/'/g,"\\'") + '\', this)">' + name + '</button>';
+    function buildChips() {
+      var s = getState();
+      var names = {};
+      function check(id) { var w = s[id+'_who']; if (w && w.trim()) names[w.trim()] = true; }
+      MAIN_ADS.forEach(function(ad) { check(ad.id); ad.subs.forEach(function(subId) { check(subId); }); });
+      ['friendCreator','bgClips'].forEach(function(k) { STANDALONE[k].forEach(function(c) { check(c.id); }); });
+      var container = document.getElementById('filterChips');
+      var html = '<button class="filter-chip' + (!activeFilter?' active':'') + '" onclick="filterBy(null,this)">All</button>';
+      Object.keys(names).forEach(function(name) {
+        html += '<button class="filter-chip' + (activeFilter===name?' active':'') + '" onclick="filterBy(\''+name.replace(/'/g,"\\'")+'\',this)">'+name+'</button>';
       });
       container.innerHTML = html;
     }
 
-    function setFilter(name, el) {
+    function filterBy(name, el) {
       activeFilter = name;
-      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.filter-chip').forEach(function(c){c.classList.remove('active');});
       el.classList.add('active');
-      const state = getShootState();
-      document.querySelectorAll('.shoot-card').forEach(card => {
-        const id = card.dataset.id;
-        const who = (state[id + '_who'] || '').trim();
-        if (!name || who === name) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
-        }
+      var s = getState();
+      document.querySelectorAll('.shoot-card').forEach(function(card) {
+        var id = card.dataset.id;
+        var who = (s[id+'_who'] || '').trim();
+        // Also check if any sub-clip is assigned to this person
+        var hasSub = false;
+        var ad = MAIN_ADS.find(function(a){return a.id===id;});
+        if (ad && ad.subs) ad.subs.forEach(function(subId) { if ((s[subId+'_who']||'').trim() === name) hasSub = true; });
+        card.style.display = (!name || who === name || hasSub) ? '' : 'none';
       });
     }
 
     function updateProgress() {
-      const state = getShootState();
-      let total = 0, done = 0;
-      Object.keys(SHOOT_DATA).forEach(phase => {
-        SHOOT_DATA[phase].forEach(clip => {
-          total++;
-          if (state[clip.id + '_done']) done++;
-        });
-      });
-      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      var s = getState(); var total = 0, done = 0;
+      MAIN_ADS.forEach(function(ad) { total++; if (s[ad.id+'_done']) done++; ad.subs.forEach(function(subId) { total++; if (s[subId+'_done']) done++; }); });
+      ['friendCreator','bgClips'].forEach(function(k) { STANDALONE[k].forEach(function(c) { total++; if (s[c.id+'_done']) done++; }); });
+      var pct = total > 0 ? Math.round((done/total)*100) : 0;
       document.getElementById('progressText').textContent = done + ' / ' + total;
       document.getElementById('progressBar').style.width = pct + '%';
     }
 
-    function assignSection(sectionId, value) {
-      if (!value || !value.trim()) return;
-      var name = value.trim();
-      var state = getShootState();
-      var clips = SHOOT_DATA[sectionId] || [];
-      clips.forEach(function(clip) {
-        state[clip.id + '_who'] = name;
-        setAssigneeTag('assignee-' + clip.id, name, clip.id);
-        var children = getChildIds(clip.id);
-        children.forEach(function(childId) {
-          state[childId + '_who'] = name;
-          setAssigneeTag('assignee-' + childId, name, childId);
-        });
-      });
-      saveShootState(state);
-      buildFilterChips();
-    }
-
-    // Also handle section assign via event delegation as backup
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' && e.target.classList.contains('section-assign')) {
-        e.preventDefault();
-        var section = e.target.dataset.section;
-        var val = e.target.value;
-        assignSection(section, val);
-        e.target.value = '';
-      }
-    });
-
     function resetAllData() {
-      if (!confirm('This will clear all assignments and checkboxes. Are you sure?')) return;
-      localStorage.removeItem('storytold_shoot');
-      renderShootPlaybook();
+      if (!confirm('Clear all assignments and checkboxes?')) return;
+      localStorage.removeItem('storytold_shoot2');
+      activeFilter = null;
+      renderAll();
     }
 
     // Focus on input on load
