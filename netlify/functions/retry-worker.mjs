@@ -393,7 +393,7 @@ export default async (req) => {
         Thank you for creating something truly special. ${safeChild}'s personalised ${categoryLabel.toLowerCase()} (~15 min) has been created and is ready to enjoy.
       </p>
       ${storyId ? `<div style="text-align:center;margin:0 0 24px;">
-        <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
+        <a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
       </div>` : ''}
       <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 8px;font-size:15px;color:#2D2844;font-weight:700;">Share with the whole family</p>
@@ -404,7 +404,7 @@ export default async (req) => {
         You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email:
       </p>
       <div style="background:#F8F5FF;border-radius:10px;padding:12px;text-align:center;margin:0 0 20px;">
-        <p style="margin:0;font-size:16px;font-weight:700;color:#7C5CFC;">${safeEmail}</p>
+        <p style="margin:0;font-size:16px;font-weight:700;color:#6B2F93;">${safeEmail}</p>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
         We hope ${safeChild} loves every second of it.
@@ -412,7 +412,7 @@ export default async (req) => {
       <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Loved it?</p>
         <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Create another story for a child you love.</p>
-        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
+        <a href="https://storytold.ai" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
       </div>
     </div>
     <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>

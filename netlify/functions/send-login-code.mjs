@@ -97,7 +97,7 @@ export default async (req) => {
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);text-align:center;">
       <p style="font-size:16px;color:#2D2844;margin:0 0 8px;">Your login code</p>
       <div style="background:#F8F5FF;border-radius:12px;padding:20px;margin:16px 0;">
-        <span style="font-size:36px;font-weight:800;letter-spacing:8px;color:#7C5CFC;">${code}</span>
+        <span style="font-size:36px;font-weight:800;letter-spacing:8px;color:#6B2F93;">${code}</span>
       </div>
       <p style="color:#999;font-size:14px;margin:0;">This code expires in 10 minutes. If you did not request this, you can safely ignore this email.</p>
     </div>

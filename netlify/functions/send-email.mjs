@@ -205,7 +205,7 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
       </p>
       ${storyId ? `
       <div style="text-align:center;margin:0 0 24px;">
-        <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
+        <a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
       </div>` : ''}
       <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 8px;font-size:15px;color:#2D2844;font-weight:700;">Share with the whole family</p>
@@ -216,7 +216,7 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
         You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email:
       </p>
       <div style="background:#F8F5FF;border-radius:10px;padding:12px;text-align:center;margin:0 0 20px;">
-        <p style="margin:0;font-size:16px;font-weight:700;color:#7C5CFC;">${safeEmail}</p>
+        <p style="margin:0;font-size:16px;font-weight:700;color:#6B2F93;">${safeEmail}</p>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
         I hope ${safeChild} loves every second of it.
@@ -224,13 +224,13 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
       ${discountCode ? `
       <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Your next story: ${discountPercent || 25}% off</p>
-        <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Because you are part of the Storytold family. Use code <strong style="color:#7C5CFC">${esc(discountCode)}</strong> at checkout.</p>
-        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
+        <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Because you are part of the Storytold family. Use code <strong style="color:#6B2F93">${esc(discountCode)}</strong> at checkout.</p>
+        <a href="https://storytold.ai" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
       </div>` : `
       <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Loved it?</p>
         <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Create another story for a child you love.</p>
-        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
+        <a href="https://storytold.ai" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
       </div>`}
     </div>
     <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
@@ -260,12 +260,12 @@ function giftEmail(childName, giftFrom, giftMessage, storyId) {
         ${safeFrom} has created a personalised audio story just for ${safeChild}. It is a one of a kind story where ${safeChild} is the star of the adventure.
       </p>
       ${giftMessage ? `
-      <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #FF8C42;">
+      <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #F1753B;">
         <p style="margin:0 0 4px;font-size:13px;color:#999;">A message from ${safeFrom}:</p>
         <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${safeMsg}"</p>
       </div>` : ''}
       <div style="text-align:center;margin:24px 0;">
-        <a href="${listenUrl}" style="display:inline-block;background:#FF8C42;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
+        <a href="${listenUrl}" style="display:inline-block;background:#F1753B;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
       </div>
       <p style="color:#999;font-size:13px;text-align:center;line-height:1.5;margin:0;">
         This story was made with love using Storytold, where every child becomes the hero of their own audio adventure.
@@ -298,18 +298,18 @@ function shareEmail(childName, fromName, message, storyId) {
         ${safeFrom} shared a personalised audio story made for ${safeChild}. It is a one of a kind story where ${safeChild} is the star of the adventure.
       </p>
       ${message ? `
-      <div style="background:#F8F5FF;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #7C5CFC;">
+      <div style="background:#F8F5FF;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #6B2F93;">
         <p style="margin:0 0 4px;font-size:13px;color:#999;">Message from ${safeFrom}:</p>
         <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${safeMsg}"</p>
       </div>` : ''}
       <div style="text-align:center;margin:24px 0;">
-        <a href="${listenUrl}" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen now</a>
+        <a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen now</a>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;text-align:center;">
         Want to create a personalised story for a child in your life?
       </p>
       <div style="text-align:center;">
-        <a href="https://storytold.ai" style="color:#7C5CFC;font-size:14px;font-weight:600;text-decoration:none;">Create your own story &rarr;</a>
+        <a href="https://storytold.ai" style="color:#6B2F93;font-size:14px;font-weight:600;text-decoration:none;">Create your own story &rarr;</a>
       </div>
     </div>
     <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>

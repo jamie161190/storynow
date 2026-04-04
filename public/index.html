@@ -27,7 +27,8 @@
 <meta name="twitter:image" content="https://storytold.ai/og-image.png">
 
 <!-- Additional SEO -->
-<meta name="theme-color" content="#7C5CFC">
+<meta name="theme-color" content="#6B2F93">
+
 <meta name="author" content="Storytold">
 <meta name="robots" content="index, follow">
 
@@ -188,12 +189,12 @@ if (localStorage.getItem('st_cookies') === 'accepted') {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --purple:#7C5CFC;
-  --purple-light:#EDE8FF;
-  --purple-soft:#B8A9FF;
-  --orange:#FF8C42;
-  --orange-light:#FFF0E5;
-  --orange-glow:#FFAD6E;
+  --purple:#6B2F93;
+  --purple-light:#F0E5F7;
+  --purple-soft:#A872C8;
+  --orange:#F1753B;
+  --orange-light:#FFF0E8;
+  --orange-glow:#F49A6A;
   --sky:#4FC3F7;
   --sky-light:#E1F5FE;
   --pink:#FF6B9D;
@@ -246,7 +247,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 .cta-group{display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:340px;margin:0.5rem auto 0}
 .btn{padding:1rem 2rem;border:none;border-radius:var(--radius);font-family:'Quicksand',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.25s ease;text-align:center;position:relative;overflow:hidden}
-.btn-primary{background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,#9B7CFF));color:#fff;box-shadow:0 4px 20px var(--cat-glow,rgba(124,92,252,0.3))}
+.btn-primary{background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,#A872C8));color:#fff;box-shadow:0 4px 20px var(--cat-glow,rgba(124,92,252,0.3))}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px var(--cat-glow,rgba(124,92,252,0.4))}
 .btn-primary:active{transform:translateY(0)}
 .btn-gift{background:var(--card);color:var(--cat-accent,var(--purple));border:2px solid var(--border);border-radius:var(--radius)}
@@ -264,7 +265,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .sample-player{width:100%;max-width:380px;background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;box-shadow:var(--shadow);margin:0.25rem auto 0}
 .sample-label{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;color:var(--purple);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.6rem}
 .sample-row{display:flex;align-items:center;gap:0.85rem}
-.sample-play-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--purple),#9B7CFF);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(124,92,252,0.3);transition:transform 0.2s}
+.sample-play-btn{width:44px;height:44px;background:linear-gradient(135deg,var(--purple),#A872C8);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;box-shadow:0 3px 12px rgba(124,92,252,0.3);transition:transform 0.2s}
 .sample-play-btn:hover{transform:scale(1.08)}
 .sample-wave{flex:1;min-width:0}
 .sample-progress-bar{width:100%;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
@@ -275,8 +276,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .sample-pills{display:flex;gap:0.4rem;margin-bottom:0.7rem;justify-content:center}
 .sample-pill{font-family:'Nunito',sans-serif;font-size:0.72rem;font-weight:800;padding:0.3rem 0.85rem;border-radius:999px;border:2px solid var(--border);background:var(--bg);color:var(--text-muted);cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.03em}
 .sample-pill:hover{border-color:var(--purple-soft);color:var(--text)}
-.sample-pill.active[data-cat="bedtime"]{background:linear-gradient(135deg,var(--purple),#9B7CFF);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(124,92,252,0.25)}
-.sample-pill.active[data-cat="adventure"]{background:linear-gradient(135deg,#E06B20,#FF8C42);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(255,140,66,0.25)}
+.sample-pill.active[data-cat="bedtime"]{background:linear-gradient(135deg,var(--purple),#A872C8);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(124,92,252,0.25)}
+.sample-pill.active[data-cat="adventure"]{background:linear-gradient(135deg,#D4601E,#F1753B);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(255,140,66,0.25)}
 
 .trust-row{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:0.5rem}
 .trust-item{display:flex;align-items:center;gap:0.3rem;font-size:0.78rem;color:var(--text-muted);font-weight:600}
@@ -340,14 +341,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* Bedtime: deep indigo, dreamy, night sky */
 .cat-bedtime{border-color:#D4C8FF}
-.cat-bedtime::before{background:linear-gradient(180deg,#7C5CFC,#5B3FD4)}
-.cat-bedtime.selected{border-color:#7C5CFC;background:linear-gradient(135deg,#F3EEFF,#E8E0FF)}
+.cat-bedtime::before{background:linear-gradient(180deg,#6B2F93,#521F7A)}
+.cat-bedtime.selected{border-color:#6B2F93;background:linear-gradient(135deg,#F3EEFF,#E8E0FF)}
 .cat-bedtime:hover{border-color:#B8A9FF}
 
 /* Adventure: warm orange, exciting, energetic */
 .cat-journey{border-color:#FFD9B8}
-.cat-journey::before{background:linear-gradient(180deg,#FF8C42,#E06B20)}
-.cat-journey.selected{border-color:#FF8C42;background:linear-gradient(135deg,#FFF5EC,#FFE8D4)}
+.cat-journey::before{background:linear-gradient(180deg,#F1753B,#D4601E)}
+.cat-journey.selected{border-color:#F1753B;background:linear-gradient(135deg,#FFF5EC,#FFE8D4)}
 .cat-journey:hover{border-color:#FFAD6E}
 
 /* Learning: bright teal, curious, smart */
@@ -363,13 +364,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .cat-journey .cat-icon{background:linear-gradient(135deg,#FFE5D0,#FFC8A0);box-shadow:0 4px 12px rgba(255,140,66,0.15)}
 .cat-learning .cat-icon{background:linear-gradient(135deg,#D4F1EE,#A8E6DF);box-shadow:0 4px 12px rgba(0,180,160,0.15)}
 .cat-info h3{font-family:'Nunito',sans-serif;font-size:1.08rem;font-weight:800;margin-bottom:0.15rem}
-.cat-bedtime .cat-info h3{color:#5B3FD4}
-.cat-journey .cat-info h3{color:#D4660F}
+.cat-bedtime .cat-info h3{color:#521F7A}
+.cat-journey .cat-info h3{color:#C45510}
 .cat-learning .cat-info h3{color:#008F7F}
 .cat-info p{font-size:0.82rem;color:var(--text-soft);line-height:1.45;font-weight:500}
 .cat-tag{display:inline-block;font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;padding:0.2rem 0.55rem;border-radius:20px;margin-top:0.35rem}
-.cat-bedtime .cat-tag{background:#E8E0FF;color:#5B3FD4}
-.cat-journey .cat-tag{background:#FFE5D0;color:#D4660F}
+.cat-bedtime .cat-tag{background:#E8E0FF;color:#521F7A}
+.cat-journey .cat-tag{background:#FFE5D0;color:#C45510}
 .cat-learning .cat-tag{background:#D4F1EE;color:#008F7F}
 
 /* ===== GIFT SECTION ===== */
@@ -706,7 +707,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- STORY COUNTER -->
   <div id="storyCounter" style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center;display:none">
-    <p style="margin:0"><span id="storyCountNum" style="font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--purple),#9B7CFF);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0</span></p>
+    <p style="margin:0"><span id="storyCountNum" style="font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--purple),#A872C8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0</span></p>
     <p style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin:0.1rem 0 0">stories created so far</p>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:500;margin:0.3rem 0 0">Every single one written from scratch. No two are the same.</p>
   </div>
@@ -1791,10 +1792,10 @@ function switchSample(cat, btn) {
   // Update play button color
   var playBtn = document.getElementById('samplePlayBtn');
   if (cat === 'adventure') {
-    playBtn.style.background = 'linear-gradient(135deg,#E06B20,#FF8C42)';
+    playBtn.style.background = 'linear-gradient(135deg,#D4601E,#F1753B)';
     playBtn.style.boxShadow = '0 3px 12px rgba(255,140,66,0.3)';
   } else {
-    playBtn.style.background = 'linear-gradient(135deg,var(--purple),#9B7CFF)';
+    playBtn.style.background = 'linear-gradient(135deg,var(--purple),#A872C8)';
     playBtn.style.boxShadow = '0 3px 12px rgba(124,92,252,0.3)';
   }
 }
@@ -2346,8 +2347,8 @@ function restoreLearningSetup() {
 
 // Category colour themes that carry through the entire flow
 const CAT_THEMES = {
-  bedtime:  { accent: '#7C5CFC', accentLight: '#E8E0FF', accentDark: '#5B3FD4', glow: 'rgba(124,92,252,0.12)', label: 'Bedtime Story' },
-  journey:  { accent: '#FF8C42', accentLight: '#FFE5D0', accentDark: '#D4660F', glow: 'rgba(255,140,66,0.12)', label: 'Adventure' },
+  bedtime:  { accent: '#6B2F93', accentLight: '#E8E0FF', accentDark: '#521F7A', glow: 'rgba(124,92,252,0.12)', label: 'Bedtime Story' },
+  journey:  { accent: '#F1753B', accentLight: '#FFE5D0', accentDark: '#C45510', glow: 'rgba(255,140,66,0.12)', label: 'Adventure' },
   learning: { accent: '#00B4A0', accentLight: '#D4F1EE', accentDark: '#008F7F', glow: 'rgba(0,180,160,0.12)', label: 'Learning Adventure' },
 };
 
@@ -3561,9 +3562,9 @@ async function handleStripeReturn() {
     errBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF8F0;border-bottom:2px solid var(--orange, #E8A040);padding:1.25rem 1rem;text-align:center;z-index:9999;font-size:0.88rem;color:#8B6914;font-weight:600;line-height:1.6';
     let bannerHtml = 'Something went wrong creating your story, but your payment is 100% safe.';
     if (sessionId) {
-      bannerHtml += '<br><button onclick="window.location.href=window.location.pathname+\'?session_id=' + sessionId + '\'" style="margin-top:0.6rem;padding:0.6rem 1.5rem;border-radius:50px;border:none;background:var(--purple,#7C5CFC);color:white;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:inherit">Try again</button>';
+      bannerHtml += '<br><button onclick="window.location.href=window.location.pathname+\'?session_id=' + sessionId + '\'" style="margin-top:0.6rem;padding:0.6rem 1.5rem;border-radius:50px;border:none;background:var(--purple,#6B2F93);color:white;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:inherit">Try again</button>';
     }
-    bannerHtml += '<br><span style="font-size:0.78rem;font-weight:500">If it still doesn\'t work, email <a href="mailto:hello@storytold.ai" style="color:var(--purple,#7C5CFC);font-weight:700">hello@storytold.ai</a> and I will sort it personally.</span>';
+    bannerHtml += '<br><span style="font-size:0.78rem;font-weight:500">If it still doesn\'t work, email <a href="mailto:hello@storytold.ai" style="color:var(--purple,#6B2F93);font-weight:700">hello@storytold.ai</a> and I will sort it personally.</span>';
     bannerHtml += '<span onclick="this.parentElement.remove()" style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;color:#8B6914">&times;</span>';
     errBanner.style.position = 'fixed';
     errBanner.innerHTML = bannerHtml;
@@ -4268,7 +4269,7 @@ function renderLibrary(stories) {
 
   const catEmoji = { bedtime:'\u{1F319}', journey:'\u{2728}', learning:'\u{1F4DA}' };
   const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Adventure' };
-  const catColor = { bedtime:'#7C6BC4', journey:'#FF8C42', learning:'#00B4A0' };
+  const catColor = { bedtime:'#7C6BC4', journey:'#F1753B', learning:'#00B4A0' };
   const catBg = { bedtime:'#F0ECFF', journey:'#FFF3E8', learning:'#E8F8F5' };
 
   const list = document.getElementById('libraryList');
@@ -4288,7 +4289,7 @@ function renderLibrary(stories) {
         <div class="lib-name">${escHtml(s.childName)}'s ${catLabel[s.category] || 'Story'}</div>
         <div class="lib-meta">${date}</div>
         ${plays > 0 ? '<div class="lib-plays"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> Played ' + plays + (plays === 1 ? ' time' : ' times') + '</div>' : ''}
-        ${giftUnsent ? '<span class="lib-badge" style="background:#FF8C42">Gift: not sent yet</span>' : ''}
+        ${giftUnsent ? '<span class="lib-badge" style="background:#F1753B">Gift: not sent yet</span>' : ''}
         ${s.isGift && s.giftSent ? '<span class="lib-badge" style="background:#00B4A0">Gift sent</span>' : ''}
       </div>
       <div class="lib-actions">
@@ -4616,7 +4617,7 @@ function populateStoryCard(childName, category, extras) {
 
 // ===== CONFETTI =====
 function launchConfetti() {
-  var colors = ['#7C5CFC','#FF8C42','#FF6B9D','#00B4A0','#FFD700','#9B7CFF'];
+  var colors = ['#6B2F93','#F1753B','#FF6B9D','#00B4A0','#FFD700','#A872C8'];
   for (var i = 0; i < 40; i++) {
     var piece = document.createElement('div');
     piece.className = 'confetti-piece';
@@ -4724,7 +4725,7 @@ function showCookieBanner() {
   const banner = document.createElement('div');
   banner.id = 'cookieBanner';
   banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:white;padding:0.9rem 1.2rem;z-index:99999;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0.75rem;font-family:Quicksand,sans-serif;font-size:0.78rem;box-shadow:0 -2px 12px rgba(0,0,0,0.15)';
-  banner.innerHTML = `<p style="margin:0;line-height:1.5;flex:1;min-width:200px">I use cookies to improve your experience and for analytics. See my <a href="/privacy.html" style="color:#a78bfa;text-decoration:underline">Privacy Policy</a>.</p><div style="display:flex;gap:0.5rem"><button onclick="acceptCookies()" style="background:#7C5CFC;color:white;border:none;padding:0.5rem 1.2rem;border-radius:8px;font-weight:700;font-size:0.78rem;cursor:pointer;font-family:inherit">Got it</button><button onclick="declineCookies()" style="background:transparent;color:#aaa;border:1px solid #555;padding:0.5rem 1rem;border-radius:8px;font-weight:600;font-size:0.78rem;cursor:pointer;font-family:inherit">Decline</button></div>`;
+  banner.innerHTML = `<p style="margin:0;line-height:1.5;flex:1;min-width:200px">I use cookies to improve your experience and for analytics. See my <a href="/privacy.html" style="color:#a78bfa;text-decoration:underline">Privacy Policy</a>.</p><div style="display:flex;gap:0.5rem"><button onclick="acceptCookies()" style="background:#6B2F93;color:white;border:none;padding:0.5rem 1.2rem;border-radius:8px;font-weight:700;font-size:0.78rem;cursor:pointer;font-family:inherit">Got it</button><button onclick="declineCookies()" style="background:transparent;color:#aaa;border:1px solid #555;padding:0.5rem 1rem;border-radius:8px;font-weight:600;font-size:0.78rem;cursor:pointer;font-family:inherit">Decline</button></div>`;
   document.body.appendChild(banner);
 }
 function acceptCookies() {

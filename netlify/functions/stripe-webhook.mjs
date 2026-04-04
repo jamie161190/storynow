@@ -320,7 +320,7 @@ function abandonedCartEmail(childName) {
         Life gets busy, I know. But the story you started is ready to be finished whenever you are.
       </p>
       <div style="text-align:center;margin:0 0 28px;">
-        <a href="https://storytold.ai" style="display:inline-block;background:#7C5CFC;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Pick up where you left off</a>
+        <a href="https://storytold.ai" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Pick up where you left off</a>
       </div>
       <div style="background:#FFF8F0;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 6px;font-size:14px;color:#2D2844;font-weight:700;">Not sure yet?</p>
