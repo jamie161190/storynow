@@ -2476,8 +2476,11 @@ let studioAudio = null;
 let audioCtx = null;
 let analyser = null;
 
+let _storyBgMusic = null;
+
 function initStudioAudio(src) {
   if (studioAudio) studioAudio.pause();
+  if (_storyBgMusic) { _storyBgMusic.pause(); _storyBgMusic = null; }
   studioAudio = new Audio(src);
   studioAudio.addEventListener('loadedmetadata', () => {
     document.getElementById('apTimeDuration').textContent = formatTime(studioAudio.duration);
@@ -2490,7 +2493,70 @@ function initStudioAudio(src) {
   });
   studioAudio.addEventListener('ended', () => {
     document.getElementById('apPlayBtn').innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="white"><polygon points="5,2 18,10 5,18"/></svg>';
+    // Stop background music with fade out
+    if (_storyBgMusic) {
+      let vol = _storyBgMusic.volume;
+      const fade = setInterval(() => {
+        vol = Math.max(0, vol - 0.02);
+        _storyBgMusic.volume = vol;
+        if (vol <= 0) { clearInterval(fade); _storyBgMusic.pause(); _storyBgMusic = null; }
+      }, 50);
+    }
   });
+}
+
+// Get the selected music track for Story Generator (snippet or full story)
+function getStoryMusicSelection() {
+  // Check snippet music pills first, then full story music dropdown
+  const snipPill = document.querySelector('#snipMusicPills .pill.active');
+  const fsMusic = document.getElementById('fsMusic');
+  // Use whichever mode is visible
+  const snippetMode = document.getElementById('snipGenBtn');
+  if (snippetMode && snippetMode.offsetParent !== null) {
+    return snipPill ? snipPill.dataset.val : 'none';
+  }
+  return fsMusic ? fsMusic.value : 'none';
+}
+
+async function startStoryBgMusic() {
+  const sel = getStoryMusicSelection();
+  if (sel === 'none') return;
+
+  // Use cached tracks if available, otherwise generate
+  if (_cachedMusicTracks[sel]) {
+    _storyBgMusic = new Audio(_cachedMusicTracks[sel]);
+  } else {
+    const desc = sel === 'adventure'
+      ? 'Upbeat, playful, wonder-filled instrumental background music for a children\'s story. Gentle percussion, bright xylophone, warm strings. 120 BPM. Loopable.'
+      : 'Soft, warm, gentle instrumental lullaby background music. Delicate piano, light strings, calming. 70 BPM. Loopable.';
+    try {
+      const res = await fetch('/api/studio-generate', {
+        method: 'POST',
+        headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generate-music', description: desc, duration: 22 })
+      });
+      const data = await res.json();
+      if (data.audio) {
+        const src = 'data:audio/mpeg;base64,' + data.audio;
+        _cachedMusicTracks[sel] = src;
+        _storyBgMusic = new Audio(src);
+      }
+    } catch (e) { console.warn('Background music generation failed:', e.message); return; }
+  }
+
+  if (_storyBgMusic) {
+    _storyBgMusic.volume = 0;
+    _storyBgMusic.loop = true;
+    _storyBgMusic.play().then(() => {
+      // Fade in to 0.15 (quiet behind narration)
+      let vol = 0;
+      const fadeIn = setInterval(() => {
+        vol = Math.min(0.15, vol + 0.01);
+        _storyBgMusic.volume = vol;
+        if (vol >= 0.15) clearInterval(fadeIn);
+      }, 50);
+    }).catch(() => {});
+  }
 }
 
 function toggleAudioPlay() {
@@ -2498,6 +2564,9 @@ function toggleAudioPlay() {
   if (studioAudio.paused) {
     studioAudio.play();
     document.getElementById('apPlayBtn').innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="white"><rect x="4" y="3" width="4" height="14"/><rect x="12" y="3" width="4" height="14"/></svg>';
+    // Start background music if selected
+    if (!_storyBgMusic || _storyBgMusic.paused) startStoryBgMusic();
+    else _storyBgMusic.play();
     // Start waveform
     if (!audioCtx) {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -2510,6 +2579,7 @@ function toggleAudioPlay() {
     drawWaveform();
   } else {
     studioAudio.pause();
+    if (_storyBgMusic) _storyBgMusic.pause();
     document.getElementById('apPlayBtn').innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="white"><polygon points="5,2 18,10 5,18"/></svg>';
   }
 }
