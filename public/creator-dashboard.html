@@ -498,6 +498,9 @@
     .shoot-assignee input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:0.4rem 0.6rem;font-size:0.85rem;font-family:'Quicksand',sans-serif;color:var(--text);background:white;outline:none;transition:border-color 0.2s}
     .shoot-assignee input:focus{border-color:var(--purple)}
     .shoot-assignee input::placeholder{color:#ccc}
+    .filter-chip{padding:0.4rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:700;border:2px solid var(--border);background:white;color:var(--text-soft);cursor:pointer;transition:all 0.2s;font-family:'Quicksand',sans-serif}
+    .filter-chip:hover{border-color:var(--purple);color:var(--purple)}
+    .filter-chip.active{background:var(--purple);color:white;border-color:var(--purple)}
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -635,6 +638,12 @@
       <div style="background:var(--border);border-radius:20px;height:12px;overflow:hidden">
         <div id="progressBar" style="background:linear-gradient(90deg,var(--purple),var(--orange));height:100%;border-radius:20px;transition:width 0.5s ease;width:0%"></div>
       </div>
+    </div>
+
+    <!-- Assignee Filter -->
+    <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.5rem;box-shadow:var(--shadow);margin-bottom:2rem">
+      <span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;color:var(--text);margin-right:0.75rem">Show clips for:</span>
+      <div id="filterChips" style="display:inline-flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem"></div>
     </div>
 
     <h2 class="section-header" style="margin-top:1rem">Chase Core</h2>
@@ -796,25 +805,29 @@
           whatToDo:'Build the adventure story in advance with Chase as hero, Ellis as the sidekick, and Daddy as the villain. Have the story ready and queued. You on camera for 3 seconds holding your phone, smiling. Cut to Chase sitting. Story audio plays. Film his full face the moment he hears Daddy is the villain. Do not cut. Do not talk. Let it run.',
           whatNot:'Do not tell Chase anything beforehand. Do not prime him. Do not say anything during filming. The moment you open your mouth you have killed the clip.',
           textOverlay:'"I made myself the villain in my son\'s adventure story" then "His face when he heard it" then "storytold.ai"',
-          sound:'Full story audio. Chase\'s reaction.' },
+          sound:'Full story audio. Chase\'s reaction.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: You holding phone (3s) then hard cut to Chase. Do NOT cut during his reaction, let it breathe. No music. Story audio is the soundtrack. Text overlays: bold white with dark shadow, appear at top of frame. Hook text first 2 seconds, reaction text when his face changes, URL last 3 seconds. Export: H.264, 30fps. Keep raw story audio loud and clear, do not lower it for overlays.' },
         { id:'2', title:'He Doesn\'t Know Yet (Car)', type:'Let It Roll', length:'20-35s', platform:'Meta + TikTok', priority:'HIGHEST',
           hook:'He doesn\'t know the story is about him yet',
           whatToDo:'Story loaded and ready. Chase in the back seat. Phone connected to car speakers. Camera propped on front seat pointing back. Press record before you press play. You say nothing. You do not look back. The camera watches Chase. Get the moment his name comes through the speaker.',
           whatNot:'Do not talk. Do not check on him. Do not direct him. Queue the story to 30 seconds before the first name drop.',
           textOverlay:'"He doesn\'t know the story is about him yet" then "Every car journey now he asks for his story" then "storytold.ai"',
-          sound:'Story audio from car speakers. Natural silence otherwise.' },
+          sound:'Story audio from car speakers. Natural silence otherwise.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: No cuts at all. One continuous shot. Trim to start 5s before name drop. No music. Car audio is the entire soundtrack. Text overlays: bold white with shadow at top. Hook text cold open, second overlay when name hits, URL last 3s. Export: H.264, 30fps. If car audio is quiet, boost it in edit but do not add background music.' },
         { id:'3', title:'Sibling Reaction', type:'Let It Roll', length:'25-40s', platform:'Meta + TikTok', priority:'HIGH',
           hook:'Put both my kids in the same story. Wait for the second one.',
           whatToDo:'Build the story with Chase as hero and his sister as best friend. Her name appears within the first 2 minutes. Both children on the sofa or in bed. Camera captures both faces. Chase reacts first, then his sister hears her name. Do not cut between the two reactions. Let it run as one continuous clip.',
           whatNot:'Do not tell either of them. Do not pause. Do not replay.',
           textOverlay:'"Put both my kids in the same story" then "Wait for the second one" then "storytold.ai"',
-          sound:'Story audio. Both children\'s reactions.' },
+          sound:'Story audio. Both children\'s reactions.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: One continuous shot, no cuts between the two reactions. The escalation IS the ad. Trim to start just before Chase hears his name. No music. Text overlays: hook text at open, "Wait for the second one" between the two reactions, URL at end. Export: H.264, 30fps.' },
         { id:'4', title:'Founder Origin Story', type:'Modular', length:'45-70s', platform:'Meta Facebook', priority:'HIGH',
           hook:'My son asked me why he was never in any of his stories',
           whatToDo:'Film every line as a completely separate clip. Selfie angle. Natural light. In the car, at home, wherever. Each clip is 6-12 seconds and standalone. You are building a library of founder pieces that assemble in different orders for different ads.',
           whatNot:'Do not try to film this as one long monologue. Do not make it a pitch. Do not talk about features. This is a dad talking about his kid.',
           textOverlay:'Each clip gets its own overlay matching the line spoken.',
-          sound:'Your voice. Then story audio with Chase\'s reaction for the assembled version.' }
+          sound:'Your voice. Then story audio with Chase\'s reaction for the assembled version.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Each modular clip is its own file. For the assembled long ad (45-70s): hard cuts between clips, no transitions. For assembled version add Chase reaction footage between founder clips. Text overlays: bold white with shadow, match spoken line. Export each clip individually AND as assembled versions. H.264, 30fps.' }
       ],
       phase2: [
         { id:'5', title:'All Four Cousins Together', type:'Let It Roll', length:'40-60s', platform:'Meta + TikTok', priority:'HIGHEST',
@@ -822,19 +835,22 @@
           whatToDo:'Build one adventure story with Chase as hero and all three cousins named as characters. Each cousin\'s name appears at a different point for four separate reaction beats. All four sitting together. Camera wide enough for all faces. Do not cut between reactions. Roll for longer than you think.',
           whatNot:'Keep this completely separate from the grandad piece. Different room, different moment. Do not play this story in front of grandad. He needs his own.',
           textOverlay:'"Put all four cousins in the same story" then "None of them knew" then "storytold.ai"',
-          sound:'Story audio. All four reactions naturally.' },
+          sound:'Story audio. All four reactions naturally.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Cut: One continuous shot for the main ad. For a shorter version, cut to the best 2-3 reaction beats (5-8s each) with hard cuts. No music. No transitions. Text overlays: bold white with shadow at top. Keep story audio loud and clear throughout. Export full version AND a 30s cut of best beats. H.264, 30fps.' },
         { id:'6', title:'One Cousin Close-Up', type:'Let It Roll', length:'15-25s', platform:'Meta + TikTok', priority:'HIGH',
           hook:'Watch her face when she hears her name',
           whatToDo:'Pick the youngest cousin. Extreme close-up on their face only. Eyes, mouth, expression. Story plays. The name comes through. Camera stays locked and does not move. Whatever expression appears, that is the ad.',
           whatNot:'Nothing else in frame. No context. Just the face.',
           textOverlay:'"Watch her face when she hears her name" then "storytold.ai"',
-          sound:'Story audio. The name drop and reaction.' },
+          sound:'Story audio. The name drop and reaction.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: No cuts. Trim to start 3s before name drop, end 5s after reaction peaks. No music. No transitions. This is the simplest edit in the playbook. Crop tight on face if the original shot is too wide. Text overlay: hook at top for first 2s, URL last 3s. Export: H.264, 30fps.' },
         { id:'7', title:'Grandad Listens', type:'Let It Roll', length:'30-50s', platform:'Meta + TikTok', priority:'HIGHEST',
           hook:'Put my dad in my son\'s story. Didn\'t expect his reaction.',
           whatToDo:'Build a separate story with Chase as hero and Grandad named as a proper character with weight. Grandad and Chase sitting together. Film primarily Grandad\'s face when he hears his own name in his grandson\'s story. A grandfather hearing himself woven into a child\'s world is something no competitor has captured.',
           whatNot:'Grandad should not have heard or seen the cousins piece before his own moment. Keep this completely separate.',
           textOverlay:'"Put my dad in my son\'s story" then "Didn\'t expect his reaction" then "storytold.ai"',
-          sound:'Story audio. Grandad\'s reaction. Chase reacting to grandad if it happens.' }
+          sound:'Story audio. Grandad\'s reaction. Chase reacting to grandad if it happens.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Cut: One continuous shot. If both grandad and Chase react, keep both in frame. Do NOT speed up or slow down. No music. The story audio and the raw emotion carry this. Text overlays: hook text first 3s, reaction text when his face changes, URL last 3s. This is your most emotional piece so keep the edit invisible. Export: H.264, 30fps. Also export a 1:1 square crop for Facebook Feed.' }
       ],
       phase3: [
         { id:'8', title:'Chase Buys His Cousin One', type:'Let It Roll', length:'60-90s', platform:'Meta + TikTok', priority:'HIGH',
@@ -842,80 +858,100 @@
           whatToDo:'THREE PARTS. Part A: Chase asks if his cousin can have a story. Film naturally, don\'t script it. Part B: Screen record of the funnel with Chase telling you what to put in. He tells you the name, favourite thing, best friend. Part C: Tomorrow, show the cousin her story. Film her receiving it and pressing play.',
           whatNot:'Do not script Part A. Let Chase initiate naturally. Each part works standalone too.',
           textOverlay:'"My son asked if his cousin could have a story like his" then "He told me exactly what to put in it" then "Wait for her face when she hears her name"',
-          sound:'Chase\'s voice giving instructions. Story audio. Cousin\'s reaction.' },
+          sound:'Chase\'s voice giving instructions. Story audio. Cousin\'s reaction.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. This is a multi-part edit. Part A (the ask): trim to the best 10-15s. Hard cut to Part B (screen record): speed up the funnel steps to 1.5x, keep Chase\'s voice at normal speed as voiceover. Hard cut to Part C (cousin reaction): normal speed, let it breathe. Text overlays between each part. No music. Total assembled should be 45-60s for the long version. Export each part standalone AND the full assembled version. H.264, 30fps.' },
         { id:'9', title:'Funnel Walk-Through', type:'Modular', length:'20-35s', platform:'Meta + Organic', priority:'HIGH',
           hook:'Watch how fast this works',
           whatToDo:'Five screen records: P1 Typing the name in (5-8s), P2 Preview generating (5-8s), P3 Pressing play for the first time (3-5s), P4 WhatsApp link being sent (5-8s), P5 Listen link opening on phone (5-8s). Each is standalone.',
           whatNot:'No voiceover needed. Captions do the work. Can be filmed anytime, no children required.',
           textOverlay:'"Watch how fast this works" with captions on each step.',
-          sound:'Typing sounds. Generation sound. Story audio on play.' },
+          sound:'Typing sounds. Generation sound. Story audio on play.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Screen record on iPhone (Settings > Control Centre > Screen Recording). Speed up typing to 1.5-2x. Hard cuts between each step. Add CapCut auto-captions describing each step. Subtle zoom-in on the name being typed and the play button being pressed. No music. The assembled version stitches all 5 in order. Export: H.264, 30fps.' },
         { id:'10', title:'Preview Close-Up (Chase)', type:'Let It Roll', length:'15-20s', platform:'Retargeting', priority:'HIGH',
           hook:'Watch his face when he hears it',
           whatToDo:'Extreme close-up on Chase\'s eyes and expression only. Story plays. Camera does not move. No cuts. No music. Nothing else in frame. Just his face and the audio. The 3-5 seconds around the name drop is the entire ad.',
           whatNot:'Do not add music. Do not cut. Do not frame anything else.',
           textOverlay:'"Watch his face when he hears it" then "storytold.ai"',
-          sound:'Story audio only. The name drop moment.' }
+          sound:'Story audio only. The name drop moment.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. No cuts. Trim to the tightest possible window around the name drop. If footage is not close enough, crop and scale in post. No music. No transitions. Text: hook at top first 2s, URL at bottom last 3s. This runs as retargeting so the copy underneath the ad says "You heard the preview. Go finish their story." Export: H.264, 30fps.' }
       ],
       modFounder: [
         { id:'F1', title:'Why I Built It', type:'Modular', length:'8-12s', platform:'All', priority:'HIGH',
           hook:'I built this because of something my son said to me',
           whatToDo:'Selfie angle. Natural light. Say the line and stop. This is one Lego brick.',
-          whatNot:'Do not explain the product. Just the line.', textOverlay:'Text matches spoken line.', sound:'Your voice only.' },
+          whatNot:'Do not explain the product. Just the line.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
+          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight, no dead air before or after. Add text overlay matching the spoken line in bold white. No music. Export standalone. H.264, 30fps.' },
         { id:'F2', title:'I Made Myself The Villain', type:'Modular', length:'6-10s', platform:'All', priority:'HIGH',
           hook:'I made myself the villain in his adventure story',
           whatToDo:'Selfie. Say the line with a grin. Cut.',
-          whatNot:'Do not explain what happens next.', textOverlay:'Text matches spoken line.', sound:'Your voice only.' },
+          whatNot:'Do not explain what happens next.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
+          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight. Bold white text overlay. No music. Export standalone. H.264, 30fps.' },
         { id:'F3', title:'He Didn\'t Know The Story Was About Him', type:'Modular', length:'6-10s', platform:'All', priority:'HIGH',
           hook:'He didn\'t know the story was about him',
           whatToDo:'Selfie. Say it. The mystery in the line does all the work.',
-          whatNot:'Do not reveal what happened.', textOverlay:'Text matches spoken line.', sound:'Your voice only.' },
+          whatNot:'Do not reveal what happened.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
+          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight. Bold white text overlay. No music. Export standalone. H.264, 30fps.' },
         { id:'F4', title:'Now Every Child Can Have One', type:'Modular', length:'4-6s', platform:'All', priority:'MEDIUM',
           hook:'Now every child can have one',
           whatToDo:'Selfie. Deliver the line. This is your closer for assembled ads.',
-          whatNot:'Do not add anything after the line.', textOverlay:'"Now every child can have one" + storytold.ai', sound:'Your voice only.' },
+          whatNot:'Do not add anything after the line.', textOverlay:'"Now every child can have one" + storytold.ai', sound:'Your voice only.',
+          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight. Bold white text overlay + storytold.ai URL at bottom. This clip goes at the END of assembled ads. No music. Export standalone. H.264, 30fps.' },
         { id:'F5', title:'He Asked Why He Was Never In A Story', type:'Modular', length:'8-12s', platform:'All', priority:'HIGH',
           hook:'My son asked me why he was never in any of his stories',
           whatToDo:'Selfie. This is your strongest opening line. Say it with weight.',
-          whatNot:'Do not rush it. Let the line land.', textOverlay:'Text matches spoken line.', sound:'Your voice only.' }
+          whatNot:'Do not rush it. Let the line land.', textOverlay:'Text matches spoken line.', sound:'Your voice only.',
+          edit:'Format: 9:16 vertical. Software: CapCut. Trim tight but leave a beat of silence after the line lands. Bold white text overlay. No music. This clip goes at the START of assembled ads. Export standalone. H.264, 30fps.' }
       ],
       modProcess: [
         { id:'P1', title:'Typing The Name In', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of typing the child\'s name into the funnel.', whatNot:'No voiceover needed.', textOverlay:'None needed.', sound:'Typing sounds.' },
+          whatToDo:'Screen record of typing the child\'s name into the funnel.', whatNot:'No voiceover needed.', textOverlay:'None needed.', sound:'Typing sounds.',
+          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record. Speed up to 1.5x if too slow. Crop to centre on the name field. Export standalone. H.264, 30fps.' },
         { id:'P2', title:'Preview Generating', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of the preview generating on screen.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'None.' },
+          whatToDo:'Screen record of the preview generating on screen.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'None.',
+          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record. Speed up if the generation takes too long. Show the loading state then the result appearing. Export standalone. H.264, 30fps.' },
         { id:'P3', title:'Pressing Play For The First Time', type:'Modular', length:'3-5s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of pressing the play button.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'The first second of audio.' },
+          whatToDo:'Screen record of pressing the play button.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'The first second of audio.',
+          edit:'Format: 9:16 vertical. Software: CapCut. Subtle zoom into the play button as finger taps it. Let the first second of story audio play. Cut immediately after. Export standalone. H.264, 30fps.' },
         { id:'P4', title:'WhatsApp Link Being Sent', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of sending the WhatsApp share link.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'Message send sound.' },
+          whatToDo:'Screen record of sending the WhatsApp share link.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'Message send sound.',
+          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record of WhatsApp. Show the message being typed and the send tap. Export standalone. H.264, 30fps.' },
         { id:'P5', title:'Listen Link Opening On Phone', type:'Modular', length:'5-8s', platform:'All', priority:'MEDIUM',
-          whatToDo:'Screen record of the listen link opening on a phone.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'Story audio beginning.' }
+          whatToDo:'Screen record of the listen link opening on a phone.', whatNot:'No voiceover.', textOverlay:'None needed.', sound:'Story audio beginning.',
+          edit:'Format: 9:16 vertical. Software: CapCut. Show the link being tapped, page loading, player appearing. Let story audio play for 1-2 seconds. Export standalone. H.264, 30fps.' }
       ],
       friendCreator: [
         { id:'FC1', title:'The Decision', type:'Let It Roll', length:'30-45s', platform:'Meta + TikTok', priority:'HIGH',
           hook:'We don\'t have kids but we just gave the best gift we\'ve ever given',
           whatToDo:'Both on the sofa. One finds Storytold. They build a story together for a real child in their life. Film them typing the name, choosing the voice, hearing the preview together for the first time. Film both faces when the preview plays.',
-          whatNot:'Do not script the conversation. Let it happen naturally.', textOverlay:'"We don\'t have kids" then "But we just gave the best gift we\'ve ever given"', sound:'Natural conversation. Preview audio.' },
+          whatNot:'Do not script the conversation. Let it happen naturally.', textOverlay:'"We don\'t have kids" then "But we just gave the best gift we\'ve ever given"', sound:'Natural conversation. Preview audio.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Trim to the best 30s. Keep their natural conversation audio. Hard cut to the preview playing moment. Text overlays: hook at top, reaction text when preview plays. No music. Export: H.264, 30fps.' },
         { id:'FC2', title:'The Send', type:'Modular', length:'15-20s', platform:'Meta + TikTok', priority:'HIGH',
           whatToDo:'Screen record of sending the WhatsApp link to the child\'s parent. The message they type. The moment they hit send.',
-          whatNot:'Nothing extra needed.', textOverlay:'"Sending it now..."', sound:'Message send sound.' },
+          whatNot:'Nothing extra needed.', textOverlay:'"Sending it now..."', sound:'Message send sound.',
+          edit:'Format: 9:16 vertical. Software: CapCut. iPhone screen record. Show the message being typed and sent. Simple text overlay. Export standalone. H.264, 30fps.' },
         { id:'FC3', title:'The Reaction', type:'Let It Roll', length:'20-35s', platform:'Meta + TikTok', priority:'HIGHEST',
           hook:'This is what happened when she heard it',
           whatToDo:'The child receiving the story and pressing play. Film the reaction. This closes the three-part journey. Without this the content has no payoff.',
-          whatNot:'The child must be real and filmed. Without the reaction this cannot run as a paid ad.', textOverlay:'"Wait for her face" then "storytold.ai"', sound:'Story audio. Child\'s reaction.' }
+          whatNot:'The child must be real and filmed. Without the reaction this cannot run as a paid ad.', textOverlay:'"Wait for her face" then "storytold.ai"', sound:'Story audio. Child\'s reaction.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. No cuts during the reaction. Trim to start just before play is pressed. No music. Text overlays: hook first 2s, URL last 3s. For the full 3-part assembled ad, hard cut FC1 > FC2 > FC3 with text overlays between parts. Export standalone AND as part of the full 3-part assembly. H.264, 30fps.' }
       ],
       bgClips: [
         { id:'BG-A', title:'The Best Single Reaction', type:'Let It Roll', length:'15-25s', platform:'Paid', priority:'HIGH',
           whatToDo:'Pick the single biggest, cleanest reaction moment in the full 15 minutes. Start the clip 5 seconds before the name hits. End 5 seconds after the peak. Add a text overlay and URL. That is your standalone paid ad.',
-          whatNot:'Do not add music or voiceover.', textOverlay:'Hook text + storytold.ai', sound:'Story audio and reaction.' },
+          whatNot:'Do not add music or voiceover.', textOverlay:'Hook text + storytold.ai', sound:'Story audio and reaction.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Trim to the tightest window. Story audio must be clearly audible. No music. No filters. Text overlay: hook at top, URL at bottom. This is a standalone paid ad ready to upload. Export: H.264, 30fps.' },
         { id:'BG-B', title:'The Compilation', type:'Let It Roll', length:'30-45s', platform:'All', priority:'HIGHEST',
           whatToDo:'Three or four best reaction moments stitched together. Each beat 5-8 seconds. Name drops in audio, reaction on face, cut to next. No music. No voiceover. Just the story audio and reactions in sequence.',
-          whatNot:'Do not add music. The raw audio is more powerful.', textOverlay:'Minimal. Let the reactions speak.', sound:'Story audio through each beat.' },
+          whatNot:'Do not add music. The raw audio is more powerful.', textOverlay:'Minimal. Let the reactions speak.', sound:'Story audio through each beat.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. Hard cuts between each reaction beat. No transitions, no fades. Each beat is 5-8s trimmed tight around the name drop. Story audio runs continuous or cuts with the video. No music. Minimal text: just the URL at the end. This is your highest retention piece. Export: H.264, 30fps.' },
         { id:'BG-C', title:'The Background Atmosphere', type:'Let It Roll', length:'10-15s', platform:'All', priority:'MEDIUM',
           whatToDo:'A moment where neither child is having a big reaction but the story is clearly audible and both children are just present and absorbed. Normal family scene.',
-          whatNot:'No performance needed. The story playing in the background of normal life is enough.', textOverlay:'"The story was just playing in the background"', sound:'Story audio in background.' },
+          whatNot:'No performance needed. The story playing in the background of normal life is enough.', textOverlay:'"The story was just playing in the background"', sound:'Story audio in background.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Minimal edit. Trim to best 10-15s of calm natural footage. Story audio should be audible but at natural room volume. Text overlay at top. URL at end. No music. Export: H.264, 30fps.' },
         { id:'BG-D', title:'The Shared Moment', type:'Let It Roll', length:'20-30s', platform:'All', priority:'HIGHEST',
           whatToDo:'Both children react to the same name or look at each other during the story. Two children sharing a private moment of recognition without adult direction. Prioritise finding this in your timestamp review.',
-          whatNot:'Do not direct them. If it did not happen naturally, skip this clip.', textOverlay:'"They didn\'t know I was filming"', sound:'Story audio. Natural reactions.' }
+          whatNot:'Do not direct them. If it did not happen naturally, skip this clip.', textOverlay:'"They didn\'t know I was filming"', sound:'Story audio. Natural reactions.',
+          edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. No cuts. One continuous moment. Trim to start 3s before the shared look/reaction. No music. No filters. Text overlay: hook at top first 2s, URL last 3s. This is raw and unedited on purpose. Export: H.264, 30fps.' }
       ]
     };
 
@@ -956,6 +992,7 @@
                 <p><strong>What NOT to do:</strong> <span class="warn">${clip.whatNot}</span></p>
                 <p><strong>Text on screen:</strong> ${clip.textOverlay}</p>
                 <p><strong>Sound:</strong> ${clip.sound}</p>
+                ${clip.edit ? '<p style="margin-top:0.5rem;padding-top:0.75rem;border-top:1px dashed var(--border)"><strong>Post-Production:</strong> ' + clip.edit + '</p>' : ''}
               </div>
               <div class="shoot-assignee">
                 <label>Assigned to:</label>
@@ -966,6 +1003,7 @@
         }).join('');
       });
       updateProgress();
+      buildFilterChips();
     }
 
     function toggleShootDone(key, el) {
@@ -987,6 +1025,42 @@
       const state = getShootState();
       state[key + '_who'] = value;
       saveShootState(state);
+      buildFilterChips();
+    }
+
+    let activeFilter = null;
+
+    function buildFilterChips() {
+      const state = getShootState();
+      const names = new Set();
+      Object.keys(SHOOT_DATA).forEach(phase => {
+        SHOOT_DATA[phase].forEach(clip => {
+          const who = state[clip.id + '_who'];
+          if (who && who.trim()) names.add(who.trim());
+        });
+      });
+      const container = document.getElementById('filterChips');
+      let html = '<button class="filter-chip active" onclick="setFilter(null, this)">All</button>';
+      names.forEach(name => {
+        html += '<button class="filter-chip" onclick="setFilter(\'' + name.replace(/'/g,"\\'") + '\', this)">' + name + '</button>';
+      });
+      container.innerHTML = html;
+    }
+
+    function setFilter(name, el) {
+      activeFilter = name;
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      const state = getShootState();
+      document.querySelectorAll('.shoot-card').forEach(card => {
+        const id = card.dataset.id;
+        const who = (state[id + '_who'] || '').trim();
+        if (!name || who === name) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
     }
 
     function updateProgress() {
