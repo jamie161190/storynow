@@ -824,7 +824,6 @@
       clips.forEach(function(clip) {
         state[clip.id + '_who'] = name;
         setAssigneeTag('assignee-' + clip.id, name, clip.id);
-        // Also cascade to children
         var children = getChildIds(clip.id);
         children.forEach(function(childId) {
           state[childId + '_who'] = name;
@@ -834,6 +833,17 @@
       saveShootState(state);
       buildFilterChips();
     }
+
+    // Also handle section assign via event delegation as backup
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && e.target.classList.contains('section-assign')) {
+        e.preventDefault();
+        var section = e.target.dataset.section;
+        var val = e.target.value;
+        assignSection(section, val);
+        e.target.value = '';
+      }
+    });
 
     function resetAllData() {
       if (!confirm('This will clear all assignments and checkboxes. Are you sure?')) return;
