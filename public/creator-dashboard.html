@@ -804,6 +804,7 @@
     const SHOOT_DATA = {
       phase1: [
         { id:'1', title:'Daddy Is The Villain', type:'Let It Roll', length:'30-45s', platform:'Meta + TikTok', priority:'HIGHEST',
+          children:['F2','F4'],
           hook:'I made myself the villain in my son\'s adventure story',
           whatToDo:'Build the adventure story in advance with Chase as hero, Ellis as the sidekick, and Daddy as the villain. Have the story ready and queued. You on camera for 3 seconds holding your phone, smiling. Cut to Chase sitting. Story audio plays. Film his full face the moment he hears Daddy is the villain. Do not cut. Do not talk. Let it run.',
           whatNot:'Do not tell Chase anything beforehand. Do not prime him. Do not say anything during filming. The moment you open your mouth you have killed the clip.',
@@ -811,6 +812,7 @@
           sound:'Full story audio. Chase\'s reaction.',
           edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: You holding phone (3s) then hard cut to Chase. Do NOT cut during his reaction, let it breathe. No music. Story audio is the soundtrack. Text overlays: bold white with dark shadow, appear at top of frame. Hook text first 2 seconds, reaction text when his face changes, URL last 3 seconds. Export: H.264, 30fps. Keep raw story audio loud and clear, do not lower it for overlays.' },
         { id:'2', title:'He Doesn\'t Know Yet (Car)', type:'Let It Roll', length:'20-35s', platform:'Meta + TikTok', priority:'HIGHEST',
+          children:['F3'],
           hook:'He doesn\'t know the story is about him yet',
           whatToDo:'Story loaded and ready. Chase in the back seat. Phone connected to car speakers. Camera propped on front seat pointing back. Press record before you press play. You say nothing. You do not look back. The camera watches Chase. Get the moment his name comes through the speaker.',
           whatNot:'Do not talk. Do not check on him. Do not direct him. Queue the story to 30 seconds before the first name drop.',
@@ -825,6 +827,7 @@
           sound:'Story audio. Both children\'s reactions.',
           edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut or InShot. Cut: One continuous shot, no cuts between the two reactions. The escalation IS the ad. Trim to start just before Chase hears his name. No music. Text overlays: hook text at open, "Wait for the second one" between the two reactions, URL at end. Export: H.264, 30fps.' },
         { id:'4', title:'Founder Origin Story', type:'Modular', length:'45-70s', platform:'Meta Facebook', priority:'HIGH',
+          children:['F1','F2','F3','F4','F5'],
           hook:'My son asked me why he was never in any of his stories',
           whatToDo:'Film every line as a completely separate clip. Selfie angle. Natural light. In the car, at home, wherever. Each clip is 6-12 seconds and standalone. You are building a library of founder pieces that assemble in different orders for different ads.',
           whatNot:'Do not try to film this as one long monologue. Do not make it a pitch. Do not talk about features. This is a dad talking about his kid.',
@@ -857,6 +860,7 @@
       ],
       phase3: [
         { id:'8', title:'Chase Buys His Cousin One', type:'Let It Roll', length:'60-90s', platform:'Meta + TikTok', priority:'HIGH',
+          children:['P1','P2','P3'],
           hook:'My son wanted to buy his cousin a story. He told me exactly what to put in it.',
           whatToDo:'THREE PARTS. Part A: Chase asks if his cousin can have a story. Film naturally, don\'t script it. Part B: Screen record of the funnel with Chase telling you what to put in. He tells you the name, favourite thing, best friend. Part C: Tomorrow, show the cousin her story. Film her receiving it and pressing play.',
           whatNot:'Do not script Part A. Let Chase initiate naturally. Each part works standalone too.',
@@ -864,6 +868,7 @@
           sound:'Chase\'s voice giving instructions. Story audio. Cousin\'s reaction.',
           edit:'Format: 9:16 vertical, 1080x1920. Software: CapCut. This is a multi-part edit. Part A (the ask): trim to the best 10-15s. Hard cut to Part B (screen record): speed up the funnel steps to 1.5x, keep Chase\'s voice at normal speed as voiceover. Hard cut to Part C (cousin reaction): normal speed, let it breathe. Text overlays between each part. No music. Total assembled should be 45-60s for the long version. Export each part standalone AND the full assembled version. H.264, 30fps.' },
         { id:'9', title:'Funnel Walk-Through', type:'Modular', length:'20-35s', platform:'Meta + Organic', priority:'HIGH',
+          children:['P1','P2','P3','P4','P5'],
           hook:'Watch how fast this works',
           whatToDo:'Five screen records: P1 Typing the name in (5-8s), P2 Preview generating (5-8s), P3 Pressing play for the first time (3-5s), P4 WhatsApp link being sent (5-8s), P5 Listen link opening on phone (5-8s). Each is standalone.',
           whatNot:'No voiceover needed. Captions do the work. Can be filmed anytime, no children required.',
@@ -1025,6 +1030,29 @@
       header.closest('.shoot-card').classList.toggle('open');
     }
 
+    // Find children for a clip ID
+    function getChildIds(clipId) {
+      var found = [];
+      Object.keys(SHOOT_DATA).forEach(function(phase) {
+        SHOOT_DATA[phase].forEach(function(clip) {
+          if (clip.id === clipId && clip.children) found = clip.children;
+        });
+      });
+      return found;
+    }
+
+    function setAssigneeTag(boxId, value, clipId) {
+      var box = document.getElementById(boxId);
+      if (!box) return;
+      box.innerHTML = '<div class="assignee-tag"><span>' + value + '</span><button onclick="event.stopPropagation();handleClearAssign(\x27' + clipId + '\x27)">\u00d7</button></div>';
+    }
+
+    function setAssigneeInput(boxId, clipId) {
+      var box = document.getElementById(boxId);
+      if (!box) return;
+      box.innerHTML = '<input type="text" class="assign-input" placeholder="Type a name and hit enter..." onkeydown="handleAssignKey(event,\x27' + clipId + '\x27)">';
+    }
+
     function handleAssignKey(e, clipId) {
       if (e.key !== 'Enter') return;
       e.preventDefault();
@@ -1032,18 +1060,28 @@
       if (!value) return;
       var state = getShootState();
       state[clipId + '_who'] = value;
+      setAssigneeTag('assignee-' + clipId, value, clipId);
+      // Cascade to children
+      var children = getChildIds(clipId);
+      children.forEach(function(childId) {
+        state[childId + '_who'] = value;
+        setAssigneeTag('assignee-' + childId, value, childId);
+      });
       saveShootState(state);
-      var box = document.getElementById('assignee-' + clipId);
-      box.innerHTML = '<div class="assignee-tag"><span>' + value + '</span><button onclick="event.stopPropagation();handleClearAssign(\x27' + clipId + '\x27)">\u00d7</button></div>';
       buildFilterChips();
     }
 
     function handleClearAssign(clipId) {
       var state = getShootState();
       delete state[clipId + '_who'];
+      setAssigneeInput('assignee-' + clipId, clipId);
+      // Cascade clear to children
+      var children = getChildIds(clipId);
+      children.forEach(function(childId) {
+        delete state[childId + '_who'];
+        setAssigneeInput('assignee-' + childId, childId);
+      });
       saveShootState(state);
-      var box = document.getElementById('assignee-' + clipId);
-      box.innerHTML = '<input type="text" class="assign-input" placeholder="Type a name and hit enter..." onkeydown="handleAssignKey(event,\x27' + clipId + '\x27)">';
       buildFilterChips();
     }
 
