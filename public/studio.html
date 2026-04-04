@@ -4179,9 +4179,10 @@ function initStudio() {
 const _origRenderStoryOutput = renderStoryOutput;
 renderStoryOutput = function(data) {
   _origRenderStoryOutput(data);
-  // Auto-save audio to library
+  // Auto-save to library
+  const voiceName = ALL_VOICES.find(v => v.id === selectedVoiceId)?.name || 'Voice';
   if (data.audio) {
-    const voiceName = ALL_VOICES.find(v => v.id === selectedVoiceId)?.name || 'Voice';
+    // Snippet: has base64 audio
     saveToLibrary(
       `snippet-${data.childName || 'story'}-${Date.now()}`,
       'snippet',
@@ -4191,24 +4192,20 @@ renderStoryOutput = function(data) {
       ['snippet', voiceName, data.childName || ''].filter(Boolean),
       { storyText: data.storyText, childName: data.childName }
     );
+  } else if (data.audioUrl) {
+    // Full story: has URL from Supabase Storage (already stored, just add to index)
+    saveToLibrary(
+      `story-${data.childName || 'story'}-${Date.now()}`,
+      'story',
+      'audio/mpeg',
+      null, null,
+      ['story', voiceName, data.childName || ''].filter(Boolean),
+      { storyText: (data.storyText || '').slice(0, 500), childName: data.childName, audioUrl: data.audioUrl }
+    );
   }
 };
 
-// Patch Content AI to auto-save
-const _origRenderAIOutput = renderAIOutput;
-renderAIOutput = function(content, params) {
-  _origRenderAIOutput(content, params);
-  // Auto-save to library
-  saveToLibrary(
-    `adcopy-${params.platform}-${params.contentType}-${Date.now()}`,
-    'adcopy',
-    'text/plain',
-    content,
-    'text',
-    [params.platform, params.contentType, params.goal, params.audience].filter(Boolean),
-    params
-  );
-};
+// Content AI auto-save removed (consolidated into AI Director)
 
 // Init on load
 applyRatioSize();
