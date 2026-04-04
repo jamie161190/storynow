@@ -498,7 +498,9 @@
       'BG-A':{id:'BG-A',title:'Best Single Reaction',length:'15-25s',whatToDo:'Single biggest reaction from 15-min clip. Start 5s before name, end 5s after peak.',whatNot:'No music or voiceover.',edit:'CapCut. Tightest window. Raw audio. H.264, 30fps.'},
       'BG-B':{id:'BG-B',title:'The Compilation',length:'30-45s',whatToDo:'3-4 best reactions stitched. Each beat 5-8s. Name drops + faces.',whatNot:'Do not add music. Raw is more powerful.',edit:'CapCut. Hard cuts. No transitions. H.264, 30fps.'},
       'BG-C':{id:'BG-C',title:'Background Atmosphere',length:'10-15s',whatToDo:'Neither child reacting big but story audible. Normal family scene.',whatNot:'No performance needed.',edit:'CapCut. Minimal edit. Natural room volume. H.264, 30fps.'},
-      'BG-D':{id:'BG-D',title:'The Shared Moment',length:'20-30s',whatToDo:'Both children react to same name or look at each other.',whatNot:'Do not direct. Skip if not natural.',edit:'CapCut. No cuts. Raw and unedited. H.264, 30fps.'}
+      'BG-D':{id:'BG-D',title:'The Shared Moment',length:'20-30s',whatToDo:'Both children react to same name or look at each other.',whatNot:'Do not direct. Skip if not natural.',edit:'CapCut. No cuts. Raw and unedited. H.264, 30fps.'},
+      C1:{id:'C1',title:'Too Old For It (Dismissive to Absorbed)',length:'20-35s',hook:'She said she was too old for it',whatToDo:'Play Chase\'s adventure story through car. 12yr old niece in back seat. Film from front seat. She will start dismissive. Let it run. Capture the moment she stops being dismissive and just listens. The arc from eye roll to absorbed is the entire ad.',whatNot:'Do not tell her to watch. Do not comment on her reaction. Do not cut before the shift happens. Give it time.',edit:'9:16, 1080x1920. CapCut. Front seat looking back. No music. Captions on. H.264, 30fps. Addresses the "too old" objection.'},
+      C2:{id:'C2',title:'She\'s In The Story (Name Drop)',length:'15-25s',hook:'She still thinks she\'s too old for it. She\'s in the story.',whatToDo:'Build a separate adventure story with the 12yr old named as a character before you set off. Second hour of drive or way back, switch to this story. She does not know she is in it. Film her face from front seat the moment her name comes through the speaker.',whatNot:'Do not tell her she is in the story. Do not build this story in front of her. Have it ready before she gets in the car.',edit:'9:16, 1080x1920. CapCut. Start a few seconds before the name drop. No music. Captions on. H.264, 30fps. C1 and C2 edit together into one longer piece or run separately.'}
     };
 
     // ====== MAIN ADS (with embedded sub-clip references) ======
@@ -574,7 +576,25 @@
         whatToDo:'You have a raw 15 min clip of your niece and nephew with the story playing in the background. Watch the full 15 minutes and timestamp every reaction moment. Pull the 4 best clips from it.',
         whatNot:'Do not add music. Do not direct. The naturalness is the entire value.',
         textOverlay:'"They didn\'t know I was filming" or "The story was just playing in the background"',sound:'Story audio in background. Natural reactions.',
-        edit:'9:16, 1080x1920. CapCut. Each sub-clip is a separate export from the raw footage. No music. Raw audio. H.264, 30fps.'}
+        edit:'9:16, 1080x1920. CapCut. Each sub-clip is a separate export from the raw footage. No music. Raw audio. H.264, 30fps.'},
+      {id:'AD13',title:'She Said She Was Too Old For It',length:'30-60s',priority:'HIGHEST',subs:['C1','C2'],
+        hook:'She said she was too old for it',
+        whatToDo:'Two-part car content with Eva (12yr old niece). Part 1: Play Chase\'s story, film her going from dismissive to absorbed. Part 2: Switch to a story with HER name in it, film the name drop reaction. C1 and C2 edit together into one longer piece or run separately.',
+        whatNot:'Do not tell her anything. Do not build the second story in front of her. Have both stories ready before she gets in the car.',
+        textOverlay:'"She said she was too old for it" then "She\'s in the story" then "storytold.ai - works for ages 3 to 12"',sound:'Story audio through car speakers. Her natural reactions. No music.',
+        edit:'9:16, 1080x1920. CapCut. Front seat looking back. No music. Captions on. C1+C2 assembled or standalone. H.264, 30fps. Addresses the "too old" objection cold audiences have.'},
+      {id:'AD14',title:'Ages 3 to 12. Both of Them In It.',length:'15-30s',priority:'HIGH',subs:[],
+        hook:'Ages 3 to 12. One story. Both of them in it.',
+        whatToDo:'Wide shot from front seat. Chase (9) and 12yr old niece both in back seat. Story playing. Both absorbed at the same time. No big reaction needed. Just two children, different ages, both completely in it. Let it roll for at least 30 seconds and pull the best 15 in the edit.',
+        whatNot:'Do not prompt them. Do not ask them to sit closer. Just capture what is already happening.',
+        textOverlay:'"Ages 3 to 12" then "One story. Both of them in it." then "storytold.ai"',sound:'Story audio. Natural ambient car sound. No music.',
+        edit:'9:16, 1080x1920. CapCut. Wide enough for both children. No cuts. Captions on. H.264, 30fps. This single clip proves the age range without saying a word.'},
+      {id:'AD15',title:'He\'s 3. First Time He\'s Heard His Name.',length:'15-25s',priority:'HIGH',subs:[],
+        hook:'He\'s 3. First time he\'s ever heard his name in a story.',
+        whatToDo:'Build a short story with the 3yr old named inside it. Play it when he is calm and settled. Film his face close. He may not have a dramatic reaction but the moment a very young child hears their own name spoken by a narrator and turns, smiles, or points is enormous on camera. Even a tiny reaction from a 3yr old reads huge.',
+        whatNot:'Do not expect a big reaction and wait for one that is not coming. Do not replay trying to manufacture it. Whatever happens naturally the first time is the clip.',
+        textOverlay:'"He\'s 3. First time he\'s heard his name in a story." then "storytold.ai - ages 3 to 12"',sound:'Story audio. His natural response however small. No music.',
+        edit:'9:16, 1080x1920. CapCut. Extreme close-up preferred. No music. Captions on. H.264, 30fps. Paired with the 12yr old content across your feed, this covers your full age range in one day of filming.'}
     ];
 
     // ====== STATE ======
