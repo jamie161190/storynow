@@ -498,6 +498,9 @@
     .shoot-assignee input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:0.4rem 0.6rem;font-size:0.85rem;font-family:'Quicksand',sans-serif;color:var(--text);background:white;outline:none;transition:border-color 0.2s}
     .shoot-assignee input:focus{border-color:var(--purple)}
     .shoot-assignee input::placeholder{color:#ccc}
+    .assignee-tag{display:inline-flex;align-items:center;gap:0.5rem;background:var(--purple);color:white;padding:0.35rem 0.6rem 0.35rem 0.9rem;border-radius:20px;font-size:0.85rem;font-weight:700;font-family:'Nunito',sans-serif}
+    .assignee-tag button{background:none;border:none;color:rgba(255,255,255,0.7);font-size:1.1rem;cursor:pointer;padding:0 0.2rem;line-height:1}
+    .assignee-tag button:hover{color:white}
     .filter-chip{padding:0.4rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:700;border:2px solid var(--border);background:white;color:var(--text-soft);cursor:pointer;transition:all 0.2s;font-family:'Quicksand',sans-serif}
     .filter-chip:hover{border-color:var(--purple);color:var(--purple)}
     .filter-chip.active{background:var(--purple);color:white;border-color:var(--purple)}
@@ -993,9 +996,11 @@
                 <p><strong>Sound:</strong> ${clip.sound}</p>
                 ${clip.edit ? '<p style="margin-top:0.5rem;padding-top:0.75rem;border-top:1px dashed var(--border)"><strong>Post-Production:</strong> ' + clip.edit + '</p>' : ''}
               </div>
-              <div class="shoot-assignee">
-                <label>Assigned to:</label>
-                <input type="text" placeholder="Who is filming this?" value="${assignee}" data-clip-id="${key}" oninput="saveAssignee(this.dataset.clipId,this.value)">
+              <div class="shoot-assignee" id="assignee-${key}">
+                ${assignee
+                  ? '<div class="assignee-tag"><span>' + assignee + '</span><button onclick="event.stopPropagation();clearAssignee(\'' + key + '\')">&times;</button></div>'
+                  : '<input type="text" placeholder="Type a name and hit enter..." data-clip-id="' + key + '" onkeydown="if(event.key===\'Enter\'){event.preventDefault();assignClip(this.dataset.clipId,this.value);}">'
+                }
               </div>
             </div>
           `;
@@ -1020,13 +1025,23 @@
       header.closest('.shoot-card').classList.toggle('open');
     }
 
-    let chipTimer = null;
-    function saveAssignee(key, value) {
+    function assignClip(key, value) {
+      if (!value || !value.trim()) return;
       const state = getShootState();
-      state[key + '_who'] = value;
+      state[key + '_who'] = value.trim();
       saveShootState(state);
-      clearTimeout(chipTimer);
-      chipTimer = setTimeout(buildFilterChips, 500);
+      const container = document.getElementById('assignee-' + key);
+      container.innerHTML = '<div class="assignee-tag"><span>' + value.trim() + '</span><button onclick="event.stopPropagation();clearAssignee(\'' + key + '\')">&times;</button></div>';
+      buildFilterChips();
+    }
+
+    function clearAssignee(key) {
+      const state = getShootState();
+      delete state[key + '_who'];
+      saveShootState(state);
+      const container = document.getElementById('assignee-' + key);
+      container.innerHTML = '<input type="text" placeholder="Type a name and hit enter..." data-clip-id="' + key + '" onkeydown="if(event.key===\'Enter\'){event.preventDefault();assignClip(this.dataset.clipId,this.value);}">';
+      buildFilterChips();
     }
 
     let activeFilter = null;
