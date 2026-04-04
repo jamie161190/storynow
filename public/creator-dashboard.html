@@ -996,10 +996,10 @@
                 <p><strong>Sound:</strong> ${clip.sound}</p>
                 ${clip.edit ? '<p style="margin-top:0.5rem;padding-top:0.75rem;border-top:1px dashed var(--border)"><strong>Post-Production:</strong> ' + clip.edit + '</p>' : ''}
               </div>
-              <div class="shoot-assignee" id="assignee-${key}">
+              <div class="shoot-assignee" id="assignee-${key}" data-clip="${key}">
                 ${assignee
-                  ? '<div class="assignee-tag"><span>' + assignee + '</span><button onclick="event.stopPropagation();clearAssignee(\'' + key + '\')">&times;</button></div>'
-                  : '<input type="text" placeholder="Type a name and hit enter..." data-clip-id="' + key + '" onkeydown="if(event.key===\'Enter\'){event.preventDefault();assignClip(this.dataset.clipId,this.value);}">'
+                  ? '<div class="assignee-tag"><span>' + assignee + '</span><button class="clear-assign-btn">&times;</button></div>'
+                  : '<input type="text" class="assign-input" placeholder="Type a name and hit enter...">'
                 }
               </div>
             </div>
@@ -1025,24 +1025,34 @@
       header.closest('.shoot-card').classList.toggle('open');
     }
 
-    function assignClip(key, value) {
-      if (!value || !value.trim()) return;
-      const state = getShootState();
-      state[key + '_who'] = value.trim();
-      saveShootState(state);
-      const container = document.getElementById('assignee-' + key);
-      container.innerHTML = '<div class="assignee-tag"><span>' + value.trim() + '</span><button onclick="event.stopPropagation();clearAssignee(\'' + key + '\')">&times;</button></div>';
-      buildFilterChips();
-    }
+    // Event delegation for assign inputs and clear buttons
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && e.target.classList.contains('assign-input')) {
+        e.preventDefault();
+        var value = e.target.value.trim();
+        if (!value) return;
+        var container = e.target.closest('.shoot-assignee');
+        var key = container.dataset.clip;
+        var state = getShootState();
+        state[key + '_who'] = value;
+        saveShootState(state);
+        container.innerHTML = '<div class="assignee-tag"><span>' + value + '</span><button class="clear-assign-btn">&times;</button></div>';
+        buildFilterChips();
+      }
+    });
 
-    function clearAssignee(key) {
-      const state = getShootState();
-      delete state[key + '_who'];
-      saveShootState(state);
-      const container = document.getElementById('assignee-' + key);
-      container.innerHTML = '<input type="text" placeholder="Type a name and hit enter..." data-clip-id="' + key + '" onkeydown="if(event.key===\'Enter\'){event.preventDefault();assignClip(this.dataset.clipId,this.value);}">';
-      buildFilterChips();
-    }
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('clear-assign-btn')) {
+        e.stopPropagation();
+        var container = e.target.closest('.shoot-assignee');
+        var key = container.dataset.clip;
+        var state = getShootState();
+        delete state[key + '_who'];
+        saveShootState(state);
+        container.innerHTML = '<input type="text" class="assign-input" placeholder="Type a name and hit enter...">';
+        buildFilterChips();
+      }
+    });
 
     let activeFilter = null;
 
