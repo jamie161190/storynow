@@ -287,6 +287,19 @@
     .sub-assignee label{font-size:0.75rem;font-weight:600;color:var(--text-soft);white-space:nowrap}
     .sub-assignee input{flex:1;border:1.5px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;font-size:0.8rem;font-family:'Quicksand',sans-serif;color:var(--text);background:white;outline:none}
     .sub-assignee input:focus{border-color:var(--purple)}
+    .idea-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);transition:all 0.3s}
+    .idea-header{display:flex;align-items:center;gap:1rem;padding:1.25rem 1.5rem;cursor:pointer}
+    .idea-num{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1ABC9C,#16A085);color:white;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.9rem;flex-shrink:0}
+    .idea-info{flex:1}
+    .idea-title{font-family:'Nunito',sans-serif;font-weight:800;font-size:1.05rem;color:var(--text);margin:0}
+    .idea-type{font-size:0.75rem;font-weight:600;color:var(--text-soft);margin-top:0.15rem}
+    .idea-expand{color:var(--text-soft);font-size:1.2rem;transition:transform 0.3s;flex-shrink:0}
+    .idea-card.open .idea-expand{transform:rotate(180deg)}
+    .idea-body{display:none;padding:0 1.5rem 1.5rem}
+    .idea-card.open .idea-body{display:block}
+    .idea-moment{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem;font-size:0.9rem;line-height:1.8;color:var(--text);font-style:italic}
+    .idea-why{font-size:0.88rem;line-height:1.7;color:var(--text-soft)}
+    .idea-why strong{color:var(--text)}
     .filter-chip{padding:0.4rem 1rem;border-radius:20px;font-size:0.85rem;font-weight:700;border:2px solid var(--border);background:white;color:var(--text-soft);cursor:pointer;transition:all 0.2s;font-family:'Quicksand',sans-serif}
     .filter-chip:hover{border-color:var(--purple);color:var(--purple)}
     .filter-chip.active{background:var(--purple);color:white;border-color:var(--purple)}
@@ -441,6 +454,13 @@
     </div>
 
     <div id="mainAds" class="shoot-grid"></div>
+
+    <!-- STORY IDEAS -->
+    <div style="margin-top:3rem;padding:2rem;background:linear-gradient(135deg,#1ABC9C,#16A085);border-radius:var(--radius-lg);color:white;text-align:center;margin-bottom:1.5rem">
+      <h2 style="font-size:1.6rem;margin:0 0 0.3rem;font-family:'Nunito',sans-serif">Story Moments That Film Themselves</h2>
+      <p style="opacity:0.85;font-size:0.9rem;margin:0">Put these in the stories. The reactions write the content for you.</p>
+    </div>
+    <div id="storyIdeas" style="display:flex;flex-direction:column;gap:1rem"></div>
   </div>
 
   <script>
@@ -659,6 +679,7 @@
 
       updateProgress();
       buildChips();
+      renderStoryIdeas();
     }
 
     // ====== ACTIONS ======
@@ -732,6 +753,47 @@
       var pct = total > 0 ? Math.round((done/total)*100) : 0;
       document.getElementById('progressText').textContent = done + ' / ' + total;
       document.getElementById('progressBar').style.width = pct + '%';
+    }
+
+    // ====== STORY IDEAS ======
+    var STORY_IDEAS = [
+      {num:'01',title:'Daddy Is The Villain But Terrible At It',type:'Group experience',
+        moment:'Daddy had decided to be the villain today. He had made himself a cape out of a tea towel. He had written VILLAIN on a piece of paper and stuck it to his chest. He had done a villain laugh for practice but it sounded more like a sneeze. Chase was not frightened. Not even slightly.',
+        why:'Specific enough to picture instantly. Adults laugh as hard as children. The sneeze detail is what makes it land.'},
+      {num:'02',title:'Villain Steals All The Biscuits',type:'Group experience',
+        moment:'The villain had been busy. Every single biscuit in the house was gone. The tin was empty. There were crumbs everywhere and in the middle of the crumbs was a note that said: You\\u2019ll never get them back. Chase looked at the empty tin and knew exactly what had to be done.',
+        why:'Food theft is a genuine crime to a child. Make it their specific favourite biscuit and the recognition reaction is immediate.'},
+      {num:'03',title:'Daddy Appeared In The Most Embarrassing Outfit',type:'Group experience',
+        moment:'And then Daddy appeared, wearing his worst outfit, doing the most embarrassing dance anyone had ever seen. He was wiggling and jiggling and making noises that sounded like a confused penguin. Everyone stopped and stared. Daddy didn\\u2019t notice and kept going.',
+        why:'The confused penguin detail is specific enough to picture exactly. Daddy not noticing everyone staring is the line that gets the room.'},
+      {num:'04',title:'The Tickle Monster Attacks',type:'Group experience',
+        moment:'The Tickle Monster leapt out from behind the sofa and grabbed Chase with his ten wiggly fingers. Chase squealed so loudly the whole village heard him. The Tickle Monster cackled and tickled and tickled until Chase could barely breathe from laughing.',
+        why:'Hearing their own name in a tickle scene makes children physically react in the room. They squirm before the narrator even finishes the sentence.'},
+      {num:'05',title:'Grandad\\u2019s Secret Superpower Is His Hug',type:'Grandad piece',
+        moment:'Nobody knew exactly why, but whenever Grandad hugged you, everything immediately felt less impossible. Scientists could not explain it. Chase had tested it many times. It worked every single time. Even the villain paused when Grandad opened his arms. Even the villain looked tempted.',
+        why:'This one will make grandad emotional, not just laugh. The villain looking tempted by the hug is the line that gets the room. Warm and funny at the same time.'},
+      {num:'06',title:'Cousin Pretends Not To Be Listening',type:'Car journey',
+        moment:'Chase\\u2019s older cousin said she was not listening to the story. She was on her phone. She was not interested. She was too old for this sort of thing. She said this four times. Then the story mentioned the dragon\\u2019s name and she looked up immediately. She knew every single thing that had happened. She had been listening the entire time. She looked back at her phone and said nothing.',
+        why:'The story describes exactly what she will physically be doing in the back seat in real time. When she hears it she realises the story is narrating her own behaviour back at her. The reaction films itself.'},
+      {num:'07',title:'The Villain Farts At The Worst Possible Moment',type:'Group experience',
+        moment:'Everything was completely silent. The villain had been so careful. The plan was working. And then, at the exact worst possible moment, the villain farted. It was enormous. It echoed. Three birds flew off a nearby roof. Chase tried not to look. The villain stared straight ahead and said nothing. Everyone pretended it had not happened. It had very much happened.',
+        why:'A professional narrator saying the word farted in a serious voice is one of the funniest things a child can hear. The three birds flying off the roof is the detail that makes every adult laugh too. Everyone pretending it did not happen is the closer.'}
+    ];
+
+    function renderStoryIdeas() {
+      var container = document.getElementById('storyIdeas');
+      if (!container) return;
+      container.innerHTML = STORY_IDEAS.map(function(idea) {
+        return '<div class="idea-card">' +
+          '<div class="idea-header" onclick="this.closest(\'.idea-card\').classList.toggle(\'open\')">' +
+          '<div class="idea-num">' + idea.num + '</div>' +
+          '<div class="idea-info"><div class="idea-title">' + idea.title + '</div><div class="idea-type">' + idea.type + '</div></div>' +
+          '<div class="idea-expand">&#9660;</div></div>' +
+          '<div class="idea-body">' +
+          '<div class="idea-moment">' + idea.moment + '</div>' +
+          '<div class="idea-why"><strong>Why it works:</strong> ' + idea.why + '</div>' +
+          '</div></div>';
+      }).join('');
     }
 
     function resetAllData() {
