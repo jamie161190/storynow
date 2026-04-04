@@ -638,12 +638,12 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div class="logo-wrap" id="sectionHero">
     <img src="/logo-new.png" alt="Storytold" class="logo-img">
   </div>
-  <h1 class="tagline">Audio stories that know <span class="highlight">them</span> by name.</h1>
-  <p class="hero-text">A personalised audio story where they are the hero. Their name, their best friend, their pet, even you as the villain. All woven into the story. Narrated by a voice you choose, ready in minutes.</p>
+  <h1 class="tagline">A story that knows <span class="highlight">their</span> name.</h1>
+  <p class="hero-text">Their name, their best friend, their world. Woven into a story made just for them. Narrated by a voice you choose. Ready in minutes.</p>
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer" data-cat="bedtime">
-    <div class="sample-label">I made these for my son Chase. Press play.</div>
+    <div class="sample-label">I made this for my son Chase. Just listen.</div>
     <div class="sample-pills">
       <button class="sample-pill active" data-cat="bedtime" onclick="switchSample('bedtime',this)">Bedtime</button>
       <button class="sample-pill" data-cat="adventure" onclick="switchSample('adventure',this)">Adventure</button>
@@ -660,17 +660,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         </div>
       </div>
     </div>
-    <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase and Ellis are in bed when something appears in the room. A gentle story to fall asleep to.</p>
+    <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase and Ellis are in bed when something appears in the room. A bedtime story made just for him.</p>
     <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.35rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
 
   <!-- FIRST CTA (after the proof) -->
   <div class="cta-group" id="sectionCta1">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Siblings, friends, and family can all appear in the story.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create their story</button>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. £19.99 for the full story.</p>
+    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128118; Add friends, family, even yourself as the villain.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not quite right? I'll rewrite it for you.</p>
   </div>
 
   <!-- FOUNDER CARD (trust signal for scrollers who didn't convert yet) -->
@@ -678,19 +678,19 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
     <div style="padding:1rem 1.2rem">
       <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
-      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he couldn't be in any of his stories. He wanted to hear his name, his best friend, his dog. So I built something where he could. Now every child can have the same thing.</p>
+      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">Chase asked me why he wasn't in any of his stories. He wanted to hear his name, his best friend, his world. So I made something where he could be. Now every child can.</p>
     </div>
   </div>
 
   <!-- HOW IT WORKS (concrete example only, no numbered steps) -->
   <div class="how-it-works" id="sectionHowItWorks">
-    <p class="how-title">Here is what happens</p>
+    <p class="how-title">You tell me about them.</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
         You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they love <strong style="color:var(--purple)">dinosaurs</strong>, sleep with a bunny called <strong style="color:var(--purple)">Mr Flopsy</strong>, are scared of the dark but pretend they are not, and <strong style="color:var(--purple)">Daddy is the villain</strong>.
       </p>
       <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
-        I take every detail and write a story only they could be in. Their friend is right beside them, their favourite toy comes along for the ride, and the villain you picked causes trouble at every turn. Every story is completely unique. Narrated in the voice you choose. Ready in a few minutes.
+        I turn every detail into a story they'll want to hear again and again. Their friend is right beside them, their favourite toy comes along for the ride, and the villain you picked causes trouble at every turn. Every story is completely unique.
       </p>
       <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
     </div>
@@ -698,7 +698,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- REAL PARENT TESTIMONIAL -->
   <div id="sectionTestimonial" style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
-    <p style="font-size:0.82rem;color:var(--text);font-weight:600;margin:0 0 0.5rem">Lisa was one of the first people to try Storytold. The next morning, she sent me this.</p>
+    <p style="font-size:0.82rem;color:var(--text);font-weight:600;margin:0 0 0.5rem">The next morning, Lisa sent me this.</p>
     <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);border:2px solid var(--border)">
       <img src="/lisa-testimonial.png" alt="WhatsApp message from Lisa: Livvie's woken up asking me for another story, I blame you" style="width:100%;display:block">
     </div>
@@ -714,11 +714,11 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- SECOND CTA -->
   <div class="cta-group" id="sectionCta2">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Make it for a child you love</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear the opening free. £19.99 for the full 15 minutes.</p>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create their story now</button>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. Only pay if you love it.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#127873; Perfect as a birthday, Christmas, or just because gift.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
-    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.2rem 0 0">&#128274; Secure payment via Stripe. No subscription. You own it forever.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not quite right? I'll rewrite it for you.</p>
+    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.2rem 0 0">&#128274; One payment. No subscription. Theirs forever.</p>
   </div>
 
   <!-- FAQ -->
@@ -1752,7 +1752,7 @@ var sampleData = {
   bedtime: {
     src: '/sample-story.mp3',
     name: 'Chase Goes to Space',
-    desc: 'Chase and Ellis are in bed when something appears in the room. A gentle story to fall asleep to.',
+    desc: 'Chase and Ellis are in bed when something appears in the room. A bedtime story made just for him.',
     track: 'bedtime'
   },
   adventure: {
