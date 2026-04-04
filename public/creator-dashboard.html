@@ -776,6 +776,7 @@
 
     // Load dashboard data
     async function loadDashboard() {
+      renderShootPlaybook();
       try {
         const response = await fetch(`${API_URL}?code=${ADMIN_CODE}`);
         if (!response.ok) throw new Error('Failed to load data');
@@ -783,7 +784,7 @@
         currentData = await response.json();
         renderDashboard();
       } catch (error) {
-        showError(`Error loading dashboard: ${error.message}`);
+        // Creators API failed but shoot playbook is already loaded
       }
     }
 
