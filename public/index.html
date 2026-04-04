@@ -231,8 +231,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ===== LANDING ===== */
 .landing{text-align:center;gap:1.2rem;padding-top:2.5rem;padding-bottom:4rem}
-.logo-wrap{position:relative;display:inline-block;margin-bottom:0.5rem}
-.logo-img{width:260px;height:auto}
+.logo-wrap{position:relative;display:inline-block;margin-bottom:0}
+.logo-img{width:340px;height:auto}
 @keyframes sparkle{0%,100%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.2) rotate(15deg);opacity:0.7}}
 
 .hero-badge{display:inline-flex;align-items:center;gap:0.4rem;background:var(--purple-light);color:var(--purple);font-size:0.8rem;font-weight:700;padding:0.4rem 1rem;border-radius:var(--radius-full);letter-spacing:0.02em}
@@ -282,7 +282,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .trust-icon{font-size:0.9rem}
 
 .floating-shapes{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;overflow:hidden;z-index:-1}
-.shape{position:absolute;border-radius:50%;opacity:0.07}
+.shape{position:absolute;border-radius:50%;opacity:0}
 .shape-1{width:120px;height:120px;background:var(--purple);top:5%;left:-30px;animation:float 6s ease-in-out infinite}
 .shape-2{width:80px;height:80px;background:var(--orange);top:20%;right:-20px;animation:float 8s ease-in-out infinite 1s}
 .shape-3{width:60px;height:60px;background:var(--sky);bottom:25%;left:10%;animation:float 7s ease-in-out infinite 0.5s}
@@ -600,7 +600,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
-  .logo-img{width:220px}
+  .logo-img{width:280px}
   .tagline{font-size:1.25rem}
   .length-cards{flex-direction:column}
   .trust-row{flex-direction:column;gap:0.5rem}
