@@ -440,14 +440,7 @@
       </div>
     </div>
 
-    <h2 class="section-header" style="margin-top:1rem">Main Ads</h2>
     <div id="mainAds" class="shoot-grid"></div>
-
-    <h2 class="section-header" style="margin-top:2rem">No-Kids Couple Brief</h2>
-    <div id="friendCreator" class="shoot-grid"></div>
-
-    <h2 class="section-header" style="margin-top:2rem">15 Min Background Clip</h2>
-    <div id="bgClips" class="shoot-grid"></div>
   </div>
 
   <script>
@@ -498,7 +491,14 @@
       P2:{id:'P2',title:'Preview Generating',length:'5-8s',whatToDo:'Screen record of the preview generating.',whatNot:'No voiceover.',edit:'CapCut. Speed up if slow. Show loading then result. H.264, 30fps.'},
       P3:{id:'P3',title:'Pressing Play',length:'3-5s',whatToDo:'Screen record of pressing the play button.',whatNot:'No voiceover.',edit:'CapCut. Subtle zoom into play button. First second of audio. H.264, 30fps.'},
       P4:{id:'P4',title:'WhatsApp Link Sent',length:'5-8s',whatToDo:'Screen record of sending the WhatsApp share link.',whatNot:'No voiceover.',edit:'CapCut. Show message typed and sent. H.264, 30fps.'},
-      P5:{id:'P5',title:'Listen Link Opening',length:'5-8s',whatToDo:'Screen record of listen link opening on phone.',whatNot:'No voiceover.',edit:'CapCut. Show link tap, page load, player. 1-2s of audio. H.264, 30fps.'}
+      P5:{id:'P5',title:'Listen Link Opening',length:'5-8s',whatToDo:'Screen record of listen link opening on phone.',whatNot:'No voiceover.',edit:'CapCut. Show link tap, page load, player. 1-2s of audio. H.264, 30fps.'},
+      FC1:{id:'FC1',title:'The Decision',length:'30-45s',hook:'We don\'t have kids but we just gave the best gift we\'ve ever given',whatToDo:'Both on sofa. Find Storytold. Build story together. Film both faces when preview plays.',whatNot:'Do not script.',edit:'9:16, 1080x1920. CapCut. Best 30s. Natural audio. No music. H.264, 30fps.'},
+      FC2:{id:'FC2',title:'The Send',length:'15-20s',whatToDo:'Screen record sending WhatsApp link. Message typed. Hit send.',whatNot:'Nothing extra.',edit:'9:16. CapCut. iPhone screen record. H.264, 30fps.'},
+      FC3:{id:'FC3',title:'The Reaction',length:'20-35s',hook:'This is what happened when she heard it',whatToDo:'Child receives story and presses play. Film reaction. Without this, no payoff.',whatNot:'Child must be real and filmed. Non-negotiable.',edit:'9:16, 1080x1920. CapCut. No cuts during reaction. H.264, 30fps.'},
+      'BG-A':{id:'BG-A',title:'Best Single Reaction',length:'15-25s',whatToDo:'Single biggest reaction from 15-min clip. Start 5s before name, end 5s after peak.',whatNot:'No music or voiceover.',edit:'CapCut. Tightest window. Raw audio. H.264, 30fps.'},
+      'BG-B':{id:'BG-B',title:'The Compilation',length:'30-45s',whatToDo:'3-4 best reactions stitched. Each beat 5-8s. Name drops + faces.',whatNot:'Do not add music. Raw is more powerful.',edit:'CapCut. Hard cuts. No transitions. H.264, 30fps.'},
+      'BG-C':{id:'BG-C',title:'Background Atmosphere',length:'10-15s',whatToDo:'Neither child reacting big but story audible. Normal family scene.',whatNot:'No performance needed.',edit:'CapCut. Minimal edit. Natural room volume. H.264, 30fps.'},
+      'BG-D':{id:'BG-D',title:'The Shared Moment',length:'20-30s',whatToDo:'Both children react to same name or look at each other.',whatNot:'Do not direct. Skip if not natural.',edit:'CapCut. No cuts. Raw and unedited. H.264, 30fps.'}
     };
 
     // ====== MAIN ADS (with embedded sub-clip references) ======
@@ -562,23 +562,20 @@
         whatToDo:'Extreme close-up Chase\'s eyes only. Story plays. No cuts. No music. Just face and audio. 3-5 seconds around name drop is the entire ad.',
         whatNot:'Do not add music. Do not cut. Do not frame anything else.',
         textOverlay:'"Watch his face when he hears it" then "storytold.ai"',sound:'Story audio only.',
-        edit:'9:16, 1080x1920. CapCut. No cuts. Crop/scale if not close enough. Retargeting ad: copy says "You heard the preview. Go finish their story." H.264, 30fps.'}
+        edit:'9:16, 1080x1920. CapCut. No cuts. Crop/scale if not close enough. Retargeting ad. H.264, 30fps.'},
+      {id:'AD11',title:'No-Kids Couple Gift',length:'60-90s',priority:'HIGH',subs:['FC1','FC2','FC3'],
+        hook:'We don\'t have kids but we just gave the best gift we\'ve ever given',
+        whatToDo:'A couple with no children buying a story for a niece/nephew/godchild. Three parts: The Decision (building the story together), The Send (WhatsApp link), The Reaction (child receiving it).',
+        whatNot:'The child reaction is non-negotiable. Without it this cannot run as a paid ad.',
+        textOverlay:'"We don\'t have kids" then "But we just gave the best gift we\'ve ever given" then "storytold.ai"',sound:'Natural conversation. Story audio. Child reaction.',
+        edit:'9:16, 1080x1920. CapCut. Assemble FC1>FC2>FC3 with text overlays between parts. Export each part standalone AND full assembly. H.264, 30fps.'},
+      {id:'AD12',title:'15 Min Background Clip',length:'Various',priority:'HIGH',subs:['BG-A','BG-B','BG-C','BG-D'],
+        hook:'They didn\'t know I was filming',
+        whatToDo:'You have a raw 15 min clip of your niece and nephew with the story playing in the background. Watch the full 15 minutes and timestamp every reaction moment. Pull the 4 best clips from it.',
+        whatNot:'Do not add music. Do not direct. The naturalness is the entire value.',
+        textOverlay:'"They didn\'t know I was filming" or "The story was just playing in the background"',sound:'Story audio in background. Natural reactions.',
+        edit:'9:16, 1080x1920. CapCut. Each sub-clip is a separate export from the raw footage. No music. Raw audio. H.264, 30fps.'}
     ];
-
-    // Standalone sections (not nested under a main ad)
-    var STANDALONE = {
-      friendCreator: [
-        {id:'FC1',title:'The Decision',length:'30-45s',priority:'HIGH',hook:'We don\'t have kids but we just gave the best gift we\'ve ever given',whatToDo:'Both on sofa. Find Storytold. Build story together. Film both faces when preview plays.',whatNot:'Do not script.',edit:'9:16, 1080x1920. CapCut. Best 30s. Natural audio. No music. H.264, 30fps.'},
-        {id:'FC2',title:'The Send',length:'15-20s',priority:'HIGH',whatToDo:'Screen record sending WhatsApp link. Message typed. Hit send.',whatNot:'Nothing extra.',edit:'9:16. CapCut. iPhone screen record. H.264, 30fps.'},
-        {id:'FC3',title:'The Reaction',length:'20-35s',priority:'HIGHEST',hook:'This is what happened when she heard it',whatToDo:'Child receives story and presses play. Film reaction. Without this, no payoff.',whatNot:'Child must be real and filmed. Non-negotiable.',edit:'9:16, 1080x1920. CapCut. No cuts during reaction. Also export full 3-part assembly FC1>FC2>FC3. H.264, 30fps.'}
-      ],
-      bgClips: [
-        {id:'BG-A',title:'The Best Single Reaction',length:'15-25s',priority:'HIGH',whatToDo:'Single biggest reaction from 15-min clip. Start 5s before name, end 5s after peak.',whatNot:'No music or voiceover.',edit:'9:16, 1080x1920. CapCut. Tightest window. Raw audio. H.264, 30fps.'},
-        {id:'BG-B',title:'The Compilation',length:'30-45s',priority:'HIGHEST',whatToDo:'3-4 best reactions stitched. Each beat 5-8s. Name drops + faces. No music.',whatNot:'Do not add music. Raw is more powerful.',edit:'9:16, 1080x1920. CapCut. Hard cuts. No transitions. Highest retention piece. H.264, 30fps.'},
-        {id:'BG-C',title:'Background Atmosphere',length:'10-15s',priority:'MEDIUM',whatToDo:'Neither child reacting big but story audible. Normal family scene.',whatNot:'No performance needed.',edit:'9:16, 1080x1920. CapCut. Minimal edit. Natural room volume. H.264, 30fps.'},
-        {id:'BG-D',title:'The Shared Moment',length:'20-30s',priority:'HIGHEST',whatToDo:'Both children react to same name or look at each other. Private recognition without adult direction.',whatNot:'Do not direct. Skip if it didn\'t happen naturally.',edit:'9:16, 1080x1920. CapCut. No cuts. Raw and unedited on purpose. H.264, 30fps.'}
-      ]
-    };
 
     // ====== STATE ======
     function getState() { try { return JSON.parse(localStorage.getItem('storytold_shoot2') || '{}'); } catch(e) { return {}; } }
@@ -640,31 +637,6 @@
       });
       document.getElementById('mainAds').innerHTML = mainHtml;
 
-      // Standalone sections
-      ['friendCreator','bgClips'].forEach(function(key) {
-        var container = document.getElementById(key);
-        if (!container) return;
-        container.innerHTML = STANDALONE[key].map(function(clip) {
-          var done = s[clip.id+'_done'] || false;
-          var who = s[clip.id+'_who'] || '';
-          return '<div class="shoot-card' + (done?' done':'') + '" data-id="'+clip.id+'">' +
-            '<div class="shoot-header" onclick="toggleShootDetail(this)">' +
-            '<div class="shoot-check' + (done?' checked':'') + '" onclick="event.stopPropagation();toggleDone(\''+clip.id+'\',this,\'main\')"></div>' +
-            '<div class="shoot-info"><div class="shoot-title">'+clip.id+'. '+clip.title+'</div>' +
-            '<div class="shoot-meta"><span class="shoot-tag length-tag">'+clip.length+'</span><span class="shoot-tag '+clip.priority.toLowerCase()+'">'+clip.priority+'</span></div></div>' +
-            '<div class="shoot-expand">&#9660;</div></div>' +
-            '<div class="shoot-detail">' +
-            (clip.hook ? '<p><strong>Hook:</strong> "'+clip.hook+'"</p>' : '') +
-            '<p><strong>What to do:</strong> '+clip.whatToDo+'</p>' +
-            '<p><strong>What NOT to do:</strong> <span class="warn">'+clip.whatNot+'</span></p>' +
-            (clip.edit ? '<p><strong>Edit:</strong> '+clip.edit+'</p>' : '') +
-            '</div>' +
-            '<div class="shoot-assignee" id="assignee-'+clip.id+'">' +
-            (who ? '<div class="assignee-tag"><span>'+who+'</span><button onclick="event.stopPropagation();clearAssign(\''+clip.id+'\')">&#215;</button></div>'
-                : '<input type="text" class="assign-input" placeholder="Assign to..." onkeydown="assignKey(event,\''+clip.id+'\')">') +
-            '</div></div>';
-        }).join('');
-      });
       updateProgress();
       buildChips();
     }
@@ -710,7 +682,6 @@
       var names = {};
       function check(id) { var w = s[id+'_who']; if (w && w.trim()) names[w.trim()] = true; }
       MAIN_ADS.forEach(function(ad) { check(ad.id); ad.subs.forEach(function(subId) { check(subId); }); });
-      ['friendCreator','bgClips'].forEach(function(k) { STANDALONE[k].forEach(function(c) { check(c.id); }); });
       var container = document.getElementById('filterChips');
       var html = '<button class="filter-chip' + (!activeFilter?' active':'') + '" onclick="filterBy(null,this)">All</button>';
       Object.keys(names).forEach(function(name) {
@@ -738,7 +709,6 @@
     function updateProgress() {
       var s = getState(); var total = 0, done = 0;
       MAIN_ADS.forEach(function(ad) { total++; if (s[ad.id+'_done']) done++; ad.subs.forEach(function(subId) { total++; if (s[subId+'_done']) done++; }); });
-      ['friendCreator','bgClips'].forEach(function(k) { STANDALONE[k].forEach(function(c) { total++; if (s[c.id+'_done']) done++; }); });
       var pct = total > 0 ? Math.round((done/total)*100) : 0;
       document.getElementById('progressText').textContent = done + ' / ' + total;
       document.getElementById('progressBar').style.width = pct + '%';
