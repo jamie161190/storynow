@@ -2522,27 +2522,9 @@ async function startStoryBgMusic() {
   const sel = getStoryMusicSelection();
   if (sel === 'none') return;
 
-  // Use cached tracks if available, otherwise generate
-  if (_cachedMusicTracks[sel]) {
-    _storyBgMusic = new Audio(_cachedMusicTracks[sel]);
-  } else {
-    const desc = sel === 'adventure'
-      ? 'Upbeat, playful, wonder-filled instrumental background music for a children\'s story. Gentle percussion, bright xylophone, warm strings. 120 BPM. Loopable.'
-      : 'Soft, warm, gentle instrumental lullaby background music. Delicate piano, light strings, calming. 70 BPM. Loopable.';
-    try {
-      const res = await fetch('/api/studio-generate', {
-        method: 'POST',
-        headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'generate-music', description: desc, duration: 22 })
-      });
-      const data = await res.json();
-      if (data.audio) {
-        const src = 'data:audio/mpeg;base64,' + data.audio;
-        _cachedMusicTracks[sel] = src;
-        _storyBgMusic = new Audio(src);
-      }
-    } catch (e) { console.warn('Background music generation failed:', e.message); return; }
-  }
+  // Use the same music files as the main website
+  const trackUrl = sel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
+  _storyBgMusic = new Audio(trackUrl);
 
   if (_storyBgMusic) {
     _storyBgMusic.volume = 0;
@@ -3302,27 +3284,8 @@ async function startComposeAudio() {
   let audioSrc = null;
 
   if (sel === 'adventure' || sel === 'bedtime') {
-    // Check cache first
-    if (_cachedMusicTracks[sel]) {
-      audioSrc = _cachedMusicTracks[sel];
-    } else {
-      // Auto-generate ambient music via ElevenLabs
-      const desc = sel === 'adventure'
-        ? 'Upbeat, playful, wonder-filled instrumental background music for a children\'s brand ad. Gentle percussion, bright xylophone, warm strings. 120 BPM. Loopable.'
-        : 'Soft, warm, gentle instrumental lullaby background music. Delicate piano, light strings, calming. 70 BPM. Loopable.';
-      try {
-        const res = await fetch('/api/studio-generate', {
-          method: 'POST',
-          headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'generate-music', description: desc, duration: 22 })
-        });
-        const data = await res.json();
-        if (data.audio) {
-          audioSrc = 'data:audio/mpeg;base64,' + data.audio;
-          _cachedMusicTracks[sel] = audioSrc;
-        }
-      } catch (e) { console.warn('Music generation failed:', e.message); }
-    }
+    // Use the same music files as the main website
+    audioSrc = sel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
   } else if (sel === 'story') {
     if (typeof studioAudio !== 'undefined' && studioAudio && studioAudio.src) audioSrc = studioAudio.src;
     else if (typeof previewAudioEl !== 'undefined' && previewAudioEl && previewAudioEl.src) audioSrc = previewAudioEl.src;
