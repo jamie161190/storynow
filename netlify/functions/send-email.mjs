@@ -195,7 +195,7 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <h1 style="color:#7C5CFC;font-size:28px;margin:0;">Storytold</h1>
+      <img src="https://storytold.ai/logo-new.png" alt="Storytold" style="height:60px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:24px;text-align:center;margin:0 0 8px;">🎧</p>
@@ -251,7 +251,7 @@ function giftEmail(childName, giftFrom, giftMessage, storyId) {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <h1 style="color:#7C5CFC;font-size:28px;margin:0;">Storytold</h1>
+      <img src="https://storytold.ai/logo-new.png" alt="Storytold" style="height:60px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:32px;text-align:center;margin:0 0 8px;">🎁</p>
@@ -289,7 +289,7 @@ function shareEmail(childName, fromName, message, storyId) {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <h1 style="color:#7C5CFC;font-size:28px;margin:0;">Storytold</h1>
+      <img src="https://storytold.ai/logo-new.png" alt="Storytold" style="height:60px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:32px;text-align:center;margin:0 0 8px;">🎧</p>
