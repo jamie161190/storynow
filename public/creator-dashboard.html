@@ -181,38 +181,6 @@
       background: var(--border);
     }
 
-    /* Stats Row */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .stat-card {
-      background-color: var(--card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.75rem;
-      box-shadow: var(--shadow);
-    }
-
-    .stat-label {
-      color: var(--text-soft);
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.75rem;
-    }
-
-    .stat-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--purple);
-      font-family: 'Nunito', sans-serif;
-    }
-
     /* Section Headers */
     .section-header {
       font-size: 1.5rem;
@@ -220,209 +188,6 @@
       color: var(--text);
       margin-bottom: 1.5rem;
       margin-top: 2rem;
-    }
-
-    /* Creators Table */
-    .table-container {
-      background-color: var(--card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      margin-bottom: 2.5rem;
-    }
-
-    .table-wrapper {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.95rem;
-    }
-
-    thead {
-      background-color: var(--purple-light);
-      border-bottom: 2px solid var(--border);
-    }
-
-    th {
-      padding: 1rem 1.25rem;
-      text-align: left;
-      font-weight: 700;
-      color: var(--purple);
-      cursor: pointer;
-      user-select: none;
-      position: relative;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    th:hover {
-      background-color: #DED3FF;
-    }
-
-    th.sortable::after {
-      content: ' ↕';
-      opacity: 0.5;
-    }
-
-    th.sorted-asc::after {
-      content: ' ↑';
-      opacity: 1;
-    }
-
-    th.sorted-desc::after {
-      content: ' ↓';
-      opacity: 1;
-    }
-
-    td {
-      padding: 1rem 1.25rem;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    tbody tr:hover {
-      background-color: rgba(124, 92, 252, 0.02);
-    }
-
-    .copy-btn {
-      padding: 0.4rem 0.8rem;
-      background-color: var(--purple-light);
-      color: var(--purple);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .copy-btn:hover {
-      background-color: var(--purple);
-      color: white;
-    }
-
-    .copy-btn.copied {
-      background-color: var(--purple);
-      color: white;
-    }
-
-    /* Takes Breakdown */
-    .takes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .piece-card {
-      background-color: var(--card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.75rem;
-      box-shadow: var(--shadow);
-    }
-
-    .piece-card.unclaimed {
-      opacity: 0.6;
-      background-color: rgba(107, 100, 144, 0.03);
-    }
-
-    .piece-number {
-      display: inline-block;
-      background-color: var(--purple);
-      color: white;
-      padding: 0.35rem 0.65rem;
-      border-radius: var(--radius);
-      font-size: 0.75rem;
-      font-weight: 700;
-      margin-bottom: 0.75rem;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    .piece-card.unclaimed .piece-number {
-      background-color: var(--text-soft);
-    }
-
-    .piece-title {
-      font-family: 'Nunito', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 0.75rem;
-    }
-
-    .piece-count {
-      font-size: 0.9rem;
-      color: var(--text-soft);
-      margin-bottom: 1rem;
-    }
-
-    .piece-creators {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .creator-tag {
-      display: inline-block;
-      background-color: var(--purple-light);
-      color: var(--purple);
-      padding: 0.4rem 0.8rem;
-      border-radius: var(--radius);
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
-    .unclaimed-text {
-      color: var(--text-soft);
-      font-size: 0.9rem;
-      font-style: italic;
-    }
-
-    /* Activity Feed */
-    .activity-feed {
-      background-color: var(--card);
-      border: 2px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: 1.75rem;
-      box-shadow: var(--shadow);
-    }
-
-    .activity-item {
-      display: flex;
-      padding: 1rem 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.95rem;
-      color: var(--text);
-    }
-
-    .activity-item:last-child {
-      border-bottom: none;
-    }
-
-    .activity-time {
-      color: var(--text-soft);
-      font-weight: 600;
-      min-width: 120px;
-      flex-shrink: 0;
-      font-family: 'Nunito', sans-serif;
-    }
-
-    .activity-text {
-      flex: 1;
-    }
-
-    .activity-creator {
-      font-weight: 700;
-      color: var(--purple);
-    }
-
-    .activity-piece {
-      font-style: italic;
-      color: var(--text-soft);
     }
 
     .no-data {
@@ -645,8 +410,13 @@
 
     <!-- Assignee Filter -->
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.5rem;box-shadow:var(--shadow);margin-bottom:2rem">
-      <span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;color:var(--text);margin-right:0.75rem">Show clips for:</span>
-      <div id="filterChips" style="display:inline-flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem">
+        <div>
+          <span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:0.9rem;color:var(--text);margin-right:0.75rem">Show clips for:</span>
+          <span id="filterChips" style="display:inline-flex;flex-wrap:wrap;gap:0.5rem"></span>
+        </div>
+        <button onclick="resetAllData()" style="font-size:0.75rem;color:var(--text-soft);background:none;border:1px solid var(--border);border-radius:8px;padding:0.3rem 0.8rem;cursor:pointer">Reset all</button>
+      </div>
     </div>
 
     <h2 class="section-header" style="margin-top:1rem">Chase Core</h2>
@@ -677,12 +447,6 @@
 
   <script>
     const ADMIN_CODE = 'StoryToldAdmin2026';
-    const API_URL = '/api/admin-creators';
-
-    const PIECE_TITLES = {};
-
-    let currentData = null;
-    let sortState = {};
 
     // Gate functionality
     document.getElementById('unlockBtn').addEventListener('click', handleUnlock);
@@ -714,90 +478,8 @@
       document.getElementById('adminCode').focus();
     });
 
-    // Load dashboard data
-    async function loadDashboard() {
+    function loadDashboard() {
       renderShootPlaybook();
-      try {
-        const response = await fetch(`${API_URL}?code=${ADMIN_CODE}`);
-        if (!response.ok) throw new Error('Failed to load data');
-
-        currentData = await response.json();
-        renderDashboard();
-      } catch (error) {
-        // Creators API failed but shoot playbook is already loaded
-      }
-    }
-
-    function showError(message) {
-      const container = document.getElementById('errorContainer');
-      container.innerHTML = `<div class="error-message">${message}</div>`;
-    }
-
-    function renderDashboard() {
-      if (!currentData) return;
-
-      const { creators, takes, referrals } = currentData;
-
-      renderStats(creators, takes, referrals);
-      renderCreatorsTable(creators, takes, referrals);
-      renderShootPlaybook();
-    }
-
-    function renderStats(creators, takes, referrals) {
-      const totalVisits = referrals.reduce((sum, r) => sum + (r.visits || 0), 0);
-      const totalConversions = referrals.reduce((sum, r) => sum + (r.conversions || 0), 0);
-      const totalRevenue = referrals.reduce((sum, r) => sum + (r.revenue || 0), 0);
-
-      document.getElementById('totalCreators').textContent = creators.length;
-      document.getElementById('totalTakes').textContent = takes.length;
-      document.getElementById('totalVisits').textContent = totalVisits.toLocaleString();
-      document.getElementById('totalConversions').textContent = totalConversions.toLocaleString();
-      document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
-    }
-
-    function renderCreatorsTable(creators, takes, referrals) {
-      const tbody = document.getElementById('creatorsBody');
-
-      const creatorsWithStats = creators.map(creator => {
-        const creatorTakes = takes.filter(t => t.creator_id === creator.id).length;
-        const referral = referrals.find(r => r.ref_code === creator.referral_code);
-
-        return {
-          ...creator,
-          takes: creatorTakes,
-          visits: referral?.visits || 0,
-          conversions: referral?.conversions || 0,
-          revenue: referral?.revenue || 0
-        };
-      });
-
-      if (creatorsWithStats.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="no-data">No creators yet</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = creatorsWithStats.map(creator => {
-        const joinedDate = new Date(creator.created_at).toLocaleDateString();
-        return `
-          <tr>
-            <td>${escapeHtml(creator.name)}</td>
-            <td>${escapeHtml(creator.child_names || '')}</td>
-            <td>
-              <button class="copy-btn" data-code="${creator.referral_code}" onclick="copyToClipboard('${creator.referral_code}', this)">
-                ${creator.referral_code}
-              </button>
-            </td>
-            <td>${joinedDate}</td>
-            <td>${creator.takes}</td>
-            <td>${creator.visits.toLocaleString()}</td>
-            <td>${creator.conversions.toLocaleString()}</td>
-            <td>$${creator.revenue.toFixed(2)}</td>
-          </tr>
-        `;
-      }).join('');
-
-      // Setup sorting
-      setupTableSorting(creatorsWithStats);
     }
 
     // ====== SHOOT PLAYBOOK ======
@@ -1134,41 +816,10 @@
       document.getElementById('progressBar').style.width = pct + '%';
     }
 
-    function setupTableSorting(data) {
-      const headers = document.querySelectorAll('th.sortable');
-      headers.forEach(header => {
-        header.addEventListener('click', () => {
-          const sortKey = header.dataset.sort;
-          const isAsc = sortState[sortKey] !== 'asc';
-          sortState = { [sortKey]: isAsc ? 'asc' : 'desc' };
-          data.sort((a, b) => {
-            let valA = a[sortKey], valB = b[sortKey];
-            if (typeof valA === 'string') { valA = valA.toLowerCase(); valB = valB.toLowerCase(); }
-            const c = valA < valB ? -1 : valA > valB ? 1 : 0;
-            return isAsc ? c : -c;
-          });
-          headers.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
-          header.classList.add(isAsc ? 'sorted-asc' : 'sorted-desc');
-          renderCreatorsTable(currentData.creators, currentData.takes, currentData.referrals);
-        });
-      });
-    }
-
-    function copyToClipboard(text, button) {
-      navigator.clipboard.writeText(text).then(() => {
-        button.classList.add('copied');
-        button.textContent = 'Copied!';
-        setTimeout(() => {
-          button.classList.remove('copied');
-          button.textContent = text;
-        }, 2000);
-      });
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    function resetAllData() {
+      if (!confirm('This will clear all assignments and checkboxes. Are you sure?')) return;
+      localStorage.removeItem('storytold_shoot');
+      renderShootPlaybook();
     }
 
     // Focus on input on load
