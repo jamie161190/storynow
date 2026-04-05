@@ -4046,11 +4046,12 @@ async function exportComedyVideo() {
     const chunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
-    // Calculate durations — video plays for its FULL length, never cut short by audio
-    const videoDuration = video.duration;
+    // Calculate durations — playback length = whichever is longer (video or narration)
+    // If narration is longer, video loops. If video is longer, it plays out after narration ends.
+    const playbackDuration = Math.max(video.duration, audioDuration);
     const startCardDur = hasStartCard ? cardDuration : 0;
     const endCardDur = hasEndCard ? cardDuration : 0;
-    const totalDuration = startCardDur + videoDuration + endCardDur;
+    const totalDuration = startCardDur + playbackDuration + endCardDur;
 
     setProgress('Rendering...', 30);
 
@@ -4081,15 +4082,15 @@ async function exportComedyVideo() {
       function drawFrame() {
         const elapsed = (performance.now() - videoStartTime) / 1000;
 
-        if (elapsed >= videoDuration) {
+        if (elapsed >= playbackDuration) {
           video.pause();
           resolve();
           return;
         }
-        // If video reports ended early (buffering issue), keep drawing last frame
-        if (video.ended && elapsed < videoDuration - 0.5) {
-          // Video ended prematurely — try restarting from current position
-          video.currentTime = elapsed;
+
+        // Loop the video if it ends before the narration finishes
+        if (video.ended && elapsed < playbackDuration - 0.5) {
+          video.currentTime = 0;
           video.play().catch(() => {});
         }
 
