@@ -3427,6 +3427,8 @@ async function sendComedyToDirector() {
       hasAudio: !!comedyData.audio,
       musicSelection: getComedyMusicSelection()
     },
+    narrationAudioUrl: lastGeneratedAudioUrl || null,
+    narrationText: lastComedyNarrationText || '',
     userContext: userContext || '',
     analysis: null,
     moments: []
@@ -3810,7 +3812,7 @@ function drawCard(ctx, w, h, title, subtitle, isEnd) {
 }
 
 // Draw subtitle text on the canvas
-function drawSubtitle(ctx, w, h, text) {
+function drawSubtitle(ctx, w, h, text, position) {
   if (!text) return;
   const fontSize = Math.round(w * 0.048);
   ctx.font = `800 ${fontSize}px "Nunito", "Quicksand", sans-serif`;
@@ -3833,8 +3835,13 @@ function drawSubtitle(ctx, w, h, text) {
   if (line) lines.push(line);
 
   const lineHeight = fontSize * 1.35;
-  const bottomPad = h * 0.10;
-  const startY = h - bottomPad - (lines.length * lineHeight);
+  let startY;
+  if (position === 'top') {
+    startY = h * 0.06;
+  } else {
+    const bottomPad = h * 0.10;
+    startY = h - bottomPad - (lines.length * lineHeight);
+  }
 
   // Background box behind text — rounded, semi-transparent
   const padding = fontSize * 0.6;
@@ -5802,13 +5809,15 @@ async function buildThisAd(conceptIdx) {
 
     setProgress('Loading audio...');
 
-    // Get narration audio (from the narrate tab if available)
+    // Get narration audio from the asset (stored when sent to Director) or fallback to global
+    const narrationUrl = clipAsset.narrationAudioUrl || lastGeneratedAudioUrl;
+    const narrationScript = clipAsset.narrationText || clipAsset.comedyMeta?.storyText || lastComedyNarrationText || '';
     let narrationDecoded = null;
     let audioDuration = 0;
     const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    if (lastGeneratedAudioUrl) {
-      const narResp = await fetch(lastGeneratedAudioUrl);
+    if (narrationUrl) {
+      const narResp = await fetch(narrationUrl);
       const narBuf = await narResp.arrayBuffer();
       narrationDecoded = await tempCtx.decodeAudioData(narBuf);
       audioDuration = narrationDecoded.duration;
@@ -5912,11 +5921,12 @@ async function buildThisAd(conceptIdx) {
     const chunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
-    // Build subtitle chunks for the video phase
+    // Build subtitle chunks for the video phase from the asset's narration
     let subtitleChunks = [];
-    if (lastComedyNarrationText) {
+    const hasNarration = !!(narrationScript && narrationUrl);
+    if (narrationScript) {
       const videoPhase = phases.find(p => p.type === 'video');
-      if (videoPhase) subtitleChunks = buildSubtitleChunks(lastComedyNarrationText, videoPhase.duration);
+      if (videoPhase) subtitleChunks = buildSubtitleChunks(narrationScript, videoPhase.duration);
     }
 
     recorder.start(100);
@@ -5957,21 +5967,21 @@ async function buildThisAd(conceptIdx) {
 
             drawVideoFrame(ctx, video, W, H);
 
-            // Draw text overlays from the concept
+            // Draw narration subtitles at the bottom
+            if (subtitleChunks.length) {
+              const sub = subtitleChunks.find(s => elapsed >= s.start && elapsed < s.end);
+              if (sub) drawSubtitle(ctx, W, H, sub.text);
+            }
+
+            // Draw concept text overlays — at the TOP if narration subtitles are present, otherwise bottom
             if (phase.overlays && phase.overlays.length) {
               for (const ov of phase.overlays) {
                 let show = true;
                 if (ov.timing === 'start' && elapsed > 3) show = false;
                 if (ov.timing === 'end' && elapsed < phase.duration - 4) show = false;
                 if (ov.timing === 'bridge' && elapsed < phase.duration - 4) show = false;
-                if (show && ov.text) drawSubtitle(ctx, W, H, ov.text);
+                if (show && ov.text) drawSubtitle(ctx, W, H, ov.text, hasNarration ? 'top' : undefined);
               }
-            }
-
-            // Draw narration subtitles
-            if (subtitleChunks.length) {
-              const sub = subtitleChunks.find(s => elapsed >= s.start && elapsed < s.end);
-              if (sub) drawSubtitle(ctx, W, H, sub.text);
             }
 
             requestAnimationFrame(drawFrame);
