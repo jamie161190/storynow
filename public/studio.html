@@ -502,8 +502,17 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
           <div style="background:var(--purple);color:#fff;padding:8px 24px;border-radius:50px;font-size:13px;font-weight:700">Choose File</div>
         </div>
         <video id="canvasVideo" style="display:none;width:100%;height:100%;object-fit:cover" playsinline loop controls></video>
+        <!-- Overlay text rendered on top of video -->
+        <div id="canvasOverlay" style="display:none;position:absolute;top:0;left:0;right:0;padding:12px 16px;z-index:5;pointer-events:none">
+          <div id="canvasOverlayText" style="background:rgba(0,0,0,0.6);color:#fff;font-size:13px;font-weight:700;text-align:center;padding:8px 12px;border-radius:8px;font-family:'Nunito',sans-serif;line-height:1.4"></div>
+        </div>
         <input type="file" id="canvasFileInput" accept="video/*" style="display:none" onchange="handleCanvasUpload(this.files[0])">
       </div>
+    </div>
+    <!-- Canvas controls -->
+    <div id="canvasControls" style="display:none;position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:10">
+      <button onclick="previewCanvasAd()" style="background:var(--purple);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Preview Ad</button>
+      <button onclick="exportCanvasAd()" style="background:var(--orange);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" id="canvasExportBtn">Export Video</button>
     </div>
     <!-- Aspect ratio pills -->
     <div style="position:absolute;bottom:20px;display:flex;gap:8px">
@@ -1314,6 +1323,26 @@ async function loadCanvasVideo() {
   return new Promise((res) => { req.onsuccess = () => res(req.result || null); req.onerror = () => res(null); });
 }
 
+// ── Canvas Ad Timeline ──
+// The timeline defines the ad structure: video segments, overlays, and end cards.
+// Set this via setCanvasTimeline() — the canvas will render it.
+window._canvasTimeline = null;
+
+function setCanvasTimeline(timeline) {
+  window._canvasTimeline = timeline;
+  // Show overlay if timeline has a hook
+  const overlay = document.getElementById('canvasOverlay');
+  const overlayText = document.getElementById('canvasOverlayText');
+  if (timeline && timeline.hook) {
+    overlayText.textContent = timeline.hook;
+    overlay.style.display = 'block';
+  } else {
+    overlay.style.display = 'none';
+  }
+  // Show controls
+  document.getElementById('canvasControls').style.display = 'flex';
+}
+
 function handleCanvasUpload(file) {
   if (!file || !file.type.startsWith('video/')) return;
   const video = document.getElementById('canvasVideo');
@@ -1324,8 +1353,238 @@ function handleCanvasUpload(file) {
   video.muted = false;
   video.style.display = 'block';
   empty.style.display = 'none';
+  // Show controls when video is loaded
+  document.getElementById('canvasControls').style.display = 'flex';
   // Persist to IndexedDB so it survives refreshes
   saveCanvasVideo(file).catch(e => console.warn('Could not save video to IndexedDB:', e));
+}
+
+// ── Preview: plays the full ad sequence in the phone frame ──
+async function previewCanvasAd() {
+  const video = document.getElementById('canvasVideo');
+  const content = document.getElementById('canvasContent');
+  const timeline = window._canvasTimeline;
+  if (!video.src && !window._canvasVideoUrl) return alert('Upload a video first');
+
+  // Reset video
+  video.loop = false;
+  video.currentTime = 0;
+  video.controls = false;
+
+  // Show overlay hook
+  const overlay = document.getElementById('canvasOverlay');
+  if (timeline && timeline.hook) {
+    document.getElementById('canvasOverlayText').textContent = timeline.hook;
+    overlay.style.display = 'block';
+  }
+
+  // Play video
+  await video.play();
+
+  // Wait for video to end
+  await new Promise(resolve => {
+    video.onended = resolve;
+  });
+
+  // Hide overlay
+  overlay.style.display = 'none';
+
+  // Show end cards
+  if (timeline && timeline.endCards) {
+    for (const card of timeline.endCards) {
+      const cardEl = document.createElement('div');
+      cardEl.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:#0a0a1a;z-index:20;padding:2rem;text-align:center';
+
+      if (card.type === 'logo') {
+        cardEl.innerHTML = `<div>
+          <div style="font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--purple);margin-bottom:12px">${card.title || 'storytold.ai'}</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:14px;color:rgba(255,255,255,0.7)">${card.subtitle || ''}</div>
+        </div>`;
+      } else {
+        cardEl.innerHTML = `<div style="font-family:'Nunito',sans-serif;font-size:${card.fontSize || '20px'};font-weight:700;color:#fff;line-height:1.5">${card.text}</div>`;
+      }
+
+      content.appendChild(cardEl);
+      await new Promise(r => setTimeout(r, (card.duration || 2) * 1000));
+      content.removeChild(cardEl);
+    }
+  }
+
+  // Reset
+  video.loop = true;
+  video.controls = true;
+  video.currentTime = 0;
+}
+
+// ── Export: renders the full ad as a downloadable video ──
+async function exportCanvasAd() {
+  const video = document.getElementById('canvasVideo');
+  const timeline = window._canvasTimeline;
+  if (!video.src && !window._canvasVideoUrl) return alert('Upload a video first');
+
+  const btn = document.getElementById('canvasExportBtn');
+  btn.textContent = 'Rendering...';
+  btn.disabled = true;
+
+  const W = video.videoWidth || 1080;
+  const H = video.videoHeight || 1920;
+  const fps = 30;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Setup recording
+  const audioCtx = new AudioContext();
+  const dest = audioCtx.createMediaStreamDestination();
+  const canvasStream = canvas.captureStream(fps);
+
+  // Capture video audio
+  const videoClone = video.cloneNode(true);
+  videoClone.muted = false;
+  videoClone.loop = false;
+  videoClone.currentTime = 0;
+
+  try {
+    const audioSource = audioCtx.createMediaElementSource(videoClone);
+    audioSource.connect(dest);
+    audioSource.connect(audioCtx.destination);
+  } catch (e) {
+    console.warn('Could not capture audio:', e);
+  }
+
+  // Combine video + audio streams
+  const tracks = [...canvasStream.getVideoTracks(), ...dest.stream.getAudioTracks()];
+  const combinedStream = new MediaStream(tracks);
+
+  const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a.40.2') ? 'video/mp4;codecs=avc1,mp4a.40.2'
+    : MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4'
+    : MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus'
+    : 'video/webm';
+
+  const recorder = new MediaRecorder(combinedStream, { mimeType, videoBitsPerSecond: 10000000 });
+  const chunks = [];
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+  const exportDone = new Promise(resolve => {
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'storytold-ad.' + (mimeType.includes('mp4') ? 'mp4' : 'webm');
+      a.click();
+      URL.revokeObjectURL(url);
+      btn.textContent = 'Export Video';
+      btn.disabled = false;
+      resolve();
+    };
+  });
+
+  recorder.start();
+
+  // Phase 1: Render video frames with overlay
+  videoClone.currentTime = 0;
+  await videoClone.play();
+
+  await new Promise(resolve => {
+    const drawFrame = () => {
+      if (videoClone.ended || videoClone.paused) { resolve(); return; }
+      ctx.drawImage(videoClone, 0, 0, W, H);
+
+      // Draw hook overlay
+      if (timeline && timeline.hook) {
+        const hookText = timeline.hook;
+        const padding = W * 0.04;
+        const fontSize = Math.round(W * 0.038);
+        ctx.font = `700 ${fontSize}px Nunito, sans-serif`;
+        const lines = wrapText(ctx, hookText, W - padding * 4);
+        const lineHeight = fontSize * 1.4;
+        const boxH = lines.length * lineHeight + padding * 2;
+        const boxY = H * 0.06;
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        roundRect(ctx, padding, boxY, W - padding * 2, boxH, W * 0.02);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        lines.forEach((line, i) => {
+          ctx.fillText(line, W / 2, boxY + padding + fontSize + i * lineHeight);
+        });
+      }
+
+      requestAnimationFrame(drawFrame);
+    };
+    drawFrame();
+  });
+
+  // Phase 2: Render end cards
+  if (timeline && timeline.endCards) {
+    for (const card of timeline.endCards) {
+      const cardFrames = Math.round((card.duration || 2) * fps);
+      for (let f = 0; f < cardFrames; f++) {
+        ctx.fillStyle = '#0a0a1a';
+        ctx.fillRect(0, 0, W, H);
+        ctx.textAlign = 'center';
+
+        if (card.type === 'logo') {
+          ctx.font = `900 ${Math.round(W * 0.08)}px Nunito, sans-serif`;
+          ctx.fillStyle = '#7c3aed';
+          ctx.fillText(card.title || 'storytold.ai', W / 2, H * 0.45);
+          ctx.font = `400 ${Math.round(W * 0.035)}px Nunito, sans-serif`;
+          ctx.fillStyle = 'rgba(255,255,255,0.7)';
+          ctx.fillText(card.subtitle || '', W / 2, H * 0.52);
+        } else {
+          const fontSize = Math.round(W * (card.fontScale || 0.055));
+          ctx.font = `700 ${fontSize}px Nunito, sans-serif`;
+          ctx.fillStyle = '#fff';
+          const lines = wrapText(ctx, card.text, W * 0.75);
+          const lineHeight = fontSize * 1.5;
+          const startY = (H - lines.length * lineHeight) / 2;
+          lines.forEach((line, i) => {
+            ctx.fillText(line, W / 2, startY + i * lineHeight);
+          });
+        }
+        await new Promise(r => setTimeout(r, 1000 / fps));
+      }
+    }
+  }
+
+  recorder.stop();
+  await exportDone;
+}
+
+// Helper: wrap text into lines
+function wrapText(ctx, text, maxWidth) {
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    const test = current ? current + ' ' + word : word;
+    if (ctx.measureText(test).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+// Helper: rounded rectangle
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
 }
 
 // Drag and drop on canvas + auto-restore from IndexedDB
