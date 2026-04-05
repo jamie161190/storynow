@@ -3425,9 +3425,9 @@ async function sendComedyToDirector() {
       voiceId: comedySelectedVoiceId,
       voiceName: ALL_VOICES.find(v => v.id === comedySelectedVoiceId)?.name || 'Voice',
       hasAudio: !!comedyData.audio,
+      audioBase64: comedyData.audio || null,
       musicSelection: getComedyMusicSelection()
     },
-    narrationAudioUrl: lastGeneratedAudioUrl || null,
     narrationText: lastComedyNarrationText || '',
     userContext: userContext || '',
     analysis: null,
@@ -5809,9 +5809,15 @@ async function buildThisAd(conceptIdx) {
 
     setProgress('Loading audio...');
 
-    // Get narration audio from the asset (stored when sent to Director) or fallback to global
-    const narrationUrl = clipAsset.narrationAudioUrl || lastGeneratedAudioUrl;
+    // Get narration audio — try asset's stored base64, then fallback to global
+    let narrationUrl = null;
+    if (clipAsset.comedyMeta?.audioBase64) {
+      narrationUrl = 'data:audio/mpeg;base64,' + clipAsset.comedyMeta.audioBase64;
+    } else if (lastGeneratedAudioUrl) {
+      narrationUrl = lastGeneratedAudioUrl;
+    }
     const narrationScript = clipAsset.narrationText || clipAsset.comedyMeta?.storyText || lastComedyNarrationText || '';
+    const isNarratedClip = !!(clipAsset.isComedyClip && narrationUrl);
     let narrationDecoded = null;
     let audioDuration = 0;
     const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -5865,8 +5871,8 @@ async function buildThisAd(conceptIdx) {
       narSrc.start(videoPhaseStart);
     }
 
-    // Load and mix music
-    const musicSel = getComedyMusicSelection ? getComedyMusicSelection() : 'none';
+    // Load and mix music — use the selection stored on the asset
+    const musicSel = clipAsset.comedyMeta?.musicSelection || (getComedyMusicSelection ? getComedyMusicSelection() : 'none');
     if (musicSel !== 'none') {
       try {
         const trackUrl = musicSel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
@@ -5923,7 +5929,6 @@ async function buildThisAd(conceptIdx) {
 
     // Build subtitle chunks for the video phase from the asset's narration
     let subtitleChunks = [];
-    const hasNarration = !!(narrationScript && narrationUrl);
     if (narrationScript) {
       const videoPhase = phases.find(p => p.type === 'video');
       if (videoPhase) subtitleChunks = buildSubtitleChunks(narrationScript, videoPhase.duration);
@@ -5967,21 +5972,20 @@ async function buildThisAd(conceptIdx) {
 
             drawVideoFrame(ctx, video, W, H);
 
-            // Check if a narration subtitle is visible right now
-            let subtitleVisible = false;
+            // Draw narration subtitles
             if (subtitleChunks.length) {
               const sub = subtitleChunks.find(s => elapsed >= s.start && elapsed < s.end);
-              if (sub) { drawSubtitle(ctx, W, H, sub.text); subtitleVisible = true; }
+              if (sub) drawSubtitle(ctx, W, H, sub.text);
             }
 
-            // Draw concept text overlays — move to top only if a subtitle is on screen right now
-            if (phase.overlays && phase.overlays.length) {
+            // Concept overlays — SKIP during clip if narrated (clip is sacred, don't layer text over it)
+            if (!isNarratedClip && phase.overlays && phase.overlays.length) {
               for (const ov of phase.overlays) {
                 let show = true;
                 if (ov.timing === 'start' && elapsed > 3) show = false;
                 if (ov.timing === 'end' && elapsed < phase.duration - 4) show = false;
                 if (ov.timing === 'bridge' && elapsed < phase.duration - 4) show = false;
-                if (show && ov.text) drawSubtitle(ctx, W, H, ov.text, subtitleVisible ? 'top' : undefined);
+                if (show && ov.text) drawSubtitle(ctx, W, H, ov.text);
               }
             }
 
