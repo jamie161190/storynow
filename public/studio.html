@@ -923,13 +923,19 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
       </div>
 
       <div class="ctrl-section">
-        <h4>2. Analyse &amp; Name</h4>
-        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:0.5rem">Identifies content type (narrated clip, reaction, raw footage), who's in it, their age, marketing potential, hook lines, bridge text, and whether the narrator should deliver a spoken CTA.</p>
+        <h4>2. Your Notes</h4>
+        <p style="font-size:0.7rem;color:var(--text-soft);margin-bottom:0.4rem">Tell the Director what you're thinking — the angle, the audience, the vibe, any context that helps.</p>
+        <textarea id="directorNotes" placeholder="e.g. This is Chase at age 2, way before Storytold existed. I want the ad to show that origin story energy — he didn't know yet that one day he'd hear his name in a story. Target bedtime parents on TikTok." style="width:100%;min-height:80px;border:1px solid var(--border);border-radius:8px;padding:0.5rem;font-size:0.78rem;font-family:Nunito,sans-serif;resize:vertical"></textarea>
+      </div>
+
+      <div class="ctrl-section">
+        <h4>3. Analyse &amp; Name</h4>
+        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:0.5rem">Identifies content type, who's in it, their age, marketing potential, hook lines, bridge text, and voice CTAs.</p>
         <button class="btn btn-purple btn-full" onclick="analyseAssets()" id="analyseBtn">Analyse All Assets</button>
       </div>
 
       <div class="ctrl-section">
-        <h4>3. Generate Ad Concepts</h4>
+        <h4>4. Generate Ad Concepts</h4>
         <label>Target platform (optional)</label>
         <select id="directorPlatform">
           <option value="">All platforms</option>
@@ -3330,12 +3336,40 @@ function renderComedyOutput(data) {
   }
 }
 
+// Show context prompt modal and return the user's input
+function showDirectorContextPrompt(defaultText) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.2s ease';
+    overlay.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:1.5rem;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <h3 style="margin:0 0 0.5rem;font-size:1rem;color:var(--purple)">Context for the Director</h3>
+        <p style="font-size:0.78rem;color:var(--text-soft);margin-bottom:0.75rem">Tell the Director what you're thinking — the angle, who this is, what era, the vibe. It'll use this plus everything it knows to make smart decisions.</p>
+        <textarea id="directorContextInput" placeholder="e.g. This is Chase at age 2, way before Storytold existed. I want to target bedtime parents on TikTok with an origin story angle." style="width:100%;min-height:100px;border:1px solid var(--border);border-radius:10px;padding:0.6rem;font-size:0.82rem;font-family:Nunito,sans-serif;resize:vertical;box-sizing:border-box">${defaultText || ''}</textarea>
+        <div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:flex-end">
+          <button class="btn btn-outline" id="dirCtxSkip" style="padding:0.4rem 1rem;font-size:0.8rem">Skip</button>
+          <button class="btn btn-purple" id="dirCtxSend" style="padding:0.4rem 1.2rem;font-size:0.8rem">Send to Director</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const input = document.getElementById('directorContextInput');
+    input.focus();
+    document.getElementById('dirCtxSend').onclick = () => { document.body.removeChild(overlay); resolve(input.value); };
+    document.getElementById('dirCtxSkip').onclick = () => { document.body.removeChild(overlay); resolve(''); };
+    overlay.onclick = (e) => { if (e.target === overlay) { document.body.removeChild(overlay); resolve(''); } };
+  });
+}
+
 // Send the approved comedy clip to the AI Director tab
 async function sendComedyToDirector() {
   if (!comedyVideoFileUrl && !comedyFrame) {
     alert('No clip to send.');
     return;
   }
+
+  // Ask for context before sending
+  const userContext = await showDirectorContextPrompt('');
 
   const comedyData = window._lastComedyData || {};
 
@@ -3392,6 +3426,7 @@ async function sendComedyToDirector() {
       hasAudio: !!comedyData.audio,
       musicSelection: getComedyMusicSelection()
     },
+    userContext: userContext || '',
     analysis: null,
     moments: []
   };
@@ -3407,6 +3442,12 @@ async function sendComedyToDirector() {
   // Hide empty state, update count
   const emptyEl = document.getElementById('directorEmpty');
   if (emptyEl) emptyEl.style.display = 'none';
+
+  // Populate the Director notes field with the user's context
+  const notesEl = document.getElementById('directorNotes');
+  if (notesEl && userContext) {
+    notesEl.value = userContext;
+  }
 
   // Switch to Director tab
   const dirTab = document.querySelector('.mode-tab[onclick*="director"]');
@@ -5197,6 +5238,13 @@ async function handleDirectorFiles(files) {
   document.getElementById('directorEmpty').style.display = 'none';
   const grid = document.getElementById('directorAssetGrid');
 
+  // Ask for context when uploading directly
+  const userContext = await showDirectorContextPrompt('');
+  if (userContext) {
+    const notesEl = document.getElementById('directorNotes');
+    if (notesEl) notesEl.value = userContext;
+  }
+
   for (const file of files) {
     const id = 'da_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
     const type = file.type.startsWith('video/') ? 'video' : 'photo';
@@ -5300,6 +5348,16 @@ function renderDirectorAssets() {
             </div>
           ` : ''}
         ` : `<div style="font-size:0.68rem;color:var(--text-soft)">${a._analysing ? 'Analysing...' : 'Not analysed yet'}</div>`}
+        ${!a.isComedyClip ? `
+          <div style="margin-top:0.4rem;padding-top:0.3rem;border-top:1px solid var(--border);display:flex;align-items:center;gap:0.4rem">
+            <label style="font-size:0.62rem;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;gap:0.3rem" title="When on, the Director will use the entire clip — no trimming or cutting">
+              <input type="checkbox" ${a.useFullClip ? 'checked' : ''} onchange="toggleFullClip('${a.id}',this.checked)" style="accent-color:var(--purple)">
+              <span>Use full clip</span>
+            </label>
+          </div>
+        ` : `
+          <div style="margin-top:0.3rem;font-size:0.6rem;color:var(--green);font-weight:600">Full clip enforced (from Narrate)</div>
+        `}
       </div>
     </div>
   `).join('');
@@ -5389,7 +5447,7 @@ async function analyseAssets() {
       const res = await fetch('/api/studio-director', {
         method: 'POST',
         headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'analyse', assets: assetsForAnalysis })
+        body: JSON.stringify({ action: 'analyse', assets: assetsForAnalysis, userNotes: document.getElementById('directorNotes')?.value || '' })
       });
       const data = await res.json();
 
@@ -5416,6 +5474,11 @@ async function analyseAssets() {
 }
 
 // ── Clip a Moment from a Long Video ──
+function toggleFullClip(id, checked) {
+  const asset = directorAssets.find(a => a.id === id);
+  if (asset) asset.useFullClip = checked;
+}
+
 function deleteDirectorAsset(id) {
   directorAssets = directorAssets.filter(a => a.id !== id);
   studioAssets = studioAssets.filter(a => a.id !== id);
@@ -5475,7 +5538,7 @@ async function generateConcepts() {
   btn.disabled = true;
 
   const platform = document.getElementById('directorPlatform').value;
-  const analyses = analysed.map(a => ({ ...a.analysis, duration: a.duration, hasMoments: !!(a.moments && a.moments.length), isComedyClip: !!a.isComedyClip }));
+  const analyses = analysed.map(a => ({ ...a.analysis, duration: a.duration, hasMoments: !!(a.moments && a.moments.length), isComedyClip: !!a.isComedyClip, useFullClip: !!(a.isComedyClip || a.useFullClip) }));
 
   const conceptsArea = document.getElementById('conceptsArea');
   conceptsArea.innerHTML = '<div class="output-loading"><div class="spinner"></div><p>Claude is designing your ads...</p></div>';
@@ -5484,7 +5547,7 @@ async function generateConcepts() {
     const res = await fetch('/api/studio-director', {
       method: 'POST',
       headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'concepts', analyses, platform })
+      body: JSON.stringify({ action: 'concepts', analyses, platform, userNotes: document.getElementById('directorNotes')?.value || '' })
     });
     const data = await res.json();
 

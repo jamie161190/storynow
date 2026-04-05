@@ -699,7 +699,7 @@ export default async (req) => {
 };
 
 // ── Analyse: Send frames/photos to Claude Vision for auto-naming and tagging ──
-async function handleAnalyse(apiKey, { assets }) {
+async function handleAnalyse(apiKey, { assets, userNotes }) {
   if (!assets || !assets.length) return json({ error: 'No assets to analyse' }, 400);
 
   const imageBlocks = [];
@@ -738,7 +738,7 @@ async function handleAnalyse(apiKey, { assets }) {
     ...imageBlocks,
     {
       type: 'text',
-      text: `Analyse each asset above. THINK about what you see before writing anything. Identify the content type, who is in it, and how it should be used.
+      text: `${userNotes ? `THE USER'S CONTEXT AND DIRECTION (this is the most important input — follow their lead):\n"${userNotes}"\n\nUse this context to inform every decision below. The user knows their content better than you do.\n\n` : ''}Analyse each asset above. THINK about what you see before writing anything. Identify the content type, who is in it, and how it should be used.
 
 For each asset, return a JSON array with objects containing:
 - id: the asset id I gave you
@@ -824,7 +824,7 @@ Return ONLY the JSON array, no other text.`
 }
 
 // ── Concepts: Generate complete Compose-ready ad builds ──
-async function handleConcepts(apiKey, { analyses, platform }) {
+async function handleConcepts(apiKey, { analyses, platform, userNotes }) {
   if (!analyses || !analyses.length) return json({ error: 'No analysed assets' }, 400);
 
   const assetsDesc = analyses.map((a, i) => {
@@ -847,7 +847,7 @@ async function handleConcepts(apiKey, { analyses, platform }) {
     return desc;
   }).join('\n');
 
-  const userPrompt = `Here are the analysed content assets:
+  const userPrompt = `${userNotes ? `THE USER'S CONTEXT AND DIRECTION (follow their lead — this is the most important input):\n"${userNotes}"\n\n` : ''}Here are the analysed content assets:
 
 ${assetsDesc}
 
