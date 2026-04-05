@@ -5963,12 +5963,20 @@ async function buildThisAd(conceptIdx) {
 
     setProgress('Loading audio...');
 
-    // Get narration audio — try asset's stored base64, then fallback to global
+    // Get narration audio — try multiple sources
     let narrationUrl = null;
     if (clipAsset.comedyMeta?.audioBase64) {
       narrationUrl = 'data:audio/mpeg;base64,' + clipAsset.comedyMeta.audioBase64;
+      console.log('[AD] Audio source: asset audioBase64');
     } else if (lastGeneratedAudioUrl) {
       narrationUrl = lastGeneratedAudioUrl;
+      console.log('[AD] Audio source: lastGeneratedAudioUrl');
+    } else if (typeof studioAudio !== 'undefined' && studioAudio && studioAudio.src && studioAudio.src.startsWith('data:')) {
+      narrationUrl = studioAudio.src;
+      console.log('[AD] Audio source: studioAudio element');
+    } else {
+      console.warn('[AD] No narration audio found! Asset audioBase64:', !!clipAsset.comedyMeta?.audioBase64, 'lastGeneratedAudioUrl:', !!lastGeneratedAudioUrl, 'studioAudio:', !!(typeof studioAudio !== 'undefined' && studioAudio?.src));
+      setProgress('Warning: No narration audio found. Re-send clip from Narrate tab.');
     }
     const narrationScript = clipAsset.narrationText || clipAsset.comedyMeta?.storyText || lastComedyNarrationText || '';
     const isNarratedClip = !!(clipAsset.isComedyClip && narrationUrl);
@@ -5977,10 +5985,17 @@ async function buildThisAd(conceptIdx) {
     const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     if (narrationUrl) {
-      const narResp = await fetch(narrationUrl);
-      const narBuf = await narResp.arrayBuffer();
-      narrationDecoded = await tempCtx.decodeAudioData(narBuf);
-      audioDuration = narrationDecoded.duration;
+      try {
+        const narResp = await fetch(narrationUrl);
+        const narBuf = await narResp.arrayBuffer();
+        console.log('[AD] Narration buffer size:', narBuf.byteLength);
+        narrationDecoded = await tempCtx.decodeAudioData(narBuf);
+        audioDuration = narrationDecoded.duration;
+        console.log('[AD] Narration decoded:', audioDuration.toFixed(1), 'seconds');
+      } catch (audioErr) {
+        console.error('[AD] Failed to decode narration audio:', audioErr);
+        setProgress('Warning: Could not decode narration audio.');
+      }
     }
 
     // Build the timeline phases from the concept
@@ -6027,27 +6042,33 @@ async function buildThisAd(conceptIdx) {
 
     // Load and mix music — use the selection stored on the asset
     const musicSel = clipAsset.comedyMeta?.musicSelection || (getComedyMusicSelection ? getComedyMusicSelection() : 'none');
+    console.log('[AD] Music selection:', musicSel);
     if (musicSel !== 'none') {
       try {
         const trackUrl = musicSel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
         const musicResp = await fetch(trackUrl);
-        const musicBuf = await musicResp.arrayBuffer();
-        const musicDecoded = await tempCtx.decodeAudioData(musicBuf);
-        const musSrc = mixCtx.createBufferSource();
-        musSrc.buffer = musicDecoded;
-        musSrc.loop = true;
-        const musGain = mixCtx.createGain();
-        musGain.gain.setValueAtTime(0, 0);
-        musGain.gain.linearRampToValueAtTime(0.15, 1);
-        musGain.gain.setValueAtTime(0.15, totalDuration - 2);
-        musGain.gain.linearRampToValueAtTime(0, totalDuration);
-        musSrc.connect(musGain);
-        musGain.connect(mixCtx.destination);
-        musSrc.start(0);
-      } catch (e) { /* no music */ }
+        if (!musicResp.ok) { console.warn('[AD] Music fetch failed:', musicResp.status); }
+        else {
+          const musicBuf = await musicResp.arrayBuffer();
+          const musicDecoded = await tempCtx.decodeAudioData(musicBuf);
+          console.log('[AD] Music decoded:', musicDecoded.duration.toFixed(1), 'seconds');
+          const musSrc = mixCtx.createBufferSource();
+          musSrc.buffer = musicDecoded;
+          musSrc.loop = true;
+          const musGain = mixCtx.createGain();
+          musGain.gain.setValueAtTime(0, 0);
+          musGain.gain.linearRampToValueAtTime(0.15, 1);
+          musGain.gain.setValueAtTime(0.15, totalDuration - 2);
+          musGain.gain.linearRampToValueAtTime(0, totalDuration);
+          musSrc.connect(musGain);
+          musGain.connect(mixCtx.destination);
+          musSrc.start(0);
+        }
+      } catch (e) { console.error('[AD] Music error:', e); }
     }
 
     const mixedAudio = await mixCtx.startRendering();
+    console.log('[AD] Mixed audio:', mixedAudio.duration.toFixed(1), 'seconds, channels:', mixedAudio.numberOfChannels);
     tempCtx.close();
 
     setProgress('Setting up renderer...');
@@ -6065,10 +6086,13 @@ async function buildThisAd(conceptIdx) {
     audioEl.muted = true;
     await new Promise(r => { audioEl.oncanplaythrough = r; audioEl.load(); });
     const playbackCtx = new (window.AudioContext || window.webkitAudioContext)();
+    await playbackCtx.resume(); // Ensure context is running
     const audioSourceNode = playbackCtx.createMediaElementSource(audioEl);
     const dest = playbackCtx.createMediaStreamDestination();
     audioSourceNode.connect(dest);
+    audioSourceNode.connect(playbackCtx.destination); // Also play through speakers for monitoring
     dest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
+    console.log('[AD] Audio tracks on stream:', canvasStream.getAudioTracks().length, 'Video tracks:', canvasStream.getVideoTracks().length);
 
     const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a.40.2')
       ? 'video/mp4;codecs=avc1,mp4a.40.2'
@@ -6076,6 +6100,7 @@ async function buildThisAd(conceptIdx) {
       : MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus'
       : 'video/webm';
     const fileExt = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
+    console.log('[AD] Recording format:', mimeType);
 
     const recorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 10000000 });
     const chunks = [];
@@ -6091,7 +6116,8 @@ async function buildThisAd(conceptIdx) {
     recorder.start(100);
     audioEl.muted = false;
     audioEl.currentTime = 0;
-    audioEl.play().catch(() => {});
+    try { await audioEl.play(); } catch (playErr) { console.error('[AD] Audio play failed:', playErr); }
+    console.log('[AD] Audio playing:', !audioEl.paused, 'duration:', audioEl.duration?.toFixed(1));
 
     // Render each phase sequentially
     let phaseStartTime = 0;
