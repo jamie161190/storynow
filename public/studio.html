@@ -5695,6 +5695,7 @@ async function generateConcepts() {
             <button class="btn btn-outline" onclick="copyConceptBrief(${idx})">Copy Brief</button>
           </div>
           <div id="conceptEditor-${idx}" style="display:none"></div>
+          <div id="conceptPreview-${idx}" style="display:none"></div>
         </div>`;
       }).join('');
       // Store concepts for auto-build
@@ -6157,16 +6158,32 @@ async function buildThisAd(conceptIdx) {
     playbackCtx.close();
     URL.revokeObjectURL(wavUrl);
 
-    // Download
+    // Show preview instead of auto-downloading
     const blob = new Blob(chunks, { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `storytold-ad-${c.name || 'concept-' + (conceptIdx + 1)}.${fileExt}`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    const previewUrl = URL.createObjectURL(blob);
 
-    progressEl.textContent = 'Ad rendered and downloaded!';
+    // Clean up old preview
+    if (window._adPreviewUrls && window._adPreviewUrls[conceptIdx]) {
+      URL.revokeObjectURL(window._adPreviewUrls[conceptIdx]);
+    }
+    if (!window._adPreviewUrls) window._adPreviewUrls = {};
+    window._adPreviewUrls[conceptIdx] = previewUrl;
+
+    const previewEl = document.getElementById('conceptPreview-' + conceptIdx);
+    if (previewEl) {
+      previewEl.style.display = 'block';
+      previewEl.innerHTML = `
+        <div style="margin-top:0.75rem;border:2px solid var(--purple);border-radius:12px;overflow:hidden;background:#000">
+          <video src="${previewUrl}" controls playsinline style="width:100%;max-height:500px;display:block"></video>
+        </div>
+        <div style="margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-green" onclick="downloadRenderedAd(${conceptIdx},'${fileExt}')">Download Ad</button>
+          <button class="btn btn-outline" style="border-color:var(--purple);color:var(--purple)" onclick="editConceptTimeline(${conceptIdx})">Edit & Re-render</button>
+          <span style="font-size:0.7rem;color:var(--text-soft)">Review your ad above, then download or edit and re-render</span>
+        </div>`;
+    }
+
+    progressEl.textContent = 'Ad ready for review!';
     progressEl.style.background = '#E8F5E9';
     progressEl.style.color = 'var(--green)';
 
@@ -6178,6 +6195,16 @@ async function buildThisAd(conceptIdx) {
   }
 
   if (origBtn) { origBtn.textContent = 'Build This Ad'; origBtn.disabled = false; }
+}
+
+function downloadRenderedAd(conceptIdx, ext) {
+  const url = window._adPreviewUrls && window._adPreviewUrls[conceptIdx];
+  if (!url) { alert('No rendered ad to download. Build it first.'); return; }
+  const c = window._lastConcepts?.[conceptIdx];
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `storytold-ad-${c?.name || 'concept-' + (conceptIdx + 1)}.${ext}`;
+  a.click();
 }
 
 // ── Create My Ads: Auto-build all 3 concepts sequentially ──
