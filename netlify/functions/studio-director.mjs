@@ -530,36 +530,54 @@ BEFORE YOU BUILD ANYTHING, THINK:
 6. What platform am I building for? (Length, format, energy all change)
 
 ═══════════════════════════════════════════════════════
-COMEDY CLIP AD ARCHITECTURE (PRIMARY FORMAT)
+NARRATED CLIP AD ARCHITECTURE (PRIMARY FORMAT)
 ═══════════════════════════════════════════════════════
 
-When the analysed assets include comedy clips, this is likely the PRIMARY content format. Here's how to build ads from comedy clips:
+CRITICAL RULE — THE CLIP IS SACRED:
+When a clip comes from the Narrate tab (isComedyClip: true), it has narration audio timed precisely to the video. The narration and video are ONE piece of content. You MUST NOT:
+- Trim the clip (no trimStart/trimEnd)
+- Cut into the middle of the clip
+- Split the clip into pieces
+- Replace any part of the clip with mockups or text cards
+- Interrupt the clip in ANY way
 
-STRUCTURE A — PURE COMEDY (shortest, TikTok/Reels, 12-20s):
-1. Hook caption over opening footage (2s): "I narrated my son's bath time like a movie trailer"
-2. Comedy clip plays with narration (8-15s): Let the comedy and the name moment land
-3. Bridge text (2-3s): "Turn your child into the story" over the final footage
-4. End card (2-3s): "storytold.ai" with "Hear it free first"
+The clip plays from FIRST FRAME to LAST FRAME, completely uninterrupted.
 
-STRUCTURE B — COMEDY + VOICE CTA (medium, 15-25s):
-1. Hook caption (2s)
-2. Comedy clip plays (10-18s)
-3. Same narrator voice delivers spoken bridge/CTA (3-5s): The narrator drops from comedy style to sincere. "Every child deserves a story... create theirs at storytold dot ai." This uses the SAME voice that did the comedy narration for continuity.
+Everything you add goes:
+- BEFORE the clip: Start card, hook text card
+- ON TOP of the clip: Text overlays (hook caption at start, bridge text near end) — these sit over the footage while it plays
+- AFTER the clip: Bridge card, voice CTA, mockup sequence, WhatsApp demo, end card
+
+Think of it like a YouTube pre-roll: you can add a bumper before, overlays during, and a CTA after. But the content itself is untouchable.
+
+When building timelines for narrated clips, the "clip" block must have NO trimStart/trimEnd and its duration must equal the FULL clip duration from the analysis.
+
+STRUCTURE A — PURE NARRATED (shortest, TikTok/Reels):
+1. [OPTIONAL] Hook text card (2s): "I narrated my son's bath time like a movie trailer"
+2. FULL CLIP plays with narration — hook caption overlay at start, bridge text overlay near end
+3. End card (2-3s): "storytold.ai" with "Hear it free first"
+Total: clip duration + 2-5s of cards
+
+STRUCTURE B — NARRATED + VOICE CTA:
+1. [OPTIONAL] Hook text card (2s)
+2. FULL CLIP plays — hook caption overlay at start
+3. Voice CTA by same narrator (3-5s): Narrator drops from comedy to sincere. "Every child deserves a story... create theirs at storytold dot ai."
 4. End card (2-3s)
+Total: clip duration + 5-9s
 
-STRUCTURE C — COMEDY + REACTION (most powerful, 20-35s):
-1. Hook caption on comedy clip (2s)
-2. Comedy clip plays, name moment lands (8-12s)
-3. CUT TO: reaction footage of a child or parent hearing a Storytold story (5-8s) — this shifts from entertainment to emotion
-4. Bridge text: "Their name. Their world. Their story." (2-3s)
-5. End card (2-3s)
+STRUCTURE C — NARRATED + PRODUCT DEMO:
+1. [OPTIONAL] Hook text card (2s)
+2. FULL CLIP plays — bridge text overlay near end: "What if this was your child?"
+3. Mockup sequence showing product creation flow or WhatsApp gift flow (5-8s)
+4. End card with CTA (3s)
+Total: clip duration + 10-13s
 
-STRUCTURE D — COMEDY + PRODUCT (explainer, 20-40s):
-1. Hook caption on comedy clip (2s)
-2. Comedy clip plays (8-12s)
-3. Bridge text: "What if this was your child?" (2s)
-4. Mockup sequence showing product creation flow (5-8s)
-5. End card with CTA (3s)
+STRUCTURE D — NARRATED + REACTION (most powerful):
+1. FULL CLIP plays — hook caption overlay at start
+2. CUT TO: reaction footage of a child hearing a Storytold story (5-8s)
+3. Bridge text card: "Their name. Their world. Their story." (2-3s)
+4. End card (2-3s)
+Total: clip duration + 10-14s (requires separate reaction footage)
 
 VOICE CTA RULES:
 When using a voice CTA (Structure B), the spoken line must:
@@ -634,7 +652,8 @@ Each concept must include a structured JSON timeline. Block types:
 
 "clip" — Real footage with optional text overlays
   config: { assetName (from analysis), trimStart, trimEnd, textOverlays: [{ text, position, size, color, timing }] }
-  NEW: textOverlays can have "timing" field: "start" (first 2s), "middle" (during clip), "end" (last 2-3s), "bridge" (last 3s, bridge styling)
+  textOverlays can have "timing" field: "start" (first 2s), "middle" (during clip), "end" (last 2-3s), "bridge" (last 3s, bridge styling)
+  NARRATED CLIP RULE: If the asset is a narrated clip (isComedyClip: true), you MUST NOT set trimStart or trimEnd. Set duration to the clip's FULL duration. The clip plays completely. Overlays go on top, everything else goes before/after.
 
 "sequence" — Product mockup animation
   config: { sequenceId, screens (array of specific screens to show) }
@@ -688,16 +707,17 @@ async function handleAnalyse(apiKey, { assets }) {
     const a = assets[i];
     // Build context line with any metadata the user provided
     let contextLine = '';
-    if (a.comedyMeta) {
-      const m = a.comedyMeta;
-      const parts = [];
+    if (a.comedyMeta || a.isComedyClip) {
+      const m = a.comedyMeta || {};
+      const parts = ['THIS IS A NARRATED CLIP from the Narrate tab (isComedyClip: true) — it MUST play in full, never trimmed'];
       if (m.childName) parts.push(`child's name: ${m.childName}`);
-      if (m.childAge) parts.push(`child's age in this clip: ${m.childAge}`);
-      if (m.styleLabel) parts.push(`comedy style: ${m.styleLabel}`);
+      if (m.childAge) parts.push(`child's age in this clip: ${m.childAge} (USE THIS AGE, do not guess differently)`);
+      if (m.styleLabel) parts.push(`narration style: ${m.styleLabel}`);
       if (m.sceneDescription) parts.push(`scene: ${m.sceneDescription}`);
-      if (parts.length) contextLine = `\nUser-provided context: ${parts.join(', ')}`;
+      if (m.storyText) parts.push(`narration script: "${m.storyText.substring(0, 200)}${m.storyText.length > 200 ? '...' : ''}"`);
+      contextLine = `\n${parts.join('. ')}`;
     } else if (a.childAge) {
-      contextLine = `\nChild's age in this clip: ${a.childAge}`;
+      contextLine = `\nChild's age in this clip: ${a.childAge} (USE THIS AGE, do not guess differently)`;
     }
 
     if (a.isLong && a.frames && a.frames.length) {
@@ -730,8 +750,9 @@ For each asset, return a JSON array with objects containing:
 - description: one sentence describing what's happening
 - whoIsInIt: describe who you see. If it looks like a boy around age 9, flag as possibly Chase. Note: adults, multiple children, grandparents, etc.
 - isChase: true/false — your best guess whether this is Chase (the founder's son, the homepage hero)
-- estimatedAge: your best estimate of the child's age (e.g. "2", "5", "baby", "9", "teenager"). Use user-provided age if available, otherwise estimate from the image.
+- estimatedAge: the child's age. If the user provided "child's age in this clip" in the context above, USE THAT EXACT VALUE — do not guess differently. Only estimate from the image if no age was provided.
 - ageTimelineNote: if this is Chase, write a note about where this falls in the Storytold timeline (e.g. "Young Chase — before Storytold existed. Origin story material." or "Current Chase — the kid on the homepage. Living proof." or "Not Chase"). For non-Chase children, write the age-appropriate ad angle (e.g. "Toddler — gentle/cute hooks work best" or "Pre-teen — 'too old for it' angle")
+- isNarratedClip: true/false — if this came from the Narrate tab (check for comedy style, narration text, or isComedyClip flag in context). CRITICAL: narrated clips MUST play in full, never trimmed or interrupted. All ad layers go before, after, or on top.
 - durationCategory: one of: very-short (under 5s), short (5-15s), medium (15-30s), long (30-60s), very-long (60s+)
 - marketingPotential: 1-5 rating
 - bestMoment: describe the single most powerful marketing moment you can see
@@ -811,6 +832,7 @@ async function handleConcepts(apiKey, { analyses, platform }) {
     if (a.estimatedAge) desc += ` | Child's age: ${a.estimatedAge}`;
     if (a.ageTimelineNote) desc += ` | Timeline: ${a.ageTimelineNote}`;
     if (a.isChase) desc += ` | THIS IS CHASE (founder's son, homepage hero)`;
+    if (a.isNarratedClip) desc += ` | *** NARRATED CLIP — MUST PLAY IN FULL, NEVER TRIM OR INTERRUPT. All cards/CTAs/mockups go BEFORE or AFTER. Overlays go ON TOP. Duration is FIXED at ${a.duration || 'full length'}s ***`;
     if (a.suggestedBridge) desc += ` | Bridge: "${a.suggestedBridge}"`;
     if (a.needsVoiceCta && a.voiceCtaLine) desc += ` | Voice CTA: "${a.voiceCtaLine}"`;
     if (a.suggestedOverlay) desc += ` | Suggested overlay: "${a.suggestedOverlay}"`;

@@ -5475,7 +5475,7 @@ async function generateConcepts() {
   btn.disabled = true;
 
   const platform = document.getElementById('directorPlatform').value;
-  const analyses = analysed.map(a => ({ ...a.analysis, duration: a.duration, hasMoments: !!(a.moments && a.moments.length) }));
+  const analyses = analysed.map(a => ({ ...a.analysis, duration: a.duration, hasMoments: !!(a.moments && a.moments.length), isComedyClip: !!a.isComedyClip }));
 
   const conceptsArea = document.getElementById('conceptsArea');
   conceptsArea.innerHTML = '<div class="output-loading"><div class="spinner"></div><p>Claude is designing your ads...</p></div>';
