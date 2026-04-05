@@ -8,7 +8,7 @@
 export default async (req) => {
   try {
     const body = await req.json();
-    const { jobId, frame, childName, style, voiceId, extraContext } = body;
+    const { jobId, frame, childName, style, voiceId, extraContext, duration } = body;
 
     if (!jobId || !frame) {
       return { statusCode: 400 };
@@ -87,7 +87,7 @@ ${sceneDescription}
 
 The child's name is ${name}.${extraContext ? `\nExtra context from the parent: ${extraContext}` : ''}
 
-Write a narration for this clip. Make it as long or short as it naturally needs to be. Let the comedy breathe. This will be read aloud by a text-to-speech voice narrator over the clip.
+${duration ? `Write a narration that is EXACTLY ${Math.round(duration * 2.5)} words (give or take 5 words). This must match a ${duration}-second video clip, so the word count is critical. At ~2.5 words per second, ${Math.round(duration * 2.5)} words = ${duration} seconds of audio.` : 'Write a narration for this clip. Make it as long or short as it naturally needs to be. Let the comedy breathe.'} This will be read aloud by a text-to-speech voice narrator over the clip.
 
 AUDIO FORMATTING RULES (CRITICAL - this is read aloud by TTS):
 - Use three dots ( ... ) to create breath pauses. Place them at moments of suspense, reveals, and before punchlines. Aim for one pause every 30-40 words minimum. Example: "And there, standing in the middle of the kitchen ... was ${name}."

@@ -968,6 +968,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
         <div id="comedyThumb" style="margin-top:0.5rem;display:none">
           <img id="comedyThumbImg" style="width:100%;border-radius:12px;border:2px solid var(--purple)">
           <button class="btn btn-outline btn-sm" style="margin-top:0.3rem;width:100%" onclick="clearComedyUpload()">Change clip</button>
+          <div id="comedyDurationBadge" style="display:none;margin-top:0.4rem;font-size:0.75rem;font-weight:600;color:var(--purple);background:rgba(107,47,147,0.08);padding:0.3rem 0.6rem;border-radius:8px;text-align:center"></div>
         </div>
       </div>
 
@@ -2791,6 +2792,7 @@ function audioBufferToWav(buffer) {
 // ═══════════════════ COMEDY CLIPS MODE ═══════════════════
 
 let comedyFrame = null; // base64 JPEG of the uploaded frame
+let comedyDuration = null; // auto-detected video duration in seconds (null for photos)
 let comedyVoiceFilter = 'all';
 let comedySelectedVoiceId = 'VR6AewLTigWG4xSOukaG'; // Arnold — strong and commanding, perfect for comedy
 
@@ -2827,6 +2829,8 @@ async function handleComedyFile(file) {
     video.currentTime = 1;
     await new Promise(r => { video.onseeked = r; video.load(); });
     await new Promise(r => setTimeout(r, 500));
+    // Capture video duration
+    comedyDuration = Math.round(video.duration);
     const raw = document.createElement('canvas');
     raw.width = video.videoWidth || 640;
     raw.height = video.videoHeight || 480;
@@ -2836,6 +2840,7 @@ async function handleComedyFile(file) {
     thumbImg.src = small.toDataURL('image/jpeg', 0.6);
     URL.revokeObjectURL(video.src);
   } else {
+    comedyDuration = null; // photos have no duration
     const reader = new FileReader();
     await new Promise(resolve => {
       reader.onload = (e) => {
@@ -2858,13 +2863,27 @@ async function handleComedyFile(file) {
 
   uploadZone.style.display = 'none';
   thumbEl.style.display = 'block';
+  // Show detected duration badge for videos
+  const durationBadge = document.getElementById('comedyDurationBadge');
+  if (durationBadge) {
+    if (comedyDuration) {
+      durationBadge.textContent = comedyDuration + 's video — narration will match';
+      durationBadge.style.display = 'block';
+    } else {
+      durationBadge.textContent = 'Photo — narration will be natural length';
+      durationBadge.style.display = 'block';
+    }
+  }
 }
 
 function clearComedyUpload() {
   comedyFrame = null;
+  comedyDuration = null;
   document.getElementById('comedyThumb').style.display = 'none';
   document.getElementById('comedyUpload').style.display = '';
   document.getElementById('comedyFileInput').value = '';
+  const badge = document.getElementById('comedyDurationBadge');
+  if (badge) badge.style.display = 'none';
 }
 
 function filterComedyVoices(filter, el) {
@@ -2931,6 +2950,7 @@ async function generateComedyClip() {
     frame: comedyFrame,
     childName: document.getElementById('comedyChildName').value || 'Chase',
     style,
+    duration: comedyDuration,
     voiceId: comedySelectedVoiceId,
     extraContext: document.getElementById('comedyContext').value
   };
