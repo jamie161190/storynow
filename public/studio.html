@@ -475,9 +475,40 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
 
   <!-- Mode tabs -->
   <div class="mode-tabs">
-    <div class="mode-tab active" onclick="switchMode('storygen',this)">Story Generator</div>
+    <div class="mode-tab active" onclick="switchMode('canvas',this)">Canvas</div>
+    <div class="mode-tab" onclick="switchMode('storygen',this)">Story Generator</div>
     <div class="mode-tab" onclick="switchMode('comedy',this)">Narrate</div>
     <div class="mode-tab" onclick="switchMode('library',this)">Library</div>
+  </div>
+
+  <!-- ═══════════════════ CANVAS MODE ═══════════════════ -->
+  <div class="mode-panel active" id="panel-canvas" style="justify-content:center;align-items:center;background:#1a1a2e;position:relative;overflow:hidden">
+    <!-- Phone frame -->
+    <div id="canvasDevice" style="position:relative;width:375px;height:812px;border-radius:44px;overflow:hidden;box-shadow:0 0 0 12px #1c1c1e,0 0 0 14px #333,0 30px 80px rgba(0,0,0,0.6);background:#000;flex-shrink:0">
+      <!-- Status bar -->
+      <div style="height:44px;background:#000;display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:10;position:relative">
+        <span style="color:#fff;font-size:12px;font-weight:600">9:41</span>
+        <div style="display:flex;gap:4px;align-items:center">
+          <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="0" width="3" height="12" rx="1"/><rect x="13" width="3" height="12" rx="1"/></svg>
+          <svg width="22" height="12" viewBox="0 0 22 12" fill="white"><rect x="0" y="0" width="20" height="12" rx="2" fill="none" stroke="white" stroke-width="1.5"/><rect x="2" y="2" width="15" height="8" rx="1"/><rect x="21" y="3.5" width="2" height="5" rx="1"/></svg>
+        </div>
+      </div>
+      <!-- Content area — this is what gets populated -->
+      <div id="canvasContent" style="width:100%;height:calc(100% - 44px);overflow:hidden;position:relative;background:#000">
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.3);text-align:center;padding:2rem">
+          <div style="font-size:48px;margin-bottom:1rem">&#127916;</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:0.5rem;color:rgba(255,255,255,0.5)">Your Canvas</div>
+          <div style="font-size:12px;line-height:1.6;max-width:260px">Tell Claude what to build here — ads, WhatsApp convos, mockups, overlays, cards, anything. Just describe it.</div>
+        </div>
+      </div>
+    </div>
+    <!-- Aspect ratio pills -->
+    <div style="position:absolute;bottom:20px;display:flex;gap:8px">
+      <button class="pill active" onclick="setCanvasRatio('9:16',this)" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">9:16</button>
+      <button class="pill" onclick="setCanvasRatio('4:5',this)" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">4:5</button>
+      <button class="pill" onclick="setCanvasRatio('1:1',this)" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">1:1</button>
+      <button class="pill" onclick="setCanvasRatio('16:9',this)" style="background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">16:9</button>
+    </div>
   </div>
 
   <!-- ═══════════════════ MOCKUPS MODE ═══════════════════ -->
@@ -637,7 +668,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
   </div>
 
   <!-- ═══════════════════ STORY GENERATOR MODE ═══════════════════ -->
-  <div class="mode-panel active" id="panel-storygen">
+  <div class="mode-panel" id="panel-storygen">
     <div class="controls" id="ctrl-storygen">
       <h3>Story Generator</h3>
       <div class="feature-tip" id="tipStory">
@@ -1138,7 +1169,7 @@ const SCREENS = [
 let currentScreen = 'landing-hero';
 let currentDevice = 'iphone';
 let currentRatio = '9:16';
-let currentMode = 'storygen';
+let currentMode = 'canvas';
 
 // ── Unboxing Sequences ──
 const UNBOX_SEQUENCES = [
@@ -1224,6 +1255,28 @@ function switchMode(mode, el) {
   document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-' + mode).classList.add('active');
   if (mode === 'library') loadLibrary();
+}
+
+// ═══════════════════ CANVAS MODE ═══════════════════
+
+const canvasRatios = { '9:16': { w: 375, h: 812 }, '4:5': { w: 375, h: 469 }, '1:1': { w: 420, h: 420 }, '16:9': { w: 640, h: 360 } };
+
+function setCanvasRatio(ratio, el) {
+  const dim = canvasRatios[ratio];
+  if (!dim) return;
+  const device = document.getElementById('canvasDevice');
+  device.style.width = dim.w + 'px';
+  device.style.height = dim.h + 'px';
+  device.style.borderRadius = ratio === '16:9' ? '16px' : '44px';
+  // Update pill styles
+  el.parentElement.querySelectorAll('.pill').forEach(p => {
+    p.style.background = 'rgba(255,255,255,0.08)';
+    p.style.color = 'rgba(255,255,255,0.5)';
+    p.style.borderColor = 'rgba(255,255,255,0.1)';
+  });
+  el.style.background = 'rgba(255,255,255,0.15)';
+  el.style.color = '#fff';
+  el.style.borderColor = 'rgba(255,255,255,0.2)';
 }
 
 // ═══════════════════ PILL HELPERS ═══════════════════
