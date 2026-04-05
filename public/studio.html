@@ -3434,9 +3434,15 @@ async function sendComedyToDirector() {
     moments: []
   };
 
-  // If we have the video URL and element, store them
-  if (comedyIsVideo && comedyVideoFileUrl) {
-    asset.objectUrl = comedyVideoFileUrl;
+  // Store video — prefer the exported version (has audio baked in), fallback to original
+  if (comedyIsVideo) {
+    if (window._exportedVideoUrl) {
+      asset.exportedVideoUrl = window._exportedVideoUrl;
+      console.log('[DIRECTOR] Using exported video (with audio)');
+    }
+    if (comedyVideoFileUrl) {
+      asset.objectUrl = comedyVideoFileUrl;
+    }
     if (videoEl) asset.videoEl = videoEl;
   }
 
@@ -4187,13 +4193,18 @@ async function exportComedyVideo() {
     const blob = new Blob(chunks, { type: mimeType });
     const url = URL.createObjectURL(blob);
 
+    // Store the exported video (with audio baked in) for Director to use
+    if (window._exportedVideoUrl) URL.revokeObjectURL(window._exportedVideoUrl);
+    window._exportedVideoUrl = url;
+    window._exportedVideoMime = mimeType;
+
     const childName = document.getElementById('comedyChildName')?.value || 'comedy';
     const style = getPillValue('comedyStylePills') || 'epic';
     const a = document.createElement('a');
     a.href = url;
     a.download = `storytold-comedy-${childName}-${style}-${aspect.replace(':','x')}.${fileExt}`;
     a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    // Don't revoke — Director needs this URL
 
     setProgress('Done! Video downloaded.', 100);
     setTimeout(() => { progress.style.display = 'none'; }, 3000);
@@ -5951,52 +5962,20 @@ async function buildThisAd(conceptIdx) {
   try {
     setProgress('Loading video...');
 
-    // Load video
+    // Load the video — it already has audio on it, DON'T touch it
+    const videoSrc = clipAsset.exportedVideoUrl || window._exportedVideoUrl || clipAsset.objectUrl || comedyVideoFileUrl;
     const video = document.createElement('video');
-    video.src = clipAsset.objectUrl || comedyVideoFileUrl;
-    video.muted = true;
+    video.src = videoSrc;
     video.playsInline = true;
     video.preload = 'auto';
+    video.crossOrigin = 'anonymous';
     await new Promise((resolve, reject) => { video.onloadedmetadata = resolve; video.onerror = reject; video.load(); });
     if (video.readyState < 4) await new Promise(r => { video.oncanplaythrough = r; setTimeout(r, 5000); });
     await new Promise(r => { video.currentTime = 0; video.onseeked = r; });
 
-    setProgress('Loading audio...');
+    console.log('[AD] Video loaded:', video.duration.toFixed(1) + 's');
 
-    // Get narration audio — try multiple sources
-    let narrationUrl = null;
-    if (clipAsset.comedyMeta?.audioBase64) {
-      narrationUrl = 'data:audio/mpeg;base64,' + clipAsset.comedyMeta.audioBase64;
-      console.log('[AD] Audio source: asset audioBase64');
-    } else if (lastGeneratedAudioUrl) {
-      narrationUrl = lastGeneratedAudioUrl;
-      console.log('[AD] Audio source: lastGeneratedAudioUrl');
-    } else if (typeof studioAudio !== 'undefined' && studioAudio && studioAudio.src && studioAudio.src.startsWith('data:')) {
-      narrationUrl = studioAudio.src;
-      console.log('[AD] Audio source: studioAudio element');
-    } else {
-      console.warn('[AD] No narration audio found! Asset audioBase64:', !!clipAsset.comedyMeta?.audioBase64, 'lastGeneratedAudioUrl:', !!lastGeneratedAudioUrl, 'studioAudio:', !!(typeof studioAudio !== 'undefined' && studioAudio?.src));
-      setProgress('Warning: No narration audio found. Re-send clip from Narrate tab.');
-    }
-    const narrationScript = clipAsset.narrationText || clipAsset.comedyMeta?.storyText || lastComedyNarrationText || '';
-    const isNarratedClip = !!(clipAsset.isComedyClip && narrationUrl);
-    let narrationDecoded = null;
-    let audioDuration = 0;
-    const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-    if (narrationUrl) {
-      try {
-        const narResp = await fetch(narrationUrl);
-        const narBuf = await narResp.arrayBuffer();
-        console.log('[AD] Narration buffer size:', narBuf.byteLength);
-        narrationDecoded = await tempCtx.decodeAudioData(narBuf);
-        audioDuration = narrationDecoded.duration;
-        console.log('[AD] Narration decoded:', audioDuration.toFixed(1), 'seconds');
-      } catch (audioErr) {
-        console.error('[AD] Failed to decode narration audio:', audioErr);
-        setProgress('Warning: Could not decode narration audio.');
-      }
-    }
+    const isNarratedClip = !!(clipAsset.isComedyClip);
 
     // Build the timeline phases from the concept
     const phases = [];
@@ -6005,11 +5984,7 @@ async function buildThisAd(conceptIdx) {
         if (block.type === 'text') {
           phases.push({ type: 'card', duration: block.duration || 3, title: block.config?.text || '', subtitle: block.config?.subtitle || '', style: block.config?.style || 'hook' });
         } else if (block.type === 'clip') {
-          // Use full clip duration if it's a narrated clip
-          const clipDur = (clipAsset.isComedyClip || clipAsset.useFullClip)
-            ? Math.max(video.duration, audioDuration)
-            : (block.duration || video.duration);
-          phases.push({ type: 'video', duration: clipDur, overlays: block.config?.textOverlays || [] });
+          phases.push({ type: 'video', duration: video.duration, overlays: block.config?.textOverlays || [] });
         } else if (block.type === 'endcard') {
           phases.push({ type: 'card', duration: block.duration || 3, title: block.config?.cta || 'Create their story at storytold.ai', subtitle: block.config?.subtitle || 'storytold.ai', isEnd: true });
         } else if (block.type === 'voicecta') {
@@ -6017,82 +5992,30 @@ async function buildThisAd(conceptIdx) {
         }
       }
     } else {
-      // Fallback: just render hook + clip + endcard
       if (c.hookText) phases.push({ type: 'card', duration: 3, title: c.hookText, subtitle: '' });
-      phases.push({ type: 'video', duration: Math.max(video.duration, audioDuration), overlays: [] });
+      phases.push({ type: 'video', duration: video.duration, overlays: [] });
       phases.push({ type: 'card', duration: 3, title: 'Create their story at storytold.ai', subtitle: 'storytold.ai', isEnd: true });
     }
 
-    // Calculate total duration
     const totalDuration = phases.reduce((sum, p) => sum + p.duration, 0);
-
-    setProgress('Mixing audio...');
-
-    // Mix audio — narration starts when the video phase starts
-    const videoPhaseStart = phases.filter(p => p.type === 'card').slice(0, phases.findIndex(p => p.type === 'video')).reduce((s, p) => s + p.duration, 0);
-    const sampleRate = 44100;
-    const mixCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil((totalDuration + 1) * sampleRate), sampleRate);
-
-    if (narrationDecoded) {
-      const narSrc = mixCtx.createBufferSource();
-      narSrc.buffer = narrationDecoded;
-      narSrc.connect(mixCtx.destination);
-      narSrc.start(videoPhaseStart);
-    }
-
-    // Load and mix music — use the selection stored on the asset
-    const musicSel = clipAsset.comedyMeta?.musicSelection || (getComedyMusicSelection ? getComedyMusicSelection() : 'none');
-    console.log('[AD] Music selection:', musicSel);
-    if (musicSel !== 'none') {
-      try {
-        const trackUrl = musicSel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
-        const musicResp = await fetch(trackUrl);
-        if (!musicResp.ok) { console.warn('[AD] Music fetch failed:', musicResp.status); }
-        else {
-          const musicBuf = await musicResp.arrayBuffer();
-          const musicDecoded = await tempCtx.decodeAudioData(musicBuf);
-          console.log('[AD] Music decoded:', musicDecoded.duration.toFixed(1), 'seconds');
-          const musSrc = mixCtx.createBufferSource();
-          musSrc.buffer = musicDecoded;
-          musSrc.loop = true;
-          const musGain = mixCtx.createGain();
-          musGain.gain.setValueAtTime(0, 0);
-          musGain.gain.linearRampToValueAtTime(0.15, 1);
-          musGain.gain.setValueAtTime(0.15, totalDuration - 2);
-          musGain.gain.linearRampToValueAtTime(0, totalDuration);
-          musSrc.connect(musGain);
-          musGain.connect(mixCtx.destination);
-          musSrc.start(0);
-        }
-      } catch (e) { console.error('[AD] Music error:', e); }
-    }
-
-    const mixedAudio = await mixCtx.startRendering();
-    console.log('[AD] Mixed audio:', mixedAudio.duration.toFixed(1), 'seconds, channels:', mixedAudio.numberOfChannels);
-    tempCtx.close();
 
     setProgress('Setting up renderer...');
 
-    // Canvas + recorder setup
+    // Canvas for video frames
     const canvas = document.createElement('canvas');
     canvas.width = W;
     canvas.height = H;
     const ctx = canvas.getContext('2d');
-
     const canvasStream = canvas.captureStream(fps);
-    const wavBlob = audioBufferToWav(mixedAudio);
-    const wavUrl = URL.createObjectURL(wavBlob);
-    const audioEl = new Audio(wavUrl);
-    audioEl.muted = true;
-    await new Promise(r => { audioEl.oncanplaythrough = r; audioEl.load(); });
+
+    // Capture the video's own audio — don't strip it, don't reconstruct it
     const playbackCtx = new (window.AudioContext || window.webkitAudioContext)();
-    await playbackCtx.resume(); // Ensure context is running
-    const audioSourceNode = playbackCtx.createMediaElementSource(audioEl);
-    const dest = playbackCtx.createMediaStreamDestination();
-    audioSourceNode.connect(dest);
-    audioSourceNode.connect(playbackCtx.destination); // Also play through speakers for monitoring
-    dest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
-    console.log('[AD] Audio tracks on stream:', canvasStream.getAudioTracks().length, 'Video tracks:', canvasStream.getVideoTracks().length);
+    await playbackCtx.resume();
+    const videoAudioSrc = playbackCtx.createMediaElementSource(video);
+    const audioDest = playbackCtx.createMediaStreamDestination();
+    videoAudioSrc.connect(audioDest);
+    videoAudioSrc.connect(playbackCtx.destination); // hear it while rendering
+    audioDest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
 
     const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a.40.2')
       ? 'video/mp4;codecs=avc1,mp4a.40.2'
@@ -6100,42 +6023,26 @@ async function buildThisAd(conceptIdx) {
       : MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus'
       : 'video/webm';
     const fileExt = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
-    console.log('[AD] Recording format:', mimeType);
 
     const recorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 10000000 });
     const chunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
-    // Build subtitle chunks for the video phase from the asset's narration
-    let subtitleChunks = [];
-    if (narrationScript) {
-      const videoPhase = phases.find(p => p.type === 'video');
-      if (videoPhase) subtitleChunks = buildSubtitleChunks(narrationScript, videoPhase.duration);
-    }
-
     recorder.start(100);
-    audioEl.muted = false;
-    audioEl.currentTime = 0;
-    try { await audioEl.play(); } catch (playErr) { console.error('[AD] Audio play failed:', playErr); }
-    console.log('[AD] Audio playing:', !audioEl.paused, 'duration:', audioEl.duration?.toFixed(1));
 
     // Render each phase sequentially
-    let phaseStartTime = 0;
-    const renderStart = performance.now();
-
     for (let pi = 0; pi < phases.length; pi++) {
       const phase = phases[pi];
       setProgress(`Rendering ${phase.type === 'video' ? 'clip' : 'card'} (${pi + 1}/${phases.length})...`);
 
       if (phase.type === 'card') {
-        // Draw static card and hold
+        // Video paused during cards — no audio plays, that's correct
         drawCard(ctx, W, H, phase.title, phase.subtitle || '', !!phase.isEnd);
         await new Promise(r => setTimeout(r, phase.duration * 1000));
 
       } else if (phase.type === 'video') {
-        // Play video in real-time
+        // Play video WITH ITS AUDIO — don't mute it
         video.currentTime = 0;
-        video.muted = true;
         await video.play();
 
         const videoStartTime = performance.now();
@@ -6144,7 +6051,6 @@ async function buildThisAd(conceptIdx) {
             const elapsed = (performance.now() - videoStartTime) / 1000;
             if (elapsed >= phase.duration) { video.pause(); resolve(); return; }
 
-            // Loop video if it ends before phase duration
             if (video.ended && elapsed < phase.duration - 0.5) {
               video.currentTime = 0;
               video.play().catch(() => {});
@@ -6152,13 +6058,7 @@ async function buildThisAd(conceptIdx) {
 
             drawVideoFrame(ctx, video, W, H);
 
-            // Draw narration subtitles
-            if (subtitleChunks.length) {
-              const sub = subtitleChunks.find(s => elapsed >= s.start && elapsed < s.end);
-              if (sub) drawSubtitle(ctx, W, H, sub.text);
-            }
-
-            // Concept overlays — SKIP during clip if narrated (clip is sacred, don't layer text over it)
+            // For non-narrated clips, show concept overlays
             if (!isNarratedClip && phase.overlays && phase.overlays.length) {
               for (const ov of phase.overlays) {
                 let show = true;
@@ -6174,15 +6074,13 @@ async function buildThisAd(conceptIdx) {
           requestAnimationFrame(drawFrame);
         });
       }
-      phaseStartTime += phase.duration;
     }
 
     setProgress('Finalising...');
+    video.pause();
     recorder.stop();
     await new Promise(r => { recorder.onstop = r; });
-    audioEl.pause();
     playbackCtx.close();
-    URL.revokeObjectURL(wavUrl);
 
     // Show preview instead of auto-downloading
     const blob = new Blob(chunks, { type: mimeType });
