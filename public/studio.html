@@ -789,13 +789,19 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
             <option value="adventure">Adventure Ambient</option>
             <option value="bedtime">Bedtime Ambient</option>
           </select>
-          <label>Duration</label>
+          <label>Length</label>
           <div class="pill-group" id="fsLengthPills">
-            <div class="pill" data-val="1" onclick="togglePill(this,'fsLengthPills')">1 min</div>
-            <div class="pill" data-val="3" onclick="togglePill(this,'fsLengthPills')">3 min</div>
-            <div class="pill" data-val="5" onclick="togglePill(this,'fsLengthPills')">5 min</div>
-            <div class="pill active" data-val="10" onclick="togglePill(this,'fsLengthPills')">10 min</div>
-            <div class="pill" data-val="15" onclick="togglePill(this,'fsLengthPills')">15 min</div>
+            <div class="pill active" data-val="preview" onclick="togglePill(this,'fsLengthPills');document.getElementById('fsDurationRow').style.display=''">Preview</div>
+            <div class="pill" data-val="full" onclick="togglePill(this,'fsLengthPills');document.getElementById('fsDurationRow').style.display='none'">Full Story (~15 min)</div>
+          </div>
+          <div id="fsDurationRow">
+            <label>Preview Duration</label>
+            <div class="pill-group" id="fsDurationPills">
+              <div class="pill active" data-val="0.5" onclick="togglePill(this,'fsDurationPills')">30 sec</div>
+              <div class="pill" data-val="1" onclick="togglePill(this,'fsDurationPills')">1 min</div>
+              <div class="pill" data-val="3" onclick="togglePill(this,'fsDurationPills')">3 min</div>
+              <div class="pill" data-val="5" onclick="togglePill(this,'fsDurationPills')">5 min</div>
+            </div>
           </div>
         </div>
 
@@ -2565,9 +2571,12 @@ async function generateFullStory() {
   btn.textContent = 'Generating...';
   btn.disabled = true;
 
-  const durationMins = parseInt(getPillValue('fsLengthPills') || '10', 10);
+  const length = getPillValue('fsLengthPills') || 'preview';
+  const durationMins = length === 'preview' ? parseFloat(getPillValue('fsDurationPills') || '0.5') : null;
 
-  output.innerHTML = `<div class="output-loading"><div class="spinner"></div><p>Generating ~${durationMins} minute story...</p></div>`;
+  output.innerHTML = length === 'preview'
+    ? `<div class="output-loading"><div class="spinner"></div><p>Generating ~${durationMins >= 1 ? durationMins + ' minute' : '30 second'} preview...</p></div>`
+    : '<div class="output-loading"><div class="spinner"></div><p>Generating full story... This may take a few minutes.</p></div>';
 
   const storyData = {
     childName: document.getElementById('fsChildName').value || 'Chase',
@@ -2589,7 +2598,7 @@ async function generateFullStory() {
     action: 'story',
     storyData,
     voiceId: selectedVoiceId,
-    length: 'full',
+    length,
     durationMins,
     music: document.getElementById('fsMusic').value
   };

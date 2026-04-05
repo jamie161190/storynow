@@ -512,17 +512,20 @@ export function buildPreviewPrompt(storyData) {
   const formulaFn = PREVIEW_FORMULAS[safe.category] || PREVIEW_FORMULAS.journey;
   const categoryFormula = formulaFn(safe);
 
+  const targetWords = storyData._targetWords || 80;
+  const isShortPreview = targetWords <= 80;
+
   return fullPrompt + categoryFormula + `
 
 RULES:
 - The child's name appears at least 3 times
-- Include one natural pause ( ... ) for the narrator to breathe
+- Include natural pauses ( ... ) for the narrator to breathe
 - NO generic openings (no "once upon a time", no waking up, no "it was a [adjective] day")
-- NO resolution, NO wrapping up, NO moral lessons
+${isShortPreview ? '- NO resolution, NO wrapping up, NO moral lessons' : '- Build a complete story arc with a satisfying ending'}
 - The preview must feel like the story already knows and loves this child
-- Use [whispers] or [laughs softly] audio tags at ONE emotionally appropriate moment
+- Use [whispers] or [laughs softly] audio tags at emotionally appropriate moments
 
-Write ONLY the opening now. Absolutely no more than 80 words.`;
+Write approximately ${targetWords} words.`;
 }
 
 // Build the full story prompt that continues from the preview opening
