@@ -119,7 +119,7 @@ export const handler = async (event) => {
   let jobId;
   try {
     const parsed = JSON.parse(event.body);
-    const { storyData: rawStoryData, voiceId, length, music, jobId: jid } = parsed;
+    const { storyData: rawStoryData, voiceId, length, durationMins, music, jobId: jid } = parsed;
     jobId = jid;
 
     const supabaseUrl = process.env.SUPABASE_URL;
@@ -132,11 +132,15 @@ export const handler = async (event) => {
     const storyData = sanitiseStoryData ? sanitiseStoryData(rawStoryData) : rawStoryData;
 
     // ── Step 1: Generate story text with Claude ──
-    console.log('[STUDIO-BG] Generating story text for:', storyData.childName, 'length:', length);
+    // ~150 words per minute of narration
+    const targetWords = durationMins ? Math.round(durationMins * 150) : null;
+    console.log('[STUDIO-BG] Generating story text for:', storyData.childName, 'duration:', durationMins, 'mins, target words:', targetWords);
 
     const isPreview = length === 'preview';
     const promptFn = isPreview ? buildPreviewPrompt : buildCompleteStoryPrompt;
     const model = isPreview ? 'claude-sonnet-4-6' : 'claude-opus-4-6';
+    // Override word count in storyData so the prompt uses it
+    if (targetWords) storyData._targetWords = targetWords;
 
     let apiResponse;
     for (let attempt = 0; attempt < 5; attempt++) {

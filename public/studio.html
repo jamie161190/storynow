@@ -789,10 +789,13 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
             <option value="adventure">Adventure Ambient</option>
             <option value="bedtime">Bedtime Ambient</option>
           </select>
-          <label>Length</label>
+          <label>Duration</label>
           <div class="pill-group" id="fsLengthPills">
-            <div class="pill active" data-val="preview" onclick="togglePill(this,'fsLengthPills')">Preview (~500 words)</div>
-            <div class="pill" data-val="full" onclick="togglePill(this,'fsLengthPills')">Full Story (~2200 words)</div>
+            <div class="pill" data-val="1" onclick="togglePill(this,'fsLengthPills')">1 min</div>
+            <div class="pill" data-val="3" onclick="togglePill(this,'fsLengthPills')">3 min</div>
+            <div class="pill" data-val="5" onclick="togglePill(this,'fsLengthPills')">5 min</div>
+            <div class="pill active" data-val="10" onclick="togglePill(this,'fsLengthPills')">10 min</div>
+            <div class="pill" data-val="15" onclick="togglePill(this,'fsLengthPills')">15 min</div>
           </div>
         </div>
 
@@ -2562,9 +2565,9 @@ async function generateFullStory() {
   btn.textContent = 'Generating...';
   btn.disabled = true;
 
-  const length = getPillValue('fsLengthPills') || 'preview';
+  const durationMins = parseInt(getPillValue('fsLengthPills') || '10', 10);
 
-  output.innerHTML = '<div class="output-loading"><div class="spinner"></div><p>Generating story... This may take a few minutes for full stories.</p></div>';
+  output.innerHTML = `<div class="output-loading"><div class="spinner"></div><p>Generating ~${durationMins} minute story...</p></div>`;
 
   const storyData = {
     childName: document.getElementById('fsChildName').value || 'Chase',
@@ -2586,7 +2589,8 @@ async function generateFullStory() {
     action: 'story',
     storyData,
     voiceId: selectedVoiceId,
-    length,
+    length: 'full',
+    durationMins,
     music: document.getElementById('fsMusic').value
   };
 

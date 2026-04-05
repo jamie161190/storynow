@@ -550,7 +550,7 @@ export function buildCompleteStoryPrompt(storyData) {
   const promptFn = STORY_PROMPTS[safe.category];
   if (!promptFn) throw new Error('Invalid category: ' + safe.category);
   const fullPrompt = promptFn(safe);
-  const wordCount = getWordCount(safe.length, safe.age);
+  const wordCount = storyData._targetWords || getWordCount(safe.length, safe.age);
 
   return fullPrompt + `
 
