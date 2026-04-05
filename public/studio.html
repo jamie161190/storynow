@@ -986,8 +986,28 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
       </div>
 
       <div class="ctrl-section">
-        <h4>2. Child's Name</h4>
+        <h4>2. Child's Details</h4>
         <input type="text" id="comedyChildName" value="Chase" placeholder="e.g. Chase">
+        <div style="display:flex;gap:0.5rem;margin-top:0.4rem;align-items:center">
+          <label style="white-space:nowrap;font-size:0.75rem;font-weight:600">Age in clip</label>
+          <select id="comedyChildAge" style="flex:1;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:8px;font-size:0.8rem;background:#fff;font-family:Nunito,sans-serif">
+            <option value="">Not sure</option>
+            <option value="baby">Baby (under 1)</option>
+            <option value="1">1 year old</option>
+            <option value="2">2 years old</option>
+            <option value="3">3 years old</option>
+            <option value="4">4 years old</option>
+            <option value="5">5 years old</option>
+            <option value="6">6 years old</option>
+            <option value="7">7 years old</option>
+            <option value="8">8 years old</option>
+            <option value="9">9 years old</option>
+            <option value="10">10 years old</option>
+            <option value="11">11 years old</option>
+            <option value="12">12 years old</option>
+            <option value="13+">13+ years old</option>
+          </select>
+        </div>
         <label style="margin-top:0.4rem">Extra context (optional)</label>
         <input type="text" id="comedyContext" placeholder="e.g. He had just stolen a biscuit">
       </div>
@@ -2978,6 +2998,7 @@ async function generateComedyClip() {
     action: 'comedy-clip',
     frame: comedyFrame,
     childName: document.getElementById('comedyChildName').value || 'Chase',
+    childAge: document.getElementById('comedyChildAge').value || '',
     style,
     duration: comedyDuration,
     voiceId: comedySelectedVoiceId,
@@ -3309,6 +3330,7 @@ async function sendComedyToDirector() {
       style: comedyData.style,
       styleLabel: styleLabels[comedyData.style] || comedyData.style,
       childName: comedyData.childName,
+      childAge: document.getElementById('comedyChildAge')?.value || '',
       sceneDescription: comedyData.sceneDescription,
       storyText: comedyData.storyText,
       voiceId: comedySelectedVoiceId,
@@ -5162,9 +5184,11 @@ function renderDirectorAssets() {
             <span class="ac-tag" style="background:#F3E8FF;color:#7B1FA2">${a.analysis.mood}</span>
             <span class="ac-tag ${a.analysis.usability}">${a.analysis.usability}</span>
             ${a.analysis.isChase ? `<span class="ac-tag" style="background:#FFF3E0;color:#E65100;font-weight:700">Chase (Homepage Hero)</span>` : ''}
+            ${a.analysis.estimatedAge ? `<span class="ac-tag" style="background:#E8F5E9;color:#2E7D32">Age: ${a.analysis.estimatedAge}</span>` : ''}
             ${a.analysis.durationCategory ? `<span class="ac-tag" style="background:#E3F2FD;color:#1565C0">${a.analysis.durationCategory}</span>` : ''}
           </div>
           <div style="font-size:0.68rem;color:var(--text-soft);margin-top:0.3rem">${escHtml(a.analysis.description || '')}</div>
+          ${a.analysis.ageTimelineNote ? `<div style="font-size:0.65rem;color:#5E35B1;font-weight:600;margin-top:0.2rem;padding:0.2rem 0.4rem;background:#F3E8FF;border-radius:6px;display:inline-block">${escHtml(a.analysis.ageTimelineNote)}</div>` : ''}
           ${a.analysis.suggestedHook ? `<div style="font-size:0.65rem;color:var(--orange);font-weight:600;font-style:italic;margin-top:0.2rem">Hook: "${escHtml(a.analysis.suggestedHook)}"</div>` : ''}
           ${a.analysis.suggestedOverlay ? `<div style="font-size:0.6rem;color:var(--text-soft);margin-top:0.15rem">Overlay: "${escHtml(a.analysis.suggestedOverlay)}"</div>` : ''}
           ${a.analysis.suggestedBridge ? `
@@ -5285,9 +5309,9 @@ async function analyseAssets() {
             } catch (e) { /* skip frame */ }
           }
         }
-        assetsForAnalysis.push({ id: a.id, type: 'video', isLong: true, duration: dur, frames });
+        assetsForAnalysis.push({ id: a.id, type: 'video', isLong: true, duration: dur, frames, comedyMeta: a.comedyMeta || null });
       } else {
-        assetsForAnalysis.push({ id: a.id, type: a.type, frame: a.thumbnail.split(',')[1] });
+        assetsForAnalysis.push({ id: a.id, type: a.type, frame: a.thumbnail.split(',')[1], comedyMeta: a.comedyMeta || null });
       }
     }
 

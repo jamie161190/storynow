@@ -8,7 +8,7 @@
 export default async (req) => {
   try {
     const body = await req.json();
-    const { jobId, frame, childName, style, voiceId, extraContext, duration } = body;
+    const { jobId, frame, childName, childAge, style, voiceId, extraContext, duration } = body;
 
     if (!jobId || !frame) {
       return { statusCode: 400 };
@@ -85,7 +85,7 @@ export default async (req) => {
 WHAT IS ACTUALLY HAPPENING IN THE CLIP:
 ${sceneDescription}
 
-The child's name is ${name}.${extraContext ? `\nExtra context from the parent: ${extraContext}` : ''}
+The child's name is ${name}.${childAge ? ` They are ${childAge === 'baby' ? 'a baby (under 1 year old)' : childAge + (childAge === '13+' ? '' : '')} in this clip.` : ''}${extraContext ? `\nExtra context from the parent: ${extraContext}` : ''}
 
 ${duration ? `Write a narration that is EXACTLY ${Math.round(duration * 2.5)} words (give or take 5 words). This must match a ${duration}-second video clip, so the word count is critical. At ~2.5 words per second, ${Math.round(duration * 2.5)} words = ${duration} seconds of audio.` : 'Write a narration for this clip. Make it as long or short as it naturally needs to be. Let the comedy breathe.'} This will be read aloud by a text-to-speech voice narrator over the clip.
 

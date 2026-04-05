@@ -34,6 +34,14 @@ SECTION 2: CHASE AND THE HOMEPAGE
 WHO CHASE IS:
 Chase is Jamie's (the founder's) son. He is not a mascot. He is the reason this product exists. Jamie built Storytold because Chase asked why he wasn't in any of his stories. Chase IS the brand. He is the living, breathing proof that this product creates magic.
 
+CHASE'S AGE TIMELINE (critical for ad storytelling):
+Chase is currently around 9-10 years old. But content featuring Chase spans his entire life. This matters enormously for ad narrative:
+- Baby/toddler Chase (0-2): This is BEFORE Storytold. Before the question. These clips show the world that INSPIRED the product. "This was before he asked the question that changed everything."
+- Young Chase (3-5): This is AROUND the time the idea formed. The origin era. "He was only 4 when he asked why he wasn't in any of his stories."
+- Current Chase (8-10): This is Chase NOW. The kid who HAS Storytold stories. The kid on the homepage. The living proof.
+
+When content shows a YOUNGER Chase, the ad narrative should reflect the timeline: "This was Chase at 3... by the time he was 5, he asked the question that started everything." Younger Chase footage + current product = origin story energy. The age gap itself is the emotional hook.
+
 THE HOMEPAGE STRUCTURE (what visitors see when they land):
 1. Hero section: "A story that knows their name" with a "Create Their Story" CTA
 2. IMMEDIATELY below: Two sample stories starring Chase that visitors can play:
@@ -159,6 +167,14 @@ CHASE (boy, Jamie's son):
 - Use hooks that reference "my son": "My son has no idea he's the main character" / "I made myself the villain in my son's story"
 - Chase + Jamie together = founder story energy. Personal. Real. Trust-building.
 - Chase with headphones/listening = the "press play" moment
+
+AGE MATTERS FOR CHASE (AND ALL CHILDREN):
+- If the child looks younger than current Chase (under 6), this may be ARCHIVE footage — before Storytold existed. This changes the ad narrative completely.
+- Young Chase: Origin story angle. "This was before he asked the question..." / "He didn't know yet that one day he'd hear his name in a story"
+- Current Chase: Living proof angle. "This is Chase. He's the hero of his own story."
+- The AGE GAP between old and new footage is itself a powerful storytelling device. "He was 3 here. By 5, he asked why he wasn't in any of his stories. Now he is."
+- If the user provides the child's age, USE IT in your analysis. It changes hooks, bridge text, and ad structure.
+- For non-Chase children: age affects tone. A toddler (1-3) gets gentler, cuter hooks. A 5-8 year old gets adventure hooks. A teenager gets the "too old for it" angle.
 
 MULTIPLE CHILDREN TOGETHER:
 - This is GROUP REACTION content. Extremely powerful.
@@ -665,15 +681,29 @@ async function handleAnalyse(apiKey, { assets }) {
   const imageBlocks = [];
   for (let i = 0; i < assets.length; i++) {
     const a = assets[i];
+    // Build context line with any metadata the user provided
+    let contextLine = '';
+    if (a.comedyMeta) {
+      const m = a.comedyMeta;
+      const parts = [];
+      if (m.childName) parts.push(`child's name: ${m.childName}`);
+      if (m.childAge) parts.push(`child's age in this clip: ${m.childAge}`);
+      if (m.styleLabel) parts.push(`comedy style: ${m.styleLabel}`);
+      if (m.sceneDescription) parts.push(`scene: ${m.sceneDescription}`);
+      if (parts.length) contextLine = `\nUser-provided context: ${parts.join(', ')}`;
+    } else if (a.childAge) {
+      contextLine = `\nChild's age in this clip: ${a.childAge}`;
+    }
+
     if (a.isLong && a.frames && a.frames.length) {
-      imageBlocks.push({ type: 'text', text: `Asset ${i + 1} (LONG VIDEO, id: ${a.id}, duration: ${a.duration}s). The following ${a.frames.length} frames are sampled across the clip:` });
+      imageBlocks.push({ type: 'text', text: `Asset ${i + 1} (LONG VIDEO, id: ${a.id}, duration: ${a.duration}s).${contextLine} The following ${a.frames.length} frames are sampled across the clip:` });
       for (const f of a.frames) {
         imageBlocks.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: f.frame } });
         imageBlocks.push({ type: 'text', text: `Frame at ${Math.floor(f.time / 60)}:${String(Math.floor(f.time % 60)).padStart(2, '0')}` });
       }
     } else {
       imageBlocks.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: a.frame } });
-      imageBlocks.push({ type: 'text', text: `Asset ${i + 1} (${a.type}, id: ${a.id}):` });
+      imageBlocks.push({ type: 'text', text: `Asset ${i + 1} (${a.type}, id: ${a.id}):${contextLine}` });
     }
   }
 
@@ -695,6 +725,8 @@ For each asset, return a JSON array with objects containing:
 - description: one sentence describing what's happening
 - whoIsInIt: describe who you see. If it looks like a boy around age 9, flag as possibly Chase. Note: adults, multiple children, grandparents, etc.
 - isChase: true/false — your best guess whether this is Chase (the founder's son, the homepage hero)
+- estimatedAge: your best estimate of the child's age (e.g. "2", "5", "baby", "9", "teenager"). Use user-provided age if available, otherwise estimate from the image.
+- ageTimelineNote: if this is Chase, write a note about where this falls in the Storytold timeline (e.g. "Young Chase — before Storytold existed. Origin story material." or "Current Chase — the kid on the homepage. Living proof." or "Not Chase"). For non-Chase children, write the age-appropriate ad angle (e.g. "Toddler — gentle/cute hooks work best" or "Pre-teen — 'too old for it' angle")
 - durationCategory: one of: very-short (under 5s), short (5-15s), medium (15-30s), long (30-60s), very-long (60s+)
 - marketingPotential: 1-5 rating
 - bestMoment: describe the single most powerful marketing moment you can see
@@ -771,8 +803,14 @@ async function handleConcepts(apiKey, { analyses, platform }) {
 
   const assetsDesc = analyses.map((a, i) => {
     let desc = `${i + 1}. "${a.name}" [${a.contentTag}] [${a.mood}] [${a.usability}] - ${a.description} (potential: ${a.marketingPotential}/5)`;
+    if (a.estimatedAge) desc += ` | Child's age: ${a.estimatedAge}`;
+    if (a.ageTimelineNote) desc += ` | Timeline: ${a.ageTimelineNote}`;
+    if (a.isChase) desc += ` | THIS IS CHASE (founder's son, homepage hero)`;
+    if (a.suggestedBridge) desc += ` | Bridge: "${a.suggestedBridge}"`;
+    if (a.needsVoiceCta && a.voiceCtaLine) desc += ` | Voice CTA: "${a.voiceCtaLine}"`;
     if (a.suggestedOverlay) desc += ` | Suggested overlay: "${a.suggestedOverlay}"`;
     if (a.suggestedMockupPair) desc += ` | Pairs with mockup: ${a.suggestedMockupPair}`;
+    if (a.adStructure) desc += ` | Recommended structure: ${a.adStructure}`;
     if (a.moments && a.moments.length) {
       desc += '\n   Best moments:';
       for (const m of a.moments) {
