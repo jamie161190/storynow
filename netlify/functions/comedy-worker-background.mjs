@@ -87,7 +87,7 @@ ${sceneDescription}
 
 The child's name is ${name}.${childAge ? ` They are ${childAge === 'baby' ? 'a baby (under 1 year old)' : childAge + (childAge === '13+' ? '' : '')} in this clip.` : ''}${extraContext ? `\nExtra context from the parent: ${extraContext}` : ''}
 
-${duration ? `Write a narration that is EXACTLY ${Math.round(duration * 2.5)} words (give or take 5 words). This must match a ${duration}-second video clip, so the word count is critical. At ~2.5 words per second, ${Math.round(duration * 2.5)} words = ${duration} seconds of audio.` : 'Write a narration for this clip. Make it as long or short as it naturally needs to be. Let the comedy breathe.'} This will be read aloud by a text-to-speech voice narrator over the clip.
+${duration ? `Write a narration that is EXACTLY ${Math.round(duration * 2.8)} words long (minimum ${Math.round(duration * 2.5)}, maximum ${Math.round(duration * 3.0)} words). This MUST fill a ${duration}-second video clip. The narration must last the ENTIRE duration of the video — do NOT end early. Count your words carefully. Remember that "..." pauses and [audio tags] take up spoken time but don't count as real words, so you need MORE actual words to compensate. Aim for ${Math.round(duration * 2.8)} real spoken words minimum.` : 'Write a narration for this clip. Make it as long or short as it naturally needs to be. Let the comedy breathe.'} This will be read aloud by a text-to-speech voice narrator over the clip.
 
 AUDIO FORMATTING RULES (CRITICAL - this is read aloud by TTS):
 - Use three dots ( ... ) to create breath pauses. Place them at moments of suspense, reveals, and before punchlines. Aim for one pause every 30-40 words minimum. Example: "And there, standing in the middle of the kitchen ... was ${name}."
