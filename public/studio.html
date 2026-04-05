@@ -513,6 +513,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
     <div id="canvasControls" style="display:none;position:absolute;right:20px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:10">
       <button onclick="previewCanvasAd()" style="background:var(--purple);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Preview Ad</button>
       <button onclick="exportCanvasAd()" style="background:var(--orange);color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" id="canvasExportBtn">Export Video</button>
+      <button onclick="clearCanvasVideo()" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.2);padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Clear Video</button>
     </div>
     <!-- Aspect ratio pills -->
     <div style="position:absolute;bottom:20px;display:flex;gap:8px">
@@ -1359,6 +1360,22 @@ function handleCanvasUpload(file) {
   applyCanvasAdTimeline();
   // Persist to IndexedDB so it survives refreshes
   saveCanvasVideo(file).catch(e => console.warn('Could not save video to IndexedDB:', e));
+}
+
+// ── Clear canvas video ──
+async function clearCanvasVideo() {
+  const video = document.getElementById('canvasVideo');
+  const empty = document.getElementById('canvasEmpty');
+  video.pause();
+  video.src = '';
+  video.style.display = 'none';
+  empty.style.display = 'flex';
+  document.getElementById('canvasOverlay').style.display = 'none';
+  document.getElementById('canvasControls').style.display = 'none';
+  window._canvasTimeline = null;
+  if (window._canvasVideoUrl) { URL.revokeObjectURL(window._canvasVideoUrl); window._canvasVideoUrl = null; }
+  // Clear from IndexedDB
+  try { const db = await openCanvasDB(); const tx = db.transaction('video', 'readwrite'); tx.objectStore('video').delete('current'); } catch (e) {}
 }
 
 // ── Current Ad Timeline — edit this to change what the ad looks like ──
