@@ -4037,8 +4037,8 @@ async function exportComedyVideo() {
     const chunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
-    // Calculate durations
-    const videoDuration = Math.min(video.duration, audioDuration);
+    // Calculate durations — video plays for its FULL length, never cut short by audio
+    const videoDuration = video.duration;
     const startCardDur = hasStartCard ? cardDuration : 0;
     const endCardDur = hasEndCard ? cardDuration : 0;
     const totalDuration = startCardDur + videoDuration + endCardDur;
