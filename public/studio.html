@@ -5779,7 +5779,7 @@ async function buildThisAd(conceptIdx) {
   for (const r of ['9:16', '4:5', '1:1', '16:9']) {
     if (format.includes(r)) { aspect = r; break; }
   }
-  const { W, H } = getExportDimensions(aspect);
+  const { width: W, height: H } = getExportDimensions(aspect);
   const fps = 30;
 
   // Show progress in the concept card
