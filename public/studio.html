@@ -501,7 +501,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
           <div style="font-size:12px;line-height:1.6;max-width:260px;margin-bottom:1rem">Drop a video or tap here, then tell Claude what to do with it</div>
           <div style="background:var(--purple);color:#fff;padding:8px 24px;border-radius:50px;font-size:13px;font-weight:700">Choose File</div>
         </div>
-        <video id="canvasVideo" style="display:none;width:100%;height:100%;object-fit:cover" playsinline loop></video>
+        <video id="canvasVideo" style="display:none;width:100%;height:100%;object-fit:cover" playsinline loop controls></video>
         <input type="file" id="canvasFileInput" accept="video/*" style="display:none" onchange="handleCanvasUpload(this.files[0])">
       </div>
     </div>
@@ -1289,11 +1289,9 @@ function handleCanvasUpload(file) {
   if (window._canvasVideoUrl) URL.revokeObjectURL(window._canvasVideoUrl);
   window._canvasVideoUrl = URL.createObjectURL(file);
   video.src = window._canvasVideoUrl;
-  video.muted = true;
+  video.muted = false;
   video.style.display = 'block';
   empty.style.display = 'none';
-  video.play().then(() => { video.muted = false; }).catch(() => {});
-  video.onclick = () => { video.muted = !video.muted; };
 }
 
 // Drag and drop on canvas
