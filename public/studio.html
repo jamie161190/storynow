@@ -3192,8 +3192,6 @@ function renderComedyOutput(data) {
   // Store narration text for subtitle export
   if (data.storyText) lastComedyNarrationText = data.storyText;
 
-  // Store last comedy data for Send to Director
-  window._lastComedyData = data;
 
   let html = '';
 
@@ -3258,7 +3256,6 @@ function renderComedyOutput(data) {
       <button class="btn btn-purple btn-sm" style="text-align:center" onclick="downloadComedyAudio()">Download Narration</button>
       <button class="btn btn-orange btn-sm" style="text-align:center" id="mixMusicBtn" onclick="mixComedyWithMusic()">Mix with Music</button>
       <button class="btn btn-outline btn-sm" style="text-align:center" onclick="generateComedyClip()">Try Another Style</button>
-      <button class="btn btn-outline btn-sm" style="text-align:center;border-color:var(--green);color:var(--green)" onclick="sendComedyToDirector()">Send to Director</button>
     </div>
     <div id="mixStatus" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:var(--text-soft)"></div>`;
 
@@ -3362,121 +3359,6 @@ function showDirectorContextPrompt(defaultText) {
   });
 }
 
-// Send the approved comedy clip to the AI Director tab
-async function sendComedyToDirector() {
-  if (!comedyVideoFileUrl && !comedyFrame) {
-    alert('No clip to send.');
-    return;
-  }
-
-  // Ask for context before sending
-  const userContext = await showDirectorContextPrompt('');
-
-  const comedyData = window._lastComedyData || {};
-
-  // Generate a proper data URL thumbnail from the comedyFrame base64 or from the thumb img
-  let thumbDataUrl = '';
-  if (comedyFrame) {
-    thumbDataUrl = 'data:image/jpeg;base64,' + comedyFrame;
-  } else {
-    // Fallback: draw the thumb image to canvas to get a data URL
-    const thumbImg = document.getElementById('comedyThumbImg');
-    if (thumbImg && thumbImg.naturalWidth) {
-      const c = document.createElement('canvas');
-      c.width = 320; c.height = 240;
-      c.getContext('2d').drawImage(thumbImg, 0, 0, 320, 240);
-      thumbDataUrl = c.toDataURL('image/jpeg', 0.7);
-    }
-  }
-
-  // Also create a video element if we have a video URL (needed for multi-frame analysis)
-  let videoEl = null;
-  if (comedyIsVideo && comedyVideoFileUrl) {
-    videoEl = document.createElement('video');
-    videoEl.src = comedyVideoFileUrl;
-    videoEl.preload = 'auto';
-    videoEl.muted = true;
-    await new Promise(r => { videoEl.onloadeddata = r; videoEl.onerror = r; });
-  }
-
-  const id = 'comedy_' + Date.now();
-  const styleLabels = {
-    epic: 'Epic Movie', documentary: 'Nature Documentary', breaking: 'Breaking News',
-    fairytale: 'Fairy Tale', sports: 'Sports Commentary', horror: 'Horror Trailer',
-    heist: 'Heist Movie', romance: 'Romance'
-  };
-
-  const asset = {
-    id,
-    type: comedyIsVideo ? 'video' : 'image',
-    thumbnail: thumbDataUrl,
-    name: `comedy-${comedyData.childName || 'clip'}-${comedyData.style || 'epic'}`,
-    frame: comedyFrame,
-    duration: comedyDuration || 0,
-    isLong: false,
-    isComedyClip: true,
-    comedyMeta: {
-      style: comedyData.style,
-      styleLabel: styleLabels[comedyData.style] || comedyData.style,
-      childName: comedyData.childName,
-      childAge: document.getElementById('comedyChildAge')?.value || '',
-      sceneDescription: comedyData.sceneDescription,
-      storyText: comedyData.storyText,
-      voiceId: comedySelectedVoiceId,
-      voiceName: ALL_VOICES.find(v => v.id === comedySelectedVoiceId)?.name || 'Voice',
-      hasAudio: !!comedyData.audio,
-      audioBase64: comedyData.audio || null,
-      musicSelection: getComedyMusicSelection()
-    },
-    narrationText: lastComedyNarrationText || '',
-    userContext: userContext || '',
-    analysis: null,
-    moments: []
-  };
-
-  // Store video — prefer the exported version (has audio baked in), fallback to original
-  if (comedyIsVideo) {
-    if (window._exportedVideoUrl) {
-      asset.exportedVideoUrl = window._exportedVideoUrl;
-      console.log('[DIRECTOR] Using exported video (with audio)');
-    }
-    if (comedyVideoFileUrl) {
-      asset.objectUrl = comedyVideoFileUrl;
-    }
-    if (videoEl) asset.videoEl = videoEl;
-  }
-
-  directorAssets.push(asset);
-
-  // Hide empty state, update count
-  const emptyEl = document.getElementById('directorEmpty');
-  if (emptyEl) emptyEl.style.display = 'none';
-
-  // Populate the Director notes field with the user's context
-  const notesEl = document.getElementById('directorNotes');
-  if (notesEl && userContext) {
-    notesEl.value = userContext;
-  }
-
-  // Switch to Director tab
-  const dirTab = document.querySelector('.mode-tab[onclick*="director"]');
-  if (dirTab) {
-    switchMode('director', dirTab);
-
-    // Flash green to confirm
-    dirTab.style.background = 'var(--green)';
-    dirTab.style.borderColor = 'var(--green)';
-    dirTab.style.color = '#fff';
-    setTimeout(() => {
-      dirTab.style.background = '';
-      dirTab.style.borderColor = '';
-      dirTab.style.color = '';
-    }, 1500);
-  }
-
-  renderDirectorAssets();
-  document.getElementById('directorAssetCount').textContent = directorAssets.length + ' asset' + (directorAssets.length !== 1 ? 's' : '') + ' uploaded';
-}
 
 function toggleComedyPlay() {
   if (!studioAudio) return;
@@ -4193,18 +4075,13 @@ async function exportComedyVideo() {
     const blob = new Blob(chunks, { type: mimeType });
     const url = URL.createObjectURL(blob);
 
-    // Store the exported video (with audio baked in) for Director to use
-    if (window._exportedVideoUrl) URL.revokeObjectURL(window._exportedVideoUrl);
-    window._exportedVideoUrl = url;
-    window._exportedVideoMime = mimeType;
-
     const childName = document.getElementById('comedyChildName')?.value || 'comedy';
     const style = getPillValue('comedyStylePills') || 'epic';
     const a = document.createElement('a');
     a.href = url;
     a.download = `storytold-comedy-${childName}-${style}-${aspect.replace(':','x')}.${fileExt}`;
     a.click();
-    // Don't revoke — Director needs this URL
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
 
     setProgress('Done! Video downloaded.', 100);
     setTimeout(() => { progress.style.display = 'none'; }, 3000);
@@ -5918,8 +5795,6 @@ async function buildThisAd(conceptIdx) {
   // Find the clip asset for this concept
   const allAssets = [...directorAssets, ...studioAssets];
   let clipAsset = null;
-  let clipVideo = null;
-  let clipAudioUrl = null;
 
   if (c.timeline && c.timeline.length) {
     for (const block of c.timeline) {
@@ -5963,7 +5838,7 @@ async function buildThisAd(conceptIdx) {
     setProgress('Loading video...');
 
     // Load the video — it already has audio on it, DON'T touch it
-    const videoSrc = clipAsset.exportedVideoUrl || window._exportedVideoUrl || clipAsset.objectUrl || comedyVideoFileUrl;
+    const videoSrc = clipAsset.objectUrl || comedyVideoFileUrl;
     const video = document.createElement('video');
     video.src = videoSrc;
     video.playsInline = true;
