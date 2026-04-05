@@ -3924,16 +3924,25 @@ async function exportComedyVideo() {
 
     setProgress('Loading video...', 5);
 
-    // Load video element
+    // Load video element — fully buffer before playback
     const video = document.createElement('video');
     video.src = comedyVideoFileUrl;
     video.muted = true;
     video.playsInline = true;
+    video.preload = 'auto';
     await new Promise((resolve, reject) => {
       video.onloadedmetadata = resolve;
       video.onerror = reject;
       video.load();
     });
+    // Wait for full buffer so playback doesn't end early
+    if (video.readyState < 4) {
+      await new Promise(r => {
+        video.oncanplaythrough = r;
+        // Safety timeout — don't wait forever
+        setTimeout(r, 5000);
+      });
+    }
     await new Promise(r => { video.currentTime = 0; video.onseeked = r; });
 
     setProgress('Decoding audio...', 10);
@@ -4072,10 +4081,16 @@ async function exportComedyVideo() {
       function drawFrame() {
         const elapsed = (performance.now() - videoStartTime) / 1000;
 
-        if (elapsed >= videoDuration || video.ended) {
+        if (elapsed >= videoDuration) {
           video.pause();
           resolve();
           return;
+        }
+        // If video reports ended early (buffering issue), keep drawing last frame
+        if (video.ended && elapsed < videoDuration - 0.5) {
+          // Video ended prematurely — try restarting from current position
+          video.currentTime = elapsed;
+          video.play().catch(() => {});
         }
 
         // Update progress every second
