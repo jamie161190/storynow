@@ -1355,8 +1355,23 @@ function handleCanvasUpload(file) {
   empty.style.display = 'none';
   // Show controls when video is loaded
   document.getElementById('canvasControls').style.display = 'flex';
+  // Apply the current ad timeline
+  applyCanvasAdTimeline();
   // Persist to IndexedDB so it survives refreshes
   saveCanvasVideo(file).catch(e => console.warn('Could not save video to IndexedDB:', e));
+}
+
+// ── Current Ad Timeline — edit this to change what the ad looks like ──
+function applyCanvasAdTimeline() {
+  setCanvasTimeline({
+    hook: "I filmed this when he was 2. He's 9 now. This is what I made him.",
+    endCards: [
+      { text: "This is Chase. He's 9 now.", duration: 2.5 },
+      { text: "His whole world is inside his own story.", duration: 2.5 },
+      { text: "Your child can have one too.", duration: 2.5 },
+      { type: "logo", title: "storytold.ai", subtitle: "Hear it free first.", duration: 3 }
+    ]
+  });
 }
 
 // ── Preview: plays the full ad sequence in the phone frame ──
@@ -1607,6 +1622,8 @@ document.addEventListener('DOMContentLoaded', () => {
     video.muted = false;
     video.style.display = 'block';
     empty.style.display = 'none';
+    document.getElementById('canvasControls').style.display = 'flex';
+    applyCanvasAdTimeline();
   }).catch(() => {});
 });
 
