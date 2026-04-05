@@ -3481,36 +3481,60 @@ function buildSubtitleChunks(text, audioDuration) {
 // Get aspect ratio dimensions (720p base)
 function getExportDimensions(aspect) {
   switch (aspect) {
-    case '9:16': return { width: 720, height: 1280 };
-    case '16:9': return { width: 1280, height: 720 };
-    case '1:1': return { width: 720, height: 720 };
-    case '4:5': return { width: 720, height: 900 };
-    default: return { width: 720, height: 1280 };
+    case '9:16': return { width: 1080, height: 1920 };
+    case '16:9': return { width: 1920, height: 1080 };
+    case '1:1': return { width: 1080, height: 1080 };
+    case '4:5': return { width: 1080, height: 1350 };
+    default: return { width: 1080, height: 1920 };
   }
 }
 
 // Draw a branded card (start or end) on canvas
 function drawCard(ctx, w, h, title, subtitle, isEnd) {
-  // Gradient background
+  // Rich gradient background
   const grad = ctx.createLinearGradient(0, 0, w, h);
-  grad.addColorStop(0, '#6B2F93');
-  grad.addColorStop(1, isEnd ? '#F1753B' : '#A872C8');
+  if (isEnd) {
+    grad.addColorStop(0, '#5a2680');
+    grad.addColorStop(0.5, '#6B2F93');
+    grad.addColorStop(1, '#F1753B');
+  } else {
+    grad.addColorStop(0, '#4a1f70');
+    grad.addColorStop(0.5, '#6B2F93');
+    grad.addColorStop(1, '#A872C8');
+  }
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
 
+  // Subtle radial glow in center
+  const glow = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w * 0.6);
+  glow.addColorStop(0, 'rgba(255,255,255,0.06)');
+  glow.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+
   // Storytold logo text
-  const logoSize = Math.round(w * 0.06);
-  ctx.font = `900 ${logoSize}px Nunito, sans-serif`;
+  const logoSize = Math.round(w * 0.07);
+  ctx.font = `900 ${logoSize}px "Nunito", sans-serif`;
   ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(255,255,255,0.3)';
-  ctx.fillText('storytold', w / 2, h * 0.25);
+  // "Story" in white, "told" in orange
+  const storyW = ctx.measureText('Story').width;
+  const toldW = ctx.measureText('told').width;
+  const totalW = storyW + toldW;
+  const logoX = w / 2 - totalW / 2;
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillText('Story', logoX + storyW / 2, h * 0.28);
+  ctx.fillStyle = 'rgba(241,117,59,0.9)';
+  ctx.fillText('told', logoX + storyW + toldW / 2, h * 0.28);
 
   // Title
   if (title) {
-    const titleSize = Math.round(w * 0.055);
-    ctx.font = `800 ${titleSize}px Nunito, sans-serif`;
+    const titleSize = Math.round(w * 0.06);
+    ctx.font = `800 ${titleSize}px "Nunito", sans-serif`;
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0,0,0,0.3)';
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetY = 2;
     // Word wrap
     const maxW = w * 0.8;
     const words = title.split(' ');
@@ -3526,27 +3550,30 @@ function drawCard(ctx, w, h, title, subtitle, isEnd) {
       }
     }
     if (line) lines.push(line);
-    const lineHeight = titleSize * 1.3;
+    const lineHeight = titleSize * 1.35;
     const startY = h / 2 - (lines.length * lineHeight) / 2;
     lines.forEach((l, i) => {
       ctx.fillText(l, w / 2, startY + i * lineHeight + lineHeight);
     });
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
   }
 
   // Subtitle
   if (subtitle) {
-    const subSize = Math.round(w * 0.032);
-    ctx.font = `600 ${subSize}px Quicksand, sans-serif`;
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx.fillText(subtitle, w / 2, h * 0.72);
+    const subSize = Math.round(w * 0.035);
+    ctx.font = `600 ${subSize}px "Quicksand", sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillText(subtitle, w / 2, h * 0.73);
   }
 }
 
 // Draw subtitle text on the canvas
 function drawSubtitle(ctx, w, h, text) {
   if (!text) return;
-  const fontSize = Math.round(w * 0.042);
-  ctx.font = `700 ${fontSize}px Quicksand, sans-serif`;
+  const fontSize = Math.round(w * 0.048);
+  ctx.font = `800 ${fontSize}px "Nunito", "Quicksand", sans-serif`;
   ctx.textAlign = 'center';
 
   // Word wrap for subtitle
@@ -3565,19 +3592,19 @@ function drawSubtitle(ctx, w, h, text) {
   }
   if (line) lines.push(line);
 
-  const lineHeight = fontSize * 1.4;
-  const bottomPad = h * 0.08;
+  const lineHeight = fontSize * 1.35;
+  const bottomPad = h * 0.10;
   const startY = h - bottomPad - (lines.length * lineHeight);
 
-  // Background box behind text
-  const padding = fontSize * 0.5;
-  const boxWidth = Math.min(w * 0.9, lines.reduce((max, l) => Math.max(max, ctx.measureText(l).width), 0) + padding * 2);
-  const boxHeight = lines.length * lineHeight + padding * 1.5;
+  // Background box behind text — rounded, semi-transparent
+  const padding = fontSize * 0.6;
+  const boxWidth = Math.min(w * 0.92, lines.reduce((max, l) => Math.max(max, ctx.measureText(l).width), 0) + padding * 2);
+  const boxHeight = lines.length * lineHeight + padding * 1.6;
   const boxX = (w - boxWidth) / 2;
-  const boxY = startY - padding * 0.5;
-  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  const boxY = startY - padding * 0.6;
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
   ctx.beginPath();
-  const r = fontSize * 0.3;
+  const r = fontSize * 0.35;
   ctx.moveTo(boxX + r, boxY);
   ctx.lineTo(boxX + boxWidth - r, boxY);
   ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + r);
@@ -3590,11 +3617,20 @@ function drawSubtitle(ctx, w, h, text) {
   ctx.closePath();
   ctx.fill();
 
-  // Text
+  // Text with shadow for extra clarity
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 2;
   ctx.fillStyle = '#FFFFFF';
   lines.forEach((l, i) => {
     ctx.fillText(l, w / 2, startY + i * lineHeight + lineHeight * 0.75);
   });
+  // Reset shadow
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
 }
 
 // Draw the video frame fitted to canvas with blurred background fill
@@ -3606,27 +3642,50 @@ function drawVideoFrame(ctx, video, canvasW, canvasH) {
   const canvasRatio = canvasW / canvasH;
   const videoRatio = vw / vh;
 
-  // Draw blurred background (stretched to fill)
-  ctx.save();
-  ctx.filter = 'blur(20px) brightness(0.4)';
-  ctx.drawImage(video, -20, -20, canvasW + 40, canvasH + 40);
-  ctx.restore();
-
-  // Draw fitted video on top
+  // Calculate fitted dimensions
   let drawW, drawH, drawX, drawY;
   if (videoRatio > canvasRatio) {
-    // Video is wider - fit by width
     drawW = canvasW;
     drawH = canvasW / videoRatio;
     drawX = 0;
     drawY = (canvasH - drawH) / 2;
   } else {
-    // Video is taller - fit by height
     drawH = canvasH;
     drawW = canvasH * videoRatio;
     drawX = (canvasW - drawW) / 2;
     drawY = 0;
   }
+
+  // Only draw blurred background if the video doesn't fill the canvas
+  const needsBackground = (drawW < canvasW - 2) || (drawH < canvasH - 2);
+  if (needsBackground) {
+    // Draw blurred, scaled-up background (crop to fill)
+    ctx.save();
+    ctx.filter = 'blur(40px) brightness(0.5) saturate(1.2)';
+    // Scale video to cover entire canvas (crop edges)
+    let bgW, bgH, bgX, bgY;
+    if (videoRatio > canvasRatio) {
+      bgH = canvasH + 80;
+      bgW = bgH * videoRatio;
+      bgX = (canvasW - bgW) / 2;
+      bgY = -40;
+    } else {
+      bgW = canvasW + 80;
+      bgH = bgW / videoRatio;
+      bgX = -40;
+      bgY = (canvasH - bgH) / 2;
+    }
+    ctx.drawImage(video, bgX, bgY, bgW, bgH);
+    ctx.restore();
+  } else {
+    // Video fills canvas, just draw black background
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvasW, canvasH);
+  }
+
+  // Draw the sharp fitted video on top
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(video, drawX, drawY, drawW, drawH);
 }
 
@@ -3777,7 +3836,7 @@ async function exportComedyVideo() {
             : 'video/webm';
     const fileExt = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
 
-    const recorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 4000000 });
+    const recorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 10000000 });
     const chunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
