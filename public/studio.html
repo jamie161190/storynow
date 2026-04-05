@@ -213,6 +213,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
 
 /* Loading animation */
 @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .ms-loading-dots{display:flex;gap:6px;justify-content:center;margin:12px 0}
 .ms-loading-dots span{width:10px;height:10px;border-radius:50%;background:var(--purple);animation:pulse 1.2s infinite}
@@ -3261,14 +3262,33 @@ async function sendComedyToDirector() {
     return;
   }
 
-  // Get the thumbnail frame as a file-like object for the Director
-  const thumbSrc = document.getElementById('comedyThumbImg')?.src || '';
   const comedyData = window._lastComedyData || {};
 
-  // Switch to Director tab
-  switchMode('director', document.querySelector('.mode-tab[onclick*="director"]'));
+  // Generate a proper data URL thumbnail from the comedyFrame base64 or from the thumb img
+  let thumbDataUrl = '';
+  if (comedyFrame) {
+    thumbDataUrl = 'data:image/jpeg;base64,' + comedyFrame;
+  } else {
+    // Fallback: draw the thumb image to canvas to get a data URL
+    const thumbImg = document.getElementById('comedyThumbImg');
+    if (thumbImg && thumbImg.naturalWidth) {
+      const c = document.createElement('canvas');
+      c.width = 320; c.height = 240;
+      c.getContext('2d').drawImage(thumbImg, 0, 0, 320, 240);
+      thumbDataUrl = c.toDataURL('image/jpeg', 0.7);
+    }
+  }
 
-  // Create a synthetic asset in the Director from the comedy clip
+  // Also create a video element if we have a video URL (needed for multi-frame analysis)
+  let videoEl = null;
+  if (comedyIsVideo && comedyVideoFileUrl) {
+    videoEl = document.createElement('video');
+    videoEl.src = comedyVideoFileUrl;
+    videoEl.preload = 'auto';
+    videoEl.muted = true;
+    await new Promise(r => { videoEl.onloadeddata = r; videoEl.onerror = r; });
+  }
+
   const id = 'comedy_' + Date.now();
   const styleLabels = {
     epic: 'Epic Movie', documentary: 'Nature Documentary', breaking: 'Breaking News',
@@ -3279,7 +3299,7 @@ async function sendComedyToDirector() {
   const asset = {
     id,
     type: comedyIsVideo ? 'video' : 'image',
-    thumbnail: thumbSrc,
+    thumbnail: thumbDataUrl,
     name: `comedy-${comedyData.childName || 'clip'}-${comedyData.style || 'epic'}`,
     frame: comedyFrame,
     duration: comedyDuration || 0,
@@ -3300,18 +3320,24 @@ async function sendComedyToDirector() {
     moments: []
   };
 
-  // If we have the video URL, store it
+  // If we have the video URL and element, store them
   if (comedyIsVideo && comedyVideoFileUrl) {
     asset.objectUrl = comedyVideoFileUrl;
+    if (videoEl) asset.videoEl = videoEl;
   }
 
   directorAssets.push(asset);
-  document.getElementById('directorEmpty').style.display = 'none';
-  renderDirectorAssets();
 
-  // Flash the Director tab green briefly
+  // Hide empty state, update count
+  const emptyEl = document.getElementById('directorEmpty');
+  if (emptyEl) emptyEl.style.display = 'none';
+
+  // Switch to Director tab
   const dirTab = document.querySelector('.mode-tab[onclick*="director"]');
   if (dirTab) {
+    switchMode('director', dirTab);
+
+    // Flash green to confirm
     dirTab.style.background = 'var(--green)';
     dirTab.style.borderColor = 'var(--green)';
     dirTab.style.color = '#fff';
@@ -3319,10 +3345,10 @@ async function sendComedyToDirector() {
       dirTab.style.background = '';
       dirTab.style.borderColor = '';
       dirTab.style.color = '';
-      dirTab.classList.add('active');
     }, 1500);
   }
 
+  renderDirectorAssets();
   document.getElementById('directorAssetCount').textContent = directorAssets.length + ' asset' + (directorAssets.length !== 1 ? 's' : '') + ' uploaded';
 }
 
@@ -5124,19 +5150,49 @@ function renderDirectorAssets() {
     <div class="asset-card" id="ac-${a.id}">
       <img src="${a.thumbnail || ''}" alt="${a.analysis?.name || a.name}">
       ${a.analysis?.marketingPotential ? `<div class="ac-rating">${'&#9733;'.repeat(a.analysis.marketingPotential)}</div>` : ''}
+      ${a.isComedyClip ? `<div style="position:absolute;top:6px;right:6px;background:var(--orange);color:#fff;padding:0.1rem 0.4rem;border-radius:6px;font-size:0.58rem;font-weight:700">COMEDY CLIP</div>` : ''}
       <div style="position:absolute;top:6px;left:6px;cursor:pointer;background:rgba(0,0,0,0.6);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700" onclick="event.stopPropagation();deleteDirectorAsset('${a.id}')" title="Remove">&#x2715;</div>
       <div class="ac-info">
         <div class="ac-name">${escHtml(a.analysis?.name || a.name)}</div>
         ${a.duration > 0 ? `<div style="font-size:0.62rem;color:var(--text-soft)">${formatTime(a.duration)} ${a.duration > 30 ? '(long clip)' : ''}</div>` : ''}
         ${a.analysis ? `
           <div class="ac-tags">
+            ${a.analysis.contentType ? `<span class="ac-tag" style="background:#E8F5E9;color:#2E7D32">${a.analysis.contentType}</span>` : ''}
             <span class="ac-tag ${a.analysis.contentTag}">${a.analysis.contentTag}</span>
             <span class="ac-tag" style="background:#F3E8FF;color:#7B1FA2">${a.analysis.mood}</span>
             <span class="ac-tag ${a.analysis.usability}">${a.analysis.usability}</span>
+            ${a.analysis.isChase ? `<span class="ac-tag" style="background:#FFF3E0;color:#E65100;font-weight:700">Chase (Homepage Hero)</span>` : ''}
+            ${a.analysis.durationCategory ? `<span class="ac-tag" style="background:#E3F2FD;color:#1565C0">${a.analysis.durationCategory}</span>` : ''}
           </div>
           <div style="font-size:0.68rem;color:var(--text-soft);margin-top:0.3rem">${escHtml(a.analysis.description || '')}</div>
-          ${a.analysis.suggestedHook ? `<div style="font-size:0.65rem;color:var(--orange);font-weight:600;font-style:italic;margin-top:0.2rem">"${escHtml(a.analysis.suggestedHook)}"</div>` : ''}
+          ${a.analysis.suggestedHook ? `<div style="font-size:0.65rem;color:var(--orange);font-weight:600;font-style:italic;margin-top:0.2rem">Hook: "${escHtml(a.analysis.suggestedHook)}"</div>` : ''}
           ${a.analysis.suggestedOverlay ? `<div style="font-size:0.6rem;color:var(--text-soft);margin-top:0.15rem">Overlay: "${escHtml(a.analysis.suggestedOverlay)}"</div>` : ''}
+          ${a.analysis.suggestedBridge ? `
+            <div style="margin-top:0.4rem;padding:0.4rem;background:linear-gradient(135deg,#FFF8E1,#FFF3E0);border-radius:8px;border-left:3px solid var(--orange)">
+              <div style="font-size:0.6rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">Bridge Text</div>
+              <div style="font-size:0.72rem;color:#333;font-weight:600">"${escHtml(a.analysis.suggestedBridge)}"</div>
+            </div>
+          ` : ''}
+          ${a.analysis.needsVoiceCta && a.analysis.voiceCtaLine ? `
+            <div style="margin-top:0.3rem;padding:0.4rem;background:linear-gradient(135deg,#E8F5E9,#E0F2F1);border-radius:8px;border-left:3px solid var(--green)">
+              <div style="font-size:0.6rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.15rem">Voice CTA (Narrator Speaks)</div>
+              <div style="font-size:0.72rem;color:#333;font-weight:600">"${escHtml(a.analysis.voiceCtaLine)}"</div>
+            </div>
+          ` : ''}
+          ${a.analysis.adStructure ? `
+            <div style="margin-top:0.3rem;padding:0.3rem 0.4rem;background:#F3E8FF;border-radius:6px">
+              <span style="font-size:0.6rem;font-weight:700;color:var(--purple)">Recommended: </span>
+              <span style="font-size:0.65rem;color:#333">${escHtml(a.analysis.adStructure)}</span>
+            </div>
+          ` : ''}
+          ${a.analysis.suggestedLayers && a.analysis.suggestedLayers.length ? `
+            <div style="margin-top:0.3rem">
+              <div style="font-size:0.6rem;font-weight:700;color:var(--purple);margin-bottom:0.15rem">Suggested Layers:</div>
+              <div style="display:flex;flex-wrap:wrap;gap:0.2rem">
+                ${a.analysis.suggestedLayers.map(l => `<span style="font-size:0.58rem;padding:0.1rem 0.35rem;background:#EDE7F6;color:#5E35B1;border-radius:4px">${escHtml(l)}</span>`).join('')}
+              </div>
+            </div>
+          ` : ''}
           ${a.moments && a.moments.length ? `
             <div style="margin-top:0.4rem;padding-top:0.3rem;border-top:1px solid var(--border)">
               <div style="font-size:0.65rem;font-weight:700;color:var(--purple);margin-bottom:0.2rem">Best Moments:</div>
@@ -5153,6 +5209,29 @@ function renderDirectorAssets() {
       </div>
     </div>
   `).join('');
+
+  // After analysis is done, show next step prompt
+  const analysedCount = directorAssets.filter(a => a.analysis).length;
+  if (analysedCount > 0) {
+    const existingPrompt = document.getElementById('directorNextStep');
+    if (!existingPrompt) {
+      const prompt = document.createElement('div');
+      prompt.id = 'directorNextStep';
+      prompt.style.cssText = 'margin-top:1rem;padding:0.75rem;background:linear-gradient(135deg,#F3E8FF,#EDE7F6);border-radius:12px;border:2px solid var(--purple);text-align:center;animation:fadeIn 0.3s ease';
+      prompt.innerHTML = `
+        <div style="font-size:0.75rem;font-weight:700;color:var(--purple);margin-bottom:0.3rem">Analysis Complete</div>
+        <div style="font-size:0.68rem;color:var(--text-soft);margin-bottom:0.5rem">${analysedCount} asset${analysedCount > 1 ? 's' : ''} analysed. Now generate ad concepts from ${analysedCount > 1 ? 'them' : 'it'}.</div>
+        <button class="btn btn-purple" style="padding:0.5rem 1.5rem;font-size:0.8rem;font-weight:700" onclick="generateConcepts();this.parentElement.remove()">Generate 3 Ad Concepts &rarr;</button>
+      `;
+      grid.parentElement.appendChild(prompt);
+    }
+    // Also highlight the concepts button in the sidebar
+    const conceptsBtn = document.getElementById('conceptsBtn');
+    if (conceptsBtn) {
+      conceptsBtn.style.animation = 'pulse 1.5s ease infinite';
+      conceptsBtn.style.boxShadow = '0 0 12px rgba(139,92,246,0.4)';
+    }
+  }
 }
 
 // ── Batch Analysis with Progress + Multi-frame for Long Clips ──
@@ -5368,7 +5447,7 @@ async function generateConcepts() {
           <div class="cc-timeline">${timelineHtml}</div>
           <div style="margin-top:0.75rem;display:flex;gap:0.4rem">
             <button class="btn btn-purple" onclick="buildThisAd(${idx})">Build This Ad</button>
-            <button class="btn btn-outline" onclick="navigator.clipboard.writeText(${JSON.stringify(JSON.stringify(c.raw || ''))}).then(()=>alert('Copied!'))">Copy Brief</button>
+            <button class="btn btn-outline" onclick="copyConceptBrief(${idx})">Copy Brief</button>
           </div>
         </div>`;
       }).join('');
@@ -5383,6 +5462,42 @@ async function generateConcepts() {
 
   btn.textContent = 'Generate 3 Ad Concepts';
   btn.disabled = false;
+}
+
+// ── Copy Concept Brief to Clipboard ──
+function copyConceptBrief(idx) {
+  const concepts = window._lastConcepts;
+  if (!concepts || !concepts[idx]) return;
+  const c = concepts[idx];
+  const lines = [];
+  lines.push(`Concept: ${c.name}`);
+  if (c.adType) lines.push(`Type: ${c.adType}`);
+  lines.push(`Platform: ${c.platform || ''} | Format: ${c.format || ''} | Duration: ${c.duration || ''}s`);
+  if (c.music) lines.push(`Music: ${c.music}`);
+  if (c.hookText) lines.push(`Hook: "${c.hookText}"`);
+  if (c.whyItWorks) lines.push(`Why: ${c.whyItWorks}`);
+  if (c.timeline && c.timeline.length) {
+    lines.push('');
+    lines.push('Timeline:');
+    let t = 0;
+    for (const b of c.timeline) {
+      const start = t;
+      t += b.duration || 3;
+      const label = { clip: 'CLIP', sequence: 'MOCKUP', text: 'TEXT', endcard: 'END CARD', voicecta: 'VOICE CTA' }[b.type] || b.type;
+      let detail = '';
+      if (b.type === 'clip') detail = b.config?.assetName || '';
+      else if (b.type === 'sequence') detail = (b.config?.screens || []).join(' > ');
+      else if (b.type === 'text') detail = `"${b.config?.text || ''}"`;
+      else if (b.type === 'endcard') detail = b.config?.cta || '';
+      else if (b.type === 'voicecta') detail = b.config?.text || '';
+      const overlay = b.config?.textOverlays?.length ? ` | Overlay: "${b.config.textOverlays[0].text}"` : '';
+      lines.push(`  ${start}s-${t}s | ${label} | ${detail}${overlay}`);
+    }
+  }
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const btns = document.querySelectorAll('.concept-card .btn-outline');
+    if (btns[idx]) { btns[idx].textContent = '✓ Copied!'; setTimeout(() => { btns[idx].textContent = 'Copy Brief'; }, 1500); }
+  });
 }
 
 // ── Build a Single Ad from Concept ──
