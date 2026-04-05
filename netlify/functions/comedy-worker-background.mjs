@@ -170,12 +170,81 @@ COMEDY RULES:
       return { statusCode: 200 };
     }
 
-    const audioBase64 = Buffer.from(await ttsRes.arrayBuffer()).toString('base64');
+    let audioBuffer = await ttsRes.arrayBuffer();
+    let finalNarrationText = narrationText;
+
+    // Check audio duration vs video duration — retry if narration is too long
+    // ElevenLabs returns MP3 at ~128kbps. Duration ≈ bytes / (128000/8) = bytes / 16000
+    if (duration) {
+      const estimatedAudioDuration = audioBuffer.byteLength / 16000;
+      const maxAllowed = duration + 3; // Allow up to 3 seconds over
+
+      if (estimatedAudioDuration > maxAllowed) {
+        console.log(`[COMEDY] Narration too long: ~${Math.round(estimatedAudioDuration)}s vs ${duration}s video. Trimming...`);
+
+        // Ask Claude to shorten the script
+        const trimRes = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 800,
+            messages: [{ role: 'user', content: `This narration script is too long. It runs approximately ${Math.round(estimatedAudioDuration)} seconds when spoken, but the video is only ${duration} seconds.
+
+SHORTEN this script to fit ${duration} seconds. Cut words, remove some pauses, tighten sentences. Keep the best jokes and the punchline. Keep the same style and character. Keep the child's name. Remove the weakest material.
+
+Original script:
+${narrationText}
+
+Return ONLY the shortened script, nothing else.` }]
+          })
+        });
+
+        if (trimRes.ok) {
+          const trimData = await trimRes.json();
+          let trimmedText = '';
+          for (const block of trimData.content) {
+            if (block.type === 'text') trimmedText += block.text;
+          }
+
+          if (trimmedText.length > 20) {
+            // Re-generate TTS with shorter script
+            await saveResult(supabaseUrl, supabaseKey, jobId, { status: 'narrating', sceneDescription, storyText: trimmedText });
+
+            const ttsRetry = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
+              method: 'POST',
+              headers: {
+                'xi-api-key': elevenLabsKey,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                text: trimmedText,
+                model_id: 'eleven_v3',
+                voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 }
+              })
+            });
+
+            if (ttsRetry.ok) {
+              audioBuffer = await ttsRetry.arrayBuffer();
+              finalNarrationText = trimmedText;
+              const newDuration = audioBuffer.byteLength / 16000;
+              console.log(`[COMEDY] Trimmed narration: ~${Math.round(newDuration)}s (target: ${duration}s)`);
+            }
+          }
+        }
+      }
+    }
+
+    const audioBase64 = Buffer.from(audioBuffer).toString('base64');
 
     // Save final result
     await saveResult(supabaseUrl, supabaseKey, jobId, {
       success: true,
-      storyText: narrationText,
+      storyText: finalNarrationText,
       sceneDescription,
       audio: audioBase64,
       childName: name,
