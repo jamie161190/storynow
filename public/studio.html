@@ -3902,9 +3902,8 @@ async function exportComedyVideo() {
       subtitleChunks = buildSubtitleChunks(lastComedyNarrationText, audioDuration);
     }
 
-    // Setup MediaRecorder — use manual captureStream(0) for frame-by-frame control
-    const canvasStream = canvas.captureStream(0);
-    const captureTrack = canvasStream.getVideoTracks()[0];
+    // Setup MediaRecorder — use real-time captureStream for smooth playback
+    const canvasStream = canvas.captureStream(fps);
 
     // Encode the mixed audio into a WAV blob, then use it as a MediaStream source
     const wavBlob = audioBufferToWav(mixedAudio);
@@ -3936,58 +3935,76 @@ async function exportComedyVideo() {
     const chunks = [];
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
-    // Calculate total frames
-    const videoDuration = Math.min(video.duration, audioDuration); // clip video to narration length
-    const startCardFrames = hasStartCard ? cardDuration * fps : 0;
-    const videoFrames = Math.ceil(videoDuration * fps);
-    const endCardFrames = hasEndCard ? cardDuration * fps : 0;
-    const totalFrames = startCardFrames + videoFrames + endCardFrames;
-    const frameDuration = 1000 / fps;
+    // Calculate durations
+    const videoDuration = Math.min(video.duration, audioDuration);
+    const startCardDur = hasStartCard ? cardDuration : 0;
+    const endCardDur = hasEndCard ? cardDuration : 0;
+    const totalDuration = startCardDur + videoDuration + endCardDur;
 
-    setProgress('Rendering frames...', 30);
+    setProgress('Rendering...', 30);
 
-    // Start recording and audio playback
-    recorder.start();
+    // Start recording
+    recorder.start(100); // collect data every 100ms for smoother output
+
+    // ── PHASE 1: Start card (static frames for cardDuration seconds) ──
+    if (hasStartCard) {
+      drawCard(ctx, W, H, startTitle, startSub, false);
+      await new Promise(r => setTimeout(r, cardDuration * 1000));
+    }
+
+    // ── PHASE 2: Video playback (real-time, smooth) ──
+    // Start audio playback at the right time
     audioEl.muted = false;
+    audioEl.currentTime = startCardDur;
     audioEl.play().catch(() => {});
 
-    // Render frame by frame sequentially
-    for (let f = 0; f < totalFrames; f++) {
-      const pct = 30 + Math.round((f / totalFrames) * 60);
-      if (f % (fps * 2) === 0) {
-        setProgress(`Rendering... ${Math.round(f / totalFrames * 100)}%`, pct);
-        // Yield to UI thread
-        await new Promise(r => setTimeout(r, 0));
-      }
+    // Play the source video in real-time
+    video.currentTime = 0;
+    video.muted = true;
+    await video.play();
 
-      if (f < startCardFrames) {
-        // Draw start card
-        drawCard(ctx, W, H, startTitle, startSub, false);
-      } else if (f < startCardFrames + videoFrames) {
-        // Draw video frame
-        const videoTime = (f - startCardFrames) / fps;
-        video.currentTime = videoTime;
-        await new Promise(r => { video.onseeked = r; });
+    const videoStartTime = performance.now();
+    let lastProgressUpdate = 0;
+
+    await new Promise((resolve) => {
+      function drawFrame() {
+        const elapsed = (performance.now() - videoStartTime) / 1000;
+
+        if (elapsed >= videoDuration || video.ended) {
+          video.pause();
+          resolve();
+          return;
+        }
+
+        // Update progress every second
+        if (elapsed - lastProgressUpdate > 1) {
+          const totalElapsed = startCardDur + elapsed;
+          const pct = 30 + Math.round((totalElapsed / totalDuration) * 60);
+          setProgress(`Rendering... ${Math.round(totalElapsed / totalDuration * 100)}%`, pct);
+          lastProgressUpdate = elapsed;
+        }
+
+        // Draw the current video frame (smooth, no seeking)
         drawVideoFrame(ctx, video, W, H);
 
         // Draw subtitle
         if (showSubs && subtitleChunks.length) {
-          const sub = subtitleChunks.find(s => videoTime >= s.start && videoTime < s.end);
+          const sub = subtitleChunks.find(s => elapsed >= s.start && elapsed < s.end);
           if (sub) drawSubtitle(ctx, W, H, sub.text);
         }
-      } else {
-        // Draw end card
-        drawCard(ctx, W, H, endTitle, endSub, true);
+
+        requestAnimationFrame(drawFrame);
       }
+      requestAnimationFrame(drawFrame);
+    });
 
-      // Request a frame capture from the canvas stream
-      if (captureTrack.requestFrame) captureTrack.requestFrame();
-
-      // Wait for the frame duration to keep recorder in sync
-      await new Promise(r => setTimeout(r, frameDuration));
+    // ── PHASE 3: End card (static frames for cardDuration seconds) ──
+    if (hasEndCard) {
+      drawCard(ctx, W, H, endTitle, endSub, true);
+      await new Promise(r => setTimeout(r, cardDuration * 1000));
     }
 
-    // Stop recording and wait for it to finish
+    // Stop audio and recording
     audioEl.pause();
     URL.revokeObjectURL(wavUrl);
     await new Promise((resolve) => {
