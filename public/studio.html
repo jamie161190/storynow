@@ -495,11 +495,14 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
       </div>
       <!-- Content area — this is what gets populated -->
       <div id="canvasContent" style="width:100%;height:calc(100% - 44px);overflow:hidden;position:relative;background:#000">
-        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.3);text-align:center;padding:2rem">
+        <div id="canvasEmpty" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.3);text-align:center;padding:2rem;cursor:pointer" onclick="document.getElementById('canvasFileInput').click()">
           <div style="font-size:48px;margin-bottom:1rem">&#127916;</div>
-          <div style="font-size:15px;font-weight:700;margin-bottom:0.5rem;color:rgba(255,255,255,0.5)">Your Canvas</div>
-          <div style="font-size:12px;line-height:1.6;max-width:260px">Tell Claude what to build here — ads, WhatsApp convos, mockups, overlays, cards, anything. Just describe it.</div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:0.5rem;color:rgba(255,255,255,0.5)">Upload Video</div>
+          <div style="font-size:12px;line-height:1.6;max-width:260px;margin-bottom:1rem">Drop a video or tap here, then tell Claude what to do with it</div>
+          <div style="background:var(--purple);color:#fff;padding:8px 24px;border-radius:50px;font-size:13px;font-weight:700">Choose File</div>
         </div>
+        <video id="canvasVideo" style="display:none;width:100%;height:100%;object-fit:cover" playsinline loop muted></video>
+        <input type="file" id="canvasFileInput" accept="video/*" style="display:none" onchange="handleCanvasUpload(this.files[0])">
       </div>
     </div>
     <!-- Aspect ratio pills -->
@@ -1278,6 +1281,30 @@ function setCanvasRatio(ratio, el) {
   el.style.color = '#fff';
   el.style.borderColor = 'rgba(255,255,255,0.2)';
 }
+
+function handleCanvasUpload(file) {
+  if (!file || !file.type.startsWith('video/')) return;
+  const video = document.getElementById('canvasVideo');
+  const empty = document.getElementById('canvasEmpty');
+  if (window._canvasVideoUrl) URL.revokeObjectURL(window._canvasVideoUrl);
+  window._canvasVideoUrl = URL.createObjectURL(file);
+  video.src = window._canvasVideoUrl;
+  video.style.display = 'block';
+  empty.style.display = 'none';
+  video.play().catch(() => {});
+}
+
+// Drag and drop on canvas
+document.addEventListener('DOMContentLoaded', () => {
+  const panel = document.getElementById('panel-canvas');
+  if (!panel) return;
+  panel.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+  panel.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) handleCanvasUpload(file);
+  });
+});
 
 // ═══════════════════ PILL HELPERS ═══════════════════
 
