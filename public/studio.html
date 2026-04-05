@@ -460,6 +460,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
     <div class="mode-tab" onclick="switchMode('storygen',this)">Story Generator</div>
     <div class="mode-tab" onclick="switchMode('compose',this)">Compose</div>
     <div class="mode-tab" onclick="switchMode('director',this)">AI Director</div>
+    <div class="mode-tab" onclick="switchMode('comedy',this)">Comedy Clips</div>
     <div class="mode-tab" onclick="switchMode('library',this)">Library</div>
   </div>
 
@@ -936,6 +937,91 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
         <div class="output-empty" id="directorEmpty">
           <h3>AI Creative Director</h3>
           <p>Upload your raw clips and photos. Claude will analyse them, name them, tag them, and propose complete ad concepts you can build with one click.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ COMEDY CLIPS MODE ═══════════════════ -->
+  <div class="mode-panel" id="panel-comedy">
+    <div class="controls" id="ctrl-comedy">
+      <h3>Comedy Clips</h3>
+      <div class="feature-tip" id="tipComedy">
+        <span class="tip-dismiss" onclick="this.parentElement.remove()">x</span>
+        <div class="tip-title">Turn Any Clip Into Comedy Gold</div>
+        <ol class="tip-steps">
+          <li>Upload a photo or video of a kid doing literally anything</li>
+          <li>Pick a comedy style (Epic, Documentary, Breaking News...)</li>
+          <li>Pick a narrator voice and hit Generate</li>
+          <li>Get a hilariously over-the-top narrated story of what is "really" happening</li>
+        </ol>
+      </div>
+
+      <div class="ctrl-section">
+        <h4>1. Upload a Clip or Photo</h4>
+        <div class="upload-zone" id="comedyUpload" onclick="document.getElementById('comedyFileInput').click()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault();this.classList.remove('dragover');handleComedyDrop(event)">
+          <input type="file" id="comedyFileInput" accept="video/*,image/*" onchange="handleComedyFile(this.files[0])">
+          <div style="font-size:2rem;margin-bottom:0.5rem">&#127909; &#129315;</div>
+          <div style="font-size:0.88rem;font-weight:700;color:var(--purple)">Drop a clip or photo here</div>
+          <div style="font-size:0.75rem;color:var(--text-soft);margin-top:0.25rem">The sillier the better</div>
+        </div>
+        <div id="comedyThumb" style="margin-top:0.5rem;display:none">
+          <img id="comedyThumbImg" style="width:100%;border-radius:12px;border:2px solid var(--purple)">
+          <button class="btn btn-outline btn-sm" style="margin-top:0.3rem;width:100%" onclick="clearComedyUpload()">Change clip</button>
+        </div>
+      </div>
+
+      <div class="ctrl-section">
+        <h4>2. Child's Name</h4>
+        <input type="text" id="comedyChildName" value="Chase" placeholder="e.g. Chase">
+        <label style="margin-top:0.4rem">Extra context (optional)</label>
+        <input type="text" id="comedyContext" placeholder="e.g. He had just stolen a biscuit">
+      </div>
+
+      <div class="ctrl-section">
+        <h4>3. Comedy Style</h4>
+        <div class="pill-group" id="comedyStylePills" style="flex-wrap:wrap">
+          <div class="pill active" data-val="epic" onclick="togglePill(this,'comedyStylePills')">Epic Movie</div>
+          <div class="pill" data-val="documentary" onclick="togglePill(this,'comedyStylePills')">Documentary</div>
+          <div class="pill" data-val="breaking" onclick="togglePill(this,'comedyStylePills')">Breaking News</div>
+          <div class="pill" data-val="fairytale" onclick="togglePill(this,'comedyStylePills')">Fairy Tale</div>
+          <div class="pill" data-val="sports" onclick="togglePill(this,'comedyStylePills')">Sports Commentary</div>
+          <div class="pill" data-val="horror" onclick="togglePill(this,'comedyStylePills')">Horror Trailer</div>
+          <div class="pill" data-val="heist" onclick="togglePill(this,'comedyStylePills')">Heist Movie</div>
+          <div class="pill" data-val="romance" onclick="togglePill(this,'comedyStylePills')">Romance</div>
+        </div>
+      </div>
+
+      <div class="ctrl-section">
+        <h4>4. Music</h4>
+        <div class="pill-group" id="comedyMusicPills">
+          <div class="pill active" data-val="none" onclick="togglePill(this,'comedyMusicPills')">None</div>
+          <div class="pill" data-val="adventure" onclick="togglePill(this,'comedyMusicPills')">Adventure</div>
+          <div class="pill" data-val="bedtime" onclick="togglePill(this,'comedyMusicPills')">Bedtime</div>
+        </div>
+      </div>
+
+      <div class="ctrl-section">
+        <h4>5. Narrator Voice</h4>
+        <div class="pill-group" style="margin-bottom:0.4rem">
+          <div class="pill active" onclick="filterComedyVoices('all',this)">All</div>
+          <div class="pill" onclick="filterComedyVoices('female',this)">Female</div>
+          <div class="pill" onclick="filterComedyVoices('male',this)">Male</div>
+        </div>
+        <div class="voice-grid-studio" id="voiceGridComedy"></div>
+      </div>
+
+      <button class="btn btn-orange btn-full" style="margin-top:0.75rem;font-size:1rem;padding:0.85rem" onclick="generateComedyClip()" id="comedyGenBtn">Generate Comedy Clip</button>
+    </div>
+
+    <div class="preview" id="preview-comedy">
+      <div class="output-area" id="comedyOutput">
+        <div class="output-empty">
+          <h3>Comedy Clips</h3>
+          <p>Upload any clip of a kid doing anything. We will narrate it like the most important event in human history.</p>
+          <div style="margin-top:1rem;font-size:0.85rem;color:var(--text-soft)">
+            <strong>Styles:</strong> Epic Movie, Nature Documentary, Breaking News, Fairy Tale, Sports Commentary, Horror Trailer, Heist Movie, Romance
+          </div>
         </div>
       </div>
     </div>
@@ -2222,6 +2308,7 @@ function setStoryMode(mode, el) {
 function buildVoiceGrids() {
   renderVoiceGrid('voiceGridSnippet');
   renderVoiceGrid('voiceGridFull');
+  renderComedyVoiceGrid();
 }
 
 function renderVoiceGrid(containerId) {
@@ -2699,6 +2786,297 @@ function audioBufferToWav(buffer) {
     }
   }
   return new Blob([ab], { type: 'audio/wav' });
+}
+
+// ═══════════════════ COMEDY CLIPS MODE ═══════════════════
+
+let comedyFrame = null; // base64 JPEG of the uploaded frame
+let comedyVoiceFilter = 'all';
+let comedySelectedVoiceId = 'VR6AewLTigWG4xSOukaG'; // Arnold — strong and commanding, perfect for comedy
+
+function handleComedyDrop(e) {
+  const file = e.dataTransfer.files[0];
+  if (file) handleComedyFile(file);
+}
+
+async function handleComedyFile(file) {
+  if (!file) return;
+  const thumbEl = document.getElementById('comedyThumb');
+  const thumbImg = document.getElementById('comedyThumbImg');
+  const uploadZone = document.getElementById('comedyUpload');
+
+  if (file.type.startsWith('video/')) {
+    // Extract frame from video at 1 second
+    const video = document.createElement('video');
+    video.src = URL.createObjectURL(file);
+    video.muted = true;
+    video.currentTime = 1;
+    await new Promise(r => { video.onseeked = r; video.load(); });
+    await new Promise(r => setTimeout(r, 300));
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    comedyFrame = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+    thumbImg.src = canvas.toDataURL('image/jpeg', 0.85);
+    URL.revokeObjectURL(video.src);
+  } else {
+    // Image file
+    const reader = new FileReader();
+    await new Promise(resolve => {
+      reader.onload = (e) => {
+        thumbImg.src = e.target.result;
+        // Resize to reasonable dimensions
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1024;
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          comedyFrame = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+          resolve();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  uploadZone.style.display = 'none';
+  thumbEl.style.display = 'block';
+}
+
+function clearComedyUpload() {
+  comedyFrame = null;
+  document.getElementById('comedyThumb').style.display = 'none';
+  document.getElementById('comedyUpload').style.display = '';
+  document.getElementById('comedyFileInput').value = '';
+}
+
+function filterComedyVoices(filter, el) {
+  comedyVoiceFilter = filter;
+  el.parentElement.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderComedyVoiceGrid();
+}
+
+function selectComedyVoice(id) {
+  comedySelectedVoiceId = id;
+  renderComedyVoiceGrid();
+}
+
+function renderComedyVoiceGrid() {
+  const container = document.getElementById('voiceGridComedy');
+  if (!container) return;
+  const filtered = comedyVoiceFilter === 'all' ? ALL_VOICES : ALL_VOICES.filter(v => v.gender === comedyVoiceFilter);
+  container.innerHTML = filtered.map(v => `
+    <div class="voice-card-studio${v.id === comedySelectedVoiceId ? ' selected' : ''}" onclick="selectComedyVoice('${v.id}')">
+      <span class="vc-emoji">${v.emoji}</span>
+      <div style="flex:1;min-width:0">
+        <div class="vc-name">${v.name}</div>
+        <div class="vc-desc">${v.desc}</div>
+      </div>
+      <div class="vc-play" onclick="event.stopPropagation();previewVoice('${v.id}')"></div>
+    </div>
+  `).join('');
+}
+
+// Get comedy music selection
+function getComedyMusicSelection() {
+  const pill = document.querySelector('#comedyMusicPills .pill.active');
+  return pill ? pill.dataset.val : 'none';
+}
+
+async function generateComedyClip() {
+  if (!comedyFrame) {
+    alert('Upload a photo or video clip first!');
+    return;
+  }
+
+  const btn = document.getElementById('comedyGenBtn');
+  const output = document.getElementById('comedyOutput');
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
+
+  const style = getPillValue('comedyStylePills') || 'epic';
+
+  const styleLabels = {
+    epic: 'Epic Movie', documentary: 'Nature Documentary', breaking: 'Breaking News',
+    fairytale: 'Fairy Tale', sports: 'Sports Commentary', horror: 'Horror Trailer',
+    heist: 'Heist Movie', romance: 'Romance'
+  };
+
+  output.innerHTML = `<div class="output-loading">
+    <div class="spinner"></div>
+    <p style="font-size:1rem;font-weight:700">Analysing the clip...</p>
+    <p style="font-size:0.85rem;color:var(--text-soft)">Writing a ${styleLabels[style] || style} narration</p>
+  </div>`;
+
+  const payload = {
+    action: 'comedy-clip',
+    frame: comedyFrame,
+    childName: document.getElementById('comedyChildName').value || 'Chase',
+    style,
+    voiceId: comedySelectedVoiceId,
+    extraContext: document.getElementById('comedyContext').value
+  };
+
+  try {
+    const res = await fetch('/api/studio-generate', {
+      method: 'POST',
+      headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+
+    if (data.error && !data.storyText) {
+      output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">${escHtml(data.error)}</pre></div>`;
+    } else {
+      renderComedyOutput(data);
+    }
+  } catch (e) {
+    output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Error: ${escHtml(e.message)}</pre></div>`;
+  }
+
+  btn.textContent = 'Generate Comedy Clip';
+  btn.disabled = false;
+}
+
+function renderComedyOutput(data) {
+  const output = document.getElementById('comedyOutput');
+  const thumbSrc = document.getElementById('comedyThumbImg')?.src || '';
+  const styleLabels = {
+    epic: 'Epic Movie', documentary: 'Nature Documentary', breaking: 'Breaking News',
+    fairytale: 'Fairy Tale', sports: 'Sports Commentary', horror: 'Horror Trailer',
+    heist: 'Heist Movie', romance: 'Romance'
+  };
+
+  let html = '';
+
+  // Style badge + scene description
+  html += `<div class="output-card" style="border-left:4px solid var(--orange)">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem">
+      <span style="background:var(--orange);color:white;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:700">${styleLabels[data.style] || data.style}</span>
+    </div>
+    ${thumbSrc ? `<img src="${thumbSrc}" style="width:100%;max-width:300px;border-radius:10px;margin-bottom:0.75rem">` : ''}
+    <h4 style="margin-bottom:0.3rem">What Claude Saw</h4>
+    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.5">${escHtml(data.sceneDescription || '')}</p>
+  </div>`;
+
+  // Narration script
+  if (data.storyText) {
+    html += `<div class="output-card">
+      <h4>The Narration</h4>
+      <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('pre').textContent).then(()=>{this.textContent='Copied!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copy';this.classList.remove('copied')},1500)})">Copy</button>
+      <pre>${escHtml(data.storyText)}</pre>
+    </div>`;
+  }
+
+  // Audio player (reuses the studio audio player pattern)
+  if (data.audio) {
+    const audioSrc = 'data:audio/mpeg;base64,' + data.audio;
+    lastGeneratedAudioUrl = audioSrc;
+
+    html += `<div class="audio-player-studio" id="studioAudioPlayer">
+      <div class="ap-title">${escHtml(data.childName || 'Comedy')} — ${styleLabels[data.style] || 'Comedy'} Narration</div>
+      <canvas id="studioWaveformCanvas" width="560" height="60"></canvas>
+      <div class="ap-bar" onclick="seekAudio(event)">
+        <div class="ap-bar-fill" id="apBarFill" style="width:0%"></div>
+        <div class="ap-bar-dot" id="apBarDot" style="left:0%"></div>
+      </div>
+      <div class="ap-time"><span id="apTimeCurrent">0:00</span><span id="apTimeDuration">0:00</span></div>
+      <div class="ap-controls">
+        <div class="ap-skip-btn" onclick="skipAudio(-15)">-15</div>
+        <button class="ap-play-btn" id="apPlayBtn" onclick="toggleComedyPlay()">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="white"><polygon points="5,2 18,10 5,18"/></svg>
+        </button>
+        <div class="ap-skip-btn" onclick="skipAudio(15)">+15</div>
+      </div>
+    </div>`;
+
+    html += `<div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap">
+      <button class="btn btn-purple btn-sm" onclick="downloadComedyAudio()">Download Audio</button>
+      <button class="btn btn-outline btn-sm" onclick="generateComedyClip()">Try Another Style</button>
+    </div>`;
+
+    setTimeout(() => initStudioAudio(audioSrc), 100);
+  } else if (data.error) {
+    html += `<div class="output-card"><p style="color:var(--pink);font-size:0.85rem">${escHtml(data.error)}</p></div>`;
+  }
+
+  output.innerHTML = html;
+
+  // Auto-save to library
+  if (data.audio) {
+    const voiceName = ALL_VOICES.find(v => v.id === comedySelectedVoiceId)?.name || 'Voice';
+    saveToLibrary(
+      `comedy-${data.childName || 'clip'}-${data.style}-${Date.now()}`,
+      'snippet',
+      'audio/mpeg',
+      data.audio,
+      'base64',
+      ['comedy', data.style, voiceName, data.childName || ''].filter(Boolean),
+      { storyText: data.storyText, childName: data.childName, style: data.style, sceneDescription: data.sceneDescription }
+    );
+  }
+}
+
+function toggleComedyPlay() {
+  if (!studioAudio) return;
+  if (studioAudio.paused) {
+    studioAudio.play();
+    document.getElementById('apPlayBtn').innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="white"><rect x="4" y="3" width="4" height="14"/><rect x="12" y="3" width="4" height="14"/></svg>';
+    startComedyBgMusic();
+    // Waveform
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(studioAudio);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 128;
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    }
+    drawWaveform();
+  } else {
+    studioAudio.pause();
+    if (_storyBgMusic) _storyBgMusic.pause();
+    document.getElementById('apPlayBtn').innerHTML = '<svg width="20" height="20" viewBox="0 0 20 20" fill="white"><polygon points="5,2 18,10 5,18"/></svg>';
+  }
+}
+
+async function startComedyBgMusic() {
+  const sel = getComedyMusicSelection();
+  if (sel === 'none') return;
+  if (_storyBgMusic && !_storyBgMusic.paused) return; // already playing
+
+  const trackUrl = sel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
+  _storyBgMusic = new Audio(trackUrl);
+  _storyBgMusic.volume = 0;
+  _storyBgMusic.loop = true;
+  _storyBgMusic.play().then(() => {
+    let vol = 0;
+    const fadeIn = setInterval(() => {
+      vol = Math.min(0.15, vol + 0.01);
+      _storyBgMusic.volume = vol;
+      if (vol >= 0.15) clearInterval(fadeIn);
+    }, 50);
+  }).catch(() => {});
+}
+
+function downloadComedyAudio() {
+  if (!lastGeneratedAudioUrl) return;
+  const a = document.createElement('a');
+  a.href = lastGeneratedAudioUrl;
+  const name = document.getElementById('comedyChildName')?.value || 'comedy';
+  const style = getPillValue('comedyStylePills') || 'epic';
+  a.download = `storytold-comedy-${name}-${style}.mp3`;
+  a.click();
 }
 
 // ═══════════════════ COMPOSE MODE (TIMELINE BUILDER) ═══════════════════
