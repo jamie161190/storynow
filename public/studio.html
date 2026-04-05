@@ -5689,10 +5689,12 @@ async function generateConcepts() {
           ${c.whyItWorks ? `<div class="cc-why">${escHtml(c.whyItWorks)}</div>` : ''}
           ${c.hookText ? `<div style="font-size:0.82rem;font-weight:700;color:var(--orange);margin-bottom:0.5rem">Hook: "${escHtml(c.hookText)}"</div>` : ''}
           <div class="cc-timeline">${timelineHtml}</div>
-          <div style="margin-top:0.75rem;display:flex;gap:0.4rem">
+          <div style="margin-top:0.75rem;display:flex;gap:0.4rem;flex-wrap:wrap">
             <button class="btn btn-purple" onclick="buildThisAd(${idx})">Build This Ad</button>
+            <button class="btn btn-outline" style="border-color:var(--purple);color:var(--purple)" onclick="editConceptTimeline(${idx})">Edit Timeline</button>
             <button class="btn btn-outline" onclick="copyConceptBrief(${idx})">Copy Brief</button>
           </div>
+          <div id="conceptEditor-${idx}" style="display:none"></div>
         </div>`;
       }).join('');
       // Store concepts for auto-build
@@ -5742,6 +5744,157 @@ function copyConceptBrief(idx) {
     const btns = document.querySelectorAll('.concept-card .btn-outline');
     if (btns[idx]) { btns[idx].textContent = '✓ Copied!'; setTimeout(() => { btns[idx].textContent = 'Copy Brief'; }, 1500); }
   });
+}
+
+// ── Edit Concept Timeline ──
+function editConceptTimeline(idx) {
+  const concepts = window._lastConcepts;
+  if (!concepts || !concepts[idx]) return;
+  const c = concepts[idx];
+  const editorEl = document.getElementById('conceptEditor-' + idx);
+  if (!editorEl) return;
+
+  // Toggle off if already open
+  if (editorEl.style.display !== 'none') { editorEl.style.display = 'none'; return; }
+
+  // Ensure timeline exists
+  if (!c.timeline || !c.timeline.length) {
+    c.timeline = [];
+    if (c.hookText) c.timeline.push({ type: 'text', duration: 3, config: { text: c.hookText, style: 'hook' } });
+    c.timeline.push({ type: 'clip', duration: 0, config: { assetName: 'clip' } });
+    c.timeline.push({ type: 'endcard', duration: 3, config: { cta: 'Create their story at storytold.ai', subtitle: 'storytold.ai' } });
+  }
+
+  renderConceptEditor(idx);
+  editorEl.style.display = 'block';
+}
+
+function renderConceptEditor(idx) {
+  const c = window._lastConcepts[idx];
+  const editorEl = document.getElementById('conceptEditor-' + idx);
+  const typeLabels = { clip: 'Video Clip', text: 'Text Card', endcard: 'End Card', voicecta: 'Voice CTA', sequence: 'Mockup' };
+  const typeColors = { clip: 'var(--green)', text: 'var(--purple)', endcard: 'var(--orange)', voicecta: 'var(--pink)', sequence: 'var(--blue)' };
+
+  let html = '<div style="margin-top:0.75rem;border:1px solid var(--border);border-radius:10px;padding:0.75rem;background:#FAFAFE">';
+  html += '<div style="font-size:0.72rem;font-weight:700;color:var(--purple);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em">Edit Timeline</div>';
+
+  c.timeline.forEach((block, bi) => {
+    const label = typeLabels[block.type] || block.type;
+    const color = typeColors[block.type] || 'var(--text)';
+    html += `<div style="padding:0.5rem;margin-bottom:0.4rem;background:white;border-radius:8px;border:1px solid #eee">`;
+    html += `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem">`;
+    html += `<span style="font-size:0.68rem;font-weight:700;color:white;background:${color};padding:0.1rem 0.5rem;border-radius:50px">${label}</span>`;
+
+    if (block.type !== 'clip') {
+      html += `<input type="number" value="${block.duration || 3}" min="1" max="15" step="0.5" style="width:50px;font-size:0.72rem;padding:0.15rem 0.3rem;border:1px solid #ddd;border-radius:4px" onchange="updateConceptBlock(${idx},${bi},'duration',parseFloat(this.value))">`;
+      html += `<span style="font-size:0.65rem;color:var(--text-soft)">sec</span>`;
+    } else {
+      html += `<span style="font-size:0.68rem;color:var(--text-soft);font-style:italic">Full clip (auto)</span>`;
+    }
+
+    // Move/delete buttons (don't delete clip)
+    html += `<div style="margin-left:auto;display:flex;gap:0.2rem">`;
+    if (bi > 0) html += `<button onclick="moveConceptBlock(${idx},${bi},-1)" style="font-size:0.65rem;padding:0.1rem 0.3rem;border:1px solid #ddd;border-radius:4px;background:white;cursor:pointer">&#9650;</button>`;
+    if (bi < c.timeline.length - 1) html += `<button onclick="moveConceptBlock(${idx},${bi},1)" style="font-size:0.65rem;padding:0.1rem 0.3rem;border:1px solid #ddd;border-radius:4px;background:white;cursor:pointer">&#9660;</button>`;
+    if (block.type !== 'clip') html += `<button onclick="removeConceptBlock(${idx},${bi})" style="font-size:0.65rem;padding:0.1rem 0.3rem;border:1px solid #ddd;border-radius:4px;background:white;color:var(--pink);cursor:pointer">&#10005;</button>`;
+    html += `</div></div>`;
+
+    // Editable fields per type
+    if (block.type === 'text') {
+      html += `<textarea style="width:100%;font-size:0.78rem;padding:0.3rem;border:1px solid #ddd;border-radius:4px;resize:vertical;height:45px;font-family:inherit" onchange="updateConceptBlock(${idx},${bi},'config.text',this.value)">${escHtml(block.config?.text || '')}</textarea>`;
+      if (block.config?.subtitle !== undefined) {
+        html += `<input type="text" placeholder="Subtitle (optional)" value="${escHtml(block.config?.subtitle || '')}" style="width:100%;font-size:0.72rem;padding:0.2rem 0.3rem;border:1px solid #ddd;border-radius:4px;margin-top:0.25rem" onchange="updateConceptBlock(${idx},${bi},'config.subtitle',this.value)">`;
+      }
+    } else if (block.type === 'endcard' || block.type === 'voicecta') {
+      html += `<input type="text" value="${escHtml(block.config?.cta || block.config?.text || '')}" style="width:100%;font-size:0.78rem;padding:0.3rem;border:1px solid #ddd;border-radius:4px;font-family:inherit" onchange="updateConceptBlock(${idx},${bi},'${block.type === 'endcard' ? 'config.cta' : 'config.text'}',this.value)">`;
+      html += `<input type="text" placeholder="Subtitle" value="${escHtml(block.config?.subtitle || '')}" style="width:100%;font-size:0.72rem;padding:0.2rem 0.3rem;border:1px solid #ddd;border-radius:4px;margin-top:0.25rem" onchange="updateConceptBlock(${idx},${bi},'config.subtitle',this.value)">`;
+    }
+    // Clip doesn't need text editing
+
+    html += `</div>`;
+  });
+
+  // Add block buttons
+  html += `<div style="display:flex;gap:0.3rem;margin-top:0.4rem">`;
+  html += `<button class="btn btn-outline" style="font-size:0.68rem;padding:0.25rem 0.6rem;border-color:var(--purple);color:var(--purple)" onclick="addConceptBlock(${idx},'text')">+ Text Card</button>`;
+  html += `<button class="btn btn-outline" style="font-size:0.68rem;padding:0.25rem 0.6rem;border-color:var(--orange);color:var(--orange)" onclick="addConceptBlock(${idx},'endcard')">+ End Card</button>`;
+  html += `</div>`;
+
+  html += `<div style="margin-top:0.5rem;display:flex;gap:0.4rem">`;
+  html += `<button class="btn btn-purple" style="font-size:0.75rem" onclick="buildThisAd(${idx})">Re-render Ad</button>`;
+  html += `<button class="btn btn-outline" style="font-size:0.75rem" onclick="document.getElementById('conceptEditor-${idx}').style.display='none'">Close</button>`;
+  html += `</div></div>`;
+
+  editorEl.innerHTML = html;
+}
+
+function updateConceptBlock(idx, blockIdx, path, value) {
+  const c = window._lastConcepts[idx];
+  if (!c || !c.timeline[blockIdx]) return;
+  const parts = path.split('.');
+  let target = c.timeline[blockIdx];
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (!target[parts[i]]) target[parts[i]] = {};
+    target = target[parts[i]];
+  }
+  target[parts[parts.length - 1]] = value;
+  // Update the concept card's timeline display too
+  refreshConceptTimelineDisplay(idx);
+}
+
+function moveConceptBlock(idx, blockIdx, dir) {
+  const tl = window._lastConcepts[idx]?.timeline;
+  if (!tl) return;
+  const newIdx = blockIdx + dir;
+  if (newIdx < 0 || newIdx >= tl.length) return;
+  [tl[blockIdx], tl[newIdx]] = [tl[newIdx], tl[blockIdx]];
+  renderConceptEditor(idx);
+  refreshConceptTimelineDisplay(idx);
+}
+
+function removeConceptBlock(idx, blockIdx) {
+  const tl = window._lastConcepts[idx]?.timeline;
+  if (!tl || tl[blockIdx]?.type === 'clip') return;
+  tl.splice(blockIdx, 1);
+  renderConceptEditor(idx);
+  refreshConceptTimelineDisplay(idx);
+}
+
+function addConceptBlock(idx, type) {
+  const tl = window._lastConcepts[idx]?.timeline;
+  if (!tl) return;
+  if (type === 'text') {
+    // Insert before the clip
+    const clipIdx = tl.findIndex(b => b.type === 'clip');
+    const insertAt = clipIdx >= 0 ? clipIdx : tl.length;
+    tl.splice(insertAt, 0, { type: 'text', duration: 3, config: { text: 'Your text here', subtitle: '', style: 'hook' } });
+  } else if (type === 'endcard') {
+    tl.push({ type: 'endcard', duration: 3, config: { cta: 'Your CTA here', subtitle: 'storytold.ai' } });
+  }
+  renderConceptEditor(idx);
+  refreshConceptTimelineDisplay(idx);
+}
+
+function refreshConceptTimelineDisplay(idx) {
+  const c = window._lastConcepts[idx];
+  if (!c || !c.timeline) return;
+  const card = document.querySelectorAll('.concept-card')[idx];
+  if (!card) return;
+  const tlEl = card.querySelector('.cc-timeline');
+  if (!tlEl) return;
+  let t = 0;
+  tlEl.innerHTML = c.timeline.map(block => {
+    const start = t;
+    t += block.duration || 3;
+    const typeIcon = { clip: '&#127916;', sequence: '&#128241;', text: '&#128172;', endcard: '&#127937;', voicecta: '&#128172;' }[block.type] || '';
+    const typeLabel = { clip: 'CLIP', sequence: 'MOCKUP', text: 'TEXT', endcard: 'END CARD', voicecta: 'VOICE CTA' }[block.type] || block.type;
+    let detail = '';
+    if (block.type === 'clip') detail = block.config?.assetName || 'clip';
+    else if (block.type === 'text') detail = '"' + (block.config?.text || '') + '"';
+    else if (block.type === 'endcard') detail = block.config?.cta || 'CTA';
+    else if (block.type === 'voicecta') detail = block.config?.text || '';
+    return `<div class="tl-entry">${typeIcon} ${start}s-${t}s | ${typeLabel} | ${escHtml(detail)}</div>`;
+  }).join('');
 }
 
 // ── Build a Single Ad from Concept ──
