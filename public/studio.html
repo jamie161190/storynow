@@ -2935,46 +2935,114 @@ async function generateComedyClip() {
     extraContext: document.getElementById('comedyContext').value
   };
 
-  try {
-    const bodyStr = JSON.stringify(payload);
-    console.log('[Comedy] Payload size:', Math.round(bodyStr.length / 1024) + 'KB');
+  // Generate a unique job ID
+  const jobId = 'comedy-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+  payload.jobId = jobId;
 
-    const res = await fetch('/api/studio-generate', {
+  try {
+    // Trigger background worker (returns immediately)
+    const res = await fetch('/.netlify/functions/comedy-worker-background', {
       method: 'POST',
-      headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
-      body: bodyStr
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      const text = await res.text();
-      console.error('[Comedy] Non-JSON response:', res.status, text.slice(0, 200));
-      if (res.status === 413) {
-        output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Image is too large. Try a smaller photo or a shorter video clip.</pre></div>`;
-      } else if (res.status === 504 || res.status === 502) {
-        output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Function timed out. The API calls took too long. Try again.</pre></div>`;
-      } else {
-        output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Server error (${res.status}). Try again in a moment.</pre></div>`;
-      }
+    if (!res.ok && res.status !== 202) {
+      output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Failed to start generation (${res.status}). Try again.</pre></div>`;
       btn.textContent = 'Generate Comedy Clip';
       btn.disabled = false;
       return;
     }
 
-    const data = await res.json();
-
-    if (data.error && !data.storyText) {
-      output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">${escHtml(data.error)}</pre></div>`;
-    } else {
-      renderComedyOutput(data);
-    }
+    // Poll for result
+    pollComedyStatus(jobId, style, btn);
   } catch (e) {
-    console.error('[Comedy] Fetch error:', e);
+    console.error('[Comedy] Trigger error:', e);
     output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Error: ${escHtml(e.message)}</pre></div>`;
+    btn.textContent = 'Generate Comedy Clip';
+    btn.disabled = false;
   }
 
   btn.textContent = 'Generate Comedy Clip';
   btn.disabled = false;
+}
+
+async function pollComedyStatus(jobId, style, btn) {
+  const output = document.getElementById('comedyOutput');
+  const styleLabels = {
+    epic: 'Epic Movie', documentary: 'Nature Documentary', breaking: 'Breaking News',
+    fairytale: 'Fairy Tale', sports: 'Sports Commentary', horror: 'Horror Trailer',
+    heist: 'Heist Movie', romance: 'Romance'
+  };
+  let attempts = 0;
+  const maxAttempts = 60; // ~2 minutes
+
+  const poll = async () => {
+    attempts++;
+    try {
+      const res = await fetch(`/api/comedy-status?jobId=${jobId}`, {
+        headers: { 'x-admin-secret': studioSecret }
+      });
+      const data = await res.json();
+
+      if (data.ready) {
+        if (data.error && !data.storyText) {
+          output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">${escHtml(data.error)}</pre></div>`;
+        } else {
+          renderComedyOutput(data);
+        }
+        btn.textContent = 'Generate Comedy Clip';
+        btn.disabled = false;
+        return;
+      }
+
+      // Still processing - show progress
+      const status = data.status || 'starting';
+      const statusMessages = {
+        starting: 'Starting up...',
+        analysing: 'Looking at the clip...',
+        writing: 'Writing the narration...',
+        narrating: 'Recording the voiceover...'
+      };
+      let progressHtml = `<div class="output-loading">
+        <div class="spinner"></div>
+        <p style="font-size:1rem;font-weight:700">${statusMessages[status] || 'Working on it...'}</p>
+        <p style="font-size:0.85rem;color:var(--text-soft)">${styleLabels[style] || style} style</p>`;
+
+      if (data.sceneDescription && status !== 'analysing') {
+        progressHtml += `<div style="margin-top:1rem;padding:0.75rem;background:rgba(107,47,147,0.08);border-radius:10px;text-align:left;max-width:400px">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--purple);margin-bottom:0.3rem">What Claude sees:</div>
+          <div style="font-size:0.8rem;color:var(--text-soft);line-height:1.4">${escHtml(data.sceneDescription)}</div>
+        </div>`;
+      }
+      if (data.storyText && status === 'narrating') {
+        progressHtml += `<div style="margin-top:0.75rem;padding:0.75rem;background:rgba(241,117,59,0.08);border-radius:10px;text-align:left;max-width:400px">
+          <div style="font-size:0.72rem;font-weight:700;color:var(--orange);margin-bottom:0.3rem">The script:</div>
+          <div style="font-size:0.8rem;color:var(--text-soft);line-height:1.4;white-space:pre-wrap">${escHtml(data.storyText.slice(0, 300))}${data.storyText.length > 300 ? '...' : ''}</div>
+        </div>`;
+      }
+      progressHtml += `<p style="font-size:0.72rem;color:var(--text-soft);margin-top:0.75rem">${attempts * 2}s elapsed</p></div>`;
+      output.innerHTML = progressHtml;
+
+      if (attempts < maxAttempts) {
+        setTimeout(poll, 2000);
+      } else {
+        output.innerHTML = '<div class="output-card"><pre style="color:var(--pink)">Generation timed out. Please try again.</pre></div>';
+        btn.textContent = 'Generate Comedy Clip';
+        btn.disabled = false;
+      }
+    } catch (e) {
+      if (attempts < maxAttempts) {
+        setTimeout(poll, 2000);
+      } else {
+        output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Error: ${escHtml(e.message)}</pre></div>`;
+        btn.textContent = 'Generate Comedy Clip';
+        btn.disabled = false;
+      }
+    }
+  };
+
+  setTimeout(poll, 2000);
 }
 
 function renderComedyOutput(data) {
