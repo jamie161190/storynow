@@ -3101,37 +3101,46 @@ function renderComedyOutput(data) {
     fairytale: 'Fairy Tale', sports: 'Sports Commentary', horror: 'Horror Trailer',
     heist: 'Heist Movie', romance: 'Romance'
   };
-
-  let html = '';
-
-  // Style badge + scene description
-  html += `<div class="output-card" style="border-left:4px solid var(--orange)">
-    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem">
-      <span style="background:var(--orange);color:white;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:700">${styleLabels[data.style] || data.style}</span>
-    </div>
-    ${thumbSrc ? `<img src="${thumbSrc}" style="width:100%;max-width:300px;border-radius:10px;margin-bottom:0.75rem">` : ''}
-    <h4 style="margin-bottom:0.3rem">What Claude Saw</h4>
-    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.5">${escHtml(data.sceneDescription || '')}</p>
-  </div>`;
-
-  // Narration script
-  if (data.storyText) {
-    html += `<div class="output-card">
-      <h4>The Narration</h4>
-      <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('pre').textContent).then(()=>{this.textContent='Copied!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copy';this.classList.remove('copied')},1500)})">Copy</button>
-      <pre>${escHtml(data.storyText)}</pre>
-    </div>`;
-  }
+  const styleEmojis = {
+    epic: '🎬', documentary: '🎙️', breaking: '📡', fairytale: '✨',
+    sports: '🏟️', horror: '👻', heist: '🕵️', romance: '💕'
+  };
 
   // Store narration text for subtitle export
   if (data.storyText) lastComedyNarrationText = data.storyText;
 
-  // Audio player (reuses the studio audio player pattern)
+  // Store last comedy data for Send to Director
+  window._lastComedyData = data;
+
+  let html = '';
+
+  // ── Header card: thumbnail + style + scene ──
+  html += `<div class="output-card" style="padding:0;overflow:hidden">`;
+  if (thumbSrc) {
+    html += `<div style="position:relative">
+      <img src="${thumbSrc}" style="width:100%;max-height:280px;object-fit:cover;display:block">
+      <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:1rem 1.25rem 0.75rem">
+        <span style="background:var(--orange);color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.78rem;font-weight:700">${styleEmojis[data.style] || '🎬'} ${styleLabels[data.style] || data.style}</span>
+        ${data.childName ? `<span style="background:var(--purple);color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.78rem;font-weight:700;margin-left:0.4rem">${escHtml(data.childName)}</span>` : ''}
+      </div>
+    </div>`;
+  } else {
+    html += `<div style="padding:1.25rem 1.25rem 0.5rem;display:flex;gap:0.5rem">
+      <span style="background:var(--orange);color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.78rem;font-weight:700">${styleEmojis[data.style] || '🎬'} ${styleLabels[data.style] || data.style}</span>
+      ${data.childName ? `<span style="background:var(--purple);color:white;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.78rem;font-weight:700">${escHtml(data.childName)}</span>` : ''}
+    </div>`;
+  }
+  html += `<div style="padding:1rem 1.25rem">
+    <p style="font-size:0.78rem;font-weight:600;color:var(--purple);margin-bottom:0.2rem">What Claude saw</p>
+    <p style="font-size:0.85rem;color:var(--text);line-height:1.6;margin:0">${escHtml(data.sceneDescription || '')}</p>
+  </div></div>`;
+
+  // ── Audio player ──
   if (data.audio) {
     const audioSrc = 'data:audio/mpeg;base64,' + data.audio;
     lastGeneratedAudioUrl = audioSrc;
 
-    html += `<div class="audio-player-studio" id="studioAudioPlayer">
+    html += `<div class="audio-player-studio" id="studioAudioPlayer" style="margin-top:0.75rem">
       <div class="ap-title">${escHtml(data.childName || 'Comedy')} — ${styleLabels[data.style] || 'Comedy'} Narration</div>
       <canvas id="studioWaveformCanvas" width="560" height="60"></canvas>
       <div class="ap-bar" onclick="seekAudio(event)">
@@ -3148,14 +3157,29 @@ function renderComedyOutput(data) {
       </div>
     </div>`;
 
-    html += `<div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap">
-      <button class="btn btn-purple btn-sm" onclick="downloadComedyAudio()">Download Narration Only</button>
-      <button class="btn btn-orange btn-sm" id="mixMusicBtn" onclick="mixComedyWithMusic()">Mix with Music & Download</button>
-      <button class="btn btn-outline btn-sm" onclick="generateComedyClip()">Try Another Style</button>
+    // ── Narration script (collapsible) ──
+    if (data.storyText) {
+      html += `<div class="output-card" style="margin-top:0.75rem">
+        <h4 style="cursor:pointer;display:flex;align-items:center;justify-content:space-between" onclick="const b=this.nextElementSibling;b.style.display=b.style.display==='none'?'block':'none';this.querySelector('.chevron').textContent=b.style.display==='none'?'▸':'▾'">
+          The Narration <span class="chevron" style="font-size:0.7rem">▾</span>
+        </h4>
+        <div>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('pre').textContent).then(()=>{this.textContent='Copied!';this.classList.add('copied');setTimeout(()=>{this.textContent='Copy';this.classList.remove('copied')},1500)})">Copy</button>
+          <pre style="max-height:200px;overflow-y:auto;margin-top:0.3rem">${escHtml(data.storyText)}</pre>
+        </div>
+      </div>`;
+    }
+
+    // ── Action buttons ──
+    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.75rem">
+      <button class="btn btn-purple btn-sm" style="text-align:center" onclick="downloadComedyAudio()">Download Narration</button>
+      <button class="btn btn-orange btn-sm" style="text-align:center" id="mixMusicBtn" onclick="mixComedyWithMusic()">Mix with Music</button>
+      <button class="btn btn-outline btn-sm" style="text-align:center" onclick="generateComedyClip()">Try Another Style</button>
+      <button class="btn btn-outline btn-sm" style="text-align:center;border-color:var(--green);color:var(--green)" onclick="sendComedyToDirector()">Send to Director</button>
     </div>
     <div id="mixStatus" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:var(--text-soft)"></div>`;
 
-    // Video Export panel (only if a video was uploaded)
+    // ── Video Export panel ──
     if (comedyIsVideo && comedyVideoFileUrl) {
       html += `<div class="export-panel" id="exportPanel">
         <h4>Export Video</h4>
@@ -3228,6 +3252,78 @@ function renderComedyOutput(data) {
       { storyText: data.storyText, childName: data.childName, style: data.style, sceneDescription: data.sceneDescription }
     );
   }
+}
+
+// Send the approved comedy clip to the AI Director tab
+async function sendComedyToDirector() {
+  if (!comedyVideoFileUrl && !comedyFrame) {
+    alert('No clip to send.');
+    return;
+  }
+
+  // Get the thumbnail frame as a file-like object for the Director
+  const thumbSrc = document.getElementById('comedyThumbImg')?.src || '';
+  const comedyData = window._lastComedyData || {};
+
+  // Switch to Director tab
+  switchMode('director', document.querySelector('.mode-tab[onclick*="director"]'));
+
+  // Create a synthetic asset in the Director from the comedy clip
+  const id = 'comedy_' + Date.now();
+  const styleLabels = {
+    epic: 'Epic Movie', documentary: 'Nature Documentary', breaking: 'Breaking News',
+    fairytale: 'Fairy Tale', sports: 'Sports Commentary', horror: 'Horror Trailer',
+    heist: 'Heist Movie', romance: 'Romance'
+  };
+
+  const asset = {
+    id,
+    type: comedyIsVideo ? 'video' : 'image',
+    thumbnail: thumbSrc,
+    name: `comedy-${comedyData.childName || 'clip'}-${comedyData.style || 'epic'}`,
+    frame: comedyFrame,
+    duration: comedyDuration || 0,
+    isLong: false,
+    isComedyClip: true,
+    comedyMeta: {
+      style: comedyData.style,
+      styleLabel: styleLabels[comedyData.style] || comedyData.style,
+      childName: comedyData.childName,
+      sceneDescription: comedyData.sceneDescription,
+      storyText: comedyData.storyText,
+      voiceId: comedySelectedVoiceId,
+      voiceName: ALL_VOICES.find(v => v.id === comedySelectedVoiceId)?.name || 'Voice',
+      hasAudio: !!comedyData.audio,
+      musicSelection: getComedyMusicSelection()
+    },
+    analysis: null,
+    moments: []
+  };
+
+  // If we have the video URL, store it
+  if (comedyIsVideo && comedyVideoFileUrl) {
+    asset.objectUrl = comedyVideoFileUrl;
+  }
+
+  directorAssets.push(asset);
+  document.getElementById('directorEmpty').style.display = 'none';
+  renderDirectorAssets();
+
+  // Flash the Director tab green briefly
+  const dirTab = document.querySelector('.mode-tab[onclick*="director"]');
+  if (dirTab) {
+    dirTab.style.background = 'var(--green)';
+    dirTab.style.borderColor = 'var(--green)';
+    dirTab.style.color = '#fff';
+    setTimeout(() => {
+      dirTab.style.background = '';
+      dirTab.style.borderColor = '';
+      dirTab.style.color = '';
+      dirTab.classList.add('active');
+    }, 1500);
+  }
+
+  document.getElementById('directorAssetCount').textContent = directorAssets.length + ' asset' + (directorAssets.length !== 1 ? 's' : '') + ' uploaded';
 }
 
 function toggleComedyPlay() {
