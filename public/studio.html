@@ -5738,154 +5738,288 @@ function copyConceptBrief(idx) {
 }
 
 // ── Build a Single Ad from Concept ──
-function buildThisAd(conceptIdx) {
+async function buildThisAd(conceptIdx) {
   const concepts = window._lastConcepts;
   if (!concepts || !concepts[conceptIdx]) return;
   const c = concepts[conceptIdx];
 
-  composeTimeline = [];
+  // Find the clip asset for this concept
+  const allAssets = [...directorAssets, ...studioAssets];
+  let clipAsset = null;
+  let clipVideo = null;
+  let clipAudioUrl = null;
 
-  // Check if concept has structured JSON timeline (new format)
-  if (c.timeline && Array.isArray(c.timeline) && c.timeline.length && typeof c.timeline[0] === 'object') {
-    // New structured timeline from Claude
-    const videoAssets = getVideoAssets();
-
+  if (c.timeline && c.timeline.length) {
     for (const block of c.timeline) {
-      if (block.type === 'text') {
-        const blockId = addTimelineBlock('text', {
-          text: block.config?.text || 'Text',
-          style: block.config?.style || 'hook',
-          subtitle: block.config?.subtitle || '',
-          size: block.config?.size || 28,
-          color: block.config?.color || '#FFFFFF',
-          bgGradient: true
-        });
-        const b = composeTimeline.find(x => x.id === blockId);
-        if (b) b.duration = block.duration || 3;
-
-      } else if (block.type === 'clip') {
-        // Find matching asset by name from shared store
-        const assetName = block.config?.assetName || '';
-        const match = videoAssets.find(a =>
-          a.name === assetName ||
-          a.analysis?.name === assetName ||
-          (a.name && a.name.toLowerCase().includes(assetName.toLowerCase()))
+      if (block.type === 'clip' && block.config?.assetName) {
+        clipAsset = allAssets.find(a =>
+          a.name === block.config.assetName ||
+          a.analysis?.name === block.config.assetName ||
+          (a.name && a.name.toLowerCase().includes(block.config.assetName.toLowerCase()))
         );
-
-        const blockId = addTimelineBlock('clip');
-        const b = composeTimeline.find(x => x.id === blockId);
-        if (b) {
-          b.duration = block.duration || 5;
-          if (match) {
-            b.config.videoEl = match.videoEl;
-            b.config.objectUrl = match.objectUrl;
-            b.config.name = match.name || assetName;
-            b.config.trimStart = block.config?.trimStart || 0;
-            b.config.trimEnd = block.config?.trimEnd || b.duration;
-          } else {
-            b.config.name = assetName + ' (not found - upload clip)';
-          }
-          // Apply text overlays from Claude
-          if (block.config?.textOverlays && block.config.textOverlays.length) {
-            b.config.textOverlays = block.config.textOverlays;
-          }
-        }
-
-      } else if (block.type === 'sequence') {
-        const seqId = block.config?.sequenceId || 'create-story';
-        const screens = block.config?.screens;
-        const blockId = addTimelineBlock('sequence', { sequenceId: seqId });
-        const b = composeTimeline.find(x => x.id === blockId);
-        if (b) {
-          b.duration = block.duration || 8;
-          // If Claude specified specific screens, override the sequence
-          if (screens && screens.length) {
-            b.config.customScreens = screens;
-            b.duration = screens.length * 2;
-          }
-        }
-
-      } else if (block.type === 'endcard') {
-        const blockId = addTimelineBlock('endcard', {
-          cta: block.config?.cta || 'Create their story at storytold.ai'
-        });
-        const b = composeTimeline.find(x => x.id === blockId);
-        if (b) b.duration = block.duration || 3;
+        if (!clipAsset) clipAsset = directorAssets.find(a => a.isComedyClip);
+        break;
       }
     }
-  } else {
-    // Fallback: old text-based concept format
-    if (c.hookText) {
-      addTimelineBlock('text', { text: c.hookText, size: 28, color: '#FFFFFF', bgGradient: true, style: 'hook' });
-      composeTimeline[composeTimeline.length - 1].duration = 3;
-    }
-
-    const videoAssets = getVideoAssets().filter(a => a.analysis);
-    const sorted = [...videoAssets].sort((a, b) => (b.analysis?.marketingPotential || 0) - (a.analysis?.marketingPotential || 0));
-    for (const clip of sorted.slice(0, 3)) {
-      const blockId = addTimelineBlock('clip');
-      const block = composeTimeline.find(b => b.id === blockId);
-      if (block) {
-        block.config.videoEl = clip.videoEl;
-        block.config.objectUrl = clip.objectUrl;
-        block.config.name = clip.name;
-        block.config.trimStart = clip.trimStart || 0;
-        block.duration = Math.min(clip.duration || 5, 8);
-      }
-    }
-
-    if (!videoAssets.length || (c.raw && /mockup|screen|product|demo/i.test(c.raw))) {
-      addTimelineBlock('sequence');
-    }
-
-    addTimelineBlock('endcard');
   }
+  if (!clipAsset) clipAsset = directorAssets.find(a => a.isComedyClip) || directorAssets[0];
 
-  // Set aspect ratio
+  if (!clipAsset) { alert('No clip found to build ad from.'); return; }
+
+  // Get aspect ratio
   const format = c.format || '9:16';
-  const ratioSel = document.getElementById('composeRatio');
-  for (const ratio of ['9:16', '4:5', '1:1', '16:9']) {
-    if (format.includes(ratio)) { ratioSel.value = ratio; resizeComposeCanvas(); break; }
+  let aspect = '9:16';
+  for (const r of ['9:16', '4:5', '1:1', '16:9']) {
+    if (format.includes(r)) { aspect = r; break; }
+  }
+  const { W, H } = getExportDimensions(aspect);
+  const fps = 30;
+
+  // Show progress in the concept card
+  const cardEl = document.querySelectorAll('.concept-card')[conceptIdx];
+  const origBtn = cardEl?.querySelector('.btn-purple');
+  if (origBtn) { origBtn.textContent = 'Rendering...'; origBtn.disabled = true; }
+
+  // Build progress UI
+  const progressEl = document.createElement('div');
+  progressEl.style.cssText = 'margin-top:0.5rem;padding:0.5rem;background:#F3E8FF;border-radius:8px;font-size:0.72rem;color:var(--purple)';
+  progressEl.textContent = 'Preparing...';
+  cardEl?.appendChild(progressEl);
+  const setProgress = (msg) => { progressEl.textContent = msg; };
+
+  try {
+    setProgress('Loading video...');
+
+    // Load video
+    const video = document.createElement('video');
+    video.src = clipAsset.objectUrl || comedyVideoFileUrl;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    await new Promise((resolve, reject) => { video.onloadedmetadata = resolve; video.onerror = reject; video.load(); });
+    if (video.readyState < 4) await new Promise(r => { video.oncanplaythrough = r; setTimeout(r, 5000); });
+    await new Promise(r => { video.currentTime = 0; video.onseeked = r; });
+
+    setProgress('Loading audio...');
+
+    // Get narration audio (from the narrate tab if available)
+    let narrationDecoded = null;
+    let audioDuration = 0;
+    const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    if (lastGeneratedAudioUrl) {
+      const narResp = await fetch(lastGeneratedAudioUrl);
+      const narBuf = await narResp.arrayBuffer();
+      narrationDecoded = await tempCtx.decodeAudioData(narBuf);
+      audioDuration = narrationDecoded.duration;
+    }
+
+    // Build the timeline phases from the concept
+    const phases = [];
+    if (c.timeline && c.timeline.length && typeof c.timeline[0] === 'object') {
+      for (const block of c.timeline) {
+        if (block.type === 'text') {
+          phases.push({ type: 'card', duration: block.duration || 3, title: block.config?.text || '', subtitle: block.config?.subtitle || '', style: block.config?.style || 'hook' });
+        } else if (block.type === 'clip') {
+          // Use full clip duration if it's a narrated clip
+          const clipDur = (clipAsset.isComedyClip || clipAsset.useFullClip)
+            ? Math.max(video.duration, audioDuration)
+            : (block.duration || video.duration);
+          phases.push({ type: 'video', duration: clipDur, overlays: block.config?.textOverlays || [] });
+        } else if (block.type === 'endcard') {
+          phases.push({ type: 'card', duration: block.duration || 3, title: block.config?.cta || 'Create their story at storytold.ai', subtitle: block.config?.subtitle || 'storytold.ai', isEnd: true });
+        } else if (block.type === 'voicecta') {
+          phases.push({ type: 'card', duration: block.duration || 4, title: block.config?.text || '', subtitle: 'storytold.ai', isEnd: true });
+        }
+      }
+    } else {
+      // Fallback: just render hook + clip + endcard
+      if (c.hookText) phases.push({ type: 'card', duration: 3, title: c.hookText, subtitle: '' });
+      phases.push({ type: 'video', duration: Math.max(video.duration, audioDuration), overlays: [] });
+      phases.push({ type: 'card', duration: 3, title: 'Create their story at storytold.ai', subtitle: 'storytold.ai', isEnd: true });
+    }
+
+    // Calculate total duration
+    const totalDuration = phases.reduce((sum, p) => sum + p.duration, 0);
+
+    setProgress('Mixing audio...');
+
+    // Mix audio — narration starts when the video phase starts
+    const videoPhaseStart = phases.filter(p => p.type === 'card').slice(0, phases.findIndex(p => p.type === 'video')).reduce((s, p) => s + p.duration, 0);
+    const sampleRate = 44100;
+    const mixCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil((totalDuration + 1) * sampleRate), sampleRate);
+
+    if (narrationDecoded) {
+      const narSrc = mixCtx.createBufferSource();
+      narSrc.buffer = narrationDecoded;
+      narSrc.connect(mixCtx.destination);
+      narSrc.start(videoPhaseStart);
+    }
+
+    // Load and mix music
+    const musicSel = getComedyMusicSelection ? getComedyMusicSelection() : 'none';
+    if (musicSel !== 'none') {
+      try {
+        const trackUrl = musicSel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
+        const musicResp = await fetch(trackUrl);
+        const musicBuf = await musicResp.arrayBuffer();
+        const musicDecoded = await tempCtx.decodeAudioData(musicBuf);
+        const musSrc = mixCtx.createBufferSource();
+        musSrc.buffer = musicDecoded;
+        musSrc.loop = true;
+        const musGain = mixCtx.createGain();
+        musGain.gain.setValueAtTime(0, 0);
+        musGain.gain.linearRampToValueAtTime(0.15, 1);
+        musGain.gain.setValueAtTime(0.15, totalDuration - 2);
+        musGain.gain.linearRampToValueAtTime(0, totalDuration);
+        musSrc.connect(musGain);
+        musGain.connect(mixCtx.destination);
+        musSrc.start(0);
+      } catch (e) { /* no music */ }
+    }
+
+    const mixedAudio = await mixCtx.startRendering();
+    tempCtx.close();
+
+    setProgress('Setting up renderer...');
+
+    // Canvas + recorder setup
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    const canvasStream = canvas.captureStream(fps);
+    const wavBlob = audioBufferToWav(mixedAudio);
+    const wavUrl = URL.createObjectURL(wavBlob);
+    const audioEl = new Audio(wavUrl);
+    audioEl.muted = true;
+    await new Promise(r => { audioEl.oncanplaythrough = r; audioEl.load(); });
+    const playbackCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioSourceNode = playbackCtx.createMediaElementSource(audioEl);
+    const dest = playbackCtx.createMediaStreamDestination();
+    audioSourceNode.connect(dest);
+    dest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
+
+    const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a.40.2')
+      ? 'video/mp4;codecs=avc1,mp4a.40.2'
+      : MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4'
+      : MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus'
+      : 'video/webm';
+    const fileExt = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
+
+    const recorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 10000000 });
+    const chunks = [];
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+    // Build subtitle chunks for the video phase
+    let subtitleChunks = [];
+    if (lastComedyNarrationText) {
+      const videoPhase = phases.find(p => p.type === 'video');
+      if (videoPhase) subtitleChunks = buildSubtitleChunks(lastComedyNarrationText, videoPhase.duration);
+    }
+
+    recorder.start(100);
+    audioEl.muted = false;
+    audioEl.currentTime = 0;
+    audioEl.play().catch(() => {});
+
+    // Render each phase sequentially
+    let phaseStartTime = 0;
+    const renderStart = performance.now();
+
+    for (let pi = 0; pi < phases.length; pi++) {
+      const phase = phases[pi];
+      setProgress(`Rendering ${phase.type === 'video' ? 'clip' : 'card'} (${pi + 1}/${phases.length})...`);
+
+      if (phase.type === 'card') {
+        // Draw static card and hold
+        drawCard(ctx, W, H, phase.title, phase.subtitle || '', !!phase.isEnd);
+        await new Promise(r => setTimeout(r, phase.duration * 1000));
+
+      } else if (phase.type === 'video') {
+        // Play video in real-time
+        video.currentTime = 0;
+        video.muted = true;
+        await video.play();
+
+        const videoStartTime = performance.now();
+        await new Promise((resolve) => {
+          function drawFrame() {
+            const elapsed = (performance.now() - videoStartTime) / 1000;
+            if (elapsed >= phase.duration) { video.pause(); resolve(); return; }
+
+            // Loop video if it ends before phase duration
+            if (video.ended && elapsed < phase.duration - 0.5) {
+              video.currentTime = 0;
+              video.play().catch(() => {});
+            }
+
+            drawVideoFrame(ctx, video, W, H);
+
+            // Draw text overlays from the concept
+            if (phase.overlays && phase.overlays.length) {
+              for (const ov of phase.overlays) {
+                let show = true;
+                if (ov.timing === 'start' && elapsed > 3) show = false;
+                if (ov.timing === 'end' && elapsed < phase.duration - 4) show = false;
+                if (ov.timing === 'bridge' && elapsed < phase.duration - 4) show = false;
+                if (show && ov.text) drawSubtitle(ctx, W, H, ov.text);
+              }
+            }
+
+            // Draw narration subtitles
+            if (subtitleChunks.length) {
+              const sub = subtitleChunks.find(s => elapsed >= s.start && elapsed < s.end);
+              if (sub) drawSubtitle(ctx, W, H, sub.text);
+            }
+
+            requestAnimationFrame(drawFrame);
+          }
+          requestAnimationFrame(drawFrame);
+        });
+      }
+      phaseStartTime += phase.duration;
+    }
+
+    setProgress('Finalising...');
+    recorder.stop();
+    await new Promise(r => { recorder.onstop = r; });
+    audioEl.pause();
+    playbackCtx.close();
+    URL.revokeObjectURL(wavUrl);
+
+    // Download
+    const blob = new Blob(chunks, { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `storytold-ad-${c.name || 'concept-' + (conceptIdx + 1)}.${fileExt}`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    progressEl.textContent = 'Ad rendered and downloaded!';
+    progressEl.style.background = '#E8F5E9';
+    progressEl.style.color = 'var(--green)';
+
+  } catch (e) {
+    console.error('[AD RENDER]', e);
+    progressEl.textContent = 'Error: ' + e.message;
+    progressEl.style.background = '#FFEBEE';
+    progressEl.style.color = 'var(--pink)';
   }
 
-  // Set music
-  const music = (c.music || '').toLowerCase();
-  const audioSel = document.getElementById('composeAudio');
-  if (music.includes('adventure') || music.includes('upbeat') || music.includes('playful')) audioSel.value = 'adventure';
-  else if (music.includes('bedtime') || music.includes('gentle') || music.includes('soft') || music.includes('piano')) audioSel.value = 'bedtime';
-  else if (music.includes('none') || music.includes('raw') || music.includes('no music')) audioSel.value = 'none';
-  else audioSel.value = 'adventure'; // Default to adventure if unrecognised
-  toggleCustomMusicUI();
-
-  switchToCompose();
-  renderTimeline();
+  if (origBtn) { origBtn.textContent = 'Build This Ad'; origBtn.disabled = false; }
 }
 
-// ── Create My Ads: Auto-build all 3 concepts ──
+// ── Create My Ads: Auto-build all 3 concepts sequentially ──
 async function createMyAds() {
   const concepts = window._lastConcepts;
   if (!concepts || !concepts.length) { alert('Generate concepts first.'); return; }
 
-  // Build the first concept into Compose
-  buildThisAd(0);
-
-  // Store all 3 as saved timelines the user can switch between
-  window._savedAdBuilds = concepts.map((c, i) => ({
-    name: `${c.platform || 'Ad'} - ${c.name}`,
-    concept: c
-  }));
-
-  // Show notification
-  alert(`3 ads built! Showing "${concepts[0].name}" in Compose. Use the concept cards in AI Director to switch between the other 2.`);
-}
-
-function switchToCompose() {
-  const tabs = document.querySelectorAll('.mode-tab');
-  tabs.forEach(t => t.classList.remove('active'));
-  tabs[2].classList.add('active');
-  document.querySelectorAll('.mode-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-compose').classList.add('active');
-  currentMode = 'compose';
+  for (let i = 0; i < concepts.length; i++) {
+    await buildThisAd(i);
+  }
 }
 
 // ═══════════════════ INIT ═══════════════════
