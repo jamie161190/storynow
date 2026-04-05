@@ -671,6 +671,11 @@ export default async (req) => {
     return handleConcepts(apiKey, body);
   }
 
+  // ── Detect best narration style from a frame ──
+  if (action === 'detect-style') {
+    return handleDetectStyle(apiKey, body);
+  }
+
   return json({ error: 'Unknown action' }, 400);
 };
 
@@ -987,6 +992,87 @@ function parseFallbackConcepts(text) {
       raw: section
     };
   });
+}
+
+// ── Detect best narration style from a single frame ──
+async function handleDetectStyle(apiKey, { frame }) {
+  if (!frame) return json({ error: 'No frame provided' }, 400);
+
+  const styleMap = {
+    epic: 'Epic Movie',
+    documentary: 'Nature Documentary',
+    breaking: 'Breaking News',
+    fairytale: 'Fairy Tale',
+    sports: 'Sports Commentary',
+    horror: 'Horror Trailer',
+    heist: 'Heist Movie',
+    romance: 'Romance'
+  };
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: frame } },
+            { type: 'text', text: `Look at this image of a child/kid. This will have a dramatic comedy narration laid over it. Based on what's happening in the scene, pick the BEST narration style and a good alternative.
+
+Available styles:
+- epic: Epic Movie — works best for dramatic moments, battles, confrontations, anything that looks intense or heroic
+- documentary: Nature Documentary — works best for observational scenes, eating, exploring, playing with animals, crawling, outdoor scenes
+- breaking: Breaking News — works best for mess, chaos, spills, destruction, caught in the act, anything that looks like "news"
+- fairytale: Fairy Tale — works best for cute/magical scenes, sleeping, playing dress-up, gentle moments, dreamy settings
+- sports: Sports Commentary — works best for physical activity, running, climbing, competing, throwing, any movement or sport-like action
+- horror: Horror Trailer — works best for dark/moody shots, hiding, sneaking, suspicious activity, nighttime, shadows
+- heist: Heist Movie — works best for sneaking, stealing food, being mischievous, plotting, teamwork between kids
+- romance: Romance — works best for tender moments, hugging, being sweet with pets/parents, gentle emotional scenes
+
+Return ONLY a JSON object:
+{
+  "style": "the style key",
+  "reason": "one short sentence why this style fits (10 words max)",
+  "altStyle": "second best style key",
+  "altReason": "one short sentence why"
+}` }
+          ]
+        }]
+      })
+    });
+
+    if (!response.ok) return json({ style: 'epic', styleName: 'Epic Movie', reason: '' });
+
+    const result = await response.json();
+    let text = '';
+    for (const block of result.content) {
+      if (block.type === 'text') text += block.text;
+    }
+
+    try {
+      const match = text.match(/\{[\s\S]*\}/);
+      const parsed = match ? JSON.parse(match[0]) : {};
+      return json({
+        style: parsed.style || 'epic',
+        styleName: styleMap[parsed.style] || 'Epic Movie',
+        reason: parsed.reason || '',
+        altStyle: parsed.altStyle || null,
+        altStyleName: styleMap[parsed.altStyle] || null,
+        altReason: parsed.altReason || ''
+      });
+    } catch {
+      return json({ style: 'epic', styleName: 'Epic Movie', reason: '' });
+    }
+  } catch {
+    return json({ style: 'epic', styleName: 'Epic Movie', reason: '' });
+  }
 }
 
 function json(data, status = 200) {

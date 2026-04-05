@@ -479,7 +479,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
     <div class="mode-tab" onclick="switchMode('storygen',this)">Story Generator</div>
     <div class="mode-tab" onclick="switchMode('compose',this)">Compose</div>
     <div class="mode-tab" onclick="switchMode('director',this)">AI Director</div>
-    <div class="mode-tab" onclick="switchMode('comedy',this)">Comedy Clips</div>
+    <div class="mode-tab" onclick="switchMode('comedy',this)">Narrate</div>
     <div class="mode-tab" onclick="switchMode('library',this)">Library</div>
   </div>
 
@@ -904,7 +904,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
         <span class="tip-dismiss" onclick="this.parentElement.remove()">x</span>
         <div class="tip-title">Your AI Creative Director</div>
         <ol class="tip-steps">
-          <li>Upload comedy clips, reaction footage, raw videos, or photos</li>
+          <li>Upload narrated clips, reaction footage, raw videos, or photos</li>
           <li>Hit Analyse — identifies content type, who's in it, suggests hooks, bridge text, and voice CTAs</li>
           <li>Generate Ad Concepts — complete ads with captions, bridge, end cards, and narrator voice lines</li>
           <li>Build This Ad — assembles everything in Compose, ready to export</li>
@@ -924,7 +924,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
 
       <div class="ctrl-section">
         <h4>2. Analyse &amp; Name</h4>
-        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:0.5rem">Identifies content type (comedy clip, reaction, raw footage), who's in it, marketing potential, hook lines, bridge text, and whether the narrator should deliver a spoken CTA.</p>
+        <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:0.5rem">Identifies content type (narrated clip, reaction, raw footage), who's in it, their age, marketing potential, hook lines, bridge text, and whether the narrator should deliver a spoken CTA.</p>
         <button class="btn btn-purple btn-full" onclick="analyseAssets()" id="analyseBtn">Analyse All Assets</button>
       </div>
 
@@ -949,22 +949,22 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
         <div id="conceptsArea"></div>
         <div class="output-empty" id="directorEmpty">
           <h3>AI Creative Director</h3>
-          <p>Upload comedy clips, reaction footage, or raw videos. The Director identifies what you have, who's in it, writes hooks and bridge text, suggests voice CTAs, and builds complete ad concepts ready to export.</p>
+          <p>Upload narrated clips, reaction footage, or raw videos. The Director identifies what you have, who's in it, estimates their age, writes hooks and bridge text, suggests voice CTAs, and builds complete ad concepts ready to export.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════ COMEDY CLIPS MODE ═══════════════════ -->
+  <!-- ═══════════════════ NARRATE MODE ═══════════════════ -->
   <div class="mode-panel" id="panel-comedy">
     <div class="controls" id="ctrl-comedy">
-      <h3>Comedy Clips</h3>
+      <h3>Narrate</h3>
       <div class="feature-tip" id="tipComedy">
         <span class="tip-dismiss" onclick="this.parentElement.remove()">x</span>
-        <div class="tip-title">Turn Any Clip Into Comedy Gold</div>
+        <div class="tip-title">Turn Any Clip Into a Narrated Story</div>
         <ol class="tip-steps">
           <li>Upload a photo or video of a kid doing literally anything</li>
-          <li>Pick a comedy style (Epic, Documentary, Breaking News...)</li>
+          <li>AI detects the best narration style — or pick your own</li>
           <li>Pick a narrator voice and hit Generate</li>
           <li>Get a hilariously over-the-top narrated story of what is "really" happening</li>
         </ol>
@@ -1013,7 +1013,12 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
       </div>
 
       <div class="ctrl-section">
-        <h4>3. Comedy Style</h4>
+        <h4>3. Narration Style</h4>
+        <div id="styleRecommendation" style="display:none;margin-bottom:0.5rem;padding:0.4rem 0.6rem;background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border-radius:8px;border-left:3px solid var(--green);font-size:0.72rem">
+          <span style="font-weight:700;color:var(--green)">AI Recommended:</span>
+          <span id="styleRecText" style="color:#333;font-weight:600"></span>
+          <span id="styleRecWhy" style="color:var(--text-soft);display:block;margin-top:0.1rem;font-size:0.65rem"></span>
+        </div>
         <div class="pill-group" id="comedyStylePills" style="flex-wrap:wrap">
           <div class="pill active" data-val="epic" onclick="togglePill(this,'comedyStylePills')">Epic Movie</div>
           <div class="pill" data-val="documentary" onclick="togglePill(this,'comedyStylePills')">Documentary</div>
@@ -1045,14 +1050,14 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
         <div class="voice-grid-studio" id="voiceGridComedy"></div>
       </div>
 
-      <button class="btn btn-orange btn-full" style="margin-top:0.75rem;font-size:1rem;padding:0.85rem" onclick="generateComedyClip()" id="comedyGenBtn">Generate Comedy Clip</button>
+      <button class="btn btn-orange btn-full" style="margin-top:0.75rem;font-size:1rem;padding:0.85rem" onclick="generateComedyClip()" id="comedyGenBtn">Generate Narration</button>
     </div>
 
     <div class="preview" id="preview-comedy">
       <div class="output-area" id="comedyOutput">
         <div class="output-empty">
-          <h3>Comedy Clips</h3>
-          <p>Upload any clip of a kid doing anything. We will narrate it like the most important event in human history.</p>
+          <h3>Narrate</h3>
+          <p>Upload any clip of a kid doing anything. AI picks the best narration style, or choose your own. We'll narrate it like the most important event in human history.</p>
           <div style="margin-top:1rem;font-size:0.85rem;color:var(--text-soft)">
             <strong>Styles:</strong> Epic Movie, Nature Documentary, Breaking News, Fairy Tale, Sports Commentary, Horror Trailer, Heist Movie, Romance
           </div>
@@ -2921,6 +2926,53 @@ async function handleComedyFile(file) {
       durationBadge.style.display = 'block';
     }
   }
+
+  // Auto-detect best narration style
+  detectBestNarrationStyle();
+}
+
+async function detectBestNarrationStyle() {
+  if (!comedyFrame) return;
+
+  const recEl = document.getElementById('styleRecommendation');
+  const recText = document.getElementById('styleRecText');
+  const recWhy = document.getElementById('styleRecWhy');
+  recEl.style.display = 'block';
+  recText.textContent = 'Analysing clip...';
+  recWhy.textContent = '';
+
+  try {
+    const res = await fetch('/api/studio-director', {
+      method: 'POST',
+      headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'detect-style',
+        frame: comedyFrame
+      })
+    });
+    const data = await res.json();
+
+    if (data.style && data.styleName) {
+      // Auto-select the recommended pill
+      const pills = document.querySelectorAll('#comedyStylePills .pill');
+      pills.forEach(p => {
+        p.classList.remove('active');
+        if (p.getAttribute('data-val') === data.style) p.classList.add('active');
+      });
+
+      recText.textContent = data.styleName;
+      recWhy.textContent = data.reason || '';
+
+      // Also recommend a second style if provided
+      if (data.altStyle && data.altStyleName) {
+        recWhy.textContent = (data.reason || '') + ` Also works as: ${data.altStyleName}`;
+      }
+    } else {
+      recEl.style.display = 'none';
+    }
+  } catch (e) {
+    recEl.style.display = 'none';
+  }
 }
 
 function clearComedyUpload() {
@@ -2931,6 +2983,8 @@ function clearComedyUpload() {
   document.getElementById('comedyThumb').style.display = 'none';
   document.getElementById('comedyUpload').style.display = '';
   document.getElementById('comedyFileInput').value = '';
+  const recEl = document.getElementById('styleRecommendation');
+  if (recEl) recEl.style.display = 'none';
   const badge = document.getElementById('comedyDurationBadge');
   if (badge) badge.style.display = 'none';
 }
@@ -3019,7 +3073,7 @@ async function generateComedyClip() {
 
     if (!res.ok && res.status !== 202) {
       output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Failed to start generation (${res.status}). Try again.</pre></div>`;
-      btn.textContent = 'Generate Comedy Clip';
+      btn.textContent = 'Generate Narration';
       btn.disabled = false;
       return;
     }
@@ -3029,11 +3083,11 @@ async function generateComedyClip() {
   } catch (e) {
     console.error('[Comedy] Trigger error:', e);
     output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Error: ${escHtml(e.message)}</pre></div>`;
-    btn.textContent = 'Generate Comedy Clip';
+    btn.textContent = 'Generate Narration';
     btn.disabled = false;
   }
 
-  btn.textContent = 'Generate Comedy Clip';
+  btn.textContent = 'Generate Narration';
   btn.disabled = false;
 }
 
@@ -3061,7 +3115,7 @@ async function pollComedyStatus(jobId, style, btn) {
         } else {
           renderComedyOutput(data);
         }
-        btn.textContent = 'Generate Comedy Clip';
+        btn.textContent = 'Generate Narration';
         btn.disabled = false;
         return;
       }
@@ -3098,7 +3152,7 @@ async function pollComedyStatus(jobId, style, btn) {
         setTimeout(poll, 2000);
       } else {
         output.innerHTML = '<div class="output-card"><pre style="color:var(--pink)">Generation timed out. Please try again.</pre></div>';
-        btn.textContent = 'Generate Comedy Clip';
+        btn.textContent = 'Generate Narration';
         btn.disabled = false;
       }
     } catch (e) {
@@ -3106,7 +3160,7 @@ async function pollComedyStatus(jobId, style, btn) {
         setTimeout(poll, 2000);
       } else {
         output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Error: ${escHtml(e.message)}</pre></div>`;
-        btn.textContent = 'Generate Comedy Clip';
+        btn.textContent = 'Generate Narration';
         btn.disabled = false;
       }
     }
