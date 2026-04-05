@@ -3765,12 +3765,17 @@ async function exportComedyVideo() {
     // Merge audio track into canvas stream
     dest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
 
-    // Determine codec
-    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
-      ? 'video/webm;codecs=vp9,opus'
-      : MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')
-        ? 'video/webm;codecs=vp8,opus'
-        : 'video/webm';
+    // Determine codec — prefer MP4 (works on phones), fall back to WebM
+    const mimeType = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1,mp4a.40.2')
+      ? 'video/mp4;codecs=avc1,mp4a.40.2'
+      : MediaRecorder.isTypeSupported('video/mp4')
+        ? 'video/mp4'
+        : MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+          ? 'video/webm;codecs=vp9,opus'
+          : MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')
+            ? 'video/webm;codecs=vp8,opus'
+            : 'video/webm';
+    const fileExt = mimeType.startsWith('video/mp4') ? 'mp4' : 'webm';
 
     const recorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 4000000 });
     const chunks = [];
@@ -3847,7 +3852,7 @@ async function exportComedyVideo() {
     const style = getPillValue('comedyStylePills') || 'epic';
     const a = document.createElement('a');
     a.href = url;
-    a.download = `storytold-comedy-${childName}-${style}-${aspect.replace(':','x')}.webm`;
+    a.download = `storytold-comedy-${childName}-${style}-${aspect.replace(':','x')}.${fileExt}`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
 
