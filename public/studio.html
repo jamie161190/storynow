@@ -5967,20 +5967,21 @@ async function buildThisAd(conceptIdx) {
 
             drawVideoFrame(ctx, video, W, H);
 
-            // Draw narration subtitles at the bottom
+            // Check if a narration subtitle is visible right now
+            let subtitleVisible = false;
             if (subtitleChunks.length) {
               const sub = subtitleChunks.find(s => elapsed >= s.start && elapsed < s.end);
-              if (sub) drawSubtitle(ctx, W, H, sub.text);
+              if (sub) { drawSubtitle(ctx, W, H, sub.text); subtitleVisible = true; }
             }
 
-            // Draw concept text overlays — at the TOP if narration subtitles are present, otherwise bottom
+            // Draw concept text overlays — move to top only if a subtitle is on screen right now
             if (phase.overlays && phase.overlays.length) {
               for (const ov of phase.overlays) {
                 let show = true;
                 if (ov.timing === 'start' && elapsed > 3) show = false;
                 if (ov.timing === 'end' && elapsed < phase.duration - 4) show = false;
                 if (ov.timing === 'bridge' && elapsed < phase.duration - 4) show = false;
-                if (show && ov.text) drawSubtitle(ctx, W, H, ov.text, hasNarration ? 'top' : undefined);
+                if (show && ov.text) drawSubtitle(ctx, W, H, ov.text, subtitleVisible ? 'top' : undefined);
               }
             }
 
