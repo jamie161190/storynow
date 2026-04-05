@@ -274,6 +274,24 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
 .clip-tool{background:#F8F5FF;border-radius:12px;padding:1rem;margin-top:0.75rem;width:100%;max-width:600px}
 .clip-tool h4{font-size:0.82rem;color:var(--purple);margin-bottom:0.5rem}
 
+/* ── Video Export Panel ── */
+.export-panel{background:#fff;border-radius:14px;padding:1.25rem;margin-top:0.75rem;box-shadow:0 2px 8px rgba(0,0,0,0.04);border:1px solid var(--border);width:100%;max-width:600px}
+.export-panel h4{font-size:0.95rem;color:var(--purple);margin-bottom:0.75rem;font-family:'Nunito',sans-serif}
+.export-section{margin-bottom:0.75rem}
+.export-section label{display:block;font-size:0.75rem;font-weight:700;color:var(--text-soft);margin-bottom:0.3rem}
+.export-section input[type="text"]{width:100%;padding:0.45rem 0.7rem;border:2px solid var(--border);border-radius:8px;font-size:0.82rem;font-family:inherit;outline:none;transition:border 0.2s}
+.export-section input[type="text"]:focus{border-color:var(--purple)}
+.export-toggle{display:flex;align-items:center;gap:0.5rem;cursor:pointer;margin-bottom:0.4rem}
+.export-toggle input[type="checkbox"]{accent-color:var(--purple);width:16px;height:16px}
+.export-toggle span{font-size:0.8rem;font-weight:700;color:var(--text)}
+.export-card-fields{padding-left:1.5rem;margin-top:0.3rem}
+.export-card-fields input{margin-bottom:0.35rem}
+.export-progress{margin-top:0.75rem;font-size:0.8rem;color:var(--text-soft)}
+.export-progress .export-bar{height:6px;background:var(--border);border-radius:3px;margin-top:0.4rem;overflow:hidden}
+.export-progress .export-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--orange));border-radius:3px;transition:width 0.3s;width:0%}
+.export-preview{margin-top:0.75rem;border-radius:10px;overflow:hidden;background:#000;text-align:center}
+.export-preview canvas{max-width:100%;height:auto}
+
 /* ── Feature Tips ── */
 .feature-tip{background:linear-gradient(135deg,#F8F5FF,#FFF0E8);border-radius:12px;padding:0.75rem 1rem;margin-bottom:0.75rem;position:relative;border:1px solid var(--border)}
 .feature-tip p{font-size:0.75rem;color:var(--text);line-height:1.6;margin:0}
@@ -2793,6 +2811,8 @@ function audioBufferToWav(buffer) {
 
 let comedyFrame = null; // base64 JPEG of the uploaded frame
 let comedyDuration = null; // auto-detected video duration in seconds (null for photos)
+let comedyVideoFileUrl = null; // object URL to original video file for export
+let comedyIsVideo = false; // true if uploaded file is a video
 let comedyVoiceFilter = 'all';
 let comedySelectedVoiceId = 'VR6AewLTigWG4xSOukaG'; // Arnold — strong and commanding, perfect for comedy
 
@@ -2823,6 +2843,10 @@ async function handleComedyFile(file) {
   }
 
   if (file.type.startsWith('video/')) {
+    // Store original video file for export compositing
+    if (comedyVideoFileUrl) URL.revokeObjectURL(comedyVideoFileUrl);
+    comedyVideoFileUrl = URL.createObjectURL(file);
+    comedyIsVideo = true;
     const video = document.createElement('video');
     video.src = URL.createObjectURL(file);
     video.muted = true;
@@ -2841,6 +2865,8 @@ async function handleComedyFile(file) {
     URL.revokeObjectURL(video.src);
   } else {
     comedyDuration = null; // photos have no duration
+    comedyIsVideo = false;
+    if (comedyVideoFileUrl) { URL.revokeObjectURL(comedyVideoFileUrl); comedyVideoFileUrl = null; }
     const reader = new FileReader();
     await new Promise(resolve => {
       reader.onload = (e) => {
@@ -2879,6 +2905,8 @@ async function handleComedyFile(file) {
 function clearComedyUpload() {
   comedyFrame = null;
   comedyDuration = null;
+  comedyIsVideo = false;
+  if (comedyVideoFileUrl) { URL.revokeObjectURL(comedyVideoFileUrl); comedyVideoFileUrl = null; }
   document.getElementById('comedyThumb').style.display = 'none';
   document.getElementById('comedyUpload').style.display = '';
   document.getElementById('comedyFileInput').value = '';
@@ -3095,6 +3123,9 @@ function renderComedyOutput(data) {
     </div>`;
   }
 
+  // Store narration text for subtitle export
+  if (data.storyText) lastComedyNarrationText = data.storyText;
+
   // Audio player (reuses the studio audio player pattern)
   if (data.audio) {
     const audioSrc = 'data:audio/mpeg;base64,' + data.audio;
@@ -3118,9 +3149,64 @@ function renderComedyOutput(data) {
     </div>`;
 
     html += `<div style="display:flex;gap:0.5rem;margin-top:0.75rem;flex-wrap:wrap">
-      <button class="btn btn-purple btn-sm" onclick="downloadComedyAudio()">Download Audio</button>
+      <button class="btn btn-purple btn-sm" onclick="downloadComedyAudio()">Download Narration Only</button>
+      <button class="btn btn-orange btn-sm" id="mixMusicBtn" onclick="mixComedyWithMusic()">Mix with Music & Download</button>
       <button class="btn btn-outline btn-sm" onclick="generateComedyClip()">Try Another Style</button>
-    </div>`;
+    </div>
+    <div id="mixStatus" style="display:none;margin-top:0.5rem;font-size:0.8rem;color:var(--text-soft)"></div>`;
+
+    // Video Export panel (only if a video was uploaded)
+    if (comedyIsVideo && comedyVideoFileUrl) {
+      html += `<div class="export-panel" id="exportPanel">
+        <h4>Export Video</h4>
+
+        <div class="export-section">
+          <label>Aspect Ratio</label>
+          <div class="pill-group" id="exportAspectPills">
+            <div class="pill active" data-val="9:16" onclick="togglePill(this,'exportAspectPills')">9:16 Reels/TikTok</div>
+            <div class="pill" data-val="16:9" onclick="togglePill(this,'exportAspectPills')">16:9 YouTube</div>
+            <div class="pill" data-val="1:1" onclick="togglePill(this,'exportAspectPills')">1:1 Square</div>
+            <div class="pill" data-val="4:5" onclick="togglePill(this,'exportAspectPills')">4:5 Facebook</div>
+          </div>
+        </div>
+
+        <div class="export-section">
+          <label class="export-toggle">
+            <input type="checkbox" id="exportSubtitles" checked>
+            <span>Subtitles</span>
+          </label>
+        </div>
+
+        <div class="export-section">
+          <label class="export-toggle">
+            <input type="checkbox" id="exportStartCard" onchange="document.getElementById('startCardFields').style.display=this.checked?'block':'none'">
+            <span>Start Card</span>
+          </label>
+          <div class="export-card-fields" id="startCardFields" style="display:none">
+            <input type="text" id="exportStartTitle" placeholder="Title line (e.g. When Chase discovered spaghetti...)">
+            <input type="text" id="exportStartSub" placeholder="Subtitle (optional)">
+          </div>
+        </div>
+
+        <div class="export-section">
+          <label class="export-toggle">
+            <input type="checkbox" id="exportEndCard" onchange="document.getElementById('endCardFields').style.display=this.checked?'block':'none'">
+            <span>End Card</span>
+          </label>
+          <div class="export-card-fields" id="endCardFields" style="display:none">
+            <input type="text" id="exportEndTitle" placeholder="CTA (e.g. storytold.ai)" value="storytold.ai">
+            <input type="text" id="exportEndSub" placeholder="Tagline (e.g. A story that knows their name)" value="A story that knows their name">
+          </div>
+        </div>
+
+        <button class="btn btn-green btn-full" style="font-size:0.95rem;padding:0.75rem;margin-top:0.5rem" onclick="exportComedyVideo()" id="exportBtn">Export Video</button>
+
+        <div class="export-progress" id="exportProgress" style="display:none">
+          <span id="exportProgressText">Preparing...</span>
+          <div class="export-bar"><div class="export-bar-fill" id="exportBarFill"></div></div>
+        </div>
+      </div>`;
+    }
 
     setTimeout(() => initStudioAudio(audioSrc), 100);
   } else if (data.error) {
@@ -3194,6 +3280,587 @@ function downloadComedyAudio() {
   const style = getPillValue('comedyStylePills') || 'epic';
   a.download = `storytold-comedy-${name}-${style}.mp3`;
   a.click();
+}
+
+async function mixComedyWithMusic() {
+  const musicSel = getComedyMusicSelection();
+  if (musicSel === 'none') {
+    alert('Select a music track first (Adventure or Bedtime) from the music pills above.');
+    return;
+  }
+  if (!lastGeneratedAudioUrl) return;
+
+  const btn = document.getElementById('mixMusicBtn');
+  const status = document.getElementById('mixStatus');
+  btn.disabled = true;
+  btn.textContent = 'Mixing...';
+  status.style.display = 'block';
+  status.textContent = 'Loading audio files...';
+
+  try {
+    const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, 1, 44100);
+
+    // Load narration
+    status.textContent = 'Decoding narration...';
+    const narrationResp = await fetch(lastGeneratedAudioUrl);
+    const narrationBuf = await narrationResp.arrayBuffer();
+    const narrationDecoded = await offlineCtx.decodeAudioData(narrationBuf);
+
+    // Load music track
+    const trackUrl = musicSel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
+    status.textContent = 'Loading music track...';
+    const musicResp = await fetch(trackUrl);
+    const musicBuf = await musicResp.arrayBuffer();
+    const musicDecoded = await offlineCtx.decodeAudioData(musicBuf);
+
+    // Create offline context with correct duration (narration length + 2s fade out)
+    const totalDuration = narrationDecoded.duration + 2;
+    const sampleRate = 44100;
+    const totalSamples = Math.ceil(totalDuration * sampleRate);
+    const mixCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, totalSamples, sampleRate);
+
+    // Narration at full volume
+    const narrationSource = mixCtx.createBufferSource();
+    narrationSource.buffer = narrationDecoded;
+    narrationSource.connect(mixCtx.destination);
+    narrationSource.start(0);
+
+    // Music at 0.15 volume, looped to cover full duration
+    const musicSource = mixCtx.createBufferSource();
+    musicSource.buffer = musicDecoded;
+    musicSource.loop = true;
+    const musicGain = mixCtx.createGain();
+    musicGain.gain.setValueAtTime(0, 0);
+    // Fade in over 1s
+    musicGain.gain.linearRampToValueAtTime(0.15, 1);
+    // Hold at 0.15 until narration ends
+    musicGain.gain.setValueAtTime(0.15, narrationDecoded.duration);
+    // Fade out over 2s after narration ends
+    musicGain.gain.linearRampToValueAtTime(0, totalDuration);
+    musicSource.connect(musicGain);
+    musicGain.connect(mixCtx.destination);
+    musicSource.start(0);
+
+    status.textContent = 'Rendering mix...';
+    const renderedBuffer = await mixCtx.startRendering();
+
+    // Encode to WAV
+    status.textContent = 'Encoding file...';
+    const wavBlob = audioBufferToWav(renderedBuffer);
+
+    // Download
+    const url = URL.createObjectURL(wavBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    const childName = document.getElementById('comedyChildName')?.value || 'comedy';
+    const style = getPillValue('comedyStylePills') || 'epic';
+    a.download = `storytold-comedy-${childName}-${style}-with-music.wav`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+    status.textContent = 'Done! Your mixed audio has been downloaded.';
+    setTimeout(() => { status.style.display = 'none'; }, 3000);
+  } catch (e) {
+    console.error('[MIX] Error:', e);
+    status.textContent = 'Mix failed: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Mix with Music & Download';
+  }
+}
+
+// Encode AudioBuffer to WAV Blob
+function audioBufferToWav(buffer) {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const format = 1; // PCM
+  const bitsPerSample = 16;
+  const bytesPerSample = bitsPerSample / 8;
+  const blockAlign = numChannels * bytesPerSample;
+  const dataLength = buffer.length * blockAlign;
+  const headerLength = 44;
+  const totalLength = headerLength + dataLength;
+
+  const arrayBuffer = new ArrayBuffer(totalLength);
+  const view = new DataView(arrayBuffer);
+
+  // WAV header
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, totalLength - 8, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, format, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitsPerSample, true);
+  writeString(view, 36, 'data');
+  view.setUint32(40, dataLength, true);
+
+  // Interleave channels and write samples
+  const channels = [];
+  for (let c = 0; c < numChannels; c++) channels.push(buffer.getChannelData(c));
+
+  let offset = 44;
+  for (let i = 0; i < buffer.length; i++) {
+    for (let c = 0; c < numChannels; c++) {
+      let sample = Math.max(-1, Math.min(1, channels[c][i]));
+      sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+      view.setInt16(offset, sample, true);
+      offset += 2;
+    }
+  }
+
+  return new Blob([arrayBuffer], { type: 'audio/wav' });
+}
+
+function writeString(view, offset, str) {
+  for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+}
+
+// ═══════════════════ VIDEO EXPORT ENGINE ═══════════════════
+
+// Store the last generated narration text for subtitle extraction
+let lastComedyNarrationText = '';
+
+// Clean narration text for subtitles: remove audio tags, pauses, formatting artifacts
+function cleanSubtitleText(text) {
+  return text
+    .replace(/\[whispers\]/gi, '')
+    .replace(/\[laughs softly\]/gi, '')
+    .replace(/\[gasps\]/gi, '')
+    .replace(/\[excitedly\]/gi, '')
+    .replace(/\[sighs\]/gi, '')
+    .replace(/\[.*?\]/g, '') // catch any other tags
+    .replace(/\.\.\.\s*\.\.\./g, ' ') // double pauses
+    .replace(/\.\.\./g, ' ') // single pauses
+    .replace(/\s{2,}/g, ' ') // collapse whitespace
+    .trim();
+}
+
+// Split narration into timed subtitle chunks
+function buildSubtitleChunks(text, audioDuration) {
+  const clean = cleanSubtitleText(text);
+  // Split into sentences on . ! ? but keep short enough for subtitles
+  const rawSentences = clean.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+
+  // Further split long sentences into chunks of ~8-12 words
+  const chunks = [];
+  for (const sentence of rawSentences) {
+    const words = sentence.split(/\s+/);
+    if (words.length <= 12) {
+      chunks.push(sentence.trim());
+    } else {
+      // Split at natural points roughly every 8-10 words
+      let buf = [];
+      for (const word of words) {
+        buf.push(word);
+        if (buf.length >= 8 && (word.endsWith(',') || word.endsWith(';') || word.endsWith(':') || buf.length >= 12)) {
+          chunks.push(buf.join(' '));
+          buf = [];
+        }
+      }
+      if (buf.length) chunks.push(buf.join(' '));
+    }
+  }
+
+  // Calculate timing proportional to word count
+  const totalWords = chunks.reduce((sum, c) => sum + c.split(/\s+/).length, 0);
+  let currentTime = 0;
+  return chunks.map(chunk => {
+    const wordCount = chunk.split(/\s+/).length;
+    const duration = (wordCount / totalWords) * audioDuration;
+    const entry = { text: chunk, start: currentTime, end: currentTime + duration };
+    currentTime += duration;
+    return entry;
+  });
+}
+
+// Get aspect ratio dimensions (720p base)
+function getExportDimensions(aspect) {
+  switch (aspect) {
+    case '9:16': return { width: 720, height: 1280 };
+    case '16:9': return { width: 1280, height: 720 };
+    case '1:1': return { width: 720, height: 720 };
+    case '4:5': return { width: 720, height: 900 };
+    default: return { width: 720, height: 1280 };
+  }
+}
+
+// Draw a branded card (start or end) on canvas
+function drawCard(ctx, w, h, title, subtitle, isEnd) {
+  // Gradient background
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#6B2F93');
+  grad.addColorStop(1, isEnd ? '#F1753B' : '#A872C8');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Storytold logo text
+  const logoSize = Math.round(w * 0.06);
+  ctx.font = `900 ${logoSize}px Nunito, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.fillText('storytold', w / 2, h * 0.25);
+
+  // Title
+  if (title) {
+    const titleSize = Math.round(w * 0.055);
+    ctx.font = `800 ${titleSize}px Nunito, sans-serif`;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    // Word wrap
+    const maxW = w * 0.8;
+    const words = title.split(' ');
+    let lines = [];
+    let line = '';
+    for (const word of words) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    const lineHeight = titleSize * 1.3;
+    const startY = h / 2 - (lines.length * lineHeight) / 2;
+    lines.forEach((l, i) => {
+      ctx.fillText(l, w / 2, startY + i * lineHeight + lineHeight);
+    });
+  }
+
+  // Subtitle
+  if (subtitle) {
+    const subSize = Math.round(w * 0.032);
+    ctx.font = `600 ${subSize}px Quicksand, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillText(subtitle, w / 2, h * 0.72);
+  }
+}
+
+// Draw subtitle text on the canvas
+function drawSubtitle(ctx, w, h, text) {
+  if (!text) return;
+  const fontSize = Math.round(w * 0.042);
+  ctx.font = `700 ${fontSize}px Quicksand, sans-serif`;
+  ctx.textAlign = 'center';
+
+  // Word wrap for subtitle
+  const maxW = w * 0.85;
+  const words = text.split(' ');
+  let lines = [];
+  let line = '';
+  for (const word of words) {
+    const test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width > maxW && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  }
+  if (line) lines.push(line);
+
+  const lineHeight = fontSize * 1.4;
+  const bottomPad = h * 0.08;
+  const startY = h - bottomPad - (lines.length * lineHeight);
+
+  // Background box behind text
+  const padding = fontSize * 0.5;
+  const boxWidth = Math.min(w * 0.9, lines.reduce((max, l) => Math.max(max, ctx.measureText(l).width), 0) + padding * 2);
+  const boxHeight = lines.length * lineHeight + padding * 1.5;
+  const boxX = (w - boxWidth) / 2;
+  const boxY = startY - padding * 0.5;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.beginPath();
+  const r = fontSize * 0.3;
+  ctx.moveTo(boxX + r, boxY);
+  ctx.lineTo(boxX + boxWidth - r, boxY);
+  ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + r);
+  ctx.lineTo(boxX + boxWidth, boxY + boxHeight - r);
+  ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - r, boxY + boxHeight);
+  ctx.lineTo(boxX + r, boxY + boxHeight);
+  ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - r);
+  ctx.lineTo(boxX, boxY + r);
+  ctx.quadraticCurveTo(boxX, boxY, boxX + r, boxY);
+  ctx.closePath();
+  ctx.fill();
+
+  // Text
+  ctx.fillStyle = '#FFFFFF';
+  lines.forEach((l, i) => {
+    ctx.fillText(l, w / 2, startY + i * lineHeight + lineHeight * 0.75);
+  });
+}
+
+// Draw the video frame fitted to canvas with blurred background fill
+function drawVideoFrame(ctx, video, canvasW, canvasH) {
+  const vw = video.videoWidth || video.width;
+  const vh = video.videoHeight || video.height;
+  if (!vw || !vh) return;
+
+  const canvasRatio = canvasW / canvasH;
+  const videoRatio = vw / vh;
+
+  // Draw blurred background (stretched to fill)
+  ctx.save();
+  ctx.filter = 'blur(20px) brightness(0.4)';
+  ctx.drawImage(video, -20, -20, canvasW + 40, canvasH + 40);
+  ctx.restore();
+
+  // Draw fitted video on top
+  let drawW, drawH, drawX, drawY;
+  if (videoRatio > canvasRatio) {
+    // Video is wider - fit by width
+    drawW = canvasW;
+    drawH = canvasW / videoRatio;
+    drawX = 0;
+    drawY = (canvasH - drawH) / 2;
+  } else {
+    // Video is taller - fit by height
+    drawH = canvasH;
+    drawW = canvasH * videoRatio;
+    drawX = (canvasW - drawW) / 2;
+    drawY = 0;
+  }
+  ctx.drawImage(video, drawX, drawY, drawW, drawH);
+}
+
+// Main export function
+async function exportComedyVideo() {
+  if (!comedyVideoFileUrl || !lastGeneratedAudioUrl) {
+    alert('No video or narration available to export.');
+    return;
+  }
+
+  const btn = document.getElementById('exportBtn');
+  const progress = document.getElementById('exportProgress');
+  const progressText = document.getElementById('exportProgressText');
+  const progressBar = document.getElementById('exportBarFill');
+  btn.disabled = true;
+  btn.textContent = 'Exporting...';
+  progress.style.display = 'block';
+
+  function setProgress(text, pct) {
+    progressText.textContent = text;
+    progressBar.style.width = pct + '%';
+  }
+
+  try {
+    // Gather settings
+    const aspectPill = document.querySelector('#exportAspectPills .pill.active');
+    const aspect = aspectPill ? aspectPill.dataset.val : '9:16';
+    const { width: W, height: H } = getExportDimensions(aspect);
+    const showSubs = document.getElementById('exportSubtitles').checked;
+    const hasStartCard = document.getElementById('exportStartCard').checked;
+    const hasEndCard = document.getElementById('exportEndCard').checked;
+    const startTitle = document.getElementById('exportStartTitle')?.value || '';
+    const startSub = document.getElementById('exportStartSub')?.value || '';
+    const endTitle = document.getElementById('exportEndTitle')?.value || '';
+    const endSub = document.getElementById('exportEndSub')?.value || '';
+    const cardDuration = 3; // seconds
+    const fps = 30;
+
+    setProgress('Loading video...', 5);
+
+    // Load video element
+    const video = document.createElement('video');
+    video.src = comedyVideoFileUrl;
+    video.muted = true;
+    video.playsInline = true;
+    await new Promise((resolve, reject) => {
+      video.onloadedmetadata = resolve;
+      video.onerror = reject;
+      video.load();
+    });
+    await new Promise(r => { video.currentTime = 0; video.onseeked = r; });
+
+    setProgress('Decoding audio...', 10);
+
+    // Decode narration audio
+    const narrationResp = await fetch(lastGeneratedAudioUrl);
+    const narrationArrayBuf = await narrationResp.arrayBuffer();
+    const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const narrationDecoded = await tempCtx.decodeAudioData(narrationArrayBuf);
+    const audioDuration = narrationDecoded.duration;
+
+    // Load music if selected
+    const musicSel = getComedyMusicSelection();
+    let musicDecoded = null;
+    if (musicSel !== 'none') {
+      setProgress('Loading music...', 15);
+      const trackUrl = musicSel === 'adventure' ? '/music/adventure-ambient.mp3' : '/music/bedtime-ambient.mp3';
+      const musicResp = await fetch(trackUrl);
+      const musicArrayBuf = await musicResp.arrayBuffer();
+      musicDecoded = await tempCtx.decodeAudioData(musicArrayBuf);
+    }
+
+    setProgress('Mixing audio...', 20);
+
+    // Mix audio offline
+    const totalAudioDuration = audioDuration + (hasStartCard ? cardDuration : 0) + (hasEndCard ? cardDuration : 0) + 1;
+    const sampleRate = 44100;
+    const mixCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil(totalAudioDuration * sampleRate), sampleRate);
+
+    const audioOffset = hasStartCard ? cardDuration : 0;
+
+    // Narration
+    const narSrc = mixCtx.createBufferSource();
+    narSrc.buffer = narrationDecoded;
+    narSrc.connect(mixCtx.destination);
+    narSrc.start(audioOffset);
+
+    // Music
+    if (musicDecoded) {
+      const musSrc = mixCtx.createBufferSource();
+      musSrc.buffer = musicDecoded;
+      musSrc.loop = true;
+      const musGain = mixCtx.createGain();
+      musGain.gain.setValueAtTime(0, 0);
+      musGain.gain.linearRampToValueAtTime(0.15, Math.min(1, audioOffset || 0.5));
+      const fadeOutStart = audioOffset + audioDuration;
+      musGain.gain.setValueAtTime(0.15, fadeOutStart);
+      musGain.gain.linearRampToValueAtTime(0, fadeOutStart + 2);
+      musSrc.connect(musGain);
+      musGain.connect(mixCtx.destination);
+      musSrc.start(0);
+    }
+
+    const mixedAudio = await mixCtx.startRendering();
+    tempCtx.close();
+
+    setProgress('Preparing canvas...', 25);
+
+    // Create canvas for rendering
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // Build subtitle timing
+    let subtitleChunks = [];
+    if (showSubs && lastComedyNarrationText) {
+      subtitleChunks = buildSubtitleChunks(lastComedyNarrationText, audioDuration);
+    }
+
+    // Setup MediaRecorder — use manual captureStream(0) for frame-by-frame control
+    const canvasStream = canvas.captureStream(0);
+    const captureTrack = canvasStream.getVideoTracks()[0];
+
+    // Encode the mixed audio into a WAV blob, then use it as a MediaStream source
+    const wavBlob = audioBufferToWav(mixedAudio);
+    const wavUrl = URL.createObjectURL(wavBlob);
+    const audioEl = new Audio(wavUrl);
+    audioEl.muted = true;
+    await new Promise(r => { audioEl.oncanplaythrough = r; audioEl.load(); });
+    const playbackCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const audioSourceNode = playbackCtx.createMediaElementSource(audioEl);
+    const dest = playbackCtx.createMediaStreamDestination();
+    audioSourceNode.connect(dest);
+
+    // Merge audio track into canvas stream
+    dest.stream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
+
+    // Determine codec
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+      ? 'video/webm;codecs=vp9,opus'
+      : MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')
+        ? 'video/webm;codecs=vp8,opus'
+        : 'video/webm';
+
+    const recorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 4000000 });
+    const chunks = [];
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+    // Calculate total frames
+    const videoDuration = Math.min(video.duration, audioDuration); // clip video to narration length
+    const startCardFrames = hasStartCard ? cardDuration * fps : 0;
+    const videoFrames = Math.ceil(videoDuration * fps);
+    const endCardFrames = hasEndCard ? cardDuration * fps : 0;
+    const totalFrames = startCardFrames + videoFrames + endCardFrames;
+    const frameDuration = 1000 / fps;
+
+    setProgress('Rendering frames...', 30);
+
+    // Start recording and audio playback
+    recorder.start();
+    audioEl.muted = false;
+    audioEl.play().catch(() => {});
+
+    // Render frame by frame sequentially
+    for (let f = 0; f < totalFrames; f++) {
+      const pct = 30 + Math.round((f / totalFrames) * 60);
+      if (f % (fps * 2) === 0) {
+        setProgress(`Rendering... ${Math.round(f / totalFrames * 100)}%`, pct);
+        // Yield to UI thread
+        await new Promise(r => setTimeout(r, 0));
+      }
+
+      if (f < startCardFrames) {
+        // Draw start card
+        drawCard(ctx, W, H, startTitle, startSub, false);
+      } else if (f < startCardFrames + videoFrames) {
+        // Draw video frame
+        const videoTime = (f - startCardFrames) / fps;
+        video.currentTime = videoTime;
+        await new Promise(r => { video.onseeked = r; });
+        drawVideoFrame(ctx, video, W, H);
+
+        // Draw subtitle
+        if (showSubs && subtitleChunks.length) {
+          const sub = subtitleChunks.find(s => videoTime >= s.start && videoTime < s.end);
+          if (sub) drawSubtitle(ctx, W, H, sub.text);
+        }
+      } else {
+        // Draw end card
+        drawCard(ctx, W, H, endTitle, endSub, true);
+      }
+
+      // Request a frame capture from the canvas stream
+      if (captureTrack.requestFrame) captureTrack.requestFrame();
+
+      // Wait for the frame duration to keep recorder in sync
+      await new Promise(r => setTimeout(r, frameDuration));
+    }
+
+    // Stop recording and wait for it to finish
+    audioEl.pause();
+    URL.revokeObjectURL(wavUrl);
+    await new Promise((resolve) => {
+      recorder.onstop = () => {
+        playbackCtx.close();
+        resolve();
+      };
+      recorder.stop();
+    });
+
+    setProgress('Encoding video...', 92);
+
+    const blob = new Blob(chunks, { type: mimeType });
+    const url = URL.createObjectURL(blob);
+
+    const childName = document.getElementById('comedyChildName')?.value || 'comedy';
+    const style = getPillValue('comedyStylePills') || 'epic';
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `storytold-comedy-${childName}-${style}-${aspect.replace(':','x')}.webm`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+    setProgress('Done! Video downloaded.', 100);
+    setTimeout(() => { progress.style.display = 'none'; }, 3000);
+
+  } catch (e) {
+    console.error('[EXPORT] Error:', e);
+    setProgress('Export failed: ' + e.message, 0);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Export Video';
+  }
 }
 
 // ═══════════════════ COMPOSE MODE (TIMELINE BUILDER) ═══════════════════
