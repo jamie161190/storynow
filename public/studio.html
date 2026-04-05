@@ -884,6 +884,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
         <input type="text" id="libSearch" placeholder="Search..." oninput="filterLibrary()">
       </div>
       <div style="font-size:0.75rem;color:var(--text-soft)" id="libCount">0 assets</div>
+      <button class="btn btn-outline btn-sm" style="margin-top:0.75rem;width:100%;color:var(--pink);border-color:var(--pink);font-size:0.72rem" onclick="clearAllLibrary()">Clear All Library</button>
     </div>
 
     <div class="preview" id="preview-library">
@@ -5063,6 +5064,25 @@ function escHtml(str) {
 // ═══════════════════ CONTENT LIBRARY ═══════════════════
 
 let libraryAssets = [];
+
+async function clearAllLibrary() {
+  if (!confirm('Clear the entire library? This deletes all saved assets and frees up storage. This cannot be undone.')) return;
+  const btn = document.querySelector('#ctrl-library .btn-outline');
+  if (btn) { btn.textContent = 'Clearing...'; btn.disabled = true; }
+  try {
+    await fetch('/api/studio-library', {
+      method: 'POST',
+      headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'clear-all' })
+    });
+    libraryAssets = [];
+    document.getElementById('libraryGrid').innerHTML = '<div class="library-empty"><h3>Library Cleared</h3><p>All assets have been removed.</p></div>';
+    document.getElementById('libCount').textContent = '0 assets';
+  } catch (e) {
+    alert('Failed to clear: ' + e.message);
+  }
+  if (btn) { btn.textContent = 'Clear All Library'; btn.disabled = false; }
+}
 
 async function loadLibrary() {
   const grid = document.getElementById('libraryGrid');

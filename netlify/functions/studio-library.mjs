@@ -30,6 +30,11 @@ export default async (req) => {
     return handleDelete(supabaseUrl, supabaseKey, body.assetId);
   }
 
+  // ── Clear all assets ──
+  if (action === 'clear-all') {
+    return handleClearAll(supabaseUrl, supabaseKey);
+  }
+
   return json({ error: 'Unknown action' }, 400);
 };
 
@@ -149,6 +154,27 @@ async function handleDelete(supabaseUrl, supabaseKey, assetId) {
   await saveIndex(supabaseUrl, supabaseKey, newIndex);
 
   return json({ deleted: true });
+}
+
+async function handleClearAll(supabaseUrl, supabaseKey) {
+  const index = await getIndex(supabaseUrl, supabaseKey);
+
+  // Delete all stored files
+  for (const asset of index) {
+    try {
+      const urlPath = asset.url?.split('/stories/')[1];
+      if (urlPath) {
+        await fetch(`${supabaseUrl}/storage/v1/object/stories/${urlPath}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey }
+        });
+      }
+    } catch (e) { /* continue deleting others */ }
+  }
+
+  // Reset index to empty
+  await saveIndex(supabaseUrl, supabaseKey, []);
+  return json({ cleared: true, count: index.length });
 }
 
 function json(data, status = 200) {
