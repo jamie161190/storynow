@@ -49,9 +49,20 @@ export default async (req) => {
     return handleContentGeneration(body);
   }
 
-  // ── Quick Snippet (text + TTS) ──
+  // ── Quick Snippet (text + TTS) — trigger background worker ──
   if (action === 'snippet') {
-    return handleSnippetGeneration(body);
+    const jobId = 'snip_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    const workerUrl = (process.env.URL || 'https://storytold.netlify.app') + '/.netlify/functions/studio-snippet-background';
+    try {
+      await fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId, ...body })
+      });
+    } catch (e) {
+      console.log('[STUDIO] Snippet background trigger sent:', e.message || 'ok');
+    }
+    return json({ jobId });
   }
 
   // ── Generate Music via ElevenLabs Sound Effects API ──
