@@ -720,6 +720,16 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
           <div class="voice-grid-studio" id="voiceGridSnippet"></div>
         </div>
 
+        <div class="ctrl-section">
+          <h4>Duration</h4>
+          <div class="pill-group" id="snipDurationPills">
+            <div class="pill active" data-val="0.5" onclick="togglePill(this,'snipDurationPills')">30 sec</div>
+            <div class="pill" data-val="1" onclick="togglePill(this,'snipDurationPills')">1 min</div>
+            <div class="pill" data-val="3" onclick="togglePill(this,'snipDurationPills')">3 min</div>
+            <div class="pill" data-val="5" onclick="togglePill(this,'snipDurationPills')">5 min</div>
+          </div>
+        </div>
+
         <button class="btn btn-orange btn-full" style="margin-top:0.75rem" onclick="generateSnippet()" id="snipGenBtn">Generate Story</button>
       </div>
 
@@ -791,17 +801,9 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
           </select>
           <label>Length</label>
           <div class="pill-group" id="fsLengthPills">
-            <div class="pill active" data-val="preview" onclick="togglePill(this,'fsLengthPills');document.getElementById('fsDurationRow').style.display=''">Preview</div>
-            <div class="pill" data-val="full" onclick="togglePill(this,'fsLengthPills');document.getElementById('fsDurationRow').style.display='none'">Full Story (~15 min)</div>
+            <div class="pill active" data-val="preview" onclick="togglePill(this,'fsLengthPills')">Preview (~500 words)</div>
+            <div class="pill" data-val="full" onclick="togglePill(this,'fsLengthPills')">Full Story (~2200 words)</div>
           </div>
-          <div id="fsDurationRow">
-            <label>Preview Duration</label>
-            <div class="pill-group" id="fsDurationPills">
-              <div class="pill active" data-val="0.5" onclick="togglePill(this,'fsDurationPills')">30 sec</div>
-              <div class="pill" data-val="1" onclick="togglePill(this,'fsDurationPills')">1 min</div>
-              <div class="pill" data-val="3" onclick="togglePill(this,'fsDurationPills')">3 min</div>
-              <div class="pill" data-val="5" onclick="togglePill(this,'fsDurationPills')">5 min</div>
-            </div>
           </div>
         </div>
 
@@ -2535,12 +2537,14 @@ async function generateSnippet() {
     return;
   }
 
-  output.innerHTML = '<div class="output-loading"><div class="spinner"></div><p>Polishing your story...</p></div>';
+  const durationMins = parseFloat(getPillValue('snipDurationPills') || '0.5');
+  output.innerHTML = `<div class="output-loading"><div class="spinner"></div><p>Generating ~${durationMins >= 1 ? durationMins + ' minute' : '30 second'} story...</p></div>`;
 
   const payload = {
     action: 'snippet',
     childName: document.getElementById('snipChildName').value || 'Chase',
     storyInput,
+    durationMins,
     voiceId: selectedVoiceId
   };
 
@@ -2572,11 +2576,8 @@ async function generateFullStory() {
   btn.disabled = true;
 
   const length = getPillValue('fsLengthPills') || 'preview';
-  const durationMins = length === 'preview' ? parseFloat(getPillValue('fsDurationPills') || '0.5') : null;
 
-  output.innerHTML = length === 'preview'
-    ? `<div class="output-loading"><div class="spinner"></div><p>Generating ~${durationMins >= 1 ? durationMins + ' minute' : '30 second'} preview...</p></div>`
-    : '<div class="output-loading"><div class="spinner"></div><p>Generating full story... This may take a few minutes.</p></div>';
+  output.innerHTML = '<div class="output-loading"><div class="spinner"></div><p>Generating story... This may take a few minutes for full stories.</p></div>';
 
   const storyData = {
     childName: document.getElementById('fsChildName').value || 'Chase',
@@ -2599,7 +2600,6 @@ async function generateFullStory() {
     storyData,
     voiceId: selectedVoiceId,
     length,
-    durationMins,
     music: document.getElementById('fsMusic').value
   };
 

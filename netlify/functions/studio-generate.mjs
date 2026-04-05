@@ -106,7 +106,7 @@ async function handleContentGeneration({ goal, platform, contentType, audience, 
 }
 
 // ── Your Story: Clean up user's rough story + TTS ──
-async function handleSnippetGeneration({ childName, storyInput, about, duration, voiceId }) {
+async function handleSnippetGeneration({ childName, storyInput, about, duration, durationMins, voiceId }) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey || !elevenLabsKey) return json({ error: 'APIs not configured' }, 500);
@@ -140,7 +140,7 @@ RULES:
 - Use ${childName}'s name naturally throughout
 - Do not include any titles, headings, or metadata. Just the polished story text.
 - The tone should be warm, magical, and narrated — like a professional storyteller reading aloud.
-- Match the length and energy of what the user wrote. If they wrote a short moment, keep it short. If they wrote a long story, keep it long.`;
+- TARGET LENGTH: Approximately ${Math.round((durationMins || 0.5) * 150)} words (~${durationMins || 0.5} minutes of narration at ~150 words per minute). Expand or condense the user's story to hit this target while keeping all the same beats and moments.`;
   } else {
     // Legacy fallback: generate a snippet from scratch
     const targetWords = Math.round((duration || 10) * 2.5);
@@ -171,7 +171,7 @@ Example tone: "${childName} didn't know it yet... but tonight's story was differ
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: hasUserStory ? 4096 : 500,
+        max_tokens: hasUserStory ? Math.max(4096, Math.round((durationMins || 0.5) * 150 * 2)) : 500,
         messages: [{ role: 'user', content: snippetPrompt }]
       })
     });
