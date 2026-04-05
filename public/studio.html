@@ -2598,6 +2598,7 @@ async function pollSnippetStatus(jobId, btn) {
       if (data.success === false) {
         output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">${escHtml(data.error || 'Generation failed')}</pre></div>`;
       } else {
+        console.log('[SNIPPET] Result keys:', Object.keys(data), 'hasText:', !!data.storyText, 'hasAudio:', !!data.audio);
         renderStoryOutput(data);
       }
     } catch (e) {
