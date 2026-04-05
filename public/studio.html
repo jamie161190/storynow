@@ -654,25 +654,19 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
       </div>
 
       <div class="story-mode-toggle">
-        <div class="story-mode-btn active" onclick="setStoryMode('snippet',this)">Quick Snippet</div>
+        <div class="story-mode-btn active" onclick="setStoryMode('snippet',this)">Your Story</div>
         <div class="story-mode-btn" onclick="setStoryMode('full',this)">Full Story</div>
       </div>
 
       <!-- Quick Snippet Form -->
       <div id="snippetForm">
         <div class="ctrl-section">
-          <h4>Quick Snippet</h4>
+          <h4>Your Story</h4>
+          <p style="font-size:0.75rem;color:var(--text-soft);margin-bottom:0.5rem;line-height:1.5">Tell the story in your own words — rough, messy, whatever. We'll clean it up, add pauses and rhythm, and narrate it exactly as you told it.</p>
           <label>Child name</label>
           <input type="text" id="snipChildName" value="Chase" placeholder="e.g. Chase">
-          <label>About them (one line)</label>
-          <input type="text" id="snipAbout" placeholder="e.g. Loves dinosaurs, best friend is Ellis">
-          <label>Duration</label>
-          <div class="pill-group" id="snipDurationPills">
-            <div class="pill active" data-val="10" onclick="togglePill(this,'snipDurationPills')">10s</div>
-            <div class="pill" data-val="15" onclick="togglePill(this,'snipDurationPills')">15s</div>
-            <div class="pill" data-val="20" onclick="togglePill(this,'snipDurationPills')">20s</div>
-            <div class="pill" data-val="30" onclick="togglePill(this,'snipDurationPills')">30s</div>
-          </div>
+          <label>Your story</label>
+          <textarea id="snipStoryInput" style="height:140px" placeholder="e.g. Chase is in the garden and he finds this massive beetle and he thinks its a dinosaur and picks it up and shows his mum and she starts screaming and he goes why are you scared its just a baby dinosaur"></textarea>
         </div>
 
         <div class="ctrl-section">
@@ -694,7 +688,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
           <div class="voice-grid-studio" id="voiceGridSnippet"></div>
         </div>
 
-        <button class="btn btn-orange btn-full" style="margin-top:0.75rem" onclick="generateSnippet()" id="snipGenBtn">Generate Snippet</button>
+        <button class="btn btn-orange btn-full" style="margin-top:0.75rem" onclick="generateSnippet()" id="snipGenBtn">Generate Story</button>
       </div>
 
       <!-- Full Story Form -->
@@ -2379,14 +2373,20 @@ async function generateSnippet() {
   btn.textContent = 'Generating...';
   btn.disabled = true;
 
-  output.innerHTML = '<div class="output-loading"><div class="spinner"></div><p>Writing a quick snippet...</p></div>';
+  const storyInput = document.getElementById('snipStoryInput').value.trim();
+  if (!storyInput) {
+    output.innerHTML = '<div class="output-card"><p style="color:var(--pink);font-size:0.85rem">Tell the story first — write it rough, we\'ll clean it up.</p></div>';
+    btn.textContent = 'Generate Story';
+    btn.disabled = false;
+    return;
+  }
 
-  const duration = parseInt(getPillValue('snipDurationPills')) || 10;
+  output.innerHTML = '<div class="output-loading"><div class="spinner"></div><p>Polishing your story...</p></div>';
+
   const payload = {
     action: 'snippet',
     childName: document.getElementById('snipChildName').value || 'Chase',
-    about: document.getElementById('snipAbout').value,
-    duration,
+    storyInput,
     voiceId: selectedVoiceId
   };
 
@@ -2407,7 +2407,7 @@ async function generateSnippet() {
     output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Error: ${escHtml(e.message)}</pre></div>`;
   }
 
-  btn.textContent = 'Generate Snippet';
+  btn.textContent = 'Generate Story';
   btn.disabled = false;
 }
 

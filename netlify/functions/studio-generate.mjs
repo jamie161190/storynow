@@ -105,17 +105,46 @@ async function handleContentGeneration({ goal, platform, contentType, audience, 
   }
 }
 
-// ── Quick Snippet: Short text + instant TTS ──
-async function handleSnippetGeneration({ childName, about, duration, voiceId }) {
+// ── Your Story: Clean up user's rough story + TTS ──
+async function handleSnippetGeneration({ childName, storyInput, about, duration, voiceId }) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   const elevenLabsKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey || !elevenLabsKey) return json({ error: 'APIs not configured' }, 500);
 
-  // Calculate approximate word count for the duration
-  // Average narration speed: ~150 words per minute = 2.5 words per second
-  const targetWords = Math.round((duration || 10) * 2.5);
+  // If user provided their own story, clean it up. Otherwise fall back to old generation mode.
+  const hasUserStory = storyInput && storyInput.trim().length > 10;
 
-  const snippetPrompt = `Write a short, emotionally powerful story snippet for a child named ${childName || 'the child'}.
+  let snippetPrompt;
+  if (hasUserStory) {
+    snippetPrompt = `You are the Storytold audio story editor. A user has written a rough story in their own words. Your job is to clean it up into a beautifully narrated story, keeping EXACTLY the same story, same beats, same moments, same characters, same dialogue — just polished for audio narration.
+
+The child's name is ${childName || 'the child'}.
+
+Here is the user's rough story:
+"""
+${storyInput}
+"""
+
+RULES:
+- Keep the EXACT same story the user told. Do not add new plot points, remove scenes, or change what happens.
+- Keep all the same characters and dialogue moments.
+- Polish the language: fix grammar, improve flow, add vivid details where natural.
+- Format for audio narration using Storytold formatting rules:
+  - Use ... for breath pauses at suspense, wonder, scene transitions, emotional reveals
+  - Add a pause every 30-40 words
+  - Use ... ... for longer scene-change pauses
+  - Use audio tags sparingly (2-4 max): [whispers], [laughs softly], [gasps], [excitedly], [sighs]
+  - Vary sentence length: short punchy beats, then flowing, then one-word. Boom.
+  - Make dialogue feel alive with varied attribution (said, called out, whispered, laughed)
+  - NO em dashes, parentheses, or asterisks
+- Use ${childName}'s name naturally throughout
+- Do not include any titles, headings, or metadata. Just the polished story text.
+- The tone should be warm, magical, and narrated — like a professional storyteller reading aloud.
+- Match the length and energy of what the user wrote. If they wrote a short moment, keep it short. If they wrote a long story, keep it long.`;
+  } else {
+    // Legacy fallback: generate a snippet from scratch
+    const targetWords = Math.round((duration || 10) * 2.5);
+    snippetPrompt = `Write a short, emotionally powerful story snippet for a child named ${childName || 'the child'}.
 ${about ? `About them: ${about}` : ''}
 
 This must be EXACTLY ${targetWords} words (give or take 5 words). It will be read aloud by a narrator as audio for a marketing ad.
@@ -129,6 +158,7 @@ Requirements:
 - The listener should think "I need this for my child" after hearing it
 
 Example tone: "${childName} didn't know it yet... but tonight's story was different. Tonight, the hero had their name... their best friend... and a secret only they could unlock."`;
+  }
 
   try {
     // Step 1: Generate snippet text with Claude
@@ -141,7 +171,7 @@ Example tone: "${childName} didn't know it yet... but tonight's story was differ
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 500,
+        max_tokens: hasUserStory ? 4096 : 500,
         messages: [{ role: 'user', content: snippetPrompt }]
       })
     });
