@@ -2805,41 +2805,49 @@ async function handleComedyFile(file) {
   const thumbImg = document.getElementById('comedyThumbImg');
   const uploadZone = document.getElementById('comedyUpload');
 
+  // Helper to resize any image/frame to max 512px and compress hard
+  function resizeFrame(sourceCanvas) {
+    const maxDim = 512;
+    let w = sourceCanvas.width, h = sourceCanvas.height;
+    if (w > maxDim || h > maxDim) {
+      if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+      else { w = Math.round(w * maxDim / h); h = maxDim; }
+    }
+    const small = document.createElement('canvas');
+    small.width = w;
+    small.height = h;
+    small.getContext('2d').drawImage(sourceCanvas, 0, 0, w, h);
+    return small;
+  }
+
   if (file.type.startsWith('video/')) {
-    // Extract frame from video at 1 second
     const video = document.createElement('video');
     video.src = URL.createObjectURL(file);
     video.muted = true;
     video.currentTime = 1;
     await new Promise(r => { video.onseeked = r; video.load(); });
-    await new Promise(r => setTimeout(r, 300));
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
-    canvas.getContext('2d').drawImage(video, 0, 0);
-    comedyFrame = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-    thumbImg.src = canvas.toDataURL('image/jpeg', 0.85);
+    await new Promise(r => setTimeout(r, 500));
+    const raw = document.createElement('canvas');
+    raw.width = video.videoWidth || 640;
+    raw.height = video.videoHeight || 480;
+    raw.getContext('2d').drawImage(video, 0, 0);
+    const small = resizeFrame(raw);
+    comedyFrame = small.toDataURL('image/jpeg', 0.6).split(',')[1];
+    thumbImg.src = small.toDataURL('image/jpeg', 0.6);
     URL.revokeObjectURL(video.src);
   } else {
-    // Image file
     const reader = new FileReader();
     await new Promise(resolve => {
       reader.onload = (e) => {
-        thumbImg.src = e.target.result;
-        // Resize to reasonable dimensions
         const img = new Image();
         img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const maxDim = 1024;
-          let w = img.width, h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-            else { w = Math.round(w * maxDim / h); h = maxDim; }
-          }
-          canvas.width = w;
-          canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          comedyFrame = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+          const raw = document.createElement('canvas');
+          raw.width = img.width;
+          raw.height = img.height;
+          raw.getContext('2d').drawImage(img, 0, 0);
+          const small = resizeFrame(raw);
+          comedyFrame = small.toDataURL('image/jpeg', 0.6).split(',')[1];
+          thumbImg.src = small.toDataURL('image/jpeg', 0.6);
           resolve();
         };
         img.src = e.target.result;
@@ -2928,11 +2936,31 @@ async function generateComedyClip() {
   };
 
   try {
+    const bodyStr = JSON.stringify(payload);
+    console.log('[Comedy] Payload size:', Math.round(bodyStr.length / 1024) + 'KB');
+
     const res = await fetch('/api/studio-generate', {
       method: 'POST',
       headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: bodyStr
     });
+
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      const text = await res.text();
+      console.error('[Comedy] Non-JSON response:', res.status, text.slice(0, 200));
+      if (res.status === 413) {
+        output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Image is too large. Try a smaller photo or a shorter video clip.</pre></div>`;
+      } else if (res.status === 504 || res.status === 502) {
+        output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Function timed out. The API calls took too long. Try again.</pre></div>`;
+      } else {
+        output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Server error (${res.status}). Try again in a moment.</pre></div>`;
+      }
+      btn.textContent = 'Generate Comedy Clip';
+      btn.disabled = false;
+      return;
+    }
+
     const data = await res.json();
 
     if (data.error && !data.storyText) {
@@ -2941,6 +2969,7 @@ async function generateComedyClip() {
       renderComedyOutput(data);
     }
   } catch (e) {
+    console.error('[Comedy] Fetch error:', e);
     output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">Error: ${escHtml(e.message)}</pre></div>`;
   }
 
