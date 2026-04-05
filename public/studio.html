@@ -2553,7 +2553,9 @@ async function generateSnippet() {
       headers: { 'x-admin-secret': studioSecret, 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { throw new Error('Server timed out — try a shorter duration or try again'); }
 
     if (data.error) {
       output.innerHTML = `<div class="output-card"><pre style="color:var(--pink)">${escHtml(data.error)}</pre></div>`;
