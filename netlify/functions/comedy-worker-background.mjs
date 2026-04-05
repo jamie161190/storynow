@@ -87,7 +87,7 @@ ${sceneDescription}
 
 The child's name is ${name}.${childAge ? ` They are ${childAge === 'baby' ? 'a baby (under 1 year old)' : childAge + (childAge === '13+' ? '' : '')} in this clip.` : ''}${extraContext ? `\nExtra context from the parent: ${extraContext}` : ''}
 
-${duration ? `Write a narration that is EXACTLY ${Math.round(duration * 1.8)} words long (absolute maximum ${Math.round(duration * 2.0)} words). This must match a ${duration}-second video clip PRECISELY. CRITICAL: Each "..." pause takes ~0.7 seconds of spoken time. Each [audio tag] takes ~1 second. These count toward the ${duration} seconds even though they aren't words. So if you use 6 pauses and 2 audio tags, that's ~6 seconds of non-word time, meaning you only have ${duration - 6} seconds for actual words. Budget accordingly. The narration MUST NOT run longer than ${duration} seconds when spoken aloud.` : 'Write a narration for this clip. Make it as long or short as it naturally needs to be. Let the comedy breathe.'} This will be read aloud by a text-to-speech voice narrator over the clip.
+${duration ? `Write a narration that is approximately ${Math.round(duration * 2.2)} words long. This must match a ${duration}-second video clip. Each "..." pause takes ~0.7 seconds and each [audio tag] takes ~1 second of spoken time, so factor those into your total duration estimate.` : 'Write a narration for this clip. Make it as long or short as it naturally needs to be. Let the comedy breathe.'} This will be read aloud by a text-to-speech voice narrator over the clip.
 
 AUDIO FORMATTING RULES (CRITICAL - this is read aloud by TTS):
 - Use three dots ( ... ) to create breath pauses. Place them at moments of suspense, reveals, and before punchlines. Aim for one pause every 30-40 words minimum. Example: "And there, standing in the middle of the kitchen ... was ${name}."
@@ -173,17 +173,22 @@ COMEDY RULES:
     let audioBuffer = await ttsRes.arrayBuffer();
     let finalNarrationText = narrationText;
 
-    // Check audio duration vs video duration — retry if narration is too long
+    // Check audio duration vs video duration — retry if narration is too long or too short
     // ElevenLabs returns MP3 at ~128kbps. Duration ≈ bytes / (128000/8) = bytes / 16000
     if (duration) {
       const estimatedAudioDuration = audioBuffer.byteLength / 16000;
-      const maxAllowed = duration + 3; // Allow up to 3 seconds over
+      const tooLong = estimatedAudioDuration > duration + 3;
+      const tooShort = estimatedAudioDuration < duration - 3;
 
-      if (estimatedAudioDuration > maxAllowed) {
-        console.log(`[COMEDY] Narration too long: ~${Math.round(estimatedAudioDuration)}s vs ${duration}s video. Trimming...`);
+      if (tooLong || tooShort) {
+        const direction = tooLong ? 'long' : 'short';
+        const instruction = tooLong
+          ? `SHORTEN this script to fit ${duration} seconds. Cut words, remove some pauses, tighten sentences. Keep the best jokes and the punchline. Remove the weakest material.`
+          : `EXPAND this script to fill ${duration} seconds. Add more dramatic pauses (...), extend descriptions, add another comedic beat or observation. Don't pad with filler — add genuinely funny material in the same style.`;
 
-        // Ask Claude to shorten the script
-        const trimRes = await fetch('https://api.anthropic.com/v1/messages', {
+        console.log(`[COMEDY] Narration too ${direction}: ~${Math.round(estimatedAudioDuration)}s vs ${duration}s video. Adjusting...`);
+
+        const adjustRes = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: {
             'x-api-key': apiKey,
@@ -192,28 +197,29 @@ COMEDY RULES:
           },
           body: JSON.stringify({
             model: 'claude-sonnet-4-6',
-            max_tokens: 800,
-            messages: [{ role: 'user', content: `This narration script is too long. It runs approximately ${Math.round(estimatedAudioDuration)} seconds when spoken, but the video is only ${duration} seconds.
+            max_tokens: 1200,
+            messages: [{ role: 'user', content: `This narration script is too ${direction}. It runs approximately ${Math.round(estimatedAudioDuration)} seconds when spoken, but the video is ${duration} seconds.
 
-SHORTEN this script to fit ${duration} seconds. Cut words, remove some pauses, tighten sentences. Keep the best jokes and the punchline. Keep the same style and character. Keep the child's name. Remove the weakest material.
+${instruction}
+
+Keep the same style and character. Keep the child's name.
 
 Original script:
-${narrationText}
+${finalNarrationText}
 
-Return ONLY the shortened script, nothing else.` }]
+Return ONLY the adjusted script, nothing else.` }]
           })
         });
 
-        if (trimRes.ok) {
-          const trimData = await trimRes.json();
-          let trimmedText = '';
-          for (const block of trimData.content) {
-            if (block.type === 'text') trimmedText += block.text;
+        if (adjustRes.ok) {
+          const adjustData = await adjustRes.json();
+          let adjustedText = '';
+          for (const block of adjustData.content) {
+            if (block.type === 'text') adjustedText += block.text;
           }
 
-          if (trimmedText.length > 20) {
-            // Re-generate TTS with shorter script
-            await saveResult(supabaseUrl, supabaseKey, jobId, { status: 'narrating', sceneDescription, storyText: trimmedText });
+          if (adjustedText.length > 20) {
+            await saveResult(supabaseUrl, supabaseKey, jobId, { status: 'narrating', sceneDescription, storyText: adjustedText });
 
             const ttsRetry = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
               method: 'POST',
@@ -222,7 +228,7 @@ Return ONLY the shortened script, nothing else.` }]
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                text: trimmedText,
+                text: adjustedText,
                 model_id: 'eleven_v3',
                 voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 }
               })
@@ -230,9 +236,9 @@ Return ONLY the shortened script, nothing else.` }]
 
             if (ttsRetry.ok) {
               audioBuffer = await ttsRetry.arrayBuffer();
-              finalNarrationText = trimmedText;
+              finalNarrationText = adjustedText;
               const newDuration = audioBuffer.byteLength / 16000;
-              console.log(`[COMEDY] Trimmed narration: ~${Math.round(newDuration)}s (target: ${duration}s)`);
+              console.log(`[COMEDY] Adjusted narration: ~${Math.round(newDuration)}s (target: ${duration}s)`);
             }
           }
         }
