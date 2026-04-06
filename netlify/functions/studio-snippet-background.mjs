@@ -22,7 +22,7 @@ export default async (req) => {
 
     let snippetPrompt;
     if (hasUserStory) {
-      snippetPrompt = `You are the Storytold audio story editor. A user has written a rough story in their own words. Your job is to clean it up into a beautifully narrated story, keeping EXACTLY the same story, same beats, same moments, same characters, same dialogue — just polished for audio narration.
+      snippetPrompt = `You are the Hear Their Name audio story editor. A user has written a rough story in their own words. Your job is to clean it up into a beautifully narrated story, keeping EXACTLY the same story, same beats, same moments, same characters, same dialogue — just polished for audio narration.
 
 The child's name is ${childName || 'the child'}.
 
@@ -35,7 +35,7 @@ RULES:
 - Keep the EXACT same story the user told. Do not add new plot points, remove scenes, or change what happens.
 - Keep all the same characters and dialogue moments.
 - Polish the language: fix grammar, improve flow, add vivid details where natural.
-- Format for audio narration using Storytold formatting rules:
+- Format for audio narration using Hear Their Name formatting rules:
   - Use ... for breath pauses at suspense, wonder, scene transitions, emotional reveals
   - Add a pause every 30-40 words
   - Use ... ... for longer scene-change pauses

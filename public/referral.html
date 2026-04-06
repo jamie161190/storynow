@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Referral Stats | Storytold</title>
+<title>Your Referral Stats | Hear Their Name</title>
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -56,7 +56,7 @@ body { font-family: 'Quicksand', sans-serif; background: #FEFBF6; color: #2D2844
 
 <div class="container">
   <div class="logo">
-    <h1>Storytold</h1>
+    <h1>Hear Their Name</h1>
     <p>Your Referral Dashboard</p>
   </div>
 
@@ -156,7 +156,7 @@ async function loadStats() {
     document.getElementById('sRevenue').textContent = '£' + Number(data.revenue).toFixed(2);
     document.getElementById('sRate').textContent = data.conversionRate + '%';
 
-    const link = 'https://storytold.ai?ref=' + encodeURIComponent(data.code);
+    const link = 'https://heartheirname.com?ref=' + encodeURIComponent(data.code);
     document.getElementById('refLinkUrl').textContent = link;
 
     // Update URL without reload

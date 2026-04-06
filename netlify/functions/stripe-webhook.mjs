@@ -72,7 +72,7 @@ export default async (req) => {
             event_name: 'Purchase',
             event_time: eventTime,
             event_id: eventId,
-            event_source_url: 'https://storytold.ai',
+            event_source_url: 'https://heartheirname.com',
             action_source: 'website',
             user_data: {
               ...(hashedEmail ? { em: [hashedEmail] } : {}),
@@ -115,7 +115,7 @@ export default async (req) => {
       try {
         const tiktokPayload = {
           pixel_code: tiktokPixelId,
-          partner_name: 'Storytold',
+          partner_name: 'Hear Their Name',
           event: 'CompletePayment',
           event_id: eventId,
           timestamp: new Date(session.created * 1000).toISOString(),
@@ -124,7 +124,7 @@ export default async (req) => {
               ...(hashedEmail ? { email: hashedEmail } : {}),
               ...(metadata.user_agent ? { user_agent: metadata.user_agent } : {})
             },
-            page: { url: 'https://storytold.ai' }
+            page: { url: 'https://heartheirname.com' }
           },
           properties: {
             currency: currency.toUpperCase(),
@@ -268,7 +268,7 @@ export default async (req) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'Jamie from Storytold <hello@storytold.ai>',
+          from: 'Jamie from Hear Their Name <jamie@heartheirname.com>',
           to: [email],
           subject: childName
             ? `${esc(childName)}'s story is still waiting for you`
@@ -303,7 +303,7 @@ function abandonedCartEmail(childName) {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://storytold.ai/logo-new.png" alt="Storytold" style="height:60px;width:auto;margin:0;" />
+      <img src="https://heartheirname.com/logo-new.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:28px;text-align:center;margin:0 0 8px;">🎧</p>
@@ -320,7 +320,7 @@ function abandonedCartEmail(childName) {
         Life gets busy, I know. But the story you started is ready to be finished whenever you are.
       </p>
       <div style="text-align:center;margin:0 0 28px;">
-        <a href="https://storytold.ai" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Pick up where you left off</a>
+        <a href="https://heartheirname.com" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Pick up where you left off</a>
       </div>
       <div style="background:#FFF8F0;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 6px;font-size:14px;color:#2D2844;font-weight:700;">Not sure yet?</p>
@@ -335,9 +335,9 @@ function abandonedCartEmail(childName) {
         }
       </p>
     </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Hear Their Name. Audio stories that know them by name.</p>
     <p style="text-align:center;margin-top:12px;">
-      <a href="https://storytold.ai" style="color:#bbb;font-size:11px;text-decoration:underline;">Unsubscribe</a>
+      <a href="https://heartheirname.com" style="color:#bbb;font-size:11px;text-decoration:underline;">Unsubscribe</a>
     </p>
   </div>
 </body>

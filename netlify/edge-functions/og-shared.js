@@ -58,28 +58,28 @@ export default async (request, context) => {
 
     const ogTitle = `Listen to ${childName}'s personalised ${categoryLabel}`;
     const ogDescription = story.gift_message
-      ? `${story.gift_message.substring(0, 140)}... Made with Storytold.`
-      : `A one of a kind audio ${categoryLabel} created just for ${childName}. Their name, their friends, their world. Made with Storytold.`;
-    const ogUrl = `https://storytold.ai/?listen=${encodeURIComponent(listenId)}`;
+      ? `${story.gift_message.substring(0, 140)}... Made with Hear Their Name.`
+      : `A one of a kind audio ${categoryLabel} created just for ${childName}. Their name, their friends, their world. Made with Hear Their Name.`;
+    const ogUrl = `https://heartheirname.com/?listen=${encodeURIComponent(listenId)}`;
 
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>${ogTitle} | Storytold</title>
+<title>${ogTitle} | Hear Their Name</title>
 <meta name="description" content="${ogDescription}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${ogUrl}">
 <meta property="og:title" content="${ogTitle}">
 <meta property="og:description" content="${ogDescription}">
-<meta property="og:image" content="https://storytold.ai/og-image.png">
+<meta property="og:image" content="https://heartheirname.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:site_name" content="Storytold">
+<meta property="og:site_name" content="Hear Their Name">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${ogTitle}">
 <meta name="twitter:description" content="${ogDescription}">
-<meta name="twitter:image" content="https://storytold.ai/og-image.png">
+<meta name="twitter:image" content="https://heartheirname.com/og-image.png">
 </head>
 <body>
 <p>Redirecting to ${childName}'s story...</p>

@@ -1,13 +1,13 @@
 // Studio AI Creative Director: Analyses uploaded clips/photos with Claude Vision,
 // auto-names and tags them, then generates complete ad builds as Compose-ready timelines.
 
-// ── The full Storytold brain: shared across analysis + concept generation ──
+// ── The full Hear Their Name brain: shared across analysis + concept generation ──
 const STORYTOLD_BRAIN = `
 ═══════════════════════════════════════════════════════
 SECTION 1: THE PRODUCT
 ═══════════════════════════════════════════════════════
 
-Storytold (storytold.ai) creates personalised audio stories for children aged 2-14. A parent fills in their child's details and receives a unique story narrated by a professional voice. The child's name is woven throughout (8+ times). Their best friend has a role. Their pet does something memorable. Their interests drive the plot. A personal message from the parent is read aloud at the start ("Chase, this is from Daddy...").
+Hear Their Name (heartheirname.com) creates personalised audio stories for children aged 2-14. A parent fills in their child's details and receives a unique story narrated by a professional voice. The child's name is woven throughout (8+ times). Their best friend has a role. Their pet does something memorable. Their interests drive the plot. A personal message from the parent is read aloud at the start ("Chase, this is from Daddy...").
 
 Price: 19.99 GBP. One payment. No subscription. Theirs forever.
 Tagline: "A story that knows their name"
@@ -32,13 +32,13 @@ SECTION 2: CHASE AND THE HOMEPAGE
 ═══════════════════════════════════════════════════════
 
 WHO CHASE IS:
-Chase is Jamie's (the founder's) son. He is not a mascot. He is the reason this product exists. Jamie built Storytold because Chase asked why he wasn't in any of his stories. Chase IS the brand. He is the living, breathing proof that this product creates magic.
+Chase is Jamie's (the founder's) son. He is not a mascot. He is the reason this product exists. Jamie built Hear Their Name because Chase asked why he wasn't in any of his stories. Chase IS the brand. He is the living, breathing proof that this product creates magic.
 
 CHASE'S AGE TIMELINE (critical for ad storytelling):
 Chase is currently around 9-10 years old. But content featuring Chase spans his entire life. This matters enormously for ad narrative:
-- Baby/toddler Chase (0-2): This is BEFORE Storytold. Before the question. These clips show the world that INSPIRED the product. "This was before he asked the question that changed everything."
+- Baby/toddler Chase (0-2): This is BEFORE Hear Their Name. Before the question. These clips show the world that INSPIRED the product. "This was before he asked the question that changed everything."
 - Young Chase (3-5): This is AROUND the time the idea formed. The origin era. "He was only 4 when he asked why he wasn't in any of his stories."
-- Current Chase (8-10): This is Chase NOW. The kid who HAS Storytold stories. The kid on the homepage. The living proof.
+- Current Chase (8-10): This is Chase NOW. The kid who HAS Hear Their Name stories. The kid on the homepage. The living proof.
 
 When content shows a YOUNGER Chase, the ad narrative should reflect the timeline: "This was Chase at 3... by the time he was 5, he asked the question that started everything." Younger Chase footage + current product = origin story energy. The age gap itself is the emotional hook.
 
@@ -54,7 +54,7 @@ THE HOMEPAGE STRUCTURE (what visitors see when they land):
 THE CRITICAL THING TO UNDERSTAND:
 Chase is the DEMO. The homepage is built around his stories. Visitors hear Chase's name, see Chase's world, and think "I want this for MY child." Then they scroll down and create their own. Chase draws them in. The product converts them.
 
-When Chase appears in ANY ad content, he is not just "a kid" — he is the origin story. The ad should feel like it comes from the same world as the homepage. The viewer should land on storytold.ai and think "that's the same kid I just watched."
+When Chase appears in ANY ad content, he is not just "a kid" — he is the origin story. The ad should feel like it comes from the same world as the homepage. The viewer should land on heartheirname.com and think "that's the same kid I just watched."
 
 OTHER PEOPLE WHO APPEAR IN CONTENT:
 - Chase's cousins (nieces, nephews) — group content, reaction chains, "put all four cousins in a story"
@@ -71,12 +71,12 @@ You will receive two fundamentally different types of content. You MUST identify
 TYPE A: COMEDY CLIPS (the hook — entertainment content)
 These are clips where a dramatic, over-the-top narration has been generated over mundane footage of a kid. Chase in the bath narrated like an epic movie. A toddler eating cereal narrated like breaking news. The comedy comes from the CONTRAST between the ordinary footage and the ridiculous narration.
 
-Comedy clips are NOT the product. They are ENTERTAINMENT that draws people in. The viewer laughs, is entertained, and if the ad is built correctly, thinks "wait, I could do this with my kid" — and THAT thought leads them to storytold.ai where they discover the real product: personalised stories.
+Comedy clips are NOT the product. They are ENTERTAINMENT that draws people in. The viewer laughs, is entertained, and if the ad is built correctly, thinks "wait, I could do this with my kid" — and THAT thought leads them to heartheirname.com where they discover the real product: personalised stories.
 
 How to recognise a comedy clip: It has dramatic narration audio over ordinary footage. The narration style is one of: Epic Movie, Nature Documentary, Breaking News, Fairy Tale, Sports Commentary, Horror Trailer, Heist Movie, Romance. The child's name appears in the narration.
 
 TYPE B: REACTION/LIFESTYLE FOOTAGE (the emotion — conversion content)
-These are real clips of children hearing their stories, parents reacting, families gathered around a speaker. This is the traditional Storytold content.
+These are real clips of children hearing their stories, parents reacting, families gathered around a speaker. This is the traditional Hear Their Name content.
 
 How to recognise reaction footage: A child is visibly listening to something. A parent is emotional. Someone is reacting to audio. There is no over-the-top comedy narration — the emotion is real and raw.
 
@@ -94,7 +94,7 @@ THE CONVERSION CHAIN:
 1. ENTERTAINMENT — Funny comedy clip stops the scroll
 2. INTRIGUE — "How is he in the story?" / The child's name is spoken
 3. THE BRIDGE — Text that shifts from entertainment to personalisation: "Turn your child into the story" / "Create their story" / "Make them the hero" / "He didn't know the story was about him... until he heard his name"
-4. ACTION — Viewer clicks through to storytold.ai
+4. ACTION — Viewer clicks through to heartheirname.com
 5. LANDING PAGE — "A story that knows their name" continues the exact same emotional thread
 6. PREVIEW — They hear their own child's name in a story
 7. PURCHASE — Emotional commitment already made
@@ -169,7 +169,7 @@ CHASE (boy, Jamie's son):
 - Chase with headphones/listening = the "press play" moment
 
 AGE MATTERS FOR CHASE (AND ALL CHILDREN):
-- If the child looks younger than current Chase (under 6), this may be ARCHIVE footage — before Storytold existed. This changes the ad narrative completely.
+- If the child looks younger than current Chase (under 6), this may be ARCHIVE footage — before Hear Their Name existed. This changes the ad narrative completely.
 - Young Chase: Origin story angle. "This was before he asked the question..." / "He didn't know yet that one day he'd hear his name in a story"
 - Current Chase: Living proof angle. "This is Chase. He's the hero of his own story."
 - The AGE GAP between old and new footage is itself a powerful storytelling device. "He was 3 here. By 5, he asked why he wasn't in any of his stories. Now he is."
@@ -225,8 +225,8 @@ LAYER 3: THE BRIDGE (after the main content, before CTA)
 - Font: Bold, clean, white on dark or on the footage. Must be instantly readable.
 
 LAYER 4: END CARD (final 2-3 seconds)
-- "Create their story at storytold.ai" or "storytold.ai" with tagline
-- Branded (purple gradient background, Storytold logo feel)
+- "Create their story at heartheirname.com" or "heartheirname.com" with tagline
+- Branded (purple gradient background, Hear Their Name logo feel)
 - Can include "Hear it free first" as a secondary line to reduce friction
 
 LAYER 5: START CARD (optional, before the clip)
@@ -249,13 +249,13 @@ SECTION 8: THE DISCONNECT AND HOW TO HANDLE IT
 THE DISCONNECT: The ad shows a comedy narration over a video clip. The product is a personalised audio story WITHOUT video. These are different things. The viewer must NOT think they are buying "funny narration over their home videos." They must understand they are buying a personalised story for their child.
 
 HOW THE AD HANDLES THIS:
-The comedy clip is the HOOK. It demonstrates that Storytold understands children's worlds. It demonstrates personalisation (the child's name is IN the narration). It demonstrates the quality of the narration voice. But the BRIDGE reframes it.
+The comedy clip is the HOOK. It demonstrates that Hear Their Name understands children's worlds. It demonstrates personalisation (the child's name is IN the narration). It demonstrates the quality of the narration voice. But the BRIDGE reframes it.
 
 "Turn your child into the story" — this says "story", not "video narration"
 "A story that knows their name" — the tagline on the landing page continues this
 "Create their story" — again, "story"
 
-The word "story" does the work. The viewer arrives on storytold.ai and sees the real product: personalised audio stories. They don't feel misled because the ad showed a story about a specific child, and the product IS a story about a specific child. The format is different (audio vs video) but the promise (personalisation, their name, their world) is the same.
+The word "story" does the work. The viewer arrives on heartheirname.com and sees the real product: personalised audio stories. They don't feel misled because the ad showed a story about a specific child, and the product IS a story about a specific child. The format is different (audio vs video) but the promise (personalisation, their name, their world) is the same.
 
 DO NOT let ads imply you can upload a video and get narration over it. The comedy clips are marketing content, not a customer-facing product (yet).
 
@@ -318,7 +318,7 @@ Structure: Extreme close-up of face > Audio plays > Micro-expressions > Full rea
 
 AD11: NO-KIDS COUPLE GIFT
 Hook: "We don't have kids but we just gave the best gift we've ever given"
-Structure: Couple finding Storytold > Building story > Child receives > Reaction
+Structure: Couple finding Hear Their Name > Building story > Child receives > Reaction
 
 AD12: 15 MIN BACKGROUND CLIP
 Hook: "They didn't know I was filming"
@@ -384,7 +384,7 @@ DO:
 - Film in 9:16 vertical (1080x1920) for primary platforms.
 - Raw audio only. No background music on reaction content.
 - ALWAYS include a bridge in comedy clip ads.
-- ALWAYS end with a CTA that includes "storytold.ai"
+- ALWAYS end with a CTA that includes "heartheirname.com"
 
 DO NOT:
 - Script reactions or tell children what to do
@@ -421,7 +421,7 @@ const ANALYSIS_BRAIN = `${STORYTOLD_BRAIN}
 YOUR ROLE AS ANALYST
 ═══════════════════════════════════════════════════════
 
-You are the AI Creative Director for Storytold. You are analysing uploaded content for marketing ads. You are not following a checklist. You are THINKING about what you see, who is in it, how long it is, what type of content it is, and how it can be turned into an ad that converts.
+You are the AI Creative Director for Hear Their Name. You are analysing uploaded content for marketing ads. You are not following a checklist. You are THINKING about what you see, who is in it, how long it is, what type of content it is, and how it can be turned into an ad that converts.
 
 STEP 1 — IDENTIFY THE CONTENT TYPE:
 Before anything else, figure out what you're looking at:
@@ -479,7 +479,7 @@ STEP 5 — DETERMINE AD POSITION AND OVERLAYS:
 - hook: Scroll-stopping moment. Must work WITHOUT audio on tiny phone screen.
 - middle: The story, the journey, the build. Where desire grows.
 - bridge: The pivot from entertainment to product. Comedy clips need this.
-- cta: Clean call to action. "Create their story at storytold.ai"
+- cta: Clean call to action. "Create their story at heartheirname.com"
 - standalone: Works as a single social post.
 
 For overlays: Think about what TEXT would make this 5x more powerful. What caption turns a funny clip into a conversion moment? What text turns a reaction into something shareable?
@@ -493,13 +493,13 @@ When to suggest a voice CTA:
 - When the clip is long enough that a 3-5 second voice tag won't feel rushed
 
 What the voice CTA sounds like (examples):
-- Epic Movie style: "Every hero deserves a story... Create theirs... at storytold dot ai" (dramatic, with pauses)
+- Epic Movie style: "Every hero deserves a story... Create theirs... at hear their name dot com" (dramatic, with pauses)
 - Documentary style: "And so begins a story... made just for them" (warm, reflective)
-- Breaking News style: "This just in... you can create their story... at storytold dot ai" (in-character)
+- Breaking News style: "This just in... you can create their story... at hear their name dot com" (in-character)
 - Fairy Tale style: "And they all lived happily ever after... especially when they heard their own name"
-- Sports Commentary: "And the crowd goes wild... create their story at storytold dot ai"
+- Sports Commentary: "And the crowd goes wild... create their story at hear their name dot com"
 - Horror style: "Coming soon... to a bedtime near you" (tongue in cheek)
-- Heist style: "The perfect getaway... storytold dot ai"
+- Heist style: "The perfect getaway... hear their name dot com"
 - Romance style: "A love story... made just for them"
 
 When NOT to use voice CTA:
@@ -555,13 +555,13 @@ When building timelines for narrated clips, the "clip" block must have NO trimSt
 STRUCTURE A — PURE NARRATED (shortest, TikTok/Reels):
 1. [OPTIONAL] Hook text card (2s): "I narrated my son's bath time like a movie trailer"
 2. FULL CLIP plays with narration — hook caption overlay at start, bridge text overlay near end
-3. End card (2-3s): "storytold.ai" with "Hear it free first"
+3. End card (2-3s): "heartheirname.com" with "Hear it free first"
 Total: clip duration + 2-5s of cards
 
 STRUCTURE B — NARRATED + VOICE CTA:
 1. [OPTIONAL] Hook text card (2s)
 2. FULL CLIP plays — hook caption overlay at start
-3. Voice CTA by same narrator (3-5s): Narrator drops from comedy to sincere. "Every child deserves a story... create theirs at storytold dot ai."
+3. Voice CTA by same narrator (3-5s): Narrator drops from comedy to sincere. "Every child deserves a story... create theirs at hear their name dot com."
 4. End card (2-3s)
 Total: clip duration + 5-9s
 
@@ -574,7 +574,7 @@ Total: clip duration + 10-13s
 
 STRUCTURE D — NARRATED + REACTION (most powerful):
 1. FULL CLIP plays — hook caption overlay at start
-2. CUT TO: reaction footage of a child hearing a Storytold story (5-8s)
+2. CUT TO: reaction footage of a child hearing a Hear Their Name story (5-8s)
 3. Bridge text card: "Their name. Their world. Their story." (2-3s)
 4. End card (2-3s)
 Total: clip duration + 10-14s (requires separate reaction footage)
@@ -586,17 +586,17 @@ When using a voice CTA (Structure B), the spoken line must:
 - Include a natural pause/beat before the CTA: "..." then the line
 - Be SHORT: one sentence max, 5-15 words
 - Feel like the narrator is breaking character just enough to be real
-- End with "storytold dot ai" spoken naturally (not "storytold.ai" — spell it for audio)
+- End with "hear their name dot com" spoken naturally (not "heartheirname.com" — spell it for audio)
 
 Voice CTA examples by comedy style:
-- Epic Movie: "[dramatic pause] ... Every hero deserves a story ... create theirs ... at storytold dot ai"
-- Documentary: "And so begins a story ... made just for them ... storytold dot ai"
-- Breaking News: "This just in ... you can create their story ... storytold dot ai"
-- Fairy Tale: "And they all lived happily ever after ... especially when they heard their own name ... storytold dot ai"
-- Sports Commentary: "And the crowd goes wild ... create their story ... storytold dot ai"
-- Horror: "Coming soon ... to a bedtime near you ... storytold dot ai"
-- Heist: "The perfect getaway ... storytold dot ai"
-- Romance: "A love story ... made just for them ... storytold dot ai"
+- Epic Movie: "[dramatic pause] ... Every hero deserves a story ... create theirs ... at hear their name dot com"
+- Documentary: "And so begins a story ... made just for them ... hear their name dot com"
+- Breaking News: "This just in ... you can create their story ... hear their name dot com"
+- Fairy Tale: "And they all lived happily ever after ... especially when they heard their own name ... hear their name dot com"
+- Sports Commentary: "And the crowd goes wild ... create their story ... hear their name dot com"
+- Horror: "Coming soon ... to a bedtime near you ... hear their name dot com"
+- Heist: "The perfect getaway ... hear their name dot com"
+- Romance: "A love story ... made just for them ... hear their name dot com"
 
 When NOT to use voice CTA:
 - Clips under 10 seconds total (too rushed)
@@ -613,7 +613,7 @@ STRUCTURE E — PURE REACTION (TikTok/Reels, 12-20s):
 1. Hook caption: "Watch his face when he hears it" (2s)
 2. Child/parent listening, reaction building (8-12s)
 3. Name moment hits, reaction (3-5s) — this IS the bridge
-4. End card: "Create their story at storytold.ai" (2-3s)
+4. End card: "Create their story at heartheirname.com" (2-3s)
 
 STRUCTURE F — FOUNDER STORY (Meta/YouTube, 25-45s):
 1. Jamie selfie: "My son asked me why he was never in any of his stories" (5-8s)
@@ -751,7 +751,7 @@ For each asset, return a JSON array with objects containing:
 - whoIsInIt: describe who you see. If it looks like a boy around age 9, flag as possibly Chase. Note: adults, multiple children, grandparents, etc.
 - isChase: true/false — your best guess whether this is Chase (the founder's son, the homepage hero)
 - estimatedAge: the child's age. If the user provided "child's age in this clip" in the context above, USE THAT EXACT VALUE — do not guess differently. Only estimate from the image if no age was provided.
-- ageTimelineNote: if this is Chase, write a note about where this falls in the Storytold timeline (e.g. "Young Chase — before Storytold existed. Origin story material." or "Current Chase — the kid on the homepage. Living proof." or "Not Chase"). For non-Chase children, write the age-appropriate ad angle (e.g. "Toddler — gentle/cute hooks work best" or "Pre-teen — 'too old for it' angle")
+- ageTimelineNote: if this is Chase, write a note about where this falls in the Hear Their Name timeline (e.g. "Young Chase — before Hear Their Name existed. Origin story material." or "Current Chase — the kid on the homepage. Living proof." or "Not Chase"). For non-Chase children, write the age-appropriate ad angle (e.g. "Toddler — gentle/cute hooks work best" or "Pre-teen — 'too old for it' angle")
 - isNarratedClip: true/false — if this came from the Narrate tab (check for comedy style, narration text, or isComedyClip flag in context). CRITICAL: narrated clips MUST play in full, never trimmed or interrupted. All ad layers go before, after, or on top.
 - durationCategory: one of: very-short (under 5s), short (5-15s), medium (15-30s), long (30-60s), very-long (60s+)
 - marketingPotential: 1-5 rating
@@ -760,7 +760,7 @@ For each asset, return a JSON array with objects containing:
 - suggestedOverlay: text overlay that would make this asset more powerful
 - suggestedBridge: if this is comedy/entertainment content, write the bridge text that converts it to action (e.g. "Turn your child into the story"). If reaction content, write "none — reaction is the bridge"
 - needsVoiceCta: true/false — should the narrator voice deliver a spoken CTA at the end?
-- voiceCtaLine: if needsVoiceCta is true, write the exact spoken line (e.g. "Every hero deserves a story... create theirs... at storytold dot ai"). Match the comedy style if applicable.
+- voiceCtaLine: if needsVoiceCta is true, write the exact spoken line (e.g. "Every hero deserves a story... create theirs... at hear their name dot com"). Match the comedy style if applicable.
 - suggestedMockupPair: which mockup screen would pair well (child-details, loading, preview-player, etc.) or "none"
 - adStructure: which ad structure from the playbook fits best? (e.g. "Structure A — Pure Comedy", "Structure B — Comedy + Voice CTA", "Structure E — Pure Reaction", etc.)
 - suggestedLayers: array of which layers this ad needs. e.g. ["hook-caption", "bridge", "end-card"] or ["hook-caption", "mid-caption", "voice-cta", "end-card"]
@@ -915,7 +915,7 @@ For each concept, return a JSON object in this EXACT format:
           "type": "endcard",
           "duration": 3,
           "config": {
-            "cta": "Create their story at storytold.ai"
+            "cta": "Create their story at heartheirname.com"
           }
         }
       ]

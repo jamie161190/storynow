@@ -26,6 +26,10 @@
 
 
 [[edge_functions]]
+  path = "/*"
+  function = "redirect-old-domain"
+
+[[edge_functions]]
   path = "/"
   function = "og-shared"
 
@@ -33,3 +37,6 @@
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
+
+# 301 redirect old domain to new domain (handled by edge function)
+# Edge function redirect-old-domain.js catches storytold.ai requests

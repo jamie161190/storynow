@@ -29,7 +29,7 @@ export default async (req) => {
     }
 
     const stripe = new Stripe(stripeKey);
-    const siteUrl = req.headers.get('origin') || process.env.URL || 'https://storytold.ai';
+    const siteUrl = req.headers.get('origin') || process.env.URL || 'https://heartheirname.com';
 
     const session = await stripe.checkout.sessions.create({
       line_items: [
@@ -37,7 +37,7 @@ export default async (req) => {
           price_data: {
             currency: 'gbp',
             product_data: {
-              name: 'Storytold: Personalised Audio Story',
+              name: 'Hear Their Name: Personalised Audio Story',
               description: `A personalised story for ${childName}`
             },
             unit_amount: 1999

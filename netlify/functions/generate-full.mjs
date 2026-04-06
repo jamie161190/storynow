@@ -99,7 +99,7 @@ export default async (req) => {
 
   } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ error: 'Something went wrong. Your payment is confirmed, please try again or contact hello@storytold.ai' }), {
+    return new Response(JSON.stringify({ error: 'Something went wrong. Your payment is confirmed, please try again or contact jamie@heartheirname.com' }), {
       status: 500, headers: { 'Content-Type': 'application/json' }
     });
   }

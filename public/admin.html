@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Storytold Admin</title>
+<title>Hear Their Name Admin</title>
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -148,7 +148,7 @@ audio { width: 100%; margin-top: 0.5rem; }
 <!-- Login -->
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
-    <h1>Storytold Admin</h1>
+    <h1>Hear Their Name Admin</h1>
     <input type="password" id="adminPass" placeholder="Admin password" onkeydown="if(event.key==='Enter')adminLogin()">
     <button onclick="adminLogin()">Log in</button>
     <p class="err" id="loginErr">Wrong password</p>
@@ -157,7 +157,7 @@ audio { width: 100%; margin-top: 0.5rem; }
 
 <!-- Admin Panel -->
 <div class="admin" id="adminPanel">
-  <h1>Storytold Admin</h1>
+  <h1>Hear Their Name Admin</h1>
   <p class="sub" id="statsLine">Loading...</p>
 
   <div class="tabs">
@@ -901,7 +901,7 @@ async function loadReferrals() {
 }
 
 function renderReferrals(referrals) {
-  const siteUrl = 'https://storytold.ai';
+  const siteUrl = 'https://heartheirname.com';
   let html = '';
 
   // Create new referral form
@@ -994,7 +994,7 @@ async function createReferral() {
     return;
   }
 
-  const link = 'https://storytold.ai?ref=' + encodeURIComponent(data.referral.ref_code);
+  const link = 'https://heartheirname.com?ref=' + encodeURIComponent(data.referral.ref_code);
   successEl.innerHTML = 'Created! Link: <code style="background:#E8F5E9;padding:0.15rem 0.4rem;border-radius:4px">' + esc(link) + '</code>';
   successEl.style.display = 'block';
   document.getElementById('refName').value = '';

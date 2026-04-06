@@ -27,8 +27,8 @@ export default async (req) => {
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price_data: { currency: 'gbp', product_data: { name: 'AUDIT TEST - DO NOT PAY' }, unit_amount: 100 }, quantity: 1 }],
       mode: 'payment',
-      success_url: 'https://storytold.ai?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'https://storytold.ai',
+      success_url: 'https://heartheirname.com?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://heartheirname.com',
       metadata: { childName: 'AuditTest', category: 'bedtime', audit: 'true' }
     });
     stripeSessionId = session.id;
@@ -119,7 +119,7 @@ export default async (req) => {
   const testJobId = 'audit_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
   try {
     // We call the INTERNAL Netlify function URL
-    const siteUrl = process.env.URL || 'https://storytold.ai';
+    const siteUrl = process.env.URL || 'https://heartheirname.com';
     const bgRes = await fetch(`${siteUrl}/.netlify/functions/full-worker-background`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -218,7 +218,7 @@ export default async (req) => {
         'Prefer': 'return=representation'
       },
       body: JSON.stringify({
-        email: 'audit@storytold.ai',
+        email: 'audit@heartheirname.com',
         child_name: 'AuditChild',
         category: 'bedtime',
         voice_id: 'EXAVITQu4vr4xnSDxMaL',

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Storytold Content Studio</title>
+<title>Hear Their Name Content Studio</title>
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -656,7 +656,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
         <div style="display:flex;align-items:center;gap:0.4rem;margin-top:0.4rem">
           <label style="margin:0;white-space:nowrap;font-size:0.75rem">End card:</label>
           <input type="checkbox" id="seqEndCard" checked>
-          <input type="text" id="seqEndCardCta" value="Create their story at storytold.ai" style="flex:1;font-size:0.72rem;padding:0.3rem 0.5rem">
+          <input type="text" id="seqEndCardCta" value="Create their story at heartheirname.com" style="flex:1;font-size:0.72rem;padding:0.3rem 0.5rem">
         </div>
         <button class="btn btn-orange btn-full" style="margin-top:0.5rem" onclick="playMockupSequence()">Play Sequence</button>
       </div>
@@ -977,7 +977,7 @@ h1,h2,h3,h4{font-family:'Nunito',sans-serif}
       <div class="ctrl-section">
         <h4>2. Your Notes</h4>
         <p style="font-size:0.7rem;color:var(--text-soft);margin-bottom:0.4rem">Tell the Director what you're thinking — the angle, the audience, the vibe, any context that helps.</p>
-        <textarea id="directorNotes" placeholder="e.g. This is Chase at age 2, way before Storytold existed. I want the ad to show that origin story energy — he didn't know yet that one day he'd hear his name in a story. Target bedtime parents on TikTok." style="width:100%;min-height:80px;border:1px solid var(--border);border-radius:8px;padding:0.5rem;font-size:0.78rem;font-family:Nunito,sans-serif;resize:vertical"></textarea>
+        <textarea id="directorNotes" placeholder="e.g. This is Chase at age 2, way before Hear Their Name existed. I want the ad to show that origin story energy — he didn't know yet that one day he'd hear his name in a story. Target bedtime parents on TikTok." style="width:100%;min-height:80px;border:1px solid var(--border);border-radius:8px;padding:0.5rem;font-size:0.78rem;font-family:Nunito,sans-serif;resize:vertical"></textarea>
       </div>
 
       <div class="ctrl-section">
@@ -1386,7 +1386,7 @@ function applyCanvasAdTimeline() {
       { text: "This is Chase. He's 9 now.", duration: 2.5 },
       { text: "His whole world is inside his own story.", duration: 2.5 },
       { text: "Your child can have one too.", duration: 2.5 },
-      { type: "logo", title: "storytold.ai", subtitle: "Hear it free first.", duration: 3 }
+      { type: "logo", title: "heartheirname.com", subtitle: "Hear it free first.", duration: 3 }
     ]
   });
 }
@@ -1429,7 +1429,7 @@ async function previewCanvasAd() {
 
       if (card.type === 'logo') {
         cardEl.innerHTML = `<div>
-          <div style="font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--purple);margin-bottom:12px">${card.title || 'storytold.ai'}</div>
+          <div style="font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--purple);margin-bottom:12px">${card.title || 'heartheirname.com'}</div>
           <div style="font-family:'Nunito',sans-serif;font-size:14px;color:rgba(255,255,255,0.7)">${card.subtitle || ''}</div>
         </div>`;
       } else {
@@ -1562,7 +1562,7 @@ async function exportCanvasAd() {
         if (card.type === 'logo') {
           ctx.font = `900 ${Math.round(W * 0.08)}px Nunito, sans-serif`;
           ctx.fillStyle = '#7c3aed';
-          ctx.fillText(card.title || 'storytold.ai', W / 2, H * 0.45);
+          ctx.fillText(card.title || 'heartheirname.com', W / 2, H * 0.45);
           ctx.font = `400 ${Math.round(W * 0.035)}px Nunito, sans-serif`;
           ctx.fillStyle = 'rgba(255,255,255,0.7)';
           ctx.fillText(card.subtitle || '', W / 2, H * 0.52);
@@ -1991,7 +1991,7 @@ const SCREEN_ANIMATIONS = {
   },
 
   'email-inbox': (c, screen) => {
-    // Highlight the Storytold email, then "tap" it
+    // Highlight the Hear Their Name email, then "tap" it
     const items = screen.querySelectorAll('.ms-email-item');
     if (items[0]) {
       items[0].style.transition = 'background 0.3s';
@@ -2319,7 +2319,7 @@ const SCREEN_RENDERERS = {
           <div class="ms-wa-link-preview">
             <div class="ms-wa-link-title">${c.childName}'s ${c.category==='bedtime'?'Bedtime':'Adventure'} Story</div>
             <div class="ms-wa-link-desc">A personalised story narrated just for ${c.childName}, featuring ${c.friendName} and all their favourite things.</div>
-            <div class="ms-wa-link-domain">storytold.ai</div>
+            <div class="ms-wa-link-domain">heartheirname.com</div>
           </div>
           ${hasAudio ? `<div class="ms-wa-audio-bar" style="margin-top:6px;background:#E8F5E9;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:8px">
             <div id="waPlayBtn" style="width:28px;height:28px;border-radius:50%;background:#075E54;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="playWaMockupAudio()">
@@ -2358,7 +2358,7 @@ const SCREEN_RENDERERS = {
       <div class="ms-email-item" style="background:#F8F5FF">
         <div class="ms-email-dot"></div>
         <div style="flex:1">
-          <div class="ms-email-from">Storytold</div>
+          <div class="ms-email-from">Hear Their Name</div>
           <div class="ms-email-subject">${c.childName}'s story is ready! &#127775;</div>
           <div class="ms-email-snippet">Press play to hear ${c.childName}'s personalised ${c.category} story, narrated by Sarah...</div>
         </div>
@@ -2387,7 +2387,7 @@ const SCREEN_RENDERERS = {
     <div class="ms-email">
       <div class="ms-email-header">
         <span class="ms-email-back">&#8592;</span>
-        <span class="ms-email-title">Storytold</span>
+        <span class="ms-email-title">Hear Their Name</span>
       </div>
       <div class="ms-email-body">
         <div class="ms-email-card">
@@ -2395,7 +2395,7 @@ const SCREEN_RENDERERS = {
           <h3 style="font-family:Nunito,sans-serif;font-size:15px;color:var(--purple);margin-bottom:6px">${c.childName}'s Story is Ready!</h3>
           <p style="font-size:10px;color:var(--text-soft);line-height:1.6;margin-bottom:12px">A personalised ${c.category} story has been created for ${c.childName}, featuring ${c.friendName} and all their favourite things. Press play to start the magic.</p>
           <div class="ms-btn ms-btn-purple" style="display:block;margin-bottom:8px">Listen to ${c.childName}'s Story</div>
-          <p style="font-size:8px;color:#ccc">storytold.ai &bull; Made with love</p>
+          <p style="font-size:8px;color:#ccc">heartheirname.com &bull; Made with love</p>
         </div>
       </div>
     </div>
@@ -2406,7 +2406,7 @@ const SCREEN_RENDERERS = {
       <h3 style="font-family:Nunito,sans-serif;font-size:16px;color:var(--purple);margin-bottom:8px">Scan to Listen</h3>
       <p style="font-size:10px;color:var(--text-soft);margin-bottom:16px">${c.childName}'s story, on any device</p>
       <div class="ms-qr-box">${generateQRPattern()}</div>
-      <p style="font-size:9px;color:var(--text-soft);margin-top:12px">storytold.ai/s/abc123</p>
+      <p style="font-size:9px;color:var(--text-soft);margin-top:12px">heartheirname.com/s/abc123</p>
       <div class="ms-btn ms-btn-outline" style="margin-top:12px">Copy Link</div>
     </div>
   `,
@@ -2602,12 +2602,12 @@ async function batchExportMockups() {
 
 // End card renderer
 SCREEN_RENDERERS['end-card'] = (c) => {
-  const cta = document.getElementById('seqEndCardCta')?.value || 'Create their story at storytold.ai';
+  const cta = document.getElementById('seqEndCardCta')?.value || 'Create their story at heartheirname.com';
   return `
     <div style="min-height:100%;background:linear-gradient(135deg,var(--purple),var(--orange));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center">
       <div style="font-family:Nunito,sans-serif;font-weight:900;font-size:28px;margin-bottom:12px"><span style="color:#fff">story</span><span style="color:#FFD166">told</span></div>
       <div style="color:rgba(255,255,255,0.95);font-size:13px;font-weight:700;line-height:1.6;max-width:200px">${escHtml(cta)}</div>
-      <div style="margin-top:16px;padding:8px 20px;border-radius:50px;background:#fff;color:var(--purple);font-weight:800;font-size:11px">storytold.ai</div>
+      <div style="margin-top:16px;padding:8px 20px;border-radius:50px;background:#fff;color:var(--purple);font-weight:800;font-size:11px">heartheirname.com</div>
     </div>
   `;
 };
@@ -3759,7 +3759,7 @@ function renderComedyOutput(data) {
             <span>End Card</span>
           </label>
           <div class="export-card-fields" id="endCardFields" style="display:none">
-            <input type="text" id="exportEndTitle" placeholder="CTA (e.g. storytold.ai)" value="storytold.ai">
+            <input type="text" id="exportEndTitle" placeholder="CTA (e.g. heartheirname.com)" value="heartheirname.com">
             <input type="text" id="exportEndSub" placeholder="Tagline (e.g. A story that knows their name)" value="A story that knows their name">
           </div>
         </div>
@@ -3804,7 +3804,7 @@ function showDirectorContextPrompt(defaultText) {
       <div style="background:#fff;border-radius:16px;padding:1.5rem;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
         <h3 style="margin:0 0 0.5rem;font-size:1rem;color:var(--purple)">Context for the Director</h3>
         <p style="font-size:0.78rem;color:var(--text-soft);margin-bottom:0.75rem">Tell the Director what you're thinking — the angle, who this is, what era, the vibe. It'll use this plus everything it knows to make smart decisions.</p>
-        <textarea id="directorContextInput" placeholder="e.g. This is Chase at age 2, way before Storytold existed. I want to target bedtime parents on TikTok with an origin story angle." style="width:100%;min-height:100px;border:1px solid var(--border);border-radius:10px;padding:0.6rem;font-size:0.82rem;font-family:Nunito,sans-serif;resize:vertical;box-sizing:border-box">${defaultText || ''}</textarea>
+        <textarea id="directorContextInput" placeholder="e.g. This is Chase at age 2, way before Hear Their Name existed. I want to target bedtime parents on TikTok with an origin story angle." style="width:100%;min-height:100px;border:1px solid var(--border);border-radius:10px;padding:0.6rem;font-size:0.82rem;font-family:Nunito,sans-serif;resize:vertical;box-sizing:border-box">${defaultText || ''}</textarea>
         <div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:flex-end">
           <button class="btn btn-outline" id="dirCtxSkip" style="padding:0.4rem 1rem;font-size:0.8rem">Skip</button>
           <button class="btn btn-purple" id="dirCtxSend" style="padding:0.4rem 1.2rem;font-size:0.8rem">Send to Director</button>
@@ -4103,7 +4103,7 @@ function drawCard(ctx, w, h, title, subtitle, isEnd) {
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, w, h);
 
-  // Storytold logo text
+  // Hear Their Name logo text
   const logoSize = Math.round(w * 0.07);
   ctx.font = `900 ${logoSize}px "Nunito", sans-serif`;
   ctx.textAlign = 'center';
@@ -4570,7 +4570,7 @@ function addTimelineBlock(type, config) {
     clip: { type:'clip', duration:5, config: { file:null, objectUrl:null, trimStart:0, trimEnd:5, name:'Upload a clip...' } },
     sequence: { type:'sequence', duration:10, config: { sequenceId:'create-story', timings:{} } },
     text: { type:'text', duration:3, config: { text:'Your text here', font:'Nunito', size:36, color:'#FFFFFF', bgGradient:true } },
-    endcard: { type:'endcard', duration:3, config: { cta:'Create their story at storytold.ai' } }
+    endcard: { type:'endcard', duration:3, config: { cta:'Create their story at heartheirname.com' } }
   };
   const block = { id, ...defaults[type] };
   if (config) Object.assign(block.config, config);
@@ -4731,7 +4731,7 @@ function renderBlockEditor() {
       <label>Text</label>
       <textarea onchange="updateBlockConfig('${block.id}','text',this.value);renderTimeline()" style="height:60px">${escHtml(block.config.text)}</textarea>
       <label>Subtitle (optional - smaller text below)</label>
-      <input type="text" value="${escHtml(block.config.subtitle||'')}" onchange="updateBlockConfig('${block.id}','subtitle',this.value)" placeholder="e.g. storytold.ai | Hear it free first">
+      <input type="text" value="${escHtml(block.config.subtitle||'')}" onchange="updateBlockConfig('${block.id}','subtitle',this.value)" placeholder="e.g. heartheirname.com | Hear it free first">
       <div style="display:flex;gap:0.4rem;margin-top:0.4rem">
         <div style="flex:1">
           <label>Size</label>
@@ -4801,7 +4801,7 @@ function setTextStyle(blockId, style) {
 
   const presets = {
     hook: { size: 32, color: '#FFFFFF', bgGradient: true, bgSolid: '', subtitle: '' },
-    stat: { size: 40, color: '#FFFFFF', bgGradient: false, bgSolid: '#000000', subtitle: 'storytold.ai' },
+    stat: { size: 40, color: '#FFFFFF', bgGradient: false, bgSolid: '#000000', subtitle: 'heartheirname.com' },
     cta: { size: 28, color: '#FFFFFF', bgGradient: true, bgSolid: '', subtitle: 'Hear it free first. 19.99 for the full story.' },
     quote: { size: 24, color: '#2D2844', bgGradient: false, bgSolid: '#FEFBF6', subtitle: '' },
     custom: {}
@@ -5341,14 +5341,14 @@ async function playEndCardBlock(canvas, ctx, block) {
   // CTA
   ctx.font = 'bold 16px Quicksand';
   ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  ctx.fillText(block.config.cta || 'storytold.ai', canvas.width/2, canvas.height/2+20);
+  ctx.fillText(block.config.cta || 'heartheirname.com', canvas.width/2, canvas.height/2+20);
   // URL pill
   ctx.fillStyle = '#FFFFFF';
   const pillW = 140, pillH = 28, pillX = canvas.width/2-pillW/2, pillY = canvas.height/2+45;
   ctx.beginPath(); ctx.roundRect(pillX, pillY, pillW, pillH, 14); ctx.fill();
   ctx.font = 'bold 11px Quicksand';
   ctx.fillStyle = '#6B2F93';
-  ctx.fillText('storytold.ai', canvas.width/2, pillY+14);
+  ctx.fillText('heartheirname.com', canvas.width/2, pillY+14);
   await sleep(block.duration * 1000);
 }
 
@@ -6112,7 +6112,7 @@ function editConceptTimeline(idx) {
     c.timeline = [];
     if (c.hookText) c.timeline.push({ type: 'text', duration: 3, config: { text: c.hookText, style: 'hook' } });
     c.timeline.push({ type: 'clip', duration: 0, config: { assetName: 'clip' } });
-    c.timeline.push({ type: 'endcard', duration: 3, config: { cta: 'Create their story at storytold.ai', subtitle: 'storytold.ai' } });
+    c.timeline.push({ type: 'endcard', duration: 3, config: { cta: 'Create their story at heartheirname.com', subtitle: 'heartheirname.com' } });
   }
 
   renderConceptEditor(idx);
@@ -6219,7 +6219,7 @@ function addConceptBlock(idx, type) {
     const insertAt = clipIdx >= 0 ? clipIdx : tl.length;
     tl.splice(insertAt, 0, { type: 'text', duration: 3, config: { text: 'Your text here', subtitle: '', style: 'hook' } });
   } else if (type === 'endcard') {
-    tl.push({ type: 'endcard', duration: 3, config: { cta: 'Your CTA here', subtitle: 'storytold.ai' } });
+    tl.push({ type: 'endcard', duration: 3, config: { cta: 'Your CTA here', subtitle: 'heartheirname.com' } });
   }
   renderConceptEditor(idx);
   refreshConceptTimelineDisplay(idx);
@@ -6322,15 +6322,15 @@ async function buildThisAd(conceptIdx) {
         } else if (block.type === 'clip') {
           phases.push({ type: 'video', duration: video.duration, overlays: block.config?.textOverlays || [] });
         } else if (block.type === 'endcard') {
-          phases.push({ type: 'card', duration: block.duration || 3, title: block.config?.cta || 'Create their story at storytold.ai', subtitle: block.config?.subtitle || 'storytold.ai', isEnd: true });
+          phases.push({ type: 'card', duration: block.duration || 3, title: block.config?.cta || 'Create their story at heartheirname.com', subtitle: block.config?.subtitle || 'heartheirname.com', isEnd: true });
         } else if (block.type === 'voicecta') {
-          phases.push({ type: 'card', duration: block.duration || 4, title: block.config?.text || '', subtitle: 'storytold.ai', isEnd: true });
+          phases.push({ type: 'card', duration: block.duration || 4, title: block.config?.text || '', subtitle: 'heartheirname.com', isEnd: true });
         }
       }
     } else {
       if (c.hookText) phases.push({ type: 'card', duration: 3, title: c.hookText, subtitle: '' });
       phases.push({ type: 'video', duration: video.duration, overlays: [] });
-      phases.push({ type: 'card', duration: 3, title: 'Create their story at storytold.ai', subtitle: 'storytold.ai', isEnd: true });
+      phases.push({ type: 'card', duration: 3, title: 'Create their story at heartheirname.com', subtitle: 'heartheirname.com', isEnd: true });
     }
 
     const totalDuration = phases.reduce((sum, p) => sum + p.duration, 0);

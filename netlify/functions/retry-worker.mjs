@@ -122,8 +122,8 @@ export default async (req) => {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'Storytold <hello@storytold.ai>',
-              to: ['hello@storytold.ai'],
+              from: 'Hear Their Name <jamie@heartheirname.com>',
+              to: ['jamie@heartheirname.com'],
               subject: 'ALERT: Story generation failed after 10 attempts',
               html: `<!DOCTYPE html>
 <html>
@@ -138,7 +138,7 @@ export default async (req) => {
 </html>`
             })
           });
-          console.log('[RETRY] Alert email sent to hello@storytold.ai');
+          console.log('[RETRY] Alert email sent to jamie@heartheirname.com');
         } catch (alertErr) {
           console.error('[RETRY] Failed to send alert email:', alertErr.message);
         }
@@ -152,7 +152,7 @@ export default async (req) => {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'Storytold <hello@storytold.ai>',
+              from: 'Hear Their Name <jamie@heartheirname.com>',
               to: [jobData.customerEmail],
               subject: 'We are working on your story',
               html: `<!DOCTYPE html>
@@ -161,7 +161,7 @@ export default async (req) => {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://storytold.ai/logo-new.png" alt="Storytold" style="height:60px;width:auto;margin:0;" />
+      <img src="https://heartheirname.com/logo-new.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">We are working on your story</h2>
@@ -169,13 +169,13 @@ export default async (req) => {
         ${jobData.childName}'s story is taking a bit longer than expected, but our team is on it. You will receive it shortly.
       </p>
       <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        If you need any help or have questions, please email us at hello@storytold.ai and we will get back to you as soon as possible.
+        If you need any help or have questions, please email us at jamie@heartheirname.com and we will get back to you as soon as possible.
       </p>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
         Thank you for your patience.
       </p>
     </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Hear Their Name. Audio stories that know them by name.</p>
   </div>
 </body>
 </html>`
@@ -265,7 +265,7 @@ export default async (req) => {
         : messageIntro + previewStory + '\n\n' + continuationText;
 
       // Branded outro: a warm sign-off after the story ends
-      const outro = ` ... ... A Storytold original ... made with love.`;
+      const outro = ` ... ... A Hear Their Name original ... made with love.`;
       const fullStoryText = storyBody + outro;
       const ttsText = prepareTTSText(fullStoryText);
 
@@ -359,14 +359,14 @@ export default async (req) => {
       if (customerEmail) {
         const resendKey = process.env.RESEND_API_KEY;
         if (resendKey) {
-          const listenUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}&utm_source=email&utm_medium=retry_email&utm_campaign=story_delivery` : 'https://storytold.ai';
+          const listenUrl = storyId ? `https://heartheirname.com?listen=${encodeURIComponent(storyId)}&utm_source=email&utm_medium=retry_email&utm_campaign=story_delivery` : 'https://heartheirname.com';
           const safeChild = (childName || 'Your child').replace(/[<>&"']/g, '');
 
           try {
             const safeEmail = (customerEmail || '').replace(/[<>&"']/g, '');
             const categoryLabel = storyData.category === 'learning' ? 'Learning Adventure' : storyData.category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
-            const waShareUrl = storyId ? `https://storytold.ai?listen=${encodeURIComponent(storyId)}&utm_source=share&utm_medium=whatsapp&utm_campaign=retry_email_share` : 'https://storytold.ai';
-            const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${waShareUrl}\n\nMade with storytold.ai`);
+            const waShareUrl = storyId ? `https://heartheirname.com?listen=${encodeURIComponent(storyId)}&utm_source=share&utm_medium=whatsapp&utm_campaign=retry_email_share` : 'https://heartheirname.com';
+            const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${waShareUrl}\n\nMade with heartheirname.com`);
 
             await fetch('https://api.resend.com/emails', {
               method: 'POST',
@@ -375,7 +375,7 @@ export default async (req) => {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                from: 'Storytold <hello@storytold.ai>',
+                from: 'Hear Their Name <jamie@heartheirname.com>',
                 to: [customerEmail],
                 subject: `${safeChild}'s story is ready!`,
                 html: `<!DOCTYPE html>
@@ -384,7 +384,7 @@ export default async (req) => {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://storytold.ai/logo-new.png" alt="Storytold" style="height:60px;width:auto;margin:0;" />
+      <img src="https://heartheirname.com/logo-new.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:24px;text-align:center;margin:0 0 8px;">🎧</p>
@@ -401,7 +401,7 @@ export default async (req) => {
         <a href="https://wa.me/?text=${waText}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;">Share on WhatsApp</a>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
-        You can replay your story any time. Just visit storytold.ai, tap <strong>My Stories</strong>, and log in with this email:
+        You can replay your story any time. Just visit heartheirname.com, tap <strong>My Stories</strong>, and log in with this email:
       </p>
       <div style="background:#F8F5FF;border-radius:10px;padding:12px;text-align:center;margin:0 0 20px;">
         <p style="margin:0;font-size:16px;font-weight:700;color:#6B2F93;">${safeEmail}</p>
@@ -412,10 +412,10 @@ export default async (req) => {
       <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 4px;font-size:15px;color:#2D2844;font-weight:700;">Loved it?</p>
         <p style="margin:0 0 8px;font-size:13px;color:#666;line-height:1.5;">Create another story for a child you love.</p>
-        <a href="https://storytold.ai" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
+        <a href="https://heartheirname.com" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:12px 32px;border-radius:50px;font-size:15px;font-weight:600;">Create another story</a>
       </div>
     </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Storytold. Audio stories that know them by name.</p>
+    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Hear Their Name. Audio stories that know them by name.</p>
   </div>
 </body>
 </html>`

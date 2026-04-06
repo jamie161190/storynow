@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://storytold.ai/sitemap.xml
+Sitemap: https://heartheirname.com/sitemap.xml

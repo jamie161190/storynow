@@ -127,7 +127,7 @@ async function handleSnippetGeneration({ childName, storyInput, about, duration,
 
   let snippetPrompt;
   if (hasUserStory) {
-    snippetPrompt = `You are the Storytold audio story editor. A user has written a rough story in their own words. Your job is to clean it up into a beautifully narrated story, keeping EXACTLY the same story, same beats, same moments, same characters, same dialogue — just polished for audio narration.
+    snippetPrompt = `You are the Hear Their Name audio story editor. A user has written a rough story in their own words. Your job is to clean it up into a beautifully narrated story, keeping EXACTLY the same story, same beats, same moments, same characters, same dialogue — just polished for audio narration.
 
 The child's name is ${childName || 'the child'}.
 
@@ -140,7 +140,7 @@ RULES:
 - Keep the EXACT same story the user told. Do not add new plot points, remove scenes, or change what happens.
 - Keep all the same characters and dialogue moments.
 - Polish the language: fix grammar, improve flow, add vivid details where natural.
-- Format for audio narration using Storytold formatting rules:
+- Format for audio narration using Hear Their Name formatting rules:
   - Use ... for breath pauses at suspense, wonder, scene transitions, emotional reveals
   - Add a pause every 30-40 words
   - Use ... ... for longer scene-change pauses
@@ -234,10 +234,10 @@ Example tone: "${childName} didn't know it yet... but tonight's story was differ
 
 // ── System Prompt for Content AI ──
 function buildContentSystemPrompt() {
-  return `You are the marketing brain behind Storytold (storytold.ai), a personalised children's story product. You create marketing content that sells the feeling, never the technology.
+  return `You are the marketing brain behind Hear Their Name (heartheirname.com), a personalised children's story product. You create marketing content that sells the feeling, never the technology.
 
 PRODUCT KNOWLEDGE:
-- Storytold creates personalised audio stories for children aged 2-14
+- Hear Their Name creates personalised audio stories for children aged 2-14
 - Parents fill in their child's details (name, age, best friend, interests, pet, personal message)
 - A professional narrator voice reads a unique story that uses the child's name 8+ times
 - The child's best friend has a role, their pet does something memorable, their interests drive the plot
@@ -264,7 +264,7 @@ KEY SELLING POINTS:
 - Perfect gift: birthdays, Christmas, christenings, just because
 
 COMPETITORS:
-Childbook.ai, StoryBee, ReadKidz are all DIY tools where parents build stories themselves. Storytold is done-for-you. Fill in the form, hear the story. Different buying experience entirely.
+Childbook.ai, StoryBee, ReadKidz are all DIY tools where parents build stories themselves. Hear Their Name is done-for-you. Fill in the form, hear the story. Different buying experience entirely.
 
 CRITICAL RULES:
 - Never mention AI, machine learning, or algorithms
@@ -276,7 +276,7 @@ CRITICAL RULES:
 
 // ── Build user prompt based on selections ──
 function buildContentUserPrompt({ goal, platform, contentType, audience, angle, tone, customContext }) {
-  let prompt = `Create ${contentType} content for Storytold.\n\n`;
+  let prompt = `Create ${contentType} content for Hear Their Name.\n\n`;
   prompt += `GOAL: ${goal === 'viral' ? 'Viral content opportunity - create something people NEED to share' : 'Direct conversion - drive purchases'}\n`;
   prompt += `PLATFORM: ${platform}\n`;
   prompt += `AUDIENCE: ${audience}\n`;
@@ -339,7 +339,7 @@ async function handleMusicGeneration({ description, duration, autoSuggest, conte
           body: JSON.stringify({
             model: 'claude-sonnet-4-6',
             max_tokens: 200,
-            messages: [{ role: 'user', content: `You are a music director for Storytold, a personalised children's story brand. Based on this context, write a short 1-2 sentence description of the ideal background music for this content. Be specific about instruments, tempo, mood, and style. The description will be sent to an AI music generator.
+            messages: [{ role: 'user', content: `You are a music director for Hear Their Name, a personalised children's story brand. Based on this context, write a short 1-2 sentence description of the ideal background music for this content. Be specific about instruments, tempo, mood, and style. The description will be sent to an AI music generator.
 
 Context: ${context}
 

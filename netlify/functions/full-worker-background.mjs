@@ -373,7 +373,7 @@ export const handler = async (event) => {
           queued: !!retryId,
           error: retryId
             ? 'Story is queued and will be emailed to you shortly.'
-            : 'Story generation failed. Your payment is confirmed, please try again or contact hello@storytold.ai'
+            : 'Story generation failed. Your payment is confirmed, please try again or contact jamie@heartheirname.com'
         });
       }
       return { statusCode: 200 };
@@ -398,7 +398,7 @@ export const handler = async (event) => {
       : messageIntro + previewStory + '\n\n' + continuationText;
 
     // Branded outro: a warm sign-off after the story ends
-    const outro = ` ... ... A Storytold original ... made with love.`;
+    const outro = ` ... ... A Hear Their Name original ... made with love.`;
     const fullStoryText = storyBody + outro;
     const ttsText = prepareTTSText(fullStoryText);
     console.log('[FULL-BG] Complete story:', fullStoryText.split(' ').length, 'words');
@@ -550,7 +550,7 @@ export const handler = async (event) => {
         queued: !!retryId,
         error: retryId
           ? 'Story is queued and will be emailed to you shortly.'
-          : 'Audio generation failed. Your payment is confirmed, please try again or contact hello@storytold.ai'
+          : 'Audio generation failed. Your payment is confirmed, please try again or contact jamie@heartheirname.com'
       });
     }
     return { statusCode: 200 };
