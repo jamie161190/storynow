@@ -1,579 +1,541 @@
-# Storytold — Complete Claude Brief
+# Hear Their Name — Complete Project Brief
 
-> Upload this document at the start of any Claude session to give full context on the product, marketing, content strategy, and technical architecture.
+> Upload this document at the start of any Claude or ChatGPT session working on Hear Their Name. It covers the full product, tech stack, codebase, email flows, ad pipeline, and creative philosophy.
 
 ---
 
-## PART 1: PRODUCT SUMMARY
+## 1. What Hear Their Name Is
 
-### What Storytold Is
-Storytold (storytold.ai) is a personalised audio story product for children aged 2-14. Parents or gift-givers enter details about a child — name, age, best friend, pet, interests, family members — and AI writes a completely unique ~2,200-word story starring that child as the hero. The story is narrated by a professional-quality AI voice the customer chooses, producing a ~15-minute audio story delivered as an MP3.
+**Hear Their Name** (heartheirname.com) is a personalised audio story product for children aged 2–14. Parents enter details about their child — name, age, best friend, pet, interests, family members — and AI writes a completely unique ~2,200-word story starring that child as the hero. The story is narrated by a professional-quality AI voice, producing a ~15-minute MP3.
 
-**Price:** £19.99 per story. One payment. No subscription. Theirs forever.
-
+**Price:** £19.99 per story (auto-converts to local currency for international visitors — see Section 11).
+**Free preview:** ~60 seconds of narrated story before purchase.
 **Tagline:** "A story that knows their name"
+**Origin:** Jamie built it because his son Chase asked why he wasn't in any of his stories.
+**Previous name:** Storytold / storytold.ai (rebranded April 2026 — old domain 301 redirects to heartheirname.com).
+**Company:** JHCLH Ltd (Jamie Harish)
+**Contact:** jamie@heartheirname.com
 
-**Guarantee:** "Not magical enough? I'll rewrite it for free."
+---
 
-### The Emotional Core
-This is NOT a "put your name in a template" product. Every story is written from scratch. The child's name appears 8+ times. Their best friend has dialogue and a personality. Their pet does something memorable. Their interests drive the plot. Parents can even make themselves the villain. A personal message from the parent is read aloud at the start by the narrator.
+## 2. Story Categories
 
-**The killer moment:** A parent presses play and hears their child's name spoken in a real story. That's what sells it. The free preview exists specifically to create that moment before payment.
+- **Bedtime** — Warm, calming, soothing. Journey home structure (NOT adventure). No danger, no villains. The story winds down until the child drifts off.
+- **Adventure** — Action-packed with twists, humour, villain. 4 acts, 5–6 scenes, 2+ twists, 50%+ dialogue. Ticking clock, running gags, impossible choice at 60% mark.
+- **Learning** — Education disguised as adventure. The subject IS the superpower. Interactive audio pauses ("Can you work it out? ... Take a moment. ... That's right!"). Confidence levels: starting/practising/nearly.
 
-### Founder Story
-Jamie built Storytold because his son Chase asked why he wasn't in any of his stories. He wanted to hear his name. His best friend. His world. So Jamie made something where he could. Now every child can. Jamie and Chase are the face of the brand — all early content is built around them.
+---
 
-### Story Categories
+## 3. Customer Flow
 
-**Bedtime** — Warm, calming, gentle. The story winds down slowly until they drift off feeling safe and loved. Perfect for sleep routines. Uses journey-home structure: discovery > gentle adventure > winding down > sleep.
+1. Land on heartheirname.com → headline, sample audio with real Chase stories
+2. "Start their story" → 7-step funnel:
+   - Story type (bedtime/adventure/learning)
+   - Gift or parent
+   - Main character (name, age, gender, occasion, email)
+   - People (best friend, family, pet, teacher, villain toggle)
+   - Theme (dragons, space, underwater, robots, etc.)
+   - Setting
+   - Voice (22 narrator voices, filterable by gender/accent/age)
+3. Free preview generated (~60 words, narrated)
+4. Review screen → hear preview, option to regenerate
+5. Stripe checkout → local currency price
+6. Full story generated → 2,200 words, full narration
+7. Delivered → playable in-browser, emailed, downloadable MP3
+8. Gift flow → separate email to recipient
+9. Sharing → public listen link with OG tags
 
-**Adventure** — Action-packed with twists, humour, and a villain if you want one. The kind of story they beg to hear again. Uses 4-act structure with scene changes, cliffhangers, and emotional peaks.
+**The preview IS the conversion mechanism.** Once parents hear their child's name in a story, the purchase becomes emotional.
 
-**Learning** — They save the day using real knowledge. Maths, science, spelling, any subject. Education disguised as magic. Uses superhero framework where knowledge IS the superpower, with interactive audio pauses.
+---
 
-### The Customer Funnel (7 Steps)
-1. **Category** — Bedtime, Adventure, or Learning
-2. **Gift toggle** — For your child or someone else's?
-3. **Main character** — Name, age, gender, occasion
-4. **People** — Best friend, family members, pet, teacher, villain toggle
-5. **Themes** — 18 tiles (Dinosaurs, Space, Football, Unicorns, Pirates, etc.) + custom
-6. **Setting & extras** — Where it happens, favourite toy, personal message from parent
-7. **Voice** — 22 narrator voices filtered by gender, accent (British/American/Australian/Irish), age
+## 4. Brand
 
-**Post-funnel:** Free preview (~60 seconds) > Stripe checkout (£19.99) > Full story generated (~5 min) > Delivered (in-browser player, email, downloadable MP3)
-
-### Post-Purchase Features
-- **My Stories** — Passwordless email login, access all purchased stories
-- **Sharing** — Public listen links with dynamic OG tags for WhatsApp/social
-- **Gifting** — Send story to another email with personal message
-- **Referral program** — Unique ref codes, tracks visits/conversions/revenue
-- **Discount codes** — 25% off next story included in purchase email
-- **Abandoned cart recovery** — Stripe webhook triggers email if checkout expires
-
-### Tech Stack
-- **Frontend:** Vanilla HTML/CSS/JS on Netlify (single-page app architecture)
-- **Backend:** 40+ Netlify serverless functions
-- **AI:** Claude API (Sonnet for previews, Opus for full stories)
-- **Voice:** ElevenLabs TTS (22 voices, v3 model)
-- **Payments:** Stripe (hosted checkout, webhooks)
-- **Database:** Supabase (Postgres + Storage for MP3s)
-- **Email:** Resend (purchase confirmations, gift notifications, login codes, abandoned cart)
-- **Tracking:** GA4, Meta Pixel, TikTok Pixel (consent-gated), server-side Meta CAPI + TikTok Events API
-- **Domain:** storytold.ai
-
-### Database Tables (Supabase)
-- `stories` — Completed purchased stories (email, child_name, category, audio_url, story_text, voice_id, gift fields)
-- `story_attempts` — Generation attempts/previews for funnel tracking
-- `page_views` — Analytics (screen, device, referrer, UTM, visitor_id)
-- `referrals` — Referral links (name, code, visits, conversions, revenue)
-- `content_creators` — Creator hub users with referral codes
-- `content_takes` — Which creator claimed which content piece
-- `auth_tokens` / `login_codes` / `login_attempts` — Passwordless auth system
-- `rate_limits` — Brute-force protection
-- `error_logs` — Exception tracking
-
-### Brand Identity
-- **Colors:** Deep purple (#6B2F93) + warm orange (#F1753B), sky blue (#4FC3F7), teal (#00B4A0)
+- **Domain:** heartheirname.com
+- **Email:** jamie@heartheirname.com (sent via Resend, forwarded to jamie@builtsmarter.co.uk via ImprovMX)
+- **Colors:** Deep purple (#6B2F93), warm orange (#F1753B)
 - **Fonts:** Nunito (headings), Quicksand (body)
-- **Tone:** Warm, personal, first-person ("I take every detail..."), conversational, emotional
-- **Design:** Rounded corners, soft shadows, gradient buttons, mobile-first, generous whitespace
-- **Rules:** Never mention AI. Never use em dashes. Sell the feeling, not the technology.
-
-### Competitive Positioning
-Competitors (Childbook.ai, StoryBee, ReadKidz) are DIY platforms where parents build stories themselves. Storytold is done-for-you: fill in the form, hear the story. "Canva exists. Designers still get paid."
-
-**5-Point Moat:**
-1. Preview before payment (nobody else does this)
-2. Personal message read aloud (nobody else does this)
-3. Category-matched narrator voices (nobody else does this)
-4. Occasion-led product design (nobody else does this)
-5. Emotional gift positioning (nobody else does this)
+- **Tone:** Warm, personal, magical but not childish. Speaks to parents. Never mentions AI.
+- **Voice:** First person, conversational, emotional
+- **Guarantee:** "Not magical enough? I'll rewrite it for free."
 
 ---
 
-## PART 2: MARKETING SUMMARY
+## 5. Tech Stack
 
-### Core Marketing Principle
-**Technology is invisible. Emotion is everything.** Never say "AI-generated" — say "a story made just for them." The free preview IS the conversion mechanism. Once parents hear their child's name, the purchase is emotional, not rational. User-generated reaction videos of parents pressing play are worth more than any ad budget.
-
-### Primary Audience Segments
-
-**1. Bedtime Parents (Highest LTV, Repeat Buyers)**
-- Parents of children aged 2-8, primarily mums with strong dad secondary
-- Buy evenings/weekends, especially Sunday nights
-- Motivation: Tired of reading the same book 400 times; want bedtime to feel special
-- Highest repeat potential (bedtime every night = subscription opportunity)
-- Channels: Parenting pages, CBeebies followers, baby/toddler groups, school mums pages
-
-**2. Journey Parents (Impulse Buyers, Urgency-Driven)**
-- Any parent facing a long trip with children
-- Buy night before or morning of journey; airport lounges, service stations
-- Motivation: Desperate for screen-free entertainment
-- Angle: "3 hours in a car with the kids? We've got you covered."
-- Channels: Travel groups, family holiday pages, half-term school holidays
-
-**3. Gift Givers (Highest Emotional Charge, Premium Positioning)**
-- Grandparents, godparents, aunties, uncles, divorced parents, friends of new parents
-- Buy around occasions: birthdays, Christmas, christenings, new baby, "just because"
-- Least price-sensitive, most emotionally driven
-- Angle: "A gift they will never forget." "Their name. Their story. From you."
-- Channels: Gift guides, grandparent communities, "gifts for children who have everything" searches
-
-**4. Teachers & Schools (B2B, Future Phase)**
-- Primary school teachers, SEN coordinators, literacy leads
-- Buy September, January, assessment periods
-- Angle: "Every child is the hero of their own learning story."
-- Channels: Teacher Facebook groups, TES marketplace, education conferences
-
-### Emotional Marketing Angles
-
-**The Bedtime Angle (Universal, Simplest Hook)**
-- "Bedtime will never be the same."
-- "A story where they are the hero. Every single night."
-- Split screen concept: tired parent reading dog-eared book vs. child's face lighting up hearing their name
-
-**The Gift Angle (Most Commercially Powerful)**
-- "The gift they will talk about forever."
-- "Not another toy. A story made just for them."
-- Concept: Grandparent filling in details > child discovering story on Christmas morning > tears from everyone
-
-**The Journey Angle (Impulse Energy, Urgency)**
-- "4 hours in the car. 0 arguments. 1 story."
-- "Screen-free. Tear-free. Their story, their journey."
-- Concept: Car chaos > same car ten minutes later, kids silent with headphones, gripped
-
-**The Memorial Voice Angle (Handle With Extreme Care — Future Feature)**
-- NEVER use: dead, died, passed, gone, deceased, loss, grief
-- ALWAYS use: "keep their voice alive," "some voices should never be forgotten"
-- The ad never explains; the viewer fills in meaning
-- One real family sharing their story = content worth millions in ad spend
-
-### Pricing Psychology
-- Sits in "meaningful gift" bracket (more than a greeting card, less than audiobook + children's book)
-- Preview eliminates price objection — emotionally committed before seeing price
-- Bundle opportunities: occasion bundles, category bundles, monthly subscription (£9.99/mo)
-
-### Website Copy & Trust Signals
-
-**Hero:** "A story that knows their name."
-
-**Subhead:** "Their name, their best friend, their world. Woven into a story made just for them. Narrated by a voice you choose. Ready in minutes."
-
-**Founder:** "My son Chase asked me why he wasn't in any of his stories."
-
-**Social Proof:** WhatsApp testimonial from Lisa: "Livvie's woken up asking me for another story, I blame you"
-
-**CTAs:** "Create their story" / "Hear it free first. £19.99 for the full story" / "Only pay if you love it"
-
-**Trust:** "One payment. No subscription. Theirs forever." / "Secure payment via Stripe." / "Their details are only used to write the story. Nothing is shared or sold. Ever."
-
-**FAQ Highlights:**
-- Free preview before payment
-- ~15 minutes narrated audio
-- One-tap sharing to family via WhatsApp/email
-- 24-hour refund if not downloaded/shared
-- Ages 2-14, automatically adapts
-- Listen forever, download to any device
-
-### The Preview as Marketing Engine
-The preview is the ENTIRE marketing strategy:
-1. Most powerful sales tool in funnel (converts before seeing price)
-2. Most shareable moment in journey (people film themselves pressing play)
-3. Why reviews don't matter at launch (customer IS their own review)
-
-**One genuine reaction video on TikTok could drive thousands of sales with zero spend.**
-
-### Server-Side Conversion Tracking
-- Stripe webhook triggers Meta CAPI (Purchase event with hashed email, value, content_name)
-- Stripe webhook triggers TikTok Events API (CompletePayment event)
-- Referral tracking updates on purchase
-- Abandoned cart recovery email on checkout expiry
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Single-page vanilla HTML/CSS/JS on Netlify |
+| Backend | 40+ Netlify serverless functions (ESM .mjs) |
+| AI Text | Anthropic Claude (Sonnet for previews, Opus for full stories) |
+| AI Voice | ElevenLabs v3 model, 22 voices |
+| Payments | Stripe (hosted checkout, Adaptive Pricing enabled) |
+| Database | Supabase (Postgres) |
+| Storage | Supabase Storage (MP3s, assets, job results) |
+| Email | Resend (transactional + abandoned cart) |
+| Email Forwarding | ImprovMX (jamie@heartheirname.com → jamie@builtsmarter.co.uk) |
+| Tracking | GA4 (G-84KXD5XPZG), Meta Pixel (1656775315345896), TikTok Pixel (D74JVVJC77U5P0Q29FKG), server-side CAPI + TikTok Events API |
+| Deployment | GitHub → Netlify (auto-deploy on push to main) |
+| Repo | github.com/jamie161190/storynow |
+| Domain | heartheirname.com (GoDaddy DNS) |
 
 ---
 
-## PART 3: CONTENT SUMMARY
+## 6. Environment Variables (Netlify)
 
-### The Core Ad Principle
-**You are not making ads. You are capturing moments.** The product is not the story — the product is the reaction when a child hears their name. Every ad must make the viewer feel like they are watching something real.
+```
+ANTHROPIC_API_KEY       — Claude text generation
+ELEVENLABS_API_KEY      — TTS narration
+STRIPE_SECRET_KEY       — Payment processing (sk_live_...)
+STRIPE_WEBHOOK_SECRET   — Webhook signature verification (whsec_...)
+RESEND_API_KEY          — Transactional email (re_...)
+SUPABASE_URL            — Database + storage URL
+SUPABASE_SECRET_KEY     — Database service role key
+ADMIN_SECRET            — Studio + admin panel password
+META_PIXEL_ID           — Meta Pixel ID (optional, has hardcoded fallback)
+META_CAPI_TOKEN         — Meta Conversions API server-side token
+TIKTOK_PIXEL_ID         — TikTok Pixel ID (optional, has hardcoded fallback)
+TIKTOK_EVENTS_TOKEN     — TikTok Events API token
+```
 
-**Foundation:** Chase is the brand. All early ads should be 80% Chase-led. His reactions, his relationship with his dad, are the origin of the product.
+---
 
-**The Structure of All Ads:**
-1. Hook curiosity: "They don't know yet..."
-2. Show listening: No explanation, just press play
-3. Capture reaction: THIS is the product
-4. Soft CTA: "Let them hear it"
+## 7. Codebase Structure
 
-### 15 Proven Ad Formats
+### Customer-Facing (DO NOT MODIFY without explicit instruction)
+```
+public/index.html              — Main site, funnel, checkout, story delivery, auth
+public/privacy.html            — Privacy policy
+public/terms.html              — Terms of service
+public/dashboard.html          — Customer story library (login required)
+public/referral.html           — Referral programme landing page
+public/music/                  — adventure-ambient.mp3, bedtime-ambient.mp3
+public/sample-story.mp3        — Sample Chase story for homepage
+public/logo-new.png            — Hear Their Name logo (used in emails)
+public/sitemap.xml             — SEO sitemap
+public/robots.txt              — SEO robots file
+```
 
-**AD1: DADDY IS THE VILLAIN** (HIGHEST priority)
-- Hook: "I made myself the villain in my son's adventure story"
-- Dad intro > Child listening > Reveal moment > Reaction
+### Admin / Internal
+```
+public/studio.html             — Password-protected Creator Studio (3 tabs)
+public/admin.html              — Admin dashboard (analytics, customers, stories)
+public/creator-dashboard.html  — Content shoot playbook for creators
+```
 
-**AD2: HE DOESN'T KNOW YET (CAR)** (HIGHEST)
-- Hook: "He doesn't know the story is about him yet"
-- Dad driving > child in back > story through speakers > name hits > reaction
+### Backend Functions (netlify/functions/)
+```
+— Customer Flow —
+create-checkout.mjs            — Creates Stripe checkout session in detected currency
+verify-payment.mjs             — Confirms Stripe payment_status === 'paid'
+generate-preview.mjs           — Gateway: preview story generation
+story-worker-background.mjs    — Worker: preview Claude text → ElevenLabs TTS
+check-preview.mjs              — Polls preview job status
+generate-full.mjs              — Gateway: full story generation (payment-gated)
+full-worker-background.mjs     — Worker: full Claude text → ElevenLabs TTS → Supabase
+check-full.mjs                 — Polls full story job status
+save-story.mjs                 — Saves completed story to Supabase
+get-stories.mjs                — Retrieves customer story library
+shared-story.mjs               — Public story sharing endpoint
+get-pending-story.mjs          — Retrieves pending story data post-Stripe redirect
+save-attempt.mjs               — Logs generation attempts for admin
+retry-worker.mjs               — Retries failed story jobs
 
-**AD3: SIBLING REACTION** (HIGH)
-- Hook: "Put both my kids in the same story. Wait for the second one."
-- Both listening > First reaction > Second reaction > Shared moment
+— Auth —
+send-login-code.mjs            — Magic link / OTP email to customer
+verify-login-code.mjs          — Validates OTP, issues session token
 
-**AD4: FOUNDER ORIGIN STORY** (HIGH)
-- Hook: "My son asked me why he was never in any of his stories"
-- Selfie narrative > Cut to Chase listening > Reaction
+— Payments & Email —
+stripe-webhook.mjs             — Handles checkout.session.completed (conversion tracking,
+                                  referral) and checkout.session.expired (abandoned cart email)
+send-email.mjs                 — Transactional emails via Resend: purchase, gift, share,
+                                  contact, review, discount
+create-discount.mjs            — Creates Stripe coupon for repeat purchases
 
-**AD5: ALL FOUR COUSINS TOGETHER** (HIGHEST)
-- Hook: "Put all four cousins in the same story and didn't tell any of them"
-- Setup > Story plays > Chain reaction cascade
+— Pricing —
+get-pricing.mjs                — Detects user country via Netlify x-country header,
+                                  returns localised price (see Section 11)
 
-**AD6: ONE COUSIN CLOSE-UP** (HIGH)
-- Hook: "Watch her face when she hears her name"
-- Close-up before > Name moment > Pure reaction
+— Tracking —
+track-pageview.mjs             — Logs page views to Supabase page_views table
+referral-track.mjs             — Tracks referral click events
+referral-stats.mjs             — Returns referral stats for dashboard
+audit.mjs                      — Full end-to-end system health check
 
-**AD7: GRANDAD LISTENS** (HIGHEST)
-- Hook: "Put my dad in my son's story. Didn't expect his reaction."
-- Grandad + child > Listening > Grandad's reaction (the twist)
+— Admin —
+admin-api.mjs                  — Protected admin endpoints: customers, stories, attempts,
+                                  errors, metrics, live activity, referrals, create-story
+admin-creators.mjs             — Creator management
+creator-auth.mjs               — Creator authentication
 
-**AD8: CHASE BUYS HIS COUSIN ONE** (HIGH)
-- Hook: "My son wanted to buy his cousin a story"
-- Chase filling in details > Product walkthrough > Cousin receives > Reaction
+— Studio —
+studio-story.mjs               — Gateway: validates auth, creates jobId, triggers worker
+studio-story-background.mjs    — Worker: Claude text gen → ElevenLabs TTS → Supabase
+studio-story-status.mjs        — Polls studio job status
+studio-generate.mjs            — Gateway: snippets, ad copy, music, AI director
+studio-snippet-background.mjs  — Worker: quick story + TTS (30s–5min stories)
+studio-director.mjs            — AI creative director: vision analysis, ad concepts
+studio-library.mjs             — Asset management: list/save/delete/clear-all
+comedy-worker-background.mjs   — Worker: narrate-style comedy clips
+comedy-status.mjs              — Polls comedy job status
 
-**AD9: FUNNEL WALK-THROUGH** (HIGH)
-- Hook: "Watch how fast this works"
-- Screen recording of creation flow > Preview plays > Reaction
+— Misc —
+voices.mjs / list-voices.mjs   — ElevenLabs voice list
+voice-preview.mjs              — Short voice preview clips
+health-check.mjs               — System status
+story-count.mjs                — Public story counter
+content-take.mjs               — Content moderation
+update-gift-sent.mjs           — Marks gift as sent
+```
 
-**AD10: PREVIEW CLOSE-UP** (HIGH)
-- Hook: "Watch his face when he hears it"
-- Extreme close-up > Audio plays > Micro-expressions > Full reaction
+### Prompts
+```
+netlify/functions/lib/story-prompts.mjs — Master prompt system
+```
 
-**AD11: NO-KIDS COUPLE GIFT** (HIGH)
-- Hook: "We don't have kids but we just gave the best gift we've ever given"
-- Couple finding Storytold > Building story > Child receives > Reaction
+### Edge Functions
+```
+netlify/edge-functions/redirect-old-domain.js — 301 storytold.ai → heartheirname.com
+netlify/edge-functions/og-shared.js           — OG meta tags for shared story links
+```
 
-**AD12: 15 MIN BACKGROUND CLIP** (HIGH)
-- Hook: "They didn't know I was filming"
-- Long-form background footage of children listening. Best moments extracted.
+### Tools
+```
+tools/make-ad.py   — Video ad builder (raw footage → finished ad)
+```
 
-**AD13: SHE SAID SHE WAS TOO OLD** (HIGH)
-- Hook: "She said she was too old for it"
-- Teenager dismissive > Presses play > Genuine reaction. Text: "Ages 3 to 12."
+---
 
-**AD14: AGES 3 TO 12** (MEDIUM)
-- Hook: "Ages 3 to 12. One story. Both of them in it."
-- Two kids different ages > Both listening > Both reacting
+## 8. Creator Studio (studio.html)
 
-**AD15: FIRST TIME HE'S HEARD HIS NAME** (MEDIUM)
-- Hook: "He's 3. First time he's ever heard his name in a story."
-- Toddler listening > Recognition moment > Pure joy
+Password-protected at heartheirname.com/studio. Login via `ADMIN_SECRET` env var.
 
-### Proven Hooks (Ranked by Stopping Power)
+### Tab 1: Story Generator
 
-**Tier 1 (Scroll-Stoppers):**
-- "He doesn't know the story is about him yet"
-- "I made myself the villain in my son's story"
-- "Watch his face when he hears it"
-- "She said she was too old for it"
-- "My son asked me why he was never in any of his stories"
+**"Your Story" (Snippet) sub-mode:**
+- Paste rough story text → select duration (30s, 1min, 3min, 5min)
+- Claude polishes text keeping exact beats → ElevenLabs narrates
+- Background worker pattern: fire-and-forget → poll every 1s
+- Word target: `durationMins * 150`
 
-**Tier 2 (Strong):**
-- "Put all four cousins in the same story"
-- "Wait for the second one..."
-- "Put my dad in my son's story. Didn't expect his reaction."
-- "We don't have kids but we just gave the best gift we've ever given"
-- "They didn't know I was filming"
+**"Full Story" sub-mode:**
+- Complete form (name, age, friend, pet, family, themes, setting, voice)
+- Length: Preview (~60s) / Standard (~15min) / Epic (~15min, different tone)
+- Background worker: fire-and-forget → poll every 3s (up to 10min)
+- Full Claude SYSTEM_PROMPT + story type prompt
 
-**Tier 3 (Solid):**
-- "Bedtime just changed"
-- "Ages 3 to 12. Both of them in it."
-- "He's 3. First time he's ever heard his name in a story."
-- "Sent this instead of a toy"
-- "Watch how fast this works"
+**Audio player:** Canvas waveform, play/pause, skip ±15s, seek bar.
 
-### Production Rules (Non-Negotiable)
+### Tab 2: Narrate
+Comedy narration over video clips. Select style (Epic Movie, Documentary, Breaking News, Fairy Tale, Sports Commentary, Horror Trailer, Heist Movie, Romance). Claude generates script → ElevenLabs narrates. Option to add background music. Download MP3 or export as video.
 
-**DO:**
-- Capture REAL reactions. Never scripted. Never coached.
-- Keep it natural. Real environments, real lighting, real sound.
-- Let the audio do the work. The story playing IS the content.
-- One continuous shot during reaction moments. Do NOT cut.
-- Close-ups on faces during key moments.
-- Film in 9:16 vertical (1080x1920), H.264, 30fps.
-- Raw audio only. No background music on reaction content.
+### Tab 3: Library
+Save/retrieve generated stories, snippets, ad copy, clips, photos. Stored in Supabase at `studio-library/`. Index tracks up to 500 assets. Filter by type (snippets, stories, ad copy, clips).
 
-**DO NOT:**
-- Script reactions or tell children what to do
-- Explain the product in the ad. Show, never tell.
-- Add background music over reaction moments
-- Over-edit. Raw > polished.
-- Cut during the reaction. Let it breathe.
-- Tell the child what is about to happen. The surprise IS the content.
-- Use the word AI anywhere
+---
 
-### What Makes Marketing Gold (Content Rating)
+## 9. Story Prompt System (lib/story-prompts.mjs)
 
-**5/5 (Best Possible Content):**
-- THE "PRESS PLAY" MOMENT: Parent hearing child's name for first time. Hand over mouth. Eyes filling up.
-- CHILD HEARING THEIR NAME: Face lighting up, eyes wide, mouth dropping, turning to parent in amazement.
-- GENUINE TEARS: Real tears, real shock, real joy.
-- THE PERSONAL MESSAGE: Someone reacting to "Chase, this is from Daddy..." moment.
-- GIFT REVEAL: Grandparent watching child discover their story. Two emotional reactions in one frame.
-- THE GROUP LISTEN: Family huddled around speaker. Multiple reactions. Social proof in a single frame.
+### SYSTEM_PROMPT (~800 lines) — Master Rules
 
-**3-4/5 (Strong):**
-- Children engaged with headphones on, eyes wide, smiling, absorbed
-- Bedtime scenes: child in bed, parent nearby, warm lighting
-- Car journey scenes: kids in backseat, headphones on, peaceful
-- Before/after contrast: chaos vs. peaceful listening child
-- Product demos: filling in the form on phone (visible Storytold interface)
-- Family lifestyle: cuddling on sofa, morning routine
-- Behind-the-scenes: choosing a voice, typing name, writing personal message
+1. **Every detail is sacred** — weave child details 8+ times, best friend has 3+ real moments, pet does one memorable action
+2. **The child's name is music** — use 8+ times naturally, never twice in same sentence
+3. **Age is everything:**
+   - Ages 2–4: 30%+ sound effects, NO danger/villains, CBeebies style, ~1200 words
+   - Ages 5–7: Clear structure, simple morals, ~1870 words
+   - Ages 8–10: Real tension, humour, clever problem-solving, ~2200 words
+   - Ages 11–14: YA tone, identity themes, realistic dialogue, ~2200 words
+4. **Written for the ear** — pauses with `...`, audio tags `[whispers] [gasps] [laughs softly]`, varied sentence rhythm. 1 pause per 100–150 words. Max 8–12 audio tags per story.
+5. **Start immediately** — first sentence hooks, child's name in first 2 sentences
+6. **40%+ dialogue** — varied attribution, distinct character voices
+7. **Final line** — specific callback to story + "This story was made just for [name]"
+8. **No generic phrases** — every sentence specific to THIS child
+9. **Pacing:** 4 acts, 3+ scenes per 300 words, plant early → pay off later
 
-### Creator Content System
+### Word Count Formula
+- Base: 2200 words (standard)
+- Age ≤3: 55% → ~1200 words
+- Age ≤4: 70% → ~1540 words
+- Age ≤6: 85% → ~1870 words
+- Age 7+: Full 2200 words
+- Studio override: `_targetWords = durationMins * 150`
 
-**41 content briefs** organised by type:
-- **Founder Story Pieces (1-12):** Solo founder moments, Chase reactions, origin story
-- **Gift & Family Moments (14-20):** Grandparent reveals, godparent moments, sibling surprises
-- **Lifestyle & Screen Recording (21-29):** Gym context, voice notes, funnel recordings, contrast shots
-- **Premium Moments (30-41):** Multi-person reactions, long-distance scenarios, duets
+### Security
+- `sanitiseInput()` strips prompt injection patterns
+- `sanitiseStoryData()` applies to all text fields, 500 char limit per field
+- Brute-force protection: 5 failed auth attempts = 1 hour lockout (Supabase rate_limits table)
 
-Each brief includes: hook/title, what to do, what NOT to do, why it works, camera position, text overlays, sound notes, editing specs (CapCut, 9:16, H.264, 30fps).
+---
 
-**Modular Sub-Clips:**
-- **F-series:** Founder selfies (F1-F5: why built it, villain joke, mystery hook, closer, strongest opening)
-- **P-series:** Product screen recordings (P1-P5: typing name, preview generating, pressing play, WhatsApp, listen link)
-- **FC-series:** Couple gift flow (FC1-FC3: the decision, the send, the reaction)
-- **BG-series:** Background 15-min clips (BG-A to BG-D: single reactions, compilation, atmosphere, shared moment)
-- **C-series:** Older kids/cousins (C1-C2: too old objection, name drop reveal)
+## 10. Audio Processing Pipeline
 
-### Content Studio (AI Creative Director)
+```
+Claude generates story text
+    ↓
+prepareTTSText() — converts ... pauses to natural breaks
+    ↓
+splitIntoChunks() — splits at 4000 char boundaries by sentence
+    ↓
+ElevenLabs TTS per chunk
+    Model: eleven_v3
+    Voice settings: stability 0.50, similarity_boost 0.75, style 0
+    ↓
+stripID3() — removes ID3v2 tags from MP3 headers
+stripXingFrame() — removes LAME VBR info frame
+    ↓
+Concatenate all chunks into single MP3
+    ↓
+Upload to Supabase: stories/{storyId}/audio.mp3 (customer)
+              or: studio/{jobId}.mp3 (studio)
+Save metadata to: studio-jobs/{jobId}.json
+```
 
-An internal tool at `/studio.html` (password-protected) that:
-1. **Analyses footage** — Upload video frames/photos > Claude Vision auto-tags mood, usability, marketing potential, suggests hooks and overlays
-2. **Generates ad concepts** — 3 complete production-ready ad timelines per batch, platform-specific (TikTok/Meta/YouTube/Reels)
-3. **Creates marketing copy** — Ad copy, video scripts, captions, briefs tailored to platform and audience
-4. **Generates story snippets** — Short emotional audio clips for ads (text + TTS)
-5. **Comedy Clips** — Upload any video/photo of a kid, pick a comedy style, and generate hilariously over-the-top narrated audio (see below)
-6. **Library** — Saves all generated assets with tagging for reuse
+---
 
-### Comedy Clips Feature
+## 11. Multi-Currency Pricing
 
-A content creation tool inside the Content Studio that takes random/mundane clips of kids and generates dramatic narrated audio using Storytold's existing voice and music engine. The comedy comes from the contrast between ordinary footage and over-the-top narration.
+The `/api/get-pricing` function auto-detects the user's country from Netlify's `x-country` header and returns a localised price.
 
 **How it works:**
-1. Upload a video clip or photo of a kid doing anything
-2. Enter the child's name and optional context
-3. Pick a comedy style (8 options — see below)
-4. Choose background music (Adventure or Bedtime ambient, or none)
-5. Choose a narrator voice (any of the 22 existing Storytold voices)
-6. Hit Generate — Claude Vision analyses the frame, writes a comedy script in the chosen style, ElevenLabs narrates it
-7. Listen to the result, read the script, approve or try another style
+- Country → currency mapped for every country in the world
+- Exchange rates are approximate (hardcoded, periodically updated)
+- Always `.99` pricing for decimal currencies (€23.99, $25.99, A$40.99)
+- Zero-decimal currencies (JPY, KRW, HUF etc.) rounded to nearest 100 (¥3,900)
+- GBP stays as £19.99 (established price)
+- Unsupported currencies fall back to EUR (Europe) or USD (rest of world)
 
-**8 Comedy Styles:**
-- **Epic Movie** — Hollywood action movie narration of a kid eating cereal
-- **Nature Documentary** — David Attenborough-style study of a child in their natural habitat
-- **Breaking News** — Urgent news anchor coverage of a kid drawing on a wall
-- **Fairy Tale** — Once upon a time, a brave warrior discovered... the cat
-- **Sports Commentary** — Play-by-play analysis of a toddler attempting stairs
-- **Horror Trailer** — Terrifying movie trailer about a child who... found a spider
-- **Heist Movie** — Ocean's Eleven-style narration of a kid stealing biscuits
-- **Romance** — Sweeping romantic epic of a child's love affair with their blanket
+**Key prices:**
+- UK → £19.99 | Ireland → €23.99 | USA → $25.99 | Canada → CA$34.99
+- Australia → A$40.99 | UAE → AED 93.99 | Singapore → S$25.99
+- Japan → ¥3,900 | India → ₹2,138.99
 
-**Duration Matching:** For video uploads, narration length automatically matches the video duration (2.5 words per second calculation). Photos get natural-length narration.
-
-**Audio Formatting:** Uses the same Storytold audio formatting rules as paid stories: `...` pauses every 30-40 words, audio tags (`[whispers]`, `[gasps]`, `[laughs softly]`, `[excitedly]`, `[sighs]`), varied sentence rhythm. The comedy script is generated by Claude and narrated by ElevenLabs TTS v3.
-
-**Technical Architecture:**
-- Background function (`comedy-worker-background.mjs`) with 15-minute Netlify timeout
-- 3-step pipeline: Claude Vision analysis > Comedy script generation > ElevenLabs TTS
-- Status polling via `comedy-status.mjs` (checks Supabase Storage at `stories/comedy-jobs/{jobId}.json`)
-- Progress updates shown live: scene description, script preview, status badges
-
-### Audio Mixing
-
-After generating comedy narration, users can:
-- **Download Narration Only** — Raw voice MP3
-- **Mix with Music & Download** — Uses Web Audio `OfflineAudioContext` to render narration at full volume + background music at 0.15 volume into a single WAV file with 1-second fade in and 2-second fade out after narration ends
-
-### Video Export Engine
-
-After approving a comedy narration (video uploads only), users can export a complete, ready-to-post video with:
-
-**Aspect Ratio Selection:**
-- 9:16 (TikTok/Reels) — default
-- 16:9 (YouTube)
-- 1:1 (Instagram Square)
-- 4:5 (Facebook)
-
-The video uses blurred background fill when the source clip doesn't match the target aspect ratio (like how TikTok shows landscape videos in portrait).
-
-**Subtitles:** On by default. The narration text is auto-cleaned (strips `[whispers]`, `[gasps]`, `...` pauses, all audio tags) and split into timed chunks proportional to word count. Displayed as white text on a semi-transparent dark rounded box at the bottom of the frame.
-
-**Start Card (Optional):** 3-second branded intro card with purple gradient background, Storytold watermark, custom title line and subtitle. Example: "When Chase discovered spaghetti..."
-
-**End Card (Optional):** 3-second branded outro card with purple-to-orange gradient, custom CTA and tagline. Defaults to "storytold.ai" / "A story that knows their name".
-
-**Export Pipeline:**
-1. Canvas-based frame-by-frame rendering at 30fps
-2. Audio mixed offline (narration + music with fades) via `OfflineAudioContext`
-3. Video captured via `MediaRecorder` with `captureStream(0)` for frame-accurate control
-4. Prefers MP4 format (phone-compatible), falls back to WebM
-5. Downloads automatically as `storytold-comedy-{name}-{style}-{aspect}.mp4`
-
-**Technical Details:**
-- Uses `CanvasRenderingContext2D` for all drawing (video frames, subtitle text, branded cards)
-- `drawVideoFrame()` handles aspect ratio fitting with blurred background fill (CSS filter blur on stretched frame, then fitted frame on top)
-- `buildSubtitleChunks()` splits cleaned text into 8-12 word chunks, timed proportionally to audio duration
-- `audioBufferToWav()` encodes AudioBuffer to 16-bit PCM WAV for MediaRecorder audio input
-- Progress bar with percentage shown during render
-
-**Available Mockup Sequences (Product Demos for Ads):**
-1. "create-story" — Full creation journey (~18s)
-2. "gift-whatsapp" — Gift via WhatsApp (~8s)
-3. "email-delivery" — Email gift delivery (~8s)
-4. "family-sharing" — Sharing features (~8s)
-5. "story-library-browse" — Collection & library (~8s)
-
-**How to Mix Footage with Mockups:**
-1. HOOK: Real footage (parent reaction) with text overlay
-2. CURIOSITY: Quick mockup (child-details screen with name being typed)
-3. EMOTIONAL PEAK: Real footage of reaction moment
-4. PRODUCT: Mockup sequence showing creation flow
-5. SOCIAL PROOF: Real footage of family enjoying story
-6. CTA: End card "Create their story at storytold.ai"
-
-### Channel Strategy
-
-**TikTok & Reels (9:16, 15-25s):**
-Raw, authentic, fast cuts. "POV: you just heard your daughter's name." Text hooks on screen. Less produced = better.
-
-**Facebook & Instagram (4:5 or 1:1, 20-45s):**
-Emotional storytelling arc. Slightly more produced. Carousel of moments. Works for gifting angles.
-
-**YouTube (16:9, 30-60s):**
-More produced, full story. Longer mockup sequences. Product-focused works.
-
-**Google Search:**
-Target: "personalised children's book," "personalised bedtime story," "unique children's gift," "personalised audiobook for kids." Gift-related searches around holidays.
-
-**Email (Post-Purchase):**
-1. Delivery email with listen link
-2. Day 3: "How did bedtime go?" (collect testimonial)
-3. Day 7: "Ready for their next adventure?" (upsell)
-4. Day 30: "A new month, a new story"
-5. Seasonal triggers: birthday reminders, Christmas, back to school
-
-### Launch Strategy (4 Phases)
-
-**Phase 1 — Soft Launch (Weeks 1-2):** Friends and family for feedback. Get 5-10 real testimonials. Film 3-5 reaction videos.
-
-**Phase 2 — Organic Push (Weeks 3-4):** Post reactions on TikTok/Reels. Share testimonials on Facebook. Submit to parenting blogs and gift guides.
-
-**Phase 3 — Paid (Month 2+):** Meta ads targeting bedtime parents first. Retarget visitors who reached voice selection. Lookalike audiences from first 50 customers. Google search ads.
-
-**Phase 4 — Scale:** Gift targeting ahead of holidays. Journey targeting ahead of half terms. Teacher/school outreach. PR push around memorial voice feature.
+**Frontend:** `.price-display` CSS class on all price elements — updated via JS on page load.
+**Checkout:** Currency and `unitAmount` passed to `create-checkout.mjs`, which creates the Stripe session in the detected currency. Stripe Adaptive Pricing also enabled as fallback.
 
 ---
 
-## PART 4: STORY QUALITY RULES
+## 12. Email Flows
 
-### Personalisation Standards
-- Child's name appears 8+ times, never forced, at moments of wonder, dialogue, quiet beats, climax
-- Best friend has 3+ meaningful moments: dialogue, action that matters, connection moment
-- Pet does something memorable and retellable (not just "wagged his tail")
-- Interest DRIVES the plot, doesn't just decorate it
-- Proud-of moment (if provided) appears as confidence source at turning point
-- Personal message from parent read aloud warmly at start, natural lead-in to story
+All emails sent via Resend from `Hear Their Name <jamie@heartheirname.com>`.
 
-### Age Tailoring
+### Purchase Confirmation (send-email.mjs, type: 'purchase')
+Triggered by frontend after story generation completes. Requires valid paid Stripe session.
+- Subject: `[Child]'s story is ready! 🎧`
+- Contains: listen link, WhatsApp share link, login email reminder
+- Optional: discount code for next purchase (25% off)
 
-**Ages 2-4:** Very short sentences. Simple words. Heavy repetition ("And they walked, and they walked..."). Sound effects. Onomatopoeia. ABSOLUTELY no danger, villains, scary moments. Everything safe and gentle. 30%+ should be repetitive patterns. Think CBeebies bedtime story.
+### Abandoned Cart Recovery (stripe-webhook.mjs)
+Triggered by `checkout.session.expired` Stripe webhook (~24hrs after abandonment).
+- Only fires if customer entered email but didn't pay
+- Skips if customer already has a story (existing customer)
+- Rate limited: max 1 per email per 24 hours (Supabase rate_limits table)
+- Subject: `[Child]'s story is still waiting for you` (or generic if no child name)
 
-**Ages 5-7:** Clear beginning, middle, end. Child is brave but world is kind. Simple moral woven naturally. Dialogue brings characters alive. Relatable challenges.
+### Gift Email (send-email.mjs, type: 'gift')
+Sent to gift recipient. Requires valid paid Stripe session or auth token.
+- Subject: `[GiftFrom] made something special for [Child] 🎁`
+- Contains: listen link, personal message if provided
 
-**Ages 8-10:** Real narrative tension. Child is clever and capable. Humour works brilliantly. Friend has own personality/opinions. Richer vocabulary without showing off.
+### Share Email (send-email.mjs, type: 'share')
+Customer shares their story with family. Requires valid story ID in database.
+- Subject: `[From] shared [Child]'s story with you 🎧`
+- Contains: listen link
 
-**Ages 11-14:** Young adult tone. Complex emotions alongside adventure. Identity, belonging, growing up. Friendship has depth. Respect intelligence. Dialogue sounds like real teens: short fragments, unfinished sentences, affectionate sarcasm.
+### Contact Form (send-email.mjs, type: 'contact')
+Sent to jamie@heartheirname.com. Rate limited (3 per IP per hour).
 
-### Audio-First Writing Rules
-- Written for the EAR, not the eye. Narrator reads aloud via TTS.
-- Use `...` for breath pauses at suspense, wonder, scene transitions, emotional reveals
-- Aim for one pause every 100-150 words minimum
-- Use `... ...` for longer scene-change pauses
-- Audio tags (sparingly, 8-12 per full story): `[whispers]`, `[laughs softly]`, `[gasps]`, `[sighs]`, `[excitedly]`
-- Vary sentence length: short punchy beats, then flowing, then one-word. Boom.
-- 40-50% dialogue minimum. Characters talking holds attention better than narration.
-- Every character has distinct voice. Friend different from child different from adults.
-- At least one line the child will want to repeat.
-
-### Story Structure
-
-**Bedtime (Journey Home):**
-Opening (20%): gentle discovery > Gentle adventure (20-50%): wondrous journey through safe places > Winding down (50-80%): energy drops, sentences shorter, dialogue quieter > Sleep (final 20%): home, lullaby prose, rhythmic, repetition welcome. End with child feeling safe, warm, loved.
-
-**Adventure (4 Acts):**
-Act 1 (20%): Immediate hook, dropped into situation > Act 2 (20-50%): Deepens, secondary characters, 3+ distinct scenes, something new every 300 words > Act 3 (50-80%): The twist, real challenge, friend/pet standout moment, moment of doubt > Act 4 (final 20%): Resolution through skill not luck, callback payoff, door left open for next adventure.
-
-**Learning (Superhero Framework):**
-Knowledge IS the superpower. 8-10 interactive pause moments where narrator asks child to answer. Pattern: present question > "Can you work it out?" > bridging pause > reveal answer with celebration. Vary delivery (villain presents challenge, embedded in action, friend discovers, trap with wrong obvious answer). Difficulty builds: easy wins first 30%, harder middle 40%, hardest final 30% combining earlier concepts.
-
-### The Final Line Rule
-Every story ends with the child's name and the phrase "This story was made just for [name]." This is the brand signature. It is the moment the parent gets emotional. Never skip it.
-
-### Quality Checklist
-- [ ] Child's name appears naturally 8+ times
-- [ ] Best friend has 3+ meaningful moments
-- [ ] Pet does something memorable
-- [ ] Interest drives the plot
-- [ ] Proud-of moment appears as confidence source
-- [ ] Language matches age group
-- [ ] Category guidelines followed
-- [ ] Personal message flows naturally into opening
-- [ ] No generic phrases that could apply to any child
-- [ ] Pauses every 100-150 words
-- [ ] 40%+ dialogue
-- [ ] Final line includes name + "This story was made just for [name]"
+### Magic Link Auth (send-login-code.mjs)
+OTP login for returning customers to access story library.
 
 ---
 
-## PART 5: KEY NUMBERS & STATUS
+## 13. Stripe Setup
 
-### Current State (as of April 2026)
-- **Stories sold:** 11
-- **Story attempts/previews:** 9
-- **Page views tracked:** 1,981
-- **Referral links:** 8
-- **Registered creators:** 7 (Eva, Jamie, Molly, Paul, Sonya + 2 others)
-- **Content pieces claimed:** 2 (Molly Craven: #30 and #38)
-- **Narrator voices:** 22 (12 female, 10 male)
-- **Comedy styles:** 8 (Epic Movie, Documentary, Breaking News, Fairy Tale, Sports Commentary, Horror Trailer, Heist Movie, Romance)
-- **Music tracks:** 2 (adventure-ambient.mp3, bedtime-ambient.mp3)
-- **Video export formats:** MP4 (preferred), WebM (fallback)
-- **Video aspect ratios:** 9:16, 16:9, 1:1, 4:5
+- **Webhook endpoint:** https://heartheirname.com/api/stripe-webhook
+- **Events listened to:** `checkout.session.completed`, `checkout.session.expired`
+- **Adaptive Pricing:** Enabled (Stripe shows local currency on checkout page)
+- **Checkout creates:** Line item "Hear Their Name: Personalised Audio Story" in detected currency
+- **Coupon:** `storytold_next_story_25` (25% off repeat purchase, internal name)
 
-### Deployment
-- **Netlify site:** storytold (Dev plan), deploy status: Ready
-- **Live URL:** https://storytold.ai
-- **Supabase project:** storytold (sxypxaahnknqnlqmorjc), EU West, Active & Healthy, Postgres 17.6
-- **Supabase tables:** 11 (stories, story_attempts, page_views, referrals, content_creators, content_takes, auth_tokens, login_codes, login_attempts, rate_limits, error_logs)
+**checkout.session.completed fires:**
+1. Meta Conversions API (server-side Purchase event, deduplicates with client pixel via eventId)
+2. TikTok Events API (CompletePayment event)
+3. Referral conversion tracking (if ref_code in metadata)
 
-### Key Files
-| Component | Path |
-|-----------|------|
-| Landing page | `/public/index.html` |
-| Dashboard | `/public/dashboard.html` |
-| Creator dashboard | `/public/creator-dashboard.html` |
-| Content studio | `/public/studio.html` |
-| Referral page | `/public/referral.html` |
-| Admin dashboard | `/public/admin.html` |
-| Story prompts | `/netlify/functions/lib/story-prompts.mjs` |
-| Preview generation | `/netlify/functions/generate-preview.mjs` |
-| Full story worker | `/netlify/functions/full-worker-background.mjs` |
-| Stripe checkout | `/netlify/functions/create-checkout.mjs` |
-| Stripe webhook | `/netlify/functions/stripe-webhook.mjs` |
-| Studio AI director | `/netlify/functions/studio-director.mjs` |
-| Studio generator | `/netlify/functions/studio-generate.mjs` |
-| Comedy worker (background) | `/netlify/functions/comedy-worker-background.mjs` |
-| Comedy status polling | `/netlify/functions/comedy-status.mjs` |
-| Email sending | `/netlify/functions/send-email.mjs` |
-| Content briefs | `/Storytold-Creator-Content-Briefs.md` |
-| Complete Claude brief | `/Storytold-Complete-Claude-Brief.md` |
+---
+
+## 14. Admin Panel (admin.html)
+
+Password-protected at heartheirname.com/admin via `ADMIN_SECRET`.
+
+**Tabs:**
+- **Customers** — All unique customer emails, story count, story details
+- **Stories** — All generated stories with audio links
+- **Attempts** — Recent generation attempts (debugging)
+- **Errors** — Error log with severity levels
+- **Analytics** — Sales, revenue, page views, previews, checkouts. Daily chart. 30/60/90 day views.
+- **Live** — Real-time visitor activity, recent events
+- **Referrals** — Referral programme stats
+
+**Tracking:** Page views logged to Supabase `page_views` table via `/api/track-pageview`. Metrics aggregated server-side by `admin-api.mjs`.
+
+---
+
+## 15. Supabase Schema (key tables)
+
+```
+stories           — id, email, child_name, category, audio_url, created_at, ...
+story_attempts    — id, email, child_name, attempts, created_at, ...
+page_views        — id, page, referrer, utm_source, utm_medium, device, visitor_id, screen_name, created_at
+rate_limits       — id, key, created_at (used for auth brute-force + email rate limiting)
+auth_tokens       — id, email, token, created_at (magic link sessions)
+referrals         — id, ref_code, referrer_name, referrer_email, conversions, revenue, referred_emails
+```
+
+**Supabase Storage buckets:**
+```
+stories/              — Customer story audio + assets
+  pending/{sessionId}.json  — Pending story data (survives mobile browser redirect)
+studio/               — Studio-generated audio files
+studio-jobs/          — Studio job result metadata JSON
+studio-library/       — Library assets (mp3, png, txt, jpg)
+  index.json          — Library index (up to 500 entries)
+```
+
+---
+
+## 16. SEO & Tracking Setup
+
+- **Canonical:** https://heartheirname.com/
+- **Sitemap:** https://heartheirname.com/sitemap.xml
+- **Robots.txt:** Disallows /api/, allows everything else
+- **GA4 Measurement ID:** G-84KXD5XPZG
+- **Meta Pixel ID:** 1656775315345896
+- **Meta domain verified:** heartheirname.com (facebook-domain-verification tag in index.html)
+- **TikTok Pixel ID:** D74JVVJC77U5P0Q29FKG
+- **Google Search Console:** Add heartheirname.com as property (pending)
+- **Old domain:** storytold.ai → 301 redirect via Netlify edge function
+
+---
+
+## 17. Deployment
+
+- **Repo:** github.com/jamie161190/storynow (main branch)
+- **Deploy:** Auto-deploys to Netlify on push to main
+- **Build command:** `npm install`
+- **Publish dir:** `public`
+- **Functions dir:** `netlify/functions`
+- **Edge functions dir:** `netlify/edge-functions`
+- **Node bundler:** esbuild
+- **Stripe, Supabase modules:** listed as external in netlify.toml
+
+---
+
+## 18. What NOT to Touch
+
+Customer-facing code handles live payments and story delivery. Never modify without explicit instruction:
+
+- `public/index.html`
+- `netlify/functions/generate-preview.mjs`
+- `netlify/functions/story-worker-background.mjs`
+- `netlify/functions/full-worker-background.mjs`
+- `netlify/functions/generate-full.mjs`
+- `netlify/functions/stripe-webhook.mjs`
+- `netlify/functions/create-checkout.mjs`
+- `netlify/functions/verify-payment.mjs`
+- Any function without `studio-` prefix (unless specifically asked)
+
+The studio (`studio.html`) and `studio-*` functions are the safe sandbox.
+
+---
+
+## 19. Video Ad Pipeline (tools/make-ad.py)
+
+Takes raw video footage → finished social media ad with narration, background music, subtitles, text overlays, and end cards.
+
+### 9-Step Process
+
+1. **Cut video clip** — ffmpeg extract between timestamps
+2. **Mute original audio** — strip source audio track
+3. **Cut narrator audio** — extract matching segment from story MP3
+4. **Combine video + narrator** — merge muted video with narration audio
+5. **Mix background music** — adventure-ambient.mp3 at 15% volume, fade in 2s, fade out over 5s. **CRITICAL: use `normalize=0` with amix or you get hissing artifacts**
+6. **Burn subtitles** — moviepy + PIL (ffmpeg drawtext/subtitles filters not available). Position at y=1470 (safe zone).
+7. **Create text overlay PNGs** — PIL transparent PNGs with bold text + dark semi-transparent banners. Position at y=350 (safe zone).
+8. **Composite overlays** — ffmpeg `overlay` filter with `enable='between(t,start,end)'`. **Use ffmpeg for this, NOT moviepy** — moviepy strips HDR colour space and washes out colours.
+9. **End cards + concat** — static PNGs → 2.5s MP4s with silent audio → concatenate via ffmpeg concat demuxer. Fade audio out 3s before end cards.
+
+### Social Media Safe Zones (CRITICAL)
+- **Top safe:** y=350 (below FB/TikTok username and status bar)
+- **Bottom safe:** y=1470 (above caption text and like/share buttons)
+
+### Key Technical Gotchas
+- `amix` must use `normalize=0` — without it, audio normalisation creates hissing
+- moviepy strips HDR/bt2020 colour data — only use for subtitle burn-in
+- ffmpeg path: `/opt/homebrew/bin/ffmpeg` (not on PATH)
+- Whisper broken on this machine — use Google Speech Recognition (`speech_recognition` library)
+- ffmpeg lacks `drawtext` (no libfreetype) and `subtitles` (no libass) — use moviepy for subtitles
+
+### Usage
+```bash
+# Edit CONFIG section at top of file, then:
+python3 tools/make-ad.py
+```
+
+---
+
+## 20. Ad Creative Philosophy
+
+**The comedy video IS the product demo.** Don't treat entertaining content as separate from Hear Their Name — it already shows what Hear Their Name does (turning ordinary moments into warm, narrated stories).
+
+**Never explain the product in an ad.** Show it working, then pivot emotionally:
+1. Hook with entertaining content (comedy narration over real video)
+2. Hard cut
+3. Emotional truth (time-jump: "he was 2, he's 9 now")
+4. CTA
+
+**Ad Structure (Chase Tickle Monster Ad — the template):**
+- **Caption:** "Made the kids the heroes of their own story. Made Dad the villain."
+- **0–2s:** Hook overlay: "They don't know what's coming..." (white bold, dark banner, safe zone)
+- **0–35s:** Video plays untouched — narration IS the demo. Don't interrupt it.
+- **20–22s:** Mid-point flash: "You can make yourself the villain too." (yellow bold) — the product bridge
+- **35–37.5s:** End card 1: "This is what happened when we put the kids in their own story." / "Dad was the villain."
+- **37.5–40s:** End card 2: "Their name. Their best friend. Their world." / "In a story made just for them."
+
+**End card design:**
+- Background: Dark purple (#2D0F41)
+- Primary text: White, Arial Bold 56pt
+- Accent text: Orange (255, 140, 0), Arial Bold 62pt
+- Duration: 2.5 seconds per card
+
+**The cardinal sin:** Explaining what Hear Their Name is. The moment you say "AI-powered personalised stories" you've lost them. Let the video do the selling.
+
+---
+
+## 21. Chase Ad Asset Reference
+
+- **Raw footage:** `~/Downloads/Full Video.MOV` (3:42)
+- **Best clip:** 2:45–3:20 (35 seconds) — Chase, Darcy (5), Ethan (3) on floor, dad appears as tickle monster under blanket, Darcy's laugh at the end is gold
+- **Narrator audio:** `~/Downloads/storytold-story.mp3` (cut to same timestamps)
+- **Background music:** `public/music/adventure-ambient.mp3` (15% volume)
+- **Final export:** `~/Downloads/storytold-chase-ad-v4.mp4` (40s)
+
+**Subtitles:**
+```
+00:00–00:05  "He was there again, as usual... and somewhere in this house"
+00:05–00:10  "something was lurking. The tickle monster."
+00:10–00:15  "All three children knew it. They could feel it. The monster was close."
+00:15–00:22  "Disguised. Hidden. Watching... and waiting."
+00:22–00:28  "Was it Grandad? Was it Chase's dad? Was it Darcy and Ethan's dad?"
+00:28–00:35  "Nobody knew. Every creak of the floorboard... every suspiciously innocent adult face."
+```
+
+---
+
+## 22. Python Dependencies (video pipeline)
+
+```bash
+pip3 install moviepy SpeechRecognition Pillow
+```
+- Python 3.9 at `/Library/Developer/CommandLineTools/usr/bin/python3`
+- ffmpeg at `/opt/homebrew/bin/ffmpeg` (v8.1, no libass/libfreetype)
