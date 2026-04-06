@@ -620,6 +620,26 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 .hero-cta-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(241,117,59,0.45)}
 .hero-cta-btn:active{transform:translateY(0)}
 .sound-hint{font-size:0.82rem;color:var(--text-soft);font-weight:600;text-align:center;margin-top:0.85rem}
+/* ===== STICKY CTA ===== */
+/* ===== STICKY BAR ===== */
+.sticky-bar{position:fixed;bottom:0;left:0;right:0;z-index:999;background:var(--purple);border-top:1px solid rgba(107,47,147,0.4);padding:12px 20px;transform:translateY(100%);transition:transform 0.3s ease;pointer-events:none}
+.sticky-bar.visible{transform:translateY(0);pointer-events:all}
+.sticky-bar.hidden{transform:translateY(100%) !important;pointer-events:none}
+.sticky-bar-inner{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.sticky-bar-left{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.sticky-bar-label{font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.75);white-space:nowrap}
+.sticky-bar-input{height:36px;padding:0 12px;border:1.5px solid rgba(255,255,255,0.2);border-radius:8px;font-family:'Quicksand',sans-serif;font-size:0.9rem;font-weight:600;color:#fff;background:rgba(255,255,255,0.12);width:180px;outline:none;transition:border-color 0.2s}
+.sticky-bar-input::placeholder{color:rgba(255,255,255,0.45);font-weight:400}
+.sticky-bar-input:focus{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.18)}
+.sticky-bar-btn{flex-shrink:0;padding:10px 20px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;color:#fff;background:#F1753B;white-space:nowrap;transition:all 0.2s}
+.sticky-bar-btn:hover{background:#D4601E;transform:translateY(-1px)}
+.sticky-bar-btn:active{transform:translateY(0)}
+@media(max-width:480px){
+  .sticky-bar{padding:12px 16px}
+  .sticky-bar-inner{flex-direction:column;gap:8px;align-items:stretch}
+  .sticky-bar-input{width:100%;box-sizing:border-box}
+  .sticky-bar-btn{width:100%;padding:12px 20px}
+}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
@@ -820,6 +840,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin:0">Already bought a story? Log in with the email you used at checkout.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);margin-top:1rem">&copy; 2026 Hear Their Name. All rights reserved.</p>
     <p style="font-size:0.62rem;color:var(--text-muted);margin-top:0.3rem"><a href="/privacy.html" style="color:var(--text-muted);text-decoration:underline">Privacy Policy</a> &middot; <a href="/terms.html" style="color:var(--text-muted);text-decoration:underline">Terms of Service</a></p>
+  </div>
+</div>
+
+<!-- STICKY BAR -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-bar-inner">
+    <div class="sticky-bar-left">
+      <label class="sticky-bar-label" for="stickyNameInput">Whose story is this?</label>
+      <input type="text" id="stickyNameInput" class="sticky-bar-input" placeholder="Their name..." autocomplete="off" maxlength="40">
+    </div>
+    <button class="sticky-bar-btn" onclick="stickyBarStart()">Start their story</button>
   </div>
 </div>
 
@@ -1720,6 +1751,14 @@ function selectHeroPill(cat) {
 function heroStartStory() {
   pendingChildName = (document.getElementById('heroChildName').value || '').trim();
   var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
+
+  // Track hero CTA click to Supabase for admin funnel
+  var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
+  fetch('/api/track-pageview', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ page: '/', screen_name: pendingChildName ? 'hero_start_name' : 'hero_start_noname', device: device, visitor_id: stVisitorId })
+  }).catch(function() {});
 
   if (pendingChildName) {
     storyData.category = cat;
@@ -4920,6 +4959,74 @@ async function submitContact() {
     });
   } catch(e) {}
   document.getElementById('contactForm').innerHTML = '<p style="color:var(--purple);font-weight:600;font-size:0.85rem;text-align:center;margin:0.5rem 0">Sent! I will get back to you soon.</p>';
+}
+
+// ── Sticky Bar ──
+(function() {
+  var bar = document.getElementById('stickyBar');
+  if (!bar) return;
+
+  function isFunnelOpen() {
+    var landing = document.getElementById('screenLanding');
+    return !landing || !landing.classList.contains('active');
+  }
+
+  function updateBar() {
+    if (isFunnelOpen()) {
+      bar.classList.add('hidden');
+      return;
+    }
+    bar.classList.remove('hidden');
+    if (window.scrollY > 400) {
+      bar.classList.add('visible');
+    } else {
+      bar.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', updateBar, { passive: true });
+
+  // Re-check when screens change (goTo calls this)
+  var origGoTo = window.goTo;
+  // Patch after page load since goTo is defined later
+  window.addEventListener('load', function() {
+    updateBar();
+  });
+
+  // MutationObserver to detect screen switches
+  var landingEl = document.getElementById('screenLanding');
+  if (landingEl && 'MutationObserver' in window) {
+    new MutationObserver(function() { updateBar(); }).observe(landingEl, { attributes: true, attributeFilter: ['class'] });
+  }
+})();
+
+function stickyBarStart() {
+  var stickyInput = document.getElementById('stickyNameInput');
+  var name = stickyInput ? stickyInput.value.trim() : '';
+
+  // Mirror name into hero input and storyData
+  if (name) {
+    var heroInput = document.getElementById('heroChildName');
+    if (heroInput) heroInput.value = name;
+    var funnelInput = document.getElementById('childName');
+    if (funnelInput) funnelInput.value = name;
+    storyData.childName = name;
+    pendingChildName = name;
+    var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
+    storyData.category = cat;
+    applyCategoryTheme(cat);
+    setGiftMode(false, false);
+    trackEvent('HeroStartStory', { content_name: cat, child_name_entered: true, source: 'sticky_bar' });
+    var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
+    fetch('/api/track-pageview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page: '/', screen_name: 'hero_start_name', device: device, visitor_id: stVisitorId })
+    }).catch(function() {});
+    goTo('screenDetails');
+  } else {
+    goTo('screenCategory');
+  }
 }
 
 // ── Homepage scroll dropoff tracking ──
