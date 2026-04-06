@@ -141,7 +141,7 @@ if (localStorage.getItem('st_cookies') === 'accepted') {
       "name": "What if I don't like the full version?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Just let me know and I will write you a brand new one. No hassle, no questions. If you would rather just get your money back, drop me an email within 24 hours and I will sort it out, provided the story has not been downloaded or shared yet."
+        "text": "Just let me know and I will write you a brand new one. No hassle, no questions asked."
       }
     },
     {
@@ -173,7 +173,7 @@ if (localStorage.getItem('st_cookies') === 'accepted') {
       "name": "How long does the full story take to generate?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "About 5 minutes from start to finish. You will see a progress screen while it is being written and narrated."
+        "text": "3 to 5 minutes from start to finish. You will see a progress screen while it is being written and narrated."
       }
     },
     {
@@ -507,7 +507,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ===== READ ALONG ===== */
 .read-along-wrap{background:var(--card);border:2px solid var(--border);border-radius:16px;margin-top:1rem;overflow:hidden;transition:all 0.3s}
-.read-along-toggle{width:100%;padding:0.75rem 1rem;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-family:'Quicksand',sans-serif;font-size:0.85rem;font-weight:700;color:var(--text-muted);transition:color 0.2s}
+.read-along-toggle{width:100%;padding:0.75rem 1rem;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-family:'Quicksand',sans-serif;font-size:0.85rem;font-weight:700;color:var(--purple);transition:color 0.2s}
 .read-along-toggle:hover{color:var(--text)}
 .read-along-content{max-height:0;overflow:hidden;transition:max-height 0.4s ease}
 .read-along-content.open{max-height:2000px}
@@ -604,12 +604,31 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 details[open] summary span:last-child{transform:rotate(45deg)}
 details summary span:last-child{transition:transform 0.2s;display:inline-block}
 
+/* ===== HERO NAME CARD ===== */
+.trust-bar{display:flex;align-items:center;justify-content:center;gap:0.4rem;margin-bottom:0.5rem;font-size:0.78rem;color:var(--text-muted);font-weight:600}
+.trust-stars{color:var(--orange);font-size:0.95rem;letter-spacing:0.08em}
+.hero-name-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1.35rem 1.25rem;box-shadow:var(--shadow);margin:1rem auto 0;max-width:380px;width:100%}
+.hero-card-label{display:block;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem}
+.hero-name-input{width:100%;padding:0.85rem 1rem;border:2px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);background:var(--card);transition:all 0.25s;text-align:center;box-sizing:border-box}
+.hero-name-input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 4px rgba(124,92,252,0.1)}
+.hero-name-input::placeholder{color:var(--text-muted);font-weight:400;font-size:0.95rem}
+.hero-pills{display:flex;gap:0.5rem;margin:0.85rem 0}
+.hero-pill{flex:1;padding:0.7rem 0.5rem;border:2px solid var(--border);border-radius:var(--radius-full);font-family:'Quicksand',sans-serif;font-size:0.88rem;font-weight:700;color:var(--text-muted);background:var(--card);cursor:pointer;transition:all 0.2s;text-align:center}
+.hero-pill:hover{border-color:var(--purple-soft);color:var(--text)}
+.hero-pill.active{background:linear-gradient(135deg,var(--purple),#A872C8);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(124,92,252,0.25)}
+.hero-cta-btn{width:100%;padding:1rem;border:none;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--orange),#D4601E);box-shadow:0 4px 20px rgba(241,117,59,0.35);transition:all 0.25s;margin-top:0.25rem}
+.hero-cta-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(241,117,59,0.45)}
+.hero-cta-btn:active{transform:translateY(0)}
+.sound-hint{font-size:0.82rem;color:var(--text-soft);font-weight:600;text-align:center;margin-top:0.85rem}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
   .logo-img{width:200px}
   .tagline{font-size:1.25rem}
   .length-cards{flex-direction:column}
   .trust-row{flex-direction:column;gap:0.5rem}
+  .hero-name-input{font-size:1rem}
+  .hero-pill{font-size:0.8rem;padding:0.6rem 0.4rem}
 }
 </style>
 </head>
@@ -639,15 +658,37 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 
   <!-- HERO -->
-  <div class="logo-wrap" id="sectionHero">
-    <img src="/images/logo-stacked.png" alt="Hear Their Name" class="logo-img">
-  </div>
-  <h1 class="tagline">A story that knows <span class="highlight">their</span> name.</h1>
-  <p class="hero-text">Their name. Their best friend. Their world. Spoken aloud in a story made just for them. Ready in minutes.</p>
+  <div id="sectionHero" style="width:100%;max-width:440px;text-align:center">
+    <div class="trust-bar">
+      <span class="trust-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      <span>Loved by families across the world</span>
+    </div>
+    <div class="logo-wrap">
+      <img src="/images/logo-stacked.png" alt="Hear Their Name" class="logo-img">
+    </div>
+    <h1 class="tagline">A story that knows <span class="highlight">their</span> name.</h1>
+    <p class="hero-text">Their name. Their best friend. Their world. Spoken aloud in a story made just for them. Hear your free sample in 60 seconds.</p>
 
-  <!-- AUDIO SAMPLE (proof first, then ask) -->
+    <!-- NAME CAPTURE CARD -->
+    <div class="hero-name-card">
+      <label class="hero-card-label">WHAT'S THEIR NAME?</label>
+      <input type="text" class="hero-name-input" id="heroChildName" placeholder="Type their name here..." autocomplete="off">
+      <div class="hero-pills">
+        <button class="hero-pill active" id="heroPillBedtime" onclick="selectHeroPill('bedtime')">&#127769; Bedtime</button>
+        <button class="hero-pill" id="heroPillAdventure" onclick="selectHeroPill('adventure')">&#9876;&#65039; Adventure</button>
+      </div>
+      <button class="hero-cta-btn" onclick="heroStartStory()">Start their story</button>
+      <p style="font-size:0.72rem;color:var(--text-muted);margin:0.6rem 0 0;line-height:1.5;font-weight:500">Hear the preview free &middot; <span class="price-display">&pound;19.99</span> for the full story &middot; No account needed</p>
+    </div>
+    <p class="sound-hint">&#127911; Put your headphones in. This one's worth it.</p>
+  </div>
+
+  <!-- AUDIO SAMPLE (below the fold) -->
+  <div style="width:100%;max-width:440px;margin-top:2rem;text-align:center">
+    <p style="font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:900;color:var(--text);margin:0 0 0.25rem">Real stories. Real children. Press play.</p>
+    <p style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin:0 0 0.75rem">Best experienced with headphones or sound on.</p>
+  </div>
   <div class="sample-player" id="samplePlayer" data-cat="bedtime">
-    <div class="sample-label">I MADE THIS FOR MY SON CHASE. PRESS PLAY.</div>
     <div class="sample-pills">
       <button class="sample-pill active" data-cat="bedtime" onclick="switchSample('bedtime',this)">Bedtime</button>
       <button class="sample-pill" data-cat="adventure" onclick="switchSample('adventure',this)">Adventure</button>
@@ -669,26 +710,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
   </div>
 
-  <!-- FIRST CTA (after the proof) -->
-  <div class="cta-group" id="sectionCta1">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. <span class="price-display">£19.99</span> for the full story.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">You can even make yourself the villain.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.2rem 0 0">They hear their best friend talking to them.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.2rem 0 0">Even the family dog has a role.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
-  </div>
-
-  <!-- FOUNDER CARD (trust signal for scrollers who didn't convert yet) -->
-  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
-    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
-    <div style="padding:1rem 1.2rem">
-      <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
-      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he wasn't in any of his stories.<br>He wanted to hear his name spoken out loud in a story made just for him.<br>So I built something where he could.<br>Now every child can.</p>
-    </div>
-  </div>
-
-  <!-- HOW IT WORKS (concrete example only, no numbered steps) -->
+  <!-- PERSONALISATION DETAIL -->
   <div class="how-it-works" id="sectionHowItWorks">
     <p class="how-title">You tell me about them.</p>
     <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
@@ -699,6 +721,15 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         I turn every detail into a story they'll want to hear again and again. Their friend is right beside them, their favourite toy comes along for the ride, and the villain you picked causes trouble at every turn. Every story is completely unique.
       </p>
       <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
+    </div>
+  </div>
+
+  <!-- FOUNDER CARD -->
+  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
+    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
+    <div style="padding:1rem 1.2rem">
+      <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
+      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he wasn't in any of his stories.<br>He wanted to hear his name spoken out loud in a story made just for him.<br>So I built something where he could.<br>Now every child can.</p>
     </div>
   </div>
 
@@ -745,7 +776,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if I don't like the full version?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let me know and I will write you a brand new one. No hassle, no questions. If you would rather just get your money back, drop me an email within 24 hours and I will sort it out, provided the story has not been downloaded or shared yet.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let me know and I will write you a brand new one. No hassle, no questions asked. Email <a href="mailto:jamie@heartheirname.com" style="color:var(--purple);font-weight:700">jamie@heartheirname.com</a> and I will sort it out.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have more than one child. Can they all be in it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -761,7 +792,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long does the full story take to generate?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">About 5 minutes from start to finish. You will see a progress screen while it is being written and narrated.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">3 to 5 minutes from start to finish. You will see a progress screen while it is being written and narrated.</p>
       </details>
       <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
         <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have a request or idea for a cool feature.<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
@@ -1007,9 +1038,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p class="form-hint">This person goes on the adventure with them. Don't know? Just type a first name and we will make it work.</p>
   </div>
   <div class="form-group">
-    <label>Sidekick (optional)</label>
+    <label>A second character (optional)</label>
     <input type="text" id="sidekickName" placeholder="e.g. Mum, Daddy, Grandma, a robot called Sparky, Captain Brave">
-    <p class="form-hint">Can be anyone: a parent, grandparent, the gift-giver, or even a magical creature. They will be by their side the whole adventure.</p>
+    <p class="form-hint">Anyone at all — a parent, grandparent, a teacher, or even a magical creature. They will play a real part in the story.</p>
   </div>
   <div class="form-group">
     <label>Other people in the story (optional)</label>
@@ -1163,9 +1194,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
 
   <div class="form-group">
-    <label>Anything else I should know? (optional)</label>
-    <textarea id="extraDetails" placeholder="e.g. He's scared of thunder but pretends he's not. She calls spaghetti 'pasketti'. He's just started swimming lessons." style="height:100px"></textarea>
-    <p class="form-hint">The more you tell me, the more personal the story feels. Little details make all the difference.</p>
+    <label>What makes them them? (optional)</label>
+    <textarea id="extraDetails" placeholder="e.g. He's scared of thunder but pretends he's not. She calls spaghetti 'pasketti'. He's obsessed with becoming a footballer. She sleeps with four teddies and names them all." style="height:100px"></textarea>
+    <p class="form-hint">Quirks, fears, obsessions, funny habits — the more specific you are, the more the story feels like it was written just for them.</p>
   </div>
 
   <div class="form-group" id="personalMessageGroup">
@@ -1454,6 +1485,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <!-- Post purchase actions -->
     <div class="post-actions">
       <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">&#127911; Download MP3</button>
+      <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin:-0.25rem 0 0">The download is narration only — background music plays in the app.</p>
       <div class="post-actions-row">
         <button class="btn btn-gift" onclick="shareFromFullScreen()">Share with family</button>
         <button class="btn btn-gift" style="background:transparent;border:2px solid var(--border);color:var(--text)" onclick="showQrCode()">QR Code</button>
@@ -1537,7 +1569,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <div class="library-empty-art">&#128218;</div>
     <p style="font-size:1.2rem;margin-bottom:0.5rem;font-weight:800;color:var(--text)">No stories yet</p>
     <p style="color:var(--text-muted);font-size:0.9rem;line-height:1.6">Once you create and purchase a story, it will appear here. Each one is saved forever.</p>
-    <button class="btn btn-primary" style="margin-top:1.25rem" onclick="goTo('screenLanding')">Create your first story</button>
+    <button class="btn btn-primary" style="margin-top:1.25rem" onclick="goTo('screenCategory')">Create your first story</button>
   </div>
   <div id="libraryLoading" style="text-align:center;padding:2rem;display:none">
     <div class="spinner"></div>
@@ -1651,7 +1683,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 <div class="screen" id="screenLogin">
   <button class="back-btn" onclick="goTo('screenLanding')">&#8592; Back</button>
   <h2 class="section-title">Your Stories</h2>
-  <p class="section-sub">Enter the email you used when purchasing. I will send you a login code.</p>
+  <p class="section-sub">Enter the email your story was sent to. I will send you a login code.</p>
   <div style="max-width:380px;margin:0 auto">
     <input type="email" id="loginEmail" placeholder="your@email.com" class="form-input" style="width:100%;margin-bottom:1rem;text-align:center;font-size:1rem">
     <button class="btn btn-primary" style="width:100%" id="sendCodeBtn" onclick="sendLoginCode()">Send me a code</button>
@@ -1674,6 +1706,34 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
 <script>
 let storyData = { category:'', length:'long', themes:[], where:'Surprise me' };
+
+// Hero name capture
+let pendingChildName = '';
+let heroCategory = 'bedtime';
+
+function selectHeroPill(cat) {
+  heroCategory = cat;
+  document.getElementById('heroPillBedtime').classList.toggle('active', cat === 'bedtime');
+  document.getElementById('heroPillAdventure').classList.toggle('active', cat === 'adventure');
+}
+
+function heroStartStory() {
+  pendingChildName = (document.getElementById('heroChildName').value || '').trim();
+  var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
+
+  if (pendingChildName) {
+    storyData.category = cat;
+    applyCategoryTheme(cat);
+    setGiftMode(false, false);
+    storyData.childName = pendingChildName;
+    document.getElementById('childName').value = pendingChildName;
+    trackEvent('HeroStartStory', { content_name: cat, child_name_entered: true });
+    goTo('screenDetails');
+  } else {
+    trackEvent('HeroStartStory', { content_name: 'no_name', child_name_entered: false });
+    goTo('screenCategory');
+  }
+}
 let selectedVoiceId = '';
 let fullStoryText = '';
 let previewStoryText = '';
@@ -2342,7 +2402,7 @@ function restoreLearningSetup() {
 // Category colour themes that carry through the entire flow
 const CAT_THEMES = {
   bedtime:  { accent: '#6B2F93', accentLight: '#E8E0FF', accentDark: '#521F7A', glow: 'rgba(124,92,252,0.12)', label: 'Bedtime Story' },
-  journey:  { accent: '#F1753B', accentLight: '#FFE5D0', accentDark: '#C45510', glow: 'rgba(255,140,66,0.12)', label: 'Adventure' },
+  journey:  { accent: '#F1753B', accentLight: '#FFE5D0', accentDark: '#C45510', glow: 'rgba(255,140,66,0.12)', label: 'Adventure Story' },
   learning: { accent: '#00B4A0', accentLight: '#D4F1EE', accentDark: '#008F7F', glow: 'rgba(0,180,160,0.12)', label: 'Learning Adventure' },
 };
 
@@ -2598,6 +2658,7 @@ function validateDetails() {
   const gender = document.getElementById('gender').value;
   const email = document.getElementById('earlyEmail').value.trim();
   if (!name) { showInlineError('detailsError', 'Please tell me their name.'); return; }
+  if (name.split(/\s+/).length > 4 || name.length > 45) { showInlineError('detailsError', "That looks like more than a name — just their first name is perfect, for example 'Chase' or 'Emma'."); return; }
   if (!age) { showInlineError('detailsError', 'Please tell us their age.'); return; }
   if (!gender) { showInlineError('detailsError', 'Please select boy or girl.'); return; }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showInlineError('detailsError', 'Please enter a valid email so I can send you the story.'); return; }
@@ -2681,8 +2742,9 @@ function goToLength() {
     storyData.giftFrom = document.getElementById('giftFrom').value.trim();
     storyData.giftMessage = document.getElementById('giftMessage').value.trim();
     storyData.giftInStory = document.getElementById('giftInStoryToggle').classList.contains('on');
-    // Gift message doubles as the personal message read aloud at the start
-    storyData.personalMessage = storyData.giftMessage;
+    // Gift message is the audio intro only — do NOT copy to personalMessage
+    // or the AI prompt will also echo it throughout the story (double exposure)
+    storyData.personalMessage = '';
   } else {
     storyData.personalMessage = document.getElementById('personalMessage').value.trim();
   }
@@ -3080,7 +3142,7 @@ async function generatePreview() {
   // Animated detail pills: show each personal detail appearing one by one
   const detailsWrap = document.getElementById('loadingDetails');
   detailsWrap.innerHTML = '';
-  const catLabelsLoading = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story' };
+  const catLabelsLoading = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
   const pills = [];
   pills.push(escHtml(d.childName));
   if (d.age) pills.push('Age ' + escHtml(String(d.age)));
@@ -3218,7 +3280,7 @@ async function generatePreview() {
     if (progressBar) progressBar.style.width = '100%';
 
     // Populate preview screen with story summary
-    const catLabels = { bedtime:'Bedtime story', journey:'Adventure', learning:'Learning story' };
+    const catLabels = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
     const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
     document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
     document.getElementById('previewTitle').textContent = `${storyData.childName}'s story is waiting`;
