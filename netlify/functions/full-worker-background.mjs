@@ -224,15 +224,21 @@ export const handler = async (event) => {
 
       let apiResponse;
       for (let attempt = 0; attempt < 5; attempt++) {
-        apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'x-api-key': process.env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01',
-            'Content-Type': 'application/json'
-          },
-          body: previewApiBody
-        });
+        try {
+          apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'x-api-key': process.env.ANTHROPIC_API_KEY,
+              'anthropic-version': '2023-06-01',
+              'Content-Type': 'application/json'
+            },
+            body: previewApiBody
+          });
+        } catch (networkErr) {
+          console.log('[PREVIEW-BG] Network error on attempt ' + (attempt + 1) + ': ' + networkErr.message);
+          if (attempt < 4) { await new Promise(r => setTimeout(r, 4000 * (attempt + 1))); continue; }
+          throw networkErr;
+        }
         if (apiResponse.ok) break;
         const shouldRetry = apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500;
         if (attempt < 4 && shouldRetry) {
@@ -318,24 +324,30 @@ export const handler = async (event) => {
     try {
       let apiResponse;
       for (let attempt = 0; attempt < 5; attempt++) {
-        apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'x-api-key': process.env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'claude-opus-4-6',
-            max_tokens: 16000,
-            temperature: 1,
-            thinking: {
-              type: 'adaptive'
+        try {
+          apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'x-api-key': process.env.ANTHROPIC_API_KEY,
+              'anthropic-version': '2023-06-01',
+              'Content-Type': 'application/json'
             },
-            system: SYSTEM_PROMPT,
-            messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
-          })
-        });
+            body: JSON.stringify({
+              model: 'claude-opus-4-6',
+              max_tokens: 16000,
+              temperature: 1,
+              thinking: {
+                type: 'adaptive'
+              },
+              system: SYSTEM_PROMPT,
+              messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
+            })
+          });
+        } catch (networkErr) {
+          console.log('[FULL-BG] Network error on attempt ' + (attempt + 1) + ': ' + networkErr.message);
+          if (attempt < 4) { await new Promise(r => setTimeout(r, 4000 * (attempt + 1))); continue; }
+          throw networkErr;
+        }
         if (apiResponse.ok) break;
         const shouldRetry = apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500;
         if (attempt < 4 && shouldRetry) {

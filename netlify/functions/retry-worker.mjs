@@ -212,22 +212,28 @@ export default async (req) => {
       // ── Step 1: Generate story with Anthropic ──
       let apiResponse;
       for (let attempt = 0; attempt < 3; attempt++) {
-        apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'x-api-key': process.env.ANTHROPIC_API_KEY,
-            'anthropic-version': '2023-06-01',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: 'claude-opus-4-6',
-            max_tokens: 16000,
-            temperature: 1,
-            thinking: { type: 'adaptive' },
-            system: SYSTEM_PROMPT,
-            messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
-          })
-        });
+        try {
+          apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'x-api-key': process.env.ANTHROPIC_API_KEY,
+              'anthropic-version': '2023-06-01',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'claude-opus-4-6',
+              max_tokens: 16000,
+              temperature: 1,
+              thinking: { type: 'adaptive' },
+              system: SYSTEM_PROMPT,
+              messages: [{ role: 'user', content: fromScratch ? buildCompleteStoryPrompt(storyData) : buildFullStoryPrompt(storyData, previewStory) }]
+            })
+          });
+        } catch (networkErr) {
+          console.log('[RETRY] Network error on attempt ' + (attempt + 1) + ': ' + networkErr.message);
+          if (attempt < 2) { await new Promise(r => setTimeout(r, 5000 * (attempt + 1))); continue; }
+          throw networkErr;
+        }
         if (apiResponse.ok) break;
         if (attempt < 2 && (apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500)) {
           const waitMs = apiResponse.status === 429 ? 8000 : 5000 * (attempt + 1);

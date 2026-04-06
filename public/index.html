@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hear Their Name | Personalised Audio Stories for Children</title>
-<meta name="description" content="Create a personalised audio story for a child you love. Their name, their friends, their world, woven into every scene. Bedtime and adventure stories. Free preview, then just £19.99.">
+<title>Hear Their Name — A story that knows their name</title>
+<meta name="description" content="Personalised audio stories for children. Their name, their best friend, their world — spoken aloud in a story made just for them. Hear it free before you pay.">
 <link rel="canonical" href="https://heartheirname.com/">
 <meta name="facebook-domain-verification" content="oivve384m8vpae0lxrhv42w3hw6i3m" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -15,8 +15,8 @@
 <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://heartheirname.com/">
-<meta property="og:title" content="Hear Their Name | Personalised Audio Stories for Children">
-<meta property="og:description" content="Create a personalised audio story for a child you love. Their name, their friends, their world, woven into every scene. Free preview, then just £19.99.">
+<meta property="og:title" content="Hear Their Name — A story that knows their name">
+<meta property="og:description" content="Personalised audio stories for children. Their name, their best friend, their world — spoken aloud in a story made just for them. Hear it free before you pay.">
 <meta property="og:image" content="https://heartheirname.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -25,7 +25,7 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hear Their Name | Personalised Audio Stories for Children">
+<meta name="twitter:title" content="Hear Their Name — A story that knows their name">
 <meta name="twitter:description" content="Create a personalised audio story for a child you love. Their name, their friends, their world, woven into every scene. Free preview, then just £19.99.">
 <meta name="twitter:image" content="https://heartheirname.com/og-image.png">
 
@@ -237,7 +237,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* ===== LANDING ===== */
 .landing{text-align:center;gap:0.6rem;padding-top:1rem;padding-bottom:4rem}
 .logo-wrap{position:relative;display:inline-block;margin-bottom:-0.5rem}
-.logo-img{width:340px;height:auto}
+.logo-img{width:220px;height:auto}
 @keyframes sparkle{0%,100%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.2) rotate(15deg);opacity:0.7}}
 
 .hero-badge{display:inline-flex;align-items:center;gap:0.4rem;background:var(--purple-light);color:var(--purple);font-size:0.8rem;font-weight:700;padding:0.4rem 1rem;border-radius:var(--radius-full);letter-spacing:0.02em}
@@ -438,7 +438,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .voice-empty{text-align:center;color:var(--text-muted);font-size:0.9rem;padding:2rem 0}
 
 /* ===== LOADING ===== */
-.loading-screen{justify-content:center;align-items:center;text-align:center;gap:1.5rem}
+.loading-screen{justify-content:flex-start;align-items:center;text-align:center;gap:1.5rem}
+.loading-screen::before,.loading-screen::after{content:'';flex:1;min-height:0}
 .loader-wrap{position:relative;width:80px;height:80px}
 .loader-dot{position:absolute;width:16px;height:16px;border-radius:50%;animation:loaderDots 1.4s ease-in-out infinite}
 .loader-dot:nth-child(1){background:var(--cat-accent,var(--purple));top:0;left:50%;transform:translateX(-50%);animation-delay:0s}
@@ -605,7 +606,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
-  .logo-img{width:280px}
+  .logo-img{width:200px}
   .tagline{font-size:1.25rem}
   .length-cards{flex-direction:column}
   .trust-row{flex-direction:column;gap:0.5rem}
@@ -639,14 +640,14 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- HERO -->
   <div class="logo-wrap" id="sectionHero">
-    <img src="/images/logo-horizontal.png" alt="Hear Their Name" class="logo-img">
+    <img src="/images/logo-stacked.png" alt="Hear Their Name" class="logo-img">
   </div>
   <h1 class="tagline">A story that knows <span class="highlight">their</span> name.</h1>
-  <p class="hero-text">Their name, their best friend, their world. Woven into a story made just for them. Narrated by a voice you choose. Ready in minutes.</p>
+  <p class="hero-text">Their name. Their best friend. Their world. Spoken aloud in a story made just for them. Ready in minutes.</p>
 
   <!-- AUDIO SAMPLE (proof first, then ask) -->
   <div class="sample-player" id="samplePlayer" data-cat="bedtime">
-    <div class="sample-label">I made this for my son Chase. Just listen.</div>
+    <div class="sample-label">I MADE THIS FOR MY SON CHASE. PRESS PLAY.</div>
     <div class="sample-pills">
       <button class="sample-pill active" data-cat="bedtime" onclick="switchSample('bedtime',this)">Bedtime</button>
       <button class="sample-pill" data-cat="adventure" onclick="switchSample('adventure',this)">Adventure</button>
@@ -670,12 +671,12 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- FIRST CTA (after the proof) -->
   <div class="cta-group" id="sectionCta1">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create their story</button>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Start their story</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. <span class="price-display">£19.99</span> for the full story.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">They hear their best friend talking to them.</p>
+    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">You can even make yourself the villain.</p>
+    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.2rem 0 0">They hear their best friend talking to them.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.2rem 0 0">Even the family dog has a role.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.2rem 0 0">You can even make yourself the villain.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not perfect? I'll rewrite it for you.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.3rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
   </div>
 
   <!-- FOUNDER CARD (trust signal for scrollers who didn't convert yet) -->
@@ -683,7 +684,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
     <div style="padding:1rem 1.2rem">
       <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
-      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he wasn't in any of his stories.<br>He wanted to hear his name. His best friend. His world.<br>So I made something where he could.<br>Now every child can.</p>
+      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he wasn't in any of his stories.<br>He wanted to hear his name spoken out loud in a story made just for him.<br>So I built something where he could.<br>Now every child can.</p>
     </div>
   </div>
 
@@ -719,10 +720,10 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- SECOND CTA -->
   <div class="cta-group" id="sectionCta2">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Create their story now</button>
+    <button class="btn btn-primary" onclick="goTo('screenCategory')">Let them hear it.</button>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. Only pay if you love it.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#127873; Perfect as a birthday, Christmas, or just because gift.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not perfect? I'll rewrite it for you.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.2rem 0 0">&#128274; One payment. No subscription. Theirs forever.</p>
   </div>
 
