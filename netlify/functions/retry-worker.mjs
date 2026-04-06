@@ -455,5 +455,5 @@ export default async (req) => {
 };
 
 export const config = {
-  schedule: '@hourly'
+  schedule: '*/5 * * * *'
 };

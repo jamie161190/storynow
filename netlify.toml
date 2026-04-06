@@ -24,6 +24,9 @@
 [functions."stripe-webhook"]
   external_node_modules = ["stripe"]
 
+[functions."retry-worker"]
+  schedule = "*/5 * * * *"
+
 
 [[edge_functions]]
   path = "/*"
