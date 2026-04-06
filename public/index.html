@@ -3236,9 +3236,9 @@ async function generatePreview() {
     if (hasPersonalMsg) {
       const childFirst = escHtml(storyData.childName);
       if (storyData.isGift && storyData.giftFrom) {
-        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; ${childFirst} will hear your message from ${escHtml(storyData.giftFrom)} the moment their story begins.</p>`;
+        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; Your message from ${escHtml(storyData.giftFrom)} plays at the very start of the full story — not in this preview.</p>`;
       } else {
-        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; ${childFirst} will hear your personal message the moment their story begins.</p>`;
+        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; Your personal message plays at the very start of the full story — not in this preview.</p>`;
       }
     }
     document.getElementById('previewSummary').innerHTML = summary;
