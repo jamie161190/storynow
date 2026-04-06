@@ -22,6 +22,17 @@ export default async (req) => {
     const userAgent = body.user_agent || '';
     const refCode = body.ref_code || '';
 
+    // Accept localised currency/amount from frontend (set by get-pricing)
+    // Validate to prevent manipulation: only allow supported currencies and sane amounts
+    const SUPPORTED_CURRENCIES = new Set(['gbp','eur','usd','cad','aud','nzd','sgd','hkd','jpy','inr','zar','nok','sek','dkk','chf','brl','mxn','pln','aed','sar','ils','myr','php','thb','krw']);
+    const requestedCurrency = (body.currency || 'gbp').toLowerCase();
+    const requestedAmount = parseInt(body.unitAmount, 10) || 1999;
+    const currency = SUPPORTED_CURRENCIES.has(requestedCurrency) ? requestedCurrency : 'gbp';
+    // Sanity check: amount must be between £5 and £200 equivalent (in minor units)
+    const MIN_AMOUNT = 500;
+    const MAX_AMOUNT = 200 * 200; // generous upper bound for high-rate currencies
+    const unitAmount = (requestedAmount >= MIN_AMOUNT && requestedAmount <= MAX_AMOUNT) ? requestedAmount : 1999;
+
     const stripeKey = process.env.STRIPE_SECRET_KEY;
 
     if (!stripeKey) {
@@ -35,12 +46,12 @@ export default async (req) => {
       line_items: [
         {
           price_data: {
-            currency: 'gbp',
+            currency,
             product_data: {
               name: 'Hear Their Name: Personalised Audio Story',
               description: `A personalised story for ${childName}`
             },
-            unit_amount: 1999
+            unit_amount: unitAmount
           },
           quantity: 1
         }

@@ -669,7 +669,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <!-- FIRST CTA (after the proof) -->
   <div class="cta-group" id="sectionCta1">
     <button class="btn btn-primary" onclick="goTo('screenCategory')">Create their story</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. £19.99 for the full story.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. <span class="price-display">£19.99</span> for the full story.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">They hear their best friend talking to them.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.2rem 0 0">Even the family dog has a role.</p>
     <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.2rem 0 0">You can even make yourself the villain.</p>
@@ -1397,7 +1397,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     </div>
 
     <!-- Unlock CTA -->
-    <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()" style="margin-top:1rem">&#128275; Unlock the full story for £19.99</button>
+    <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()" style="margin-top:1rem">&#128275; Unlock the full story for <span class="price-display">£19.99</span></button>
     <p class="unlock-price" id="unlockSub" style="margin-top:0.5rem;margin-bottom:0">The full story is 15 minutes of magic. Download it, share it, keep it forever.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.4rem 0 0">&#128274; Secure payment via Stripe. No subscription, no hidden fees.</p>
     <a onclick="goTo('screenReview')" style="font-size:0.75rem;color:var(--text-muted);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">&#8592; Edit story details</a>
@@ -1584,7 +1584,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <div class="post-actions" style="margin-top:1.5rem">
       <div style="background:linear-gradient(135deg,#F8F5FF,#FFF0F5);border:2px solid var(--purple-light);border-radius:16px;padding:1.25rem;text-align:center;margin-bottom:1rem">
         <p style="font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--text);margin:0 0 0.3rem">Know a child who deserves their own story?</p>
-        <p style="font-size:0.82rem;color:var(--text-soft);margin:0 0 0.75rem;line-height:1.5">Their name, their friends, their world. A 15 minute audio story made just for them. Free preview, then £19.99.</p>
+        <p style="font-size:0.82rem;color:var(--text-soft);margin:0 0 0.75rem;line-height:1.5">Their name, their friends, their world. A 15 minute audio story made just for them. Free preview, then <span class="price-display">£19.99</span>.</p>
         <button class="btn btn-primary" style="width:100%;font-size:0.95rem" onclick="goTo('screenCategory')">Create a story for a child you love</button>
         <p style="font-size:0.68rem;color:var(--text-muted);margin:0.4rem 0 0">Every story is unique. Siblings, friends, and family all get real roles.</p>
       </div>
@@ -3064,7 +3064,7 @@ async function generatePreview() {
   // Make sure we have a valid voice selected
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
   applyCategoryTheme(storyData.category);
-  trackEvent('AddToCart', { content_name: storyData.category, value: 19.99, currency: 'GBP' });
+  trackEvent('AddToCart', { content_name: storyData.category, value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP' });
   goTo('screenLoading');
 
   // Personalised loading messages
@@ -3219,7 +3219,7 @@ async function generatePreview() {
     audio.addEventListener('ended', audio._stEnd);
 
     // Personalise unlock button with child's name
-    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story &mdash; £19.99';
+    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story &mdash; ' + (window.pricing ? window.pricing.display : '£19.99');
 
     clearInterval(msgInterval);
     clearInterval(pillInterval);
@@ -3303,9 +3303,9 @@ async function unlockFull() {
   }
   emailErr.style.display = 'none';
 
-  trackEvent('InitiateCheckout', { value: 19.99, currency: 'GBP', content_name: storyData.category });
+  trackEvent('InitiateCheckout', { value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP', content_name: storyData.category });
   // TikTok uses different standard event names
-  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('PlaceAnOrder', { value: 19.99, currency: 'GBP', content_name: storyData.category });
+  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('PlaceAnOrder', { value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP', content_name: storyData.category });
 
   goTo('screenLoading');
   document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
@@ -3318,7 +3318,7 @@ async function unlockFull() {
     const res = await fetch('/api/create-checkout', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, previewStoryText, selectedVoiceId, ...getTrackingParams() })
+      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, previewStoryText, selectedVoiceId, currency: window.pricing ? window.pricing.currency : 'GBP', unitAmount: window.pricing ? window.pricing.amountMinor : 1999, ...getTrackingParams() })
     });
     const data = await res.json();
     if(!data.success) throw new Error(data.error || 'Something went wrong');
@@ -3404,7 +3404,7 @@ async function handleStripeReturn() {
     }
 
     // Fire Purchase event across all pixels (eventID matches server-side for dedup)
-    trackEvent('Purchase', { value: 19.99, currency: 'GBP', content_name: storyData.category }, { eventID: 'purchase_' + sessionId });
+    trackEvent('Purchase', { value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP', content_name: storyData.category }, { eventID: 'purchase_' + sessionId });
 
     // Payment confirmed, switch to dedicated generation screen
     startGeneratingScreen(storyData.childName);
@@ -3712,6 +3712,18 @@ function getTrackingParams() {
   if (ref) params.ref_code = ref;
   return params;
 }
+
+// ── Currency detection ──
+window.pricing = null;
+(function() {
+  fetch('/api/get-pricing')
+    .then(r => r.json())
+    .then(p => {
+      window.pricing = p;
+      document.querySelectorAll('.price-display').forEach(el => { el.textContent = p.display; });
+    })
+    .catch(() => {}); // silently fall back to £19.99
+})();
 
 document.addEventListener('DOMContentLoaded', () => {
   const audio = document.getElementById('fullStoryAudio');
