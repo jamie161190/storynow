@@ -92,7 +92,7 @@ export default async (req) => {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://heartheirname.com/logo-new.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
+      <img src="https://heartheirname.com/images/logo-email.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);text-align:center;">
       <p style="font-size:16px;color:#2D2844;margin:0 0 8px;">Your login code</p>
