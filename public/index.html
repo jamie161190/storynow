@@ -5004,29 +5004,25 @@ function stickyBarStart() {
   var stickyInput = document.getElementById('stickyNameInput');
   var name = stickyInput ? stickyInput.value.trim() : '';
 
-  // Mirror name into hero input and storyData
+  // Store name so screenDetails picks it up after category is chosen
   if (name) {
+    pendingChildName = name;
+    storyData.childName = name;
     var heroInput = document.getElementById('heroChildName');
     if (heroInput) heroInput.value = name;
     var funnelInput = document.getElementById('childName');
     if (funnelInput) funnelInput.value = name;
-    storyData.childName = name;
-    pendingChildName = name;
-    var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
-    storyData.category = cat;
-    applyCategoryTheme(cat);
-    setGiftMode(false, false);
-    trackEvent('HeroStartStory', { content_name: cat, child_name_entered: true, source: 'sticky_bar' });
+    trackEvent('HeroStartStory', { content_name: 'sticky_bar', child_name_entered: true, source: 'sticky_bar' });
     var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
     fetch('/api/track-pageview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ page: '/', screen_name: 'hero_start_name', device: device, visitor_id: stVisitorId })
     }).catch(function() {});
-    goTo('screenDetails');
-  } else {
-    goTo('screenCategory');
   }
+  // Always go to category so they pick bedtime or adventure
+  setGiftMode(false, false);
+  goTo('screenCategory');
 }
 
 // ── Homepage scroll dropoff tracking ──
