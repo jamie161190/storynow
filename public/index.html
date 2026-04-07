@@ -195,6 +195,7 @@ if (localStorage.getItem('st_cookies') === 'accepted') {
   --purple:#6B2F93;
   --purple-light:#F0E5F7;
   --purple-soft:#A872C8;
+  --purple-deep:#2D1B4E;
   --orange:#F1753B;
   --orange-light:#FFF0E8;
   --orange-glow:#F49A6A;
@@ -244,9 +245,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .hero-badge::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--purple);animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-.tagline{font-family:'Nunito',sans-serif;font-size:1.5rem;font-weight:800;color:var(--text);line-height:1.4;max-width:400px;margin:0 auto}
+.tagline{font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;color:var(--text);line-height:1.2;max-width:400px;margin:0 auto 10px}
+.tagline em{font-style:normal;color:var(--purple)}
 .tagline .highlight{color:var(--purple);position:relative}
-.hero-text{font-size:0.95rem;color:var(--text-soft);line-height:1.7;max-width:380px;margin:0 auto}
+.hero-sub{font-size:0.92rem;color:var(--text-soft);line-height:1.65;max-width:360px;margin:0 auto 22px}
 
 .cta-group{display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:340px;margin:0.5rem auto 0}
 .btn{padding:1rem 2rem;border:none;border-radius:var(--radius);font-family:'Quicksand',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.25s ease;text-align:center;position:relative;overflow:hidden}
@@ -603,52 +605,96 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* ===== FAQ TOGGLE ===== */
 details[open] summary span:last-child{transform:rotate(45deg)}
 details summary span:last-child{transition:transform 0.2s;display:inline-block}
+/* Landing page FAQ (new style) */
+.faq-section details{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:6px;cursor:pointer}
+.faq-section summary{font-size:0.84rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center}
+.faq-section summary::-webkit-details-marker{display:none}
+.faq-section summary::after{content:'+';color:var(--purple);font-size:1rem;flex-shrink:0;margin-left:8px}
+.faq-section details[open] summary::after{content:'\2212'}
+.faq-section details p{font-size:0.79rem;color:var(--text-soft);line-height:1.6;margin-top:7px;font-weight:500}
 
 /* ===== HERO NAME CARD ===== */
-.trust-bar{display:flex;align-items:center;justify-content:center;gap:0.4rem;margin-bottom:0.5rem;font-size:0.78rem;color:var(--text-muted);font-weight:600}
-.trust-stars{color:var(--orange);font-size:0.95rem;letter-spacing:0.08em}
-.hero-name-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:1.35rem 1.25rem;box-shadow:var(--shadow);margin:1rem auto 0;max-width:380px;width:100%}
-.hero-card-label{display:block;font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:0.5rem}
-.hero-name-input{width:100%;padding:0.85rem 1rem;border:2px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-size:1.1rem;font-weight:600;color:var(--text);background:var(--card);transition:all 0.25s;text-align:center;box-sizing:border-box}
-.hero-name-input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 4px rgba(124,92,252,0.1)}
-.hero-name-input::placeholder{color:var(--text-muted);font-weight:400;font-size:0.95rem}
-.hero-pills{display:flex;gap:0.5rem;margin:0.85rem 0}
-.hero-pill{flex:1;padding:0.7rem 0.5rem;border:2px solid var(--border);border-radius:var(--radius-full);font-family:'Quicksand',sans-serif;font-size:0.88rem;font-weight:700;color:var(--text-muted);background:var(--card);cursor:pointer;transition:all 0.2s;text-align:center}
-.hero-pill:hover{border-color:var(--purple-soft);color:var(--text)}
-.hero-pill.active{background:linear-gradient(135deg,var(--purple),#A872C8);color:#fff;border-color:transparent;box-shadow:0 2px 10px rgba(124,92,252,0.25)}
-.hero-cta-btn{width:100%;padding:1rem;border:none;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--orange),#D4601E);box-shadow:0 4px 20px rgba(241,117,59,0.35);transition:all 0.25s;margin-top:0.25rem}
-.hero-cta-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(241,117,59,0.45)}
-.hero-cta-btn:active{transform:translateY(0)}
-.sound-hint{font-size:0.82rem;color:var(--text-soft);font-weight:600;text-align:center;margin-top:0.85rem}
-/* ===== STICKY CTA ===== */
+.trust-bar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.75rem;color:var(--text-muted);font-weight:600;margin-bottom:14px}
+.trust-stars{color:var(--orange);font-size:0.85rem;letter-spacing:0.05em}
+.name-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:20px 18px;box-shadow:var(--shadow);margin-bottom:12px;width:100%}
+.field-label{font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);display:block;text-align:left;margin-bottom:7px}
+.name-input{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Quicksand',sans-serif;font-size:1.05rem;font-weight:600;color:var(--text);background:#FDFBFF;text-align:center;outline:none;transition:border-color 0.2s;box-sizing:border-box}
+.name-input:focus{border-color:var(--purple)}
+.name-input::placeholder{color:var(--text-muted);font-weight:400;font-size:0.9rem}
+.type-label{font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--text-muted);display:block;text-align:left;margin:14px 0 8px}
+.type-pills{display:flex;gap:8px;margin-bottom:14px}
+.type-pill{flex:1;padding:11px 6px;border:2px solid var(--border);border-radius:99px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;color:var(--text-muted);background:var(--card);cursor:pointer;transition:all 0.2s;text-align:center}
+.type-pill.active{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;border-color:transparent;box-shadow:0 2px 12px rgba(107,47,147,0.25)}
+.hero-btn{width:100%;padding:15px;border:none;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--orange),#D4601E);box-shadow:0 4px 20px rgba(241,117,59,0.35);cursor:pointer;transition:all 0.25s}
+.hero-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(241,117,59,0.45)}
+.hero-price{font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:10px;font-weight:500}
+.trust-dots{display:flex;justify-content:center;gap:16px;margin-top:14px;flex-wrap:wrap}
+.trust-dot{font-size:0.72rem;color:var(--text-muted);font-weight:600}
+/* ===== STORY CINEMA ===== */
+.section-divider{text-align:center;padding:22px 0 0;width:100%}
+.section-divider h2{font-family:'Nunito',sans-serif;font-size:1.25rem;font-weight:900;color:var(--text);margin-bottom:5px}
+.section-divider p{font-size:0.82rem;color:var(--text-soft);line-height:1.55}
+.story-cinema{padding:14px 0 0;width:100%}
+.story-tabs{display:flex;gap:6px;margin-bottom:20px;background:var(--card);border:2px solid var(--border);border-radius:14px;padding:5px}
+.story-tab{flex:1;padding:10px 4px;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.2s}
+.story-tab.active{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;box-shadow:0 2px 10px rgba(107,47,147,0.2)}
+.story-tab.active.orange{background:linear-gradient(135deg,var(--orange),#D4601E)}
+.story-tab.active.green{background:linear-gradient(135deg,#4ECB71,#34B85A)}
+.recipe-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.recipe-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.recipe-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.recipe-title{font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:800;color:var(--text)}
+.recipe-sub{font-size:0.68rem;color:var(--text-muted);font-weight:600;margin-top:1px}
+.recipe-chips{display:flex;flex-wrap:wrap;gap:4px}
+.recipe-chip{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;font-size:0.67rem;font-weight:700;border:1.5px solid var(--border);background:var(--bg)}
+.recipe-chip .chip-label{color:var(--text-muted);font-weight:500}
+.recipe-chip .chip-val{color:var(--text);font-weight:700}
+.chip-check{width:12px;height:12px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;flex-shrink:0}
+.recipe-arrow{text-align:center;padding:5px 0;font-size:0.78rem;color:var(--purple-soft);font-weight:700;letter-spacing:0.05em;text-transform:uppercase}
+.story-reader{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg)}
+.reader-header{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.reader-play-btn{display:flex;align-items:center;gap:7px;background:var(--purple-light);border:1.5px solid var(--border);border-radius:99px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;color:var(--purple);cursor:pointer;white-space:nowrap}
+.reader-play-btn .play-icon{width:18px;height:18px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.reader-play-btn .play-icon svg{margin-left:2px}
+.reader-meta{font-size:0.67rem;color:var(--text-muted);font-weight:600;line-height:1.45}
+.story-text{padding:14px;max-height:320px;overflow-y:auto;font-size:0.87rem;line-height:1.75;color:var(--text-soft);font-weight:500}
+.story-text p{margin-bottom:10px}
+.story-text p:last-child{margin-bottom:0}
+.cn{color:var(--orange);font-weight:800}
+.cf{color:var(--purple);font-weight:700}
+.reader-fade{position:relative;margin-top:-50px;height:50px;background:linear-gradient(transparent,var(--card));pointer-events:none}
+.reader-footer{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.reader-footer-text{display:flex;gap:4px;flex-wrap:wrap}
+.benefit-tag{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:99px;font-size:0.64rem;font-weight:700;white-space:nowrap}
+.read-more-btn{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:800;color:var(--purple);background:var(--purple-light);border:none;padding:5px 12px;border-radius:99px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.story-section{display:none}
+.story-section.active{display:block}
+/* ===== STATS ===== */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%}
+.stat-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;box-shadow:var(--shadow)}
+.stat-num{font-family:'Nunito',sans-serif;font-size:1.4rem;font-weight:900;display:block}
+.stat-num.purple{color:var(--purple)}
+.stat-num.orange{color:var(--orange)}
+.stat-num.green{color:var(--green)}
+.stat-label{font-size:0.6rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;display:block}
 /* ===== STICKY BAR ===== */
-.sticky-bar{position:fixed;bottom:0;left:0;right:0;z-index:999;background:var(--purple);border-top:1px solid rgba(107,47,147,0.4);padding:12px 20px;transform:translateY(100%);transition:transform 0.3s ease;pointer-events:none}
-.sticky-bar.visible{transform:translateY(0);pointer-events:all}
-.sticky-bar.hidden{transform:translateY(100%) !important;pointer-events:none}
-.sticky-bar-inner{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:12px}
-.sticky-bar-left{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
-.sticky-bar-label{font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.75);white-space:nowrap}
-.sticky-bar-input{height:36px;padding:0 12px;border:1.5px solid rgba(255,255,255,0.2);border-radius:8px;font-family:'Quicksand',sans-serif;font-size:0.9rem;font-weight:600;color:#fff;background:rgba(255,255,255,0.12);width:180px;outline:none;transition:border-color 0.2s}
-.sticky-bar-input::placeholder{color:rgba(255,255,255,0.45);font-weight:400}
-.sticky-bar-input:focus{border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.18)}
-.sticky-bar-btn{flex-shrink:0;padding:10px 20px;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;cursor:pointer;color:#fff;background:#F1753B;white-space:nowrap;transition:all 0.2s}
+.sticky-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:480px;z-index:999;background:var(--purple-deep);border-top:1px solid rgba(168,114,200,0.3);padding:12px 16px calc(12px + env(safe-area-inset-bottom));transition:transform 0.3s ease}
+.sticky-bar-inner{display:flex;gap:10px;align-items:center;max-width:440px;margin:0 auto}
+.sticky-bar-left{flex:1;min-width:0}
+.sticky-bar-label{font-family:'Nunito',sans-serif;font-size:0.65rem;font-weight:800;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:5px;display:block}
+.sticky-bar-input{width:100%;padding:10px 12px;border:1.5px solid rgba(255,255,255,0.15);border-radius:10px;font-family:'Quicksand',sans-serif;font-size:0.92rem;font-weight:600;color:#fff;background:rgba(255,255,255,0.1);outline:none;box-sizing:border-box}
+.sticky-bar-input::placeholder{color:rgba(255,255,255,0.4);font-weight:400}
+.sticky-bar-btn{flex-shrink:0;padding:11px 18px;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:800;cursor:pointer;color:#fff;background:var(--orange);white-space:nowrap;line-height:1.3;transition:all 0.2s}
+.sticky-bar-btn strong{display:block;font-size:0.72rem;font-weight:900;letter-spacing:0.03em}
+.sticky-bar-btn span{display:block;font-size:0.65rem;opacity:0.85;font-weight:600}
 .sticky-bar-btn:hover{background:#D4601E;transform:translateY(-1px)}
-.sticky-bar-btn:active{transform:translateY(0)}
-@media(max-width:480px){
-  .sticky-bar{padding:12px 16px}
-  .sticky-bar-inner{flex-direction:column;gap:8px;align-items:stretch}
-  .sticky-bar-input{width:100%;box-sizing:border-box}
-  .sticky-bar-btn{width:100%;padding:12px 20px}
-}
-
 /* ===== RESPONSIVE ===== */
 @media(max-width:400px){
   .logo-img{width:200px}
-  .tagline{font-size:1.25rem}
+  .tagline{font-size:1.8rem}
   .length-cards{flex-direction:column}
   .trust-row{flex-direction:column;gap:0.5rem}
-  .hero-name-input{font-size:1rem}
-  .hero-pill{font-size:0.8rem;padding:0.6rem 0.4rem}
+  .type-pill{font-size:0.78rem;padding:9px 4px}
 }
 </style>
 </head>
@@ -686,139 +732,332 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <div class="logo-wrap">
       <img src="/images/logo-stacked.png" alt="Hear Their Name" class="logo-img">
     </div>
-    <h1 class="tagline">A story that knows <span class="highlight">their</span> name.</h1>
-    <p class="hero-text">Their name. Their best friend. Their world. Spoken aloud in a story made just for them. Hear your free sample in 60 seconds.</p>
+    <h1 class="tagline">A story made<br><em>just for them.</em></h1>
+    <p class="hero-sub">Their name. Their best friend. Their favourite things. All woven into 15 minutes of story, made only for them.</p>
 
     <!-- NAME CAPTURE CARD -->
-    <div class="hero-name-card">
-      <label class="hero-card-label">WHAT'S THEIR NAME?</label>
-      <input type="text" class="hero-name-input" id="heroChildName" placeholder="Type their name here..." autocomplete="off">
-      <div class="hero-pills">
-        <button class="hero-pill active" id="heroPillBedtime" onclick="selectHeroPill('bedtime')">&#127769; Bedtime</button>
-        <button class="hero-pill" id="heroPillAdventure" onclick="selectHeroPill('adventure')">&#9876;&#65039; Adventure</button>
+    <div class="name-card">
+      <label class="field-label">What's their name?</label>
+      <input type="text" class="name-input" id="heroChildName" placeholder="Type their name here..." autocomplete="off" oninput="updateStickyBtn(this.value)">
+      <span class="type-label">Choose a story type</span>
+      <div class="type-pills">
+        <button class="type-pill active" id="heroPillBedtime" onclick="setPill(this,'bedtime')">&#127769; Bedtime</button>
+        <button class="type-pill" id="heroPillAdventure" onclick="setPill(this,'adventure')">&#9876;&#65039; Adventure</button>
+        <button class="type-pill" id="heroPillGift" onclick="setPill(this,'gift')">&#127873; Gift</button>
       </div>
-      <button class="hero-cta-btn" onclick="heroStartStory()">Start their story</button>
-      <p style="font-size:0.72rem;color:var(--text-muted);margin:0.6rem 0 0;line-height:1.5;font-weight:500">Hear the preview free &middot; <span class="price-display">&pound;19.99</span> for the full story &middot; No account needed</p>
+      <!-- Gift sub-picker -->
+      <div id="giftSubPicker" style="display:none;margin-bottom:14px;padding:12px 14px;background:var(--purple-light);border-radius:12px;border:1.5px solid var(--border)">
+        <span style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--purple);display:block;margin-bottom:8px">What type of story for the gift?</span>
+        <div style="display:flex;gap:8px">
+          <button class="gift-sub-pill active" data-sub="bedtime" onclick="setGiftSub(this)" style="flex:1;padding:9px 6px;border:2px solid var(--purple-soft);border-radius:99px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;background:#fff;color:var(--purple);transition:all 0.2s">&#127769; Bedtime</button>
+          <button class="gift-sub-pill" data-sub="adventure" onclick="setGiftSub(this)" style="flex:1;padding:9px 6px;border:2px solid var(--border);border-radius:99px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;background:#fff;color:var(--text-muted);transition:all 0.2s">&#9876;&#65039; Adventure</button>
+        </div>
+      </div>
+      <button class="hero-btn" id="heroBtn" onclick="heroStartStory()">Start their story</button>
+      <p class="hero-price">Free preview first &nbsp;&middot;&nbsp; &pound;19.99 to keep it forever &nbsp;&middot;&nbsp; No account needed</p>
     </div>
-    <p class="sound-hint">&#127911; Put your headphones in. This one's worth it.</p>
+
+    <div class="trust-dots">
+      <span class="trust-dot">&#10003; Ages 2 to 10</span>
+      <span class="trust-dot">&#10003; Hear their name spoken aloud</span>
+      <span class="trust-dot">&#10003; One payment forever</span>
+    </div>
   </div>
 
-  <!-- AUDIO SAMPLE (below the fold) -->
-  <div style="width:100%;max-width:440px;margin-top:2rem;text-align:center">
-    <p style="font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:900;color:var(--text);margin:0 0 0.25rem">Real stories. Real children. Press play.</p>
-    <p style="font-size:0.75rem;color:var(--text-muted);font-weight:600;margin:0 0 0.75rem">Best experienced with headphones or sound on.</p>
+  <!-- STORY CINEMA -->
+  <div class="section-divider">
+    <h2>Real stories. Real children.</h2>
+    <p>Three completely different stories. Every word written from scratch using only what the parent told us. Read them. Hear them. Or both.</p>
   </div>
-  <div class="sample-player" id="samplePlayer" data-cat="bedtime">
-    <div class="sample-pills">
-      <button class="sample-pill active" data-cat="bedtime" onclick="switchSample('bedtime',this)">Bedtime</button>
-      <button class="sample-pill" data-cat="adventure" onclick="switchSample('adventure',this)">Adventure</button>
+
+  <div class="story-cinema" id="sectionCinema">
+    <!-- Tabs -->
+    <div class="story-tabs">
+      <button class="story-tab active" onclick="switchTab('bedtime',this)">&#127769; Bedtime</button>
+      <button class="story-tab" onclick="switchTab('adventure',this)">&#9876;&#65039; Adventure</button>
+      <button class="story-tab" onclick="switchTab('gift',this)">&#127873; Gift</button>
     </div>
-    <div class="sample-row">
-      <button class="sample-play-btn" id="samplePlayBtn" data-cat="bedtime" onclick="playSample()">
-        <svg id="sampleIcon" viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M8 5v14l11-7z"/></svg>
-      </button>
-      <div class="sample-wave">
-        <div class="sample-progress-bar"><div class="sample-progress-fill" id="sampleFill"></div></div>
-        <div class="sample-meta">
-          <span class="sample-name" id="sampleName">Chase Goes to Space</span>
-          <span class="sample-time" id="sampleTime">0:00</span>
+
+    <!-- BEDTIME -->
+    <div class="story-section active" id="tab-bedtime">
+      <div class="recipe-card">
+        <div class="recipe-header">
+          <div class="recipe-icon" style="background:#F0E5F7">&#127769;</div>
+          <div>
+            <div class="recipe-title">Poppy's Bedtime Story</div>
+            <div class="recipe-sub">Here's what Poppy's mum told us...</div>
+          </div>
+        </div>
+        <div class="recipe-chips">
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Name</span>&nbsp;<span class="chip-val">Poppy</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Age</span>&nbsp;<span class="chip-val">6</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Best friend</span>&nbsp;<span class="chip-val">Mia</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Cuddly toy</span>&nbsp;<span class="chip-val">Bunny</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Loves</span>&nbsp;<span class="chip-val">unicorns &amp; glitter</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Pet</span>&nbsp;<span class="chip-val">Daisy the cat</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Family</span>&nbsp;<span class="chip-val">Mummy &amp; Daddy</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Setting</span>&nbsp;<span class="chip-val">night sky adventure</span></div>
+          <div class="recipe-chip"><div class="chip-check" style="background:#9B59B6">&#10003;</div><span class="chip-label">Their thing</span>&nbsp;<span class="chip-val">wears wellies even in sunshine</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Narrator voice</span>&nbsp;<span class="chip-val">Charlotte</span></div>
+        </div>
+      </div>
+      <div class="recipe-arrow">&#8595; this became...</div>
+      <div class="story-reader">
+        <div class="reader-header">
+          <button class="reader-play-btn" onclick="playDemoStory('bedtime',this)">
+            <div class="play-icon"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
+            &#9654; Play this story
+          </button>
+          <div class="reader-meta">Read or listen below &#8595;<br>Name highlights in <span style="color:var(--orange);font-weight:800">orange</span></div>
+        </div>
+        <div class="story-text" id="story-bedtime">
+          <p>Somewhere between the last yawn and the softest dream, there lived a little girl named <span class="cn">Poppy</span> — and tonight, <span class="cn">Poppy</span> was still wearing her wellies.</p>
+          <p><span class="cf">Mummy</span> had tucked her in with a kiss, <span class="cf">Daddy</span> had turned off the light, and <span class="cf">Bunny</span> was snuggled tight under her chin — but <span class="cn">Poppy</span>'s bright yellow wellies were still on her feet. Just in case, she always said. You never know when you might need them.</p>
+          <p>And tonight — tonight, she was very glad she had kept them on.</p>
+          <p>Because the moment <span class="cn">Poppy</span> closed her eyes, something magical began to happen. A shimmer appeared at her window. Then another. And another — until the whole room glittered like the inside of a snow globe filled with starlight.</p>
+          <p><span class="cn">Poppy</span> sat up. <span class="cf">Bunny</span> tucked under one arm. And there, outside her window, floated the most beautiful unicorn she had ever seen. Its mane was the colour of moonlight, and every step it took left a trail of glitter drifting slowly down into the night sky.</p>
+          <p>"<span class="cn">Poppy</span>," the unicorn said softly, "I have been looking for you."</p>
+          <p>The unicorn's name was <span class="cf">Orla</span>, and she had come with a very important mission. Somewhere far above, between the stars, a whole trail of glitter had gone missing from the Milky Way, and only someone brave enough to wear wellies in the sunshine could help find it.</p>
+          <p><span class="cn">Poppy</span> did not even hesitate. She climbed onto <span class="cf">Orla</span>'s back, <span class="cf">Bunny</span> gripped tight, and they rose up — up — up — into the velvet dark of the night sky.</p>
+          <p>"<span class="cf">Mia</span> is going to absolutely not believe this," <span class="cn">Poppy</span> whispered to <span class="cf">Bunny</span>.</p>
+          <p>Up in the sky, the stars were close enough to touch. <span class="cn">Poppy</span> reached out and brushed one with her fingertips, and it chimed like a tiny bell. <span class="cf">Orla</span> laughed, a warm sound like wind chimes, and galloped faster along the invisible road between the constellations.</p>
+          <p>They found the missing glitter trail just past the Great Bear — a river of sparkle that had come loose and was drifting gently toward the edge of the sky. <span class="cn">Poppy</span> leaned out carefully and, one handful at a time, guided the glitter back where it belonged.</p>
+          <p>It was the most beautiful thing she had ever done.</p>
+          <p>When the last sparkle was back in place, the whole sky seemed to glow a little brighter. And then, from somewhere very far below, the tiniest sound floated up. A meow. Long and gentle and very familiar.</p>
+          <p><span class="cn">Poppy</span> looked down. "<span class="cf">Daisy</span>," she breathed.</p>
+          <p>Her little cat was sitting on the windowsill below, watching the whole sky light up, her tail curled neat around her paws. And <span class="cn">Poppy</span> felt a warm pull in her chest — the pull of home, of <span class="cf">Bunny</span>, of <span class="cf">Mummy</span> and <span class="cf">Daddy</span> sleeping just down the hall.</p>
+          <p>"Time to go back," said <span class="cf">Orla</span> quietly. "But <span class="cn">Poppy</span> — the sky will always remember what you did tonight."</p>
+          <p><span class="cf">Orla</span> swooped low and let <span class="cn">Poppy</span> slip back through her window, landing soft as a feather on her pillow. <span class="cf">Daisy</span> leapt up onto the bed and curled herself into a perfect circle at <span class="cn">Poppy</span>'s feet, right beside the yellow wellies.</p>
+          <p><span class="cn">Poppy</span> lay back down and pulled <span class="cf">Bunny</span> close. The ceiling above her was still scattered with tiny drifting sparks of glitter, swirling slowly in the dark like the Milky Way come indoors. She watched them until they began to blur.</p>
+          <p>She left her wellies on. Just in case.</p>
+          <p>And somewhere above the clouds, a trail of glitter stretched from one end of the night to the other — because <span class="cn">Poppy</span> had put it there.</p>
+          <p>Goodnight, <span class="cn">Poppy</span>. Goodnight, <span class="cf">Bunny</span>. Goodnight, little cat.</p>
+          <p>This story was made just for <span class="cn">Poppy</span>.</p>
+        </div>
+        <div class="reader-fade"></div>
+        <div class="reader-footer">
+          <div class="reader-footer-text">
+            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Personalised</span>
+            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#9201; 15 min</span>
+            <span class="benefit-tag" style="background:#E3FAEB;color:#2D8A50">&#128066; Read or listen</span>
+          </div>
+          <button class="read-more-btn" onclick="expandStory(this)">Read full story &#8595;</button>
         </div>
       </div>
     </div>
-    <p class="sample-desc" id="sampleDesc" style="font-size:0.78rem;color:var(--text-soft);margin-top:0.5rem;text-align:center;font-weight:500;line-height:1.55">Chase and Ellis are in bed when something appears in the room. A bedtime story made just for him.</p>
-    <p style="font-size:0.68rem;color:var(--text-muted);margin-top:0.35rem;text-align:center">Full stories are about 15 minutes. You choose the voice.</p>
-    <audio id="sampleAudio" src="/sample-story.mp3" preload="auto"></audio>
-  </div>
 
-  <!-- PERSONALISATION DETAIL -->
-  <div class="how-it-works" id="sectionHowItWorks">
-    <p class="how-title">You tell me about them.</p>
-    <div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.15rem;margin-top:0.5rem;text-align:left">
-      <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0;font-weight:500">
-        You tell me their name is <strong style="color:var(--purple)">Chase</strong>, age <strong style="color:var(--purple)">9</strong>, best friend is <strong style="color:var(--purple)">Ellis</strong>, they love <strong style="color:var(--purple)">dinosaurs</strong>, sleep with a bunny called <strong style="color:var(--purple)">Mr Flopsy</strong>, are scared of the dark but pretend they are not, and <strong style="color:var(--purple)">Daddy is the villain</strong>.
-      </p>
-      <p style="font-size:0.85rem;color:var(--text);line-height:1.75;margin:0.6rem 0 0;font-weight:500">
-        I turn every detail into a story they'll want to hear again and again. Their friend is right beside them, their favourite toy comes along for the ride, and the villain you picked causes trouble at every turn. Every story is completely unique.
-      </p>
-      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.75;margin:0.5rem 0 0;font-weight:500;font-style:italic">You can even add a personal message, read aloud at the start by the narrator.</p>
+    <!-- ADVENTURE -->
+    <div class="story-section" id="tab-adventure">
+      <div class="recipe-card">
+        <div class="recipe-header">
+          <div class="recipe-icon" style="background:#FFF0E8">&#9876;&#65039;</div>
+          <div>
+            <div class="recipe-title">Chase's Adventure</div>
+            <div class="recipe-sub">Here's what Chase's dad told us...</div>
+          </div>
+        </div>
+        <div class="recipe-chips">
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Name</span>&nbsp;<span class="chip-val">Chase</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Age</span>&nbsp;<span class="chip-val">9</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Best friend</span>&nbsp;<span class="chip-val">Ellis</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Loves</span>&nbsp;<span class="chip-val">dinosaurs &amp; space</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Villain</span>&nbsp;<span class="chip-val">Daddy</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Pet</span>&nbsp;<span class="chip-val">Bruno the dog</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Family</span>&nbsp;<span class="chip-val">Dad &amp; Mum</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Setting</span>&nbsp;<span class="chip-val">Enchanted Forest</span></div>
+          <div class="recipe-chip"><div class="chip-check" style="background:#9B59B6">&#10003;</div><span class="chip-label">Their thing</span>&nbsp;<span class="chip-val">argues with nature docs on TV</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Narrator voice</span>&nbsp;<span class="chip-val">Josh</span></div>
+        </div>
+      </div>
+      <div class="recipe-arrow">&#8595; this became...</div>
+      <div class="story-reader">
+        <div class="reader-header">
+          <button class="reader-play-btn" style="background:var(--orange-light);color:#D4601E;border-color:var(--border)" onclick="playDemoStory('adventure',this)">
+            <div class="play-icon" style="background:var(--orange)"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
+            &#9654; Play this story
+          </button>
+          <div class="reader-meta">Read or listen below &#8595;<br>Name highlights in <span style="color:var(--orange);font-weight:800">orange</span></div>
+        </div>
+        <div class="story-text">
+          <p>The moment <span class="cn">Chase</span> stepped into the Enchanted Forest, something growled at him from behind a very suspicious-looking mushroom — and he was almost certain it was a dinosaur.</p>
+          <p><span class="cf">Ellis</span> grabbed his arm. "<span class="cn">Chase</span>," he hissed. "What was that?"</p>
+          <p><span class="cn">Chase</span> narrowed his eyes. He had seen every nature documentary ever made about prehistoric animals. He had argued with most of them. And he knew, with absolute certainty, that what was hiding behind that mushroom had made the wrong kind of growl for a Tyrannosaurus rex. "Velociraptor," he said calmly. "And they don't actually roar. That documentary last Tuesday got it completely wrong."</p>
+          <p>But before they could investigate — a long, dramatic shadow fell across the forest path.</p>
+          <p>A figure stepped out from behind a tree. He was wearing a cape. He had twirled it once, possibly twice, before arriving. He had a magnificent if slightly ridiculous scowl on his face.</p>
+          <p>It was <span class="cf">Dad</span>.</p>
+          <p>"AH HA!" said <span class="cf">Dad</span>, in the voice of someone who had been practising his villain laugh in the bathroom mirror. "<span class="cn">Chase</span>! I have hidden the Cosmic Star Map deep within this enchanted forest, and you will NEVER find it! <span class="cf">Mum</span> said dinner is at six, but I said the map comes FIRST! Mwahahahaha!"</p>
+          <p>He twirled the cape again. A leaf got stuck in it.</p>
+          <p><span class="cn">Chase</span> turned to <span class="cf">Ellis</span>. "This," he said, "is going to be a very long afternoon."</p>
+          <p>The Cosmic Star Map was no ordinary map. It showed every constellation, every planet, every known asteroid in the solar system, and three that weren't in any book <span class="cn">Chase</span> had ever read. He had been building it for months. And <span class="cf">Dad</span>, in a moment of cheerful villainy, had hidden it somewhere in these woods.</p>
+          <p><span class="cf">Bruno</span> the dog was already ahead of them, nose down, tail spinning like a satellite dish picking up a signal.</p>
+          <p>"<span class="cf">Bruno</span> can track the map," <span class="cn">Chase</span> told <span class="cf">Ellis</span>. "The ink I used has lavender in it. He'll find it in under three minutes."</p>
+          <p><span class="cf">Ellis</span> looked impressed. "How do you know that?"</p>
+          <p>"There was a documentary about scent tracking in dogs. They got the statistics wrong, but the underlying science was correct."</p>
+          <p>Sure enough, <span class="cf">Bruno</span>'s nose led them straight past three ancient oak trees, over a stream full of water that seemed to flow uphill for no apparent reason, and directly to a hollow log near the oldest tree in the forest — which was wearing a small sign that said, in <span class="cf">Dad</span>'s handwriting: <em>You will NEVER look here. Definitely not. Signed, The Villain.</em></p>
+          <p><span class="cn">Chase</span> reached inside and pulled out the rolled-up Cosmic Star Map.</p>
+          <p>From behind a nearby tree, there came the sound of a cape being rustled dramatically. Then a defeated sigh. Then: "I forgot the dog knew about lavender."</p>
+          <p><span class="cn">Chase</span> grinned. Even <span class="cf">Dad</span>, when he was being a pantomime villain, couldn't outthink a boy who had argued with every nature documentary ever made and won.</p>
+          <p>He spread the map out on a flat rock. The stars glittered back at him in the afternoon light. There, in the corner, were the three constellations he had added himself. Constellations that didn't exist yet. Not officially. But <span class="cn">Chase</span> was nine years old, and he had time.</p>
+          <p><span class="cf">Ellis</span> pointed at one. "What's that one called?"</p>
+          <p><span class="cn">Chase</span> looked at it for a moment. Then at <span class="cf">Bruno</span>, now sitting on his feet, panting happily.</p>
+          <p>"That one's called <span class="cf">Bruno</span>," said <span class="cn">Chase</span>.</p>
+          <p>From the trees, <span class="cf">Dad</span> made one final dramatic speech about how this wasn't over. Then <span class="cf">Mum</span> called that dinner was ready and <span class="cf">Dad</span> immediately stopped being a villain and jogged home ahead of them.</p>
+          <p><span class="cn">Chase</span> rolled up the map carefully and tucked it under his arm. The forest rustled. Somewhere in the branches, something made a sound that was definitely, scientifically, not a roar.</p>
+          <p><span class="cn">Chase</span> smiled. He knew exactly what it was.</p>
+          <p>This story was made just for <span class="cn">Chase</span>.</p>
+        </div>
+        <div class="reader-fade"></div>
+        <div class="reader-footer">
+          <div class="reader-footer-text">
+            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Personalised</span>
+            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#9201; 15 min</span>
+            <span class="benefit-tag" style="background:#E3FAEB;color:#2D8A50">&#128066; Read or listen</span>
+          </div>
+          <button class="read-more-btn" style="background:var(--orange-light);color:var(--orange)" onclick="expandStory(this)">Read full story &#8595;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GIFT -->
+    <div class="story-section" id="tab-gift">
+      <div class="recipe-card">
+        <div class="recipe-header">
+          <div class="recipe-icon" style="background:#E3FAEB">&#127873;</div>
+          <div>
+            <div class="recipe-title">A Gift from Grandma to Livvie</div>
+            <div class="recipe-sub">Here's what Grandma told us...</div>
+          </div>
+        </div>
+        <div class="recipe-chips">
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">For</span>&nbsp;<span class="chip-val">Livvie</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Age</span>&nbsp;<span class="chip-val">4</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Story type</span>&nbsp;<span class="chip-val">&#127769; Bedtime</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Loves</span>&nbsp;<span class="chip-val">butterflies &amp; dancing</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Cuddly toy</span>&nbsp;<span class="chip-val">Mr Elephant</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Setting</span>&nbsp;<span class="chip-val">secret butterfly meadow</span></div>
+          <div class="recipe-chip"><div class="chip-check" style="background:#9B59B6">&#10003;</div><span class="chip-label">Their thing</span>&nbsp;<span class="chip-val">does a bow after every dance, even in Tesco</span></div>
+          <div class="recipe-chip"><div class="chip-check" style="background:#4ECB71">&#10003;</div><span class="chip-label">Gift from</span>&nbsp;<span class="chip-val">Grandma</span></div>
+          <div class="recipe-chip"><div class="chip-check" style="background:#4ECB71">&#10003;</div><span class="chip-label">Grandma in the story</span>&nbsp;<span class="chip-val">Yes</span></div>
+          <div class="recipe-chip"><div class="chip-check" style="background:#4ECB71">&#10003;</div><span class="chip-label">Personal message</span>&nbsp;<span class="chip-val">Read aloud first</span></div>
+        </div>
+      </div>
+      <div class="recipe-arrow">&#8595; this became...</div>
+      <div class="story-reader">
+        <div class="reader-header">
+          <button class="reader-play-btn" style="background:#E3FAEB;color:#2D8A50;border-color:#C8E6C9" onclick="playDemoStory('gift',this)">
+            <div class="play-icon" style="background:#4ECB71"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
+            &#9654; Play this story
+          </button>
+          <div class="reader-meta">Or read it below &#8595;<br><span style="color:#4ECB71;font-weight:800">Gift message</span> read aloud first</div>
+        </div>
+        <div class="story-text">
+          <p style="background:#E3FAEB;border-left:3px solid #4ECB71;padding:10px 12px;border-radius:8px;font-style:italic;color:#2D6A4F;font-size:0.85rem;margin-bottom:16px">"My darling <span class="cn">Livvie</span>, this story is just for you, from <span class="cf">Grandma</span>, because you are the most wonderful little dancer I have ever seen. I hope it makes you smile as big as your hugs. All my love, always." <span style="display:block;font-size:0.7rem;color:#81C784;margin-top:4px;font-style:normal;font-weight:700">&#8593; Read aloud by the narrator at the very start</span></p>
+          <p>Once upon a very quiet morning, a little girl named <span class="cn">Livvie</span> was dancing in her bedroom.</p>
+          <p>She was dancing with <span class="cf">Mr Elephant</span>, who was an excellent partner and never complained when <span class="cn">Livvie</span> changed the music halfway through. She spun, she twirled, she leapt as high as the top of the bed — and then, with the greatest dignity you have ever seen in someone wearing pyjamas, <span class="cn">Livvie</span> took a deep bow.</p>
+          <p><span class="cf">Mr Elephant</span> seemed very impressed.</p>
+          <p>Outside the window, a butterfly watched from the garden. It was the colour of sunshine and peach blossom, and it had been watching <span class="cn">Livvie</span> dance for a very long time.</p>
+          <p>When <span class="cn">Livvie</span> spotted it, she pressed her nose to the glass. "Hello," she said.</p>
+          <p>The butterfly fluttered once, twice — and then, to <span class="cn">Livvie</span>'s absolute amazement, it beckoned with one wing.</p>
+          <p>She pulled on her shoes, tucked <span class="cf">Mr Elephant</span> carefully under her arm, and followed.</p>
+          <p>The butterfly led her through the garden, through the little gate at the bottom, and into a place <span class="cn">Livvie</span> had never seen before. A meadow — but not just any meadow. A secret butterfly meadow, where the air was thick and soft and full of colour, and butterflies of every shade you could imagine drifted like living flowers through the long grass.</p>
+          <p>There were hundreds of them. Blue ones and gold ones and ones the colour of deep summer sky. Some were small as fingernails. Some were wide as open books. And all around her, the meadow hummed with a sound that was almost, almost like music.</p>
+          <p><span class="cn">Livvie</span> did what <span class="cn">Livvie</span> always did when there was music. She danced.</p>
+          <p>She danced through the meadow with <span class="cf">Mr Elephant</span> held high, and the butterflies swirled around her like a living, breathing rainbow. She leapt and she spun and she dipped — and when the music in the air reached its most beautiful moment, <span class="cn">Livvie</span> came to a stop, and she took her bow.</p>
+          <p>A perfect, deep, very serious bow. The butterflies rose in a great shimmering cloud and filled the sky above her.</p>
+          <p>And then a hand reached down and took hers.</p>
+          <p><span class="cn">Livvie</span> looked up. It was <span class="cf">Grandma</span>.</p>
+          <p><span class="cf">Grandma</span> was there in the meadow, and she was smiling the smile she always saved just for <span class="cn">Livvie</span>. "I wondered if you'd find this place," <span class="cf">Grandma</span> said softly. "I found it a very long time ago. I always hoped you would come here one day."</p>
+          <p><span class="cn">Livvie</span> took <span class="cf">Grandma</span>'s hand properly in both of hers. "Did you dance here too?" she asked.</p>
+          <p>"Every chance I got," said <span class="cf">Grandma</span>. "And I always bowed at the end."</p>
+          <p><span class="cn">Livvie</span> beamed. "I do that too. Even in the supermarket."</p>
+          <p>"I know," said <span class="cf">Grandma</span>, and her eyes went very bright and warm. "I have seen you. And every single time, <span class="cn">Livvie</span>, it is the most wonderful thing."</p>
+          <p>They sat together in the long grass for a while, <span class="cf">Grandma</span> and <span class="cn">Livvie</span> and <span class="cf">Mr Elephant</span>, while the butterflies drifted and the meadow hummed. <span class="cn">Livvie</span> leaned her head against <span class="cf">Grandma</span>'s arm and felt the warmth of it — the particular warmth that only <span class="cf">Grandma</span> had, like sunshine and home all at once.</p>
+          <p>"Will we be able to come back?" <span class="cn">Livvie</span> asked quietly.</p>
+          <p><span class="cf">Grandma</span> squeezed her hand. "Whenever you dance with your whole heart," she said, "this meadow is always here."</p>
+          <p>When <span class="cn">Livvie</span> found herself back in her bedroom, <span class="cf">Mr Elephant</span> was still tucked under her arm and the morning light was coming soft through the curtains. She stood in the middle of the floor for a moment. Then she danced, just a few steps, just for the joy of it.</p>
+          <p>And at the end, she bowed.</p>
+          <p>Somewhere, in a meadow full of colour and light, the butterflies rose.</p>
+          <p>This story was made just for <span class="cn">Livvie</span>.</p>
+        </div>
+        <div class="reader-fade"></div>
+        <div class="reader-footer">
+          <div class="reader-footer-text">
+            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Personalised</span>
+            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#9201; 15 min</span>
+            <span class="benefit-tag" style="background:#E3FAEB;color:#2D8A50">&#128066; Read or listen</span>
+          </div>
+          <button class="read-more-btn" style="background:#E3FAEB;color:#2D8A50" onclick="expandStory(this)">Read full story &#8595;</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- FOUNDER CARD -->
-  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;max-width:440px;width:100%;box-shadow:var(--shadow)">
-    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:320px;object-fit:cover;object-position:center 15%;display:block">
-    <div style="padding:1rem 1.2rem">
-      <p style="margin:0 0 0.1rem;font-size:0.78rem;font-weight:700;color:var(--purple);font-family:'Nunito',sans-serif">Jamie, Chase's dad</p>
-      <p style="color:var(--text);font-size:0.92rem;line-height:1.75;margin:0;font-weight:500">My son Chase asked me why he wasn't in any of his stories.<br>He wanted to hear his name spoken out loud in a story made just for him.<br>So I built something where he could.<br>Now every child can.</p>
-    </div>
+  <!-- STATS -->
+  <div class="stats-grid" style="margin-top:20px">
+    <div class="stat-card"><span class="stat-num purple">22</span><span class="stat-label">narrator voices</span></div>
+    <div class="stat-card"><span class="stat-num orange">15<small style="font-size:0.8rem">min</small></span><span class="stat-label">full story</span></div>
+    <div class="stat-card"><span class="stat-num green">Free</span><span class="stat-label">to preview</span></div>
   </div>
 
-  <!-- REAL PARENT TESTIMONIAL -->
-  <div id="sectionTestimonial" style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center">
-    <p style="font-size:0.82rem;color:var(--text);font-weight:600;margin:0 0 0.5rem">The next morning, Lisa sent me this.</p>
-    <div style="border-radius:16px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,0.08);border:2px solid var(--border)">
-      <img src="/lisa-testimonial.png" alt="WhatsApp message from Lisa: Livvie's woken up asking me for another story, I blame you" style="width:100%;display:block">
-    </div>
-    <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.5rem;font-weight:600;font-style:italic">Lisa, mum to Livvie (age 4)</p>
-  </div>
-
-  <!-- STORY COUNTER -->
+  <!-- STORY COUNTER (hidden until count loads) -->
   <div id="storyCounter" style="width:100%;max-width:440px;margin-top:1.5rem;text-align:center;display:none">
     <p style="margin:0"><span id="storyCountNum" style="font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--purple),#A872C8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">0</span></p>
     <p style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin:0.1rem 0 0">stories created so far</p>
     <p style="font-size:0.78rem;color:var(--text-muted);font-weight:500;margin:0.3rem 0 0">Every single one written from scratch. No two are the same.</p>
   </div>
 
+  <!-- FOUNDER CARD -->
+  <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;width:100%;box-shadow:var(--shadow)">
+    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:220px;object-fit:cover;object-position:center 15%;display:block">
+    <div style="padding:12px 14px">
+      <p style="margin:0 0 5px;font-size:0.75rem;font-weight:800;color:var(--purple);font-family:'Nunito',sans-serif">Jamie &middot; Chase's dad &middot; Founder of Hear Their Name</p>
+      <p style="color:var(--text);font-size:0.84rem;line-height:1.65;margin:0;font-weight:500">"My son Chase asked me why he wasn't in any of his stories. He wanted to hear his name spoken out loud in a story made just for him. So I built something where he could. Now every child can."</p>
+    </div>
+  </div>
+
   <!-- SECOND CTA -->
-  <div class="cta-group" id="sectionCta2">
-    <button class="btn btn-primary" onclick="goTo('screenCategory')">Let them hear it.</button>
-    <p style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-align:center;margin:-0.25rem 0 0">Hear it free first. Only pay if you love it.</p>
-    <p style="font-size:0.72rem;color:var(--purple);font-weight:700;text-align:center;margin:0.3rem 0 0">&#127873; Perfect as a birthday, Christmas, or just because gift.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;text-align:center;margin:0.2rem 0 0">&#128154; Not magical enough? I'll rewrite it for free.</p>
-    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.2rem 0 0">&#128274; One payment. No subscription. Theirs forever.</p>
+  <div style="width:100%;text-align:center;margin-top:20px" id="sectionCta2">
+    <button class="hero-btn" id="cta2Btn" onclick="goTo('screenCategory')" style="margin-bottom:8px">Make their story now.</button>
+    <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin-bottom:5px">Free preview first. Only pay if you love it.</p>
+    <p style="font-size:0.72rem;color:var(--green);font-weight:700;margin-bottom:5px">&#128154; Not magical enough? I'll rewrite it for free.</p>
+    <p style="font-size:0.65rem;color:var(--text-muted);font-weight:600">&#128274; One payment. No subscription. Theirs forever.</p>
   </div>
 
   <!-- FAQ -->
-  <div id="sectionFaq" style="width:100%;max-width:440px;margin-top:1.5rem">
-    <p style="font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:var(--text);margin:0 0 0.75rem;text-align:center">Common questions</p>
-    <div style="display:flex;flex-direction:column;gap:0.5rem">
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I hear it before I pay?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Yes. You get a free preview of the opening of your story before you spend anything. Only pay if you love it.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long is the full story?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Around 15 minutes of narrated audio. Long enough for bedtime, a rainy afternoon, or quiet time. Every story is unique and written from scratch.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I share it with family?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">One tap. That is all it takes. Hit share and send the story to grandparents, aunties, uncles, or anyone you like by email or WhatsApp. They get a link, they tap play, done. You can also download the audio and save it straight to your phone. No extra cost, no limits on who you share it with.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What if I don't like the full version?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Just let me know and I will write you a brand new one. No hassle, no questions asked. Email <a href="mailto:jamie@heartheirname.com" style="color:var(--purple);font-weight:700">jamie@heartheirname.com</a> and I will sort it out.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have more than one child. Can they all be in it?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Absolutely. Add siblings, cousins, or anyone you like using the family and friends fields. They will each get a real role in the story. If you want a separate story where another child is the hero, you will get a discount code after your first purchase.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">What ages does this work for?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">Ages 2 to 14. Stories automatically adapt to the child's age. Toddlers get simple language with sound effects and repetition. Older children get richer plots, real dialogue, and deeper themes.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">Can I listen to it more than once?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">As many times as you like, forever. The story lives in your personal library on this site. You can also download the audio file and save it to your phone, tablet, or computer. No expiry, no limits.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">How long does the full story take to generate?<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">3 to 5 minutes from start to finish. You will see a progress screen while it is being written and narrated.</p>
-      </details>
-      <details style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;cursor:pointer">
-        <summary style="font-size:0.88rem;font-weight:700;color:var(--text);list-style:none;display:flex;justify-content:space-between;align-items:center">I have a request or idea for a cool feature.<span style="color:var(--purple);font-size:1.1rem;margin-left:0.5rem;flex-shrink:0">+</span></summary>
-        <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.65;margin:0.5rem 0 0;font-weight:500">I love hearing ideas. Drop me an email at <a href="mailto:jamie@heartheirname.com" style="color:var(--purple);font-weight:700">jamie@heartheirname.com</a> and tell me what you are thinking. I read every single message and the best ideas get built.</p>
-      </details>
-    </div>
+  <div class="faq-section" id="sectionFaq" style="margin-top:20px">
+    <p style="font-family:'Nunito',sans-serif;font-size:0.92rem;font-weight:800;color:var(--text);margin-bottom:10px;text-align:center">Common questions</p>
+    <details>
+      <summary>Can I hear it before I pay?</summary>
+      <p>Yes. You get a free preview of your child's story before you spend anything. Only pay if you love it.</p>
+    </details>
+    <details>
+      <summary>How long is the full story?</summary>
+      <p>Around 15 minutes of narrated audio. Long enough for bedtime, a rainy afternoon, or a long journey.</p>
+    </details>
+    <details>
+      <summary>What if I don't like the full version?</summary>
+      <p>Just let me know and I'll write a brand new one. No hassle, no questions asked.</p>
+    </details>
+    <details>
+      <summary>Is this a gift?</summary>
+      <p>Perfect for birthdays, Christmas, or just because. Add a personal message and it'll be read aloud by the narrator at the very start. The recipient gets a private link to listen anytime.</p>
+    </details>
+    <details>
+      <summary>What age is it suitable for?</summary>
+      <p>Best for children aged 2 to 10. Bedtime stories are written to be gentle and soothing for younger children. Adventure stories have a bit more pace and humour for older ones.</p>
+    </details>
+    <details>
+      <summary>How do they get the story?</summary>
+      <p>After checkout, the story is generated and delivered as a private link, usually within a few minutes. They can listen in any browser, no app needed. You can share the link with grandparents, aunties, anyone.</p>
+    </details>
+    <details>
+      <summary>Can they listen more than once?</summary>
+      <p>As many times as they like. The link is theirs to keep. Most kids ask for it on repeat. You've been warned.</p>
+    </details>
+    <details>
+      <summary>Can I share it with family?</summary>
+      <p>One tap. Hit share and send the link to grandparents, aunties, uncles by email or WhatsApp. You can also download the audio. No extra cost, no limits.</p>
+    </details>
   </div>
 
   <!-- CONTACT -->
@@ -848,9 +1087,12 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div class="sticky-bar-inner">
     <div class="sticky-bar-left">
       <label class="sticky-bar-label" for="stickyNameInput">Whose story is this?</label>
-      <input type="text" id="stickyNameInput" class="sticky-bar-input" placeholder="Their name..." autocomplete="off" maxlength="40">
+      <input type="text" id="stickyNameInput" class="sticky-bar-input" placeholder="Their name..." autocomplete="off" maxlength="40" oninput="updateStickyBtn(this.value)">
     </div>
-    <button class="sticky-bar-btn" onclick="stickyBarStart()">Start their story</button>
+    <button class="sticky-bar-btn" id="stickyBtn" onclick="stickyBarStart()">
+      <strong id="stickyBtnText">Start their story</strong>
+      <span>Free preview. Full story &pound;19.99.</span>
+    </button>
   </div>
 </div>
 
@@ -1742,14 +1984,114 @@ let storyData = { category:'', length:'long', themes:[], where:'Surprise me' };
 let pendingChildName = '';
 let heroCategory = 'bedtime';
 
-function selectHeroPill(cat) {
-  heroCategory = cat;
-  document.getElementById('heroPillBedtime').classList.toggle('active', cat === 'bedtime');
-  document.getElementById('heroPillAdventure').classList.toggle('active', cat === 'adventure');
+var heroGiftSubType = 'bedtime';
+
+function setPill(el, type) {
+  document.querySelectorAll('.type-pill').forEach(function(p) { p.classList.remove('active'); });
+  el.classList.add('active');
+  heroCategory = type;
+  var subPicker = document.getElementById('giftSubPicker');
+  if (subPicker) subPicker.style.display = (type === 'gift') ? 'block' : 'none';
+  // Sync cinema tab
+  var tabBtn = document.querySelector('.story-tab[onclick*="' + (type === 'gift' ? 'gift' : type === 'adventure' ? 'adventure' : 'bedtime') + '"]');
+  if (tabBtn) switchTab(type === 'adventure' ? 'adventure' : type === 'gift' ? 'gift' : 'bedtime', tabBtn);
+  updateHeroBtn();
+}
+
+function setGiftSub(el) {
+  document.querySelectorAll('.gift-sub-pill').forEach(function(p) {
+    p.style.borderColor = 'var(--border)';
+    p.style.color = 'var(--text-muted)';
+    p.style.background = '#fff';
+  });
+  el.style.borderColor = 'var(--purple-soft)';
+  el.style.color = 'var(--purple)';
+  el.style.background = 'var(--purple-light)';
+  heroGiftSubType = el.getAttribute('data-sub');
+}
+
+function updateHeroBtn() {
+  var heroBtn = document.getElementById('heroBtn');
+  if (!heroBtn) return;
+  heroBtn.textContent = (heroCategory === 'gift') ? 'Create their gift story' : 'Start their story';
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.story-tab').forEach(function(t) { t.classList.remove('active','orange','green'); });
+  document.querySelectorAll('.story-section').forEach(function(s) { s.classList.remove('active'); });
+  el.classList.add('active');
+  if (tab === 'adventure') el.classList.add('orange');
+  if (tab === 'gift') el.classList.add('green');
+  var sec = document.getElementById('tab-' + tab);
+  if (sec) sec.classList.add('active');
+}
+
+function expandStory(btn) {
+  var reader = btn.closest('.story-reader');
+  var textEl = reader.querySelector('.story-text');
+  var fade = reader.querySelector('.reader-fade');
+  var expanded = textEl.style.maxHeight === 'none';
+  if (expanded) {
+    textEl.style.maxHeight = '320px';
+    fade.style.display = '';
+    btn.textContent = 'Read full story \u2193';
+  } else {
+    textEl.style.maxHeight = 'none';
+    fade.style.display = 'none';
+    btn.textContent = 'Show less \u2191';
+    textEl.scrollTop = 0;
+  }
+}
+
+var demoAudios = {};
+var currentDemoTab = null;
+
+function playDemoStory(tab, btn) {
+  // Pause any other playing demo
+  if (currentDemoTab && currentDemoTab !== tab && demoAudios[currentDemoTab]) {
+    demoAudios[currentDemoTab].pause();
+    resetDemoBtn(currentDemoTab);
+  }
+
+  if (!demoAudios[tab]) {
+    demoAudios[tab] = new Audio('/audio/demo-' + tab + '.mp3');
+    demoAudios[tab].addEventListener('ended', function() {
+      resetDemoBtn(tab);
+      currentDemoTab = null;
+    });
+  }
+
+  var audio = demoAudios[tab];
+
+  if (audio.paused) {
+    audio.play().catch(function() {});
+    currentDemoTab = tab;
+    // Update button to pause state
+    btn.innerHTML = '<div class="play-icon" style="' + getPlayIconStyle(tab) + '"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg></div> &#9646;&#9646; Playing...';
+  } else {
+    audio.pause();
+    currentDemoTab = null;
+    resetDemoBtn(tab);
+  }
+}
+
+function getPlayIconStyle(tab) {
+  if (tab === 'adventure') return 'background:var(--orange);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+  if (tab === 'gift') return 'background:#4ECB71;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+  return 'background:var(--purple);width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+}
+
+function resetDemoBtn(tab) {
+  var reader = document.getElementById('tab-' + tab);
+  if (!reader) return;
+  var btn = reader.querySelector('.reader-play-btn');
+  if (!btn) return;
+  btn.innerHTML = '<div class="play-icon" style="' + getPlayIconStyle(tab) + '"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div> &#9654; Play this story';
 }
 
 function heroStartStory() {
   pendingChildName = (document.getElementById('heroChildName').value || '').trim();
+  var isGift = (heroCategory === 'gift');
   var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
 
   // Track hero CTA click to Supabase for admin funnel
@@ -1760,12 +2102,22 @@ function heroStartStory() {
     body: JSON.stringify({ page: '/', screen_name: pendingChildName ? 'hero_start_name' : 'hero_start_noname', device: device, visitor_id: stVisitorId })
   }).catch(function() {});
 
-  if (pendingChildName) {
+  if (isGift) {
+    if (pendingChildName) {
+      storyData.childName = pendingChildName;
+      var nameInput = document.getElementById('childName');
+      if (nameInput) nameInput.value = pendingChildName;
+    }
+    trackEvent('HeroStartStory', { content_name: 'gift', child_name_entered: !!pendingChildName });
+    setGiftMode(true, false);
+    goTo('screenCategory');
+  } else if (pendingChildName) {
     storyData.category = cat;
     applyCategoryTheme(cat);
     setGiftMode(false, false);
     storyData.childName = pendingChildName;
-    document.getElementById('childName').value = pendingChildName;
+    var nameInput = document.getElementById('childName');
+    if (nameInput) nameInput.value = pendingChildName;
     trackEvent('HeroStartStory', { content_name: cat, child_name_entered: true });
     goTo('screenDetails');
   } else {
@@ -4962,43 +5314,50 @@ async function submitContact() {
 }
 
 // ── Sticky Bar ──
-(function() {
+function updateStickyBarVisibility() {
   var bar = document.getElementById('stickyBar');
   if (!bar) return;
-
-  function isFunnelOpen() {
-    var landing = document.getElementById('screenLanding');
-    return !landing || !landing.classList.contains('active');
+  // Hide when funnel is open
+  var landing = document.getElementById('screenLanding');
+  if (!landing || !landing.classList.contains('active')) {
+    bar.style.transform = 'translateX(-50%) translateY(100%)';
+    return;
   }
-
-  function updateBar() {
-    if (isFunnelOpen()) {
-      bar.classList.add('hidden');
-      return;
-    }
-    bar.classList.remove('hidden');
-    if (window.scrollY > 400) {
-      bar.classList.add('visible');
-    } else {
-      bar.classList.remove('visible');
-    }
-  }
-
-  window.addEventListener('scroll', updateBar, { passive: true });
-
-  // Re-check when screens change (goTo calls this)
-  var origGoTo = window.goTo;
-  // Patch after page load since goTo is defined later
-  window.addEventListener('load', function() {
-    updateBar();
+  // Hide when either CTA button is visible in viewport
+  var ctaEls = [document.getElementById('heroBtn'), document.getElementById('cta2Btn')].filter(Boolean);
+  var anyVisible = ctaEls.some(function(el) {
+    var r = el.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
   });
-
-  // MutationObserver to detect screen switches
+  bar.style.transform = anyVisible ? 'translateX(-50%) translateY(100%)' : 'translateX(-50%) translateY(0)';
+}
+window.addEventListener('scroll', updateStickyBarVisibility, { passive: true });
+window.addEventListener('resize', updateStickyBarVisibility, { passive: true });
+document.addEventListener('DOMContentLoaded', updateStickyBarVisibility);
+// Re-check on screen changes
+(function() {
   var landingEl = document.getElementById('screenLanding');
   if (landingEl && 'MutationObserver' in window) {
-    new MutationObserver(function() { updateBar(); }).observe(landingEl, { attributes: true, attributeFilter: ['class'] });
+    new MutationObserver(updateStickyBarVisibility).observe(landingEl, { attributes: true, attributeFilter: ['class'] });
   }
 })();
+
+function updateStickyBtn(val) {
+  var name = (val || '').trim();
+  var btn = document.getElementById('stickyBtnText');
+  if (btn) {
+    if (name.length > 0) {
+      btn.innerHTML = 'Start <span style="color:#FFD166;font-weight:900">' + name + '</span>\'s story';
+    } else {
+      btn.textContent = 'Start their story';
+    }
+  }
+  // Sync both inputs
+  var heroInput = document.getElementById('heroChildName');
+  var stickyInput = document.getElementById('stickyNameInput');
+  if (heroInput && heroInput !== document.activeElement) heroInput.value = val;
+  if (stickyInput && stickyInput !== document.activeElement) stickyInput.value = val;
+}
 
 function stickyBarStart() {
   var stickyInput = document.getElementById('stickyNameInput');
@@ -5032,9 +5391,7 @@ function stickyBarStart() {
   var tracked = {};
   var sections = [
     { id: 'sectionHero', screen: 'hp_hero' },
-    { id: 'samplePlayer', screen: 'hp_sample' },
-    { id: 'sectionHowItWorks', screen: 'hp_how_it_works' },
-    { id: 'sectionTestimonial', screen: 'hp_testimonial' },
+    { id: 'sectionCinema', screen: 'hp_cinema' },
     { id: 'sectionCta2', screen: 'hp_cta2' },
     { id: 'sectionFaq', screen: 'hp_faq' },
     { id: 'sectionContact', screen: 'hp_contact' },
