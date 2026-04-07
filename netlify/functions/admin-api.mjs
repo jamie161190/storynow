@@ -312,7 +312,7 @@ export default async (req) => {
           { headers: sbHeaders(supabaseKey) }
         ),
         fetch(
-          `${supabaseUrl}/rest/v1/page_views?created_at=gte.${enc(since)}&select=page,referrer,utm_source,utm_medium,utm_campaign,device,screen_name,created_at&order=created_at.desc`,
+          `${supabaseUrl}/rest/v1/page_views?created_at=gte.${enc(since)}&select=page,referrer,utm_source,utm_medium,utm_campaign,device,screen_name,visitor_id,created_at&order=created_at.desc`,
           { headers: sbHeaders(supabaseKey) }
         ).catch(() => ({ ok: false }))
       ]);
@@ -409,6 +409,23 @@ export default async (req) => {
         }
       }
 
+      // Unique visitors (distinct visitor_id values)
+      const uniqueVisitorSet = new Set();
+      for (const v of views) { if (v.visitor_id) uniqueVisitorSet.add(v.visitor_id); }
+
+      // Currently creating a story (visitors who reached the funnel screens)
+      const creatingSet = new Set();
+      const creatingScreens = new Set(['screenCategory','screenDetails','screenTheme','screenVoice','screenLoading','screenPreview']);
+      for (const v of views) { if (creatingScreens.has(v.screen_name) && v.visitor_id) creatingSet.add(v.visitor_id); }
+
+      // Played on homepage (sample_play_* events)
+      let playedHomepage = 0;
+      for (const v of views) { if (v.screen_name && v.screen_name.startsWith('sample_play_')) playedHomepage++; }
+
+      // Played on preview (reached screenPreview)
+      let playedPreview = 0;
+      for (const v of views) { if (v.screen_name === 'screenPreview') playedPreview++; }
+
       // Unique customers
       const uniqueEmails = new Set(stories.map(s => s.email).filter(Boolean));
 
@@ -430,6 +447,12 @@ export default async (req) => {
           uniqueCustomers: uniqueEmails.size,
           conversionRate: parseFloat(conversionRate),
           visitorToPreview: parseFloat(visitorToPreview)
+        },
+        simplified: {
+          uniqueVisitors: uniqueVisitorSet.size,
+          creatingStory: creatingSet.size,
+          playedHomepage,
+          playedPreview
         },
         daily,
         categories: catCount,
