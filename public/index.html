@@ -1227,7 +1227,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <h2 class="section-title">Is this a gift?</h2>
   <p class="section-sub">If you are making this for someone else's child, I can make it extra special.</p>
 
-  <div id="giftChoiceButtons" style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:440px;margin-top:0.5rem">
+  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:440px;margin-top:0.5rem">
     <button class="cat-card" onclick="setGiftMode(true)" id="giftYesBtn" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
       <span style="font-size:1.8rem">&#127873;</span>
       <div>
@@ -2126,15 +2126,8 @@ function heroStartStory() {
       if (nameInput) nameInput.value = pendingChildName;
     }
     trackEvent('HeroStartStory', { content_name: 'gift', child_name_entered: !!pendingChildName });
-    // Pre-set category from the gift sub-picker (bedtime/adventure)
-    var giftCat = (heroGiftSubType === 'adventure') ? 'journey' : 'bedtime';
-    storyData.category = giftCat;
-    applyCategoryTheme(giftCat);
     setGiftMode(true, false);
-    // Hide the Yes/No choice — they already said it's a gift
-    var giftChoice = document.getElementById('giftChoiceButtons');
-    if (giftChoice) giftChoice.style.display = 'none';
-    goTo('screenGift');
+    goTo('screenCategory');
   } else if (pendingChildName) {
     storyData.category = cat;
     applyCategoryTheme(cat);
@@ -2637,11 +2630,6 @@ function goTo(id, skipHistory) {
 
   if(id === 'screenVoice') showVoices();
   if(id === 'screenExtras') updateExtrasVisibility();
-  if(id === 'screenGift') {
-    // Only show Yes/No choice if we didn't arrive from homepage gift mode
-    var gcb = document.getElementById('giftChoiceButtons');
-    if (gcb && !isGiftMode) gcb.style.display = 'flex';
-  }
   // Multi-child removed: each child gets their own purchase
   if(id === 'screenCategory') restoreCategory();
   if(id === 'screenDetails') restoreDetails();
