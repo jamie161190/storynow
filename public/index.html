@@ -457,6 +457,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .preview-badge{display:inline-flex;align-items:center;gap:0.4rem;background:var(--cat-accent-light,var(--green-light));color:var(--cat-accent-dark,var(--green));font-size:0.8rem;font-weight:700;padding:0.4rem 1rem;border-radius:var(--radius-full);margin-bottom:1rem}
 .preview-title{font-family:'Nunito',sans-serif;font-size:1.6rem;font-weight:900;color:var(--text);margin-bottom:0.5rem}
 .preview-sub{font-size:0.9rem;color:var(--text-soft);margin-bottom:2rem;font-weight:500;line-height:1.5}
+/* Storybook text display */
+.story-book{background:var(--card);border:1.5px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);text-align:left}
+.story-book-header{padding:10px 14px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.story-book-icon{font-size:1rem}
+.story-book-label{font-family:'Nunito',sans-serif;font-size:0.75rem;font-weight:900;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase}
+.story-book-body{padding:16px 16px 0;max-height:280px;overflow:hidden;position:relative}
+.story-book-body p{font-size:0.88rem;line-height:1.8;color:var(--text-soft);font-weight:500;margin:0 0 12px}
+.story-book-body p:last-child{margin-bottom:0}
+.story-book-body .cn{color:var(--orange);font-weight:800}
+.story-book-fade{height:80px;background:linear-gradient(to bottom,transparent,var(--card));margin-top:-80px;position:relative;pointer-events:none}
+.story-book-footer{padding:10px 14px;text-align:center;border-top:1px solid var(--border)}
+.story-book-footer p{font-size:0.72rem;color:var(--text-muted);font-weight:600;margin:0}
 
 .audio-player{width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,var(--purple-soft)));display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 40px var(--cat-glow,rgba(124,92,252,0.25));position:relative}
 .audio-player:hover{transform:scale(1.05);box-shadow:0 12px 48px var(--cat-glow,rgba(124,92,252,0.35))}
@@ -635,9 +647,11 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 .section-divider h2{font-family:'Nunito',sans-serif;font-size:1.25rem;font-weight:900;color:var(--text);margin-bottom:5px}
 .section-divider p{font-size:0.82rem;color:var(--text-soft);line-height:1.55}
 .story-cinema{padding:14px 0 0;width:100%}
+.story-tabs-label{font-size:0.72rem;font-weight:700;color:var(--text-muted);text-align:center;margin-bottom:8px;letter-spacing:0.03em}
 .story-tabs{display:flex;gap:6px;margin-bottom:20px;background:var(--card);border:2px solid var(--border);border-radius:14px;padding:5px}
-.story-tab{flex:1;padding:10px 4px;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;background:transparent;color:var(--text-muted);transition:all 0.2s}
-.story-tab.active{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;box-shadow:0 2px 10px rgba(107,47,147,0.2)}
+.story-tab{flex:1;padding:10px 4px;border:2px solid transparent;border-radius:10px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;background:var(--bg);color:var(--text-soft);transition:all 0.2s}
+.story-tab:not(.active):hover{border-color:var(--border);color:var(--text)}
+.story-tab.active{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;box-shadow:0 2px 10px rgba(107,47,147,0.2);border-color:transparent}
 .story-tab.active.orange{background:linear-gradient(135deg,var(--orange),#D4601E)}
 .story-tab.active.green{background:linear-gradient(135deg,#4ECB71,#34B85A)}
 .recipe-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
@@ -657,7 +671,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 .reader-play-btn .play-icon{width:18px;height:18px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .reader-play-btn .play-icon svg{margin-left:2px}
 .reader-meta{font-size:0.67rem;color:var(--text-muted);font-weight:600;line-height:1.45}
-.story-text{padding:14px;max-height:320px;overflow-y:auto;font-size:0.87rem;line-height:1.75;color:var(--text-soft);font-weight:500}
+.story-text{padding:14px;max-height:320px;overflow:hidden;font-size:0.87rem;line-height:1.75;color:var(--text-soft);font-weight:500}
 .story-text p{margin-bottom:10px}
 .story-text p:last-child{margin-bottom:0}
 .cn{color:var(--orange);font-weight:800}
@@ -772,6 +786,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <div class="story-cinema" id="sectionCinema">
     <!-- Tabs -->
+    <p class="story-tabs-label">Tap a story to read or listen &#8595;</p>
     <div class="story-tabs">
       <button class="story-tab active" onclick="switchTab('bedtime',this)">&#127769; Bedtime</button>
       <button class="story-tab" onclick="switchTab('adventure',this)">&#9876;&#65039; Adventure</button>
@@ -1008,7 +1023,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- FOUNDER CARD -->
   <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;width:100%;box-shadow:var(--shadow)">
-    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:240px;object-fit:cover;object-position:center 28%;display:block">
+    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:400px;object-fit:cover;object-position:center 18%;display:block">
     <div style="padding:12px 14px">
       <p style="margin:0 0 5px;font-size:0.75rem;font-weight:800;color:var(--purple);font-family:'Nunito',sans-serif">Jamie &middot; Chase's dad &middot; Founder of Hear Their Name</p>
       <p style="color:var(--text);font-size:0.84rem;line-height:1.65;margin:0;font-weight:500">"My son Chase asked me why he wasn't in any of his stories. He wanted to hear his name spoken out loud in a story made just for him. So I built something where he could. Now every child can."</p>
@@ -1663,6 +1678,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
     <!-- Summary of what they built (below player) -->
     <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.85rem 1rem;margin:1.25rem 0 0;text-align:left;max-width:340px;width:100%"></div>
+
+    <!-- Story text display -->
+    <div id="previewStoryDisplay" style="display:none;width:100%;max-width:340px;margin:1.25rem auto 0"></div>
 
     <!-- Social proof -->
     <p id="previewProof" style="font-size:0.78rem;color:var(--text-muted);font-style:italic;font-weight:500;margin:1rem 0 0;line-height:1.5;max-width:340px">"My daughter asked to hear it three times before bed." <span style="font-style:normal;font-weight:700;color:var(--text-soft)">&#11088;</span></p>
@@ -5347,7 +5365,8 @@ function updateStickyBtn(val) {
   var btn = document.getElementById('stickyBtnText');
   if (btn) {
     if (name.length > 0) {
-      btn.innerHTML = 'Start <span style="color:#FFD166;font-weight:900">' + name + '</span>\'s story';
+      var apos = name.slice(-1).toLowerCase() === 's' ? '\'' : '\'s';
+      btn.innerHTML = 'Start <span style="color:#FFD166;font-weight:900">' + name + '</span>' + apos + ' story';
     } else {
       btn.textContent = 'Start their story';
     }
