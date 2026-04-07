@@ -5365,8 +5365,7 @@ function updateStickyBtn(val) {
   var btn = document.getElementById('stickyBtnText');
   if (btn) {
     if (name.length > 0) {
-      var apos = name.slice(-1).toLowerCase() === 's' ? '\'' : '\'s';
-      btn.innerHTML = 'Start <span style="color:#FFD166;font-weight:900">' + name + '</span>' + apos + ' story';
+      btn.innerHTML = 'Story for <span style="color:#FFD166;font-weight:900">' + name + '</span>';
     } else {
       btn.textContent = 'Start their story';
     }
