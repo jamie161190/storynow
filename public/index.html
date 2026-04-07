@@ -3714,6 +3714,45 @@ async function generatePreview() {
     }
     document.getElementById('previewSummary').innerHTML = summary;
 
+    // Populate story text display
+    const storyDisplay = document.getElementById('previewStoryDisplay');
+    if (storyDisplay && previewStoryText) {
+      // Strip audio cues and pause markers for display
+      const cleanText = previewStoryText
+        .replace(/\[whispers\]/gi, '')
+        .replace(/\[laughs?(?: softly)?\]/gi, '')
+        .replace(/\[sighs?\]/gi, '')
+        .replace(/\[gasps?\]/gi, '')
+        .replace(/\[excitedly\]/gi, '')
+        .replace(/\.\.\. \.\.\./g, '')
+        .replace(/\.\.\./g, '')
+        .trim();
+
+      const nameEsc = escHtml(storyData.childName);
+      const nameTag = `<span style="color:var(--orange);font-weight:800">${nameEsc}</span>`;
+
+      const paras = cleanText.split(/\n+/).filter(p => p.trim());
+      const paraHtml = paras.map(p => {
+        const escaped = escHtml(p.trim());
+        const highlighted = escaped.split(nameEsc).join(nameTag);
+        return `<p>${highlighted}</p>`;
+      }).join('');
+
+      storyDisplay.innerHTML = `
+        <div class="story-book">
+          <div class="story-book-header">
+            <span class="story-book-icon">📖</span>
+            <span class="story-book-label">Read along — their name is highlighted</span>
+          </div>
+          <div class="story-book-body">${paraHtml}</div>
+          <div class="story-book-fade"></div>
+          <div class="story-book-footer">
+            <p>✨ The full story is 15 minutes long — unlock it below</p>
+          </div>
+        </div>`;
+      storyDisplay.style.display = 'block';
+    }
+
     goTo('screenPreview');
   } catch(err) {
     clearInterval(msgInterval);
