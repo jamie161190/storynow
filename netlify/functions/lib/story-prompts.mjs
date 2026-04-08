@@ -575,58 +575,32 @@ function getPreviewAgeBand(age) {
 const PREVIEW_FORMULAS = {
   bedtime: (d) => {
     const isMulti = d.isMultiChild && d.children && d.children.length > 1;
-    const names = isMulti ? d.children.map(c => c.name) : [d.childName];
     return `
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write the opening of the story. The parent is listening to decide whether to buy. You have 30 seconds to make them feel the warmth and magic.
-
-BEDTIME PREVIEW FORMULA:
-This is a BEDTIME story preview. It must feel intimate, warm, and safe. NOT adventurous or high energy.
-${isMulti ? `1. FIRST FEW SENTENCES: Introduce each child one at a time in a quiet, sensory moment. Each child enters individually — NEVER list them together. Example: "${names[0]} pulled the blanket up to her chin. Beside her, ${names[1]} was already half asleep. But ${names.length > 2 ? names[2] : names[1]}? ${names.length > 2 ? names[2] : names[1]} had heard something."
-2. NEXT 2 TO 3 SENTENCES: Build a sensory world. Warmth, soft light, gentle sounds. Weave in ONE personal detail (pet, teddy, or interest) naturally. The parent hearing the preview needs to hear EACH child's name spoken individually within the first 30 seconds.
-3. FINAL SENTENCE: A gentle moment of wonder that makes the parent lean in. Not a cliffhanger, but a soft invitation.`
-: `1. FIRST SENTENCE: The child's name in a quiet, sensory moment. Something gentle is happening. A soft glow, a whisper, a familiar comfort. Example: "${d.childName} pulled the blanket up to their chin, and that is when the ceiling began to sparkle."
-2. SECOND SENTENCE: Their best friend (${d.friendName}) is there, close and comforting. A whispered word, a shared glance, a warm presence.
-3. NEXT 2 TO 3 SENTENCES: Build a sensory world. Warmth, soft light, gentle sounds. Weave in ONE personal detail (pet, teddy, or interest) naturally. Every sentence should include something the child can feel, hear, or see. Do NOT introduce more than 2 named characters total.
-4. FINAL SENTENCE: A gentle moment of wonder that makes the parent lean in. Not a cliffhanger, but a soft invitation. The listener wants to know where this gentle journey leads.`}
-
-${getPreviewAgeBand(d.age)}`;
+PREVIEW STRUCTURE:
+This is the opening of a BEDTIME story. It must feel intimate, warm, and safe.
+${isMulti ? 'Introduce each child one at a time in their own quiet, sensory moment. NEVER list them together.' : 'Open with the child\'s name in a quiet, sensory moment. Their friend (' + (d.friendName || 'best friend') + ') should appear.'}
+Build a sensory world: warmth, soft light, gentle sounds. Weave in personal details (pet, teddy, interests).
+End at a gentle moment of wonder that makes the parent lean in. Not a resolution, a soft invitation to hear more.`;
   },
 
   journey: (d) => {
     const isMulti = d.isMultiChild && d.children && d.children.length > 1;
-    const names = isMulti ? d.children.map(c => c.name) : [d.childName];
     return `
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write the opening of the story. The parent is listening to decide whether to buy. You have 30 seconds to make them cry, gasp, or smile so wide they cannot say no.
-
-JOURNEY PREVIEW FORMULA:
-${isMulti ? `1. FIRST FEW SENTENCES: Each child reacts differently to the inciting moment. Introduce them INDIVIDUALLY — NEVER list them together. Example: "${names[0]} froze. She could hear it. ${names[1]} was already running toward the noise. ${names.length > 2 ? names[2] + ' tugged at ' + (d.children[0].gender === 'girl' ? 'her' : 'his') + ' sleeve and whispered, "I want to see."' : ''}"
-2. NEXT 2 TO 3 SENTENCES: Stack personal details fast. The pet, theme, or interest becomes the world around them.${d.hasVillain && d.villainName ? ' Hint at the villain (' + d.villainName + ') with playful menace.' : ''} The parent must hear EACH child's name individually within the first 30 seconds.
-3. FINAL SENTENCE: Stop mid-action at an impossible, wonderful moment. The listener MUST need to know what happens next.`
-: `1. FIRST SENTENCE: The child's name in a moment of wonder or emotion, not walking or waking up. Something is already happening TO them or BECAUSE of them. Example: "${d.childName} could not believe what just landed in the garden."
-2. SECOND SENTENCE: Their best friend (${d.friendName}) reacts, speaks, or does something that proves this story KNOWS this child's world.
-3. NEXT 2 TO 3 SENTENCES: Stack personal details fast. The pet does something memorable. The interest or theme becomes the world around them.${d.hasVillain && d.villainName ? ' Hint at the villain (' + d.villainName + ') with playful menace.' : ''} Every sentence should make the parent think "how does it know all this?"
-4. FINAL SENTENCE: Stop mid-action at an impossible, wonderful moment. The child is about to discover, face, or unlock something extraordinary. The listener MUST need to know what happens next.`}
-
-${getPreviewAgeBand(d.age)}`;
+PREVIEW STRUCTURE:
+This is the opening of an ADVENTURE story. It must grab attention immediately.
+${isMulti ? 'Each child reacts differently to the inciting moment. Introduce them INDIVIDUALLY, never as a group.' : 'Open with the child\'s name in a moment of wonder or action. Their friend (' + (d.friendName || 'best friend') + ') reacts and speaks.'}
+Stack personal details fast: pet, theme, interests become the world. ${d.hasVillain && d.villainName ? 'Hint at the villain (' + d.villainName + ') with playful menace.' : ''}
+End mid-action at an impossible, wonderful cliffhanger. The listener MUST need to know what happens next.`;
   },
 
   learning: (d) => {
     const isMulti = d.isMultiChild && d.children && d.children.length > 1;
-    const names = isMulti ? d.children.map(c => c.name) : [d.childName];
     return `
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write the opening of the story. The parent is listening to decide whether to buy. You have 30 seconds to prove this story teaches AND entertains.
-
-LEARNING PREVIEW FORMULA:
-This preview must signal that this is an INTERACTIVE learning story about ${d.subject || 'the subject'}.
-${isMulti ? `1. FIRST FEW SENTENCES: Introduce each child individually discovering the learning challenge. Example: "${names[0]} stared at the puzzle. ${names[1]} was already counting on ${d.children[1]?.gender === 'girl' ? 'her' : 'his'} fingers.${names.length > 2 ? ' ' + names[2] + ' pointed at the screen. "I know that one!"' : ''}"
-2. NEXT 2 TO 3 SENTENCES: Build the adventure world where learning IS the superpower. Include ONE interactive moment with "Can you work it out?" The children must each contribute something different to solving the challenge.
-3. FINAL SENTENCE: A challenge that makes the listener want to hear more.`
-: `1. FIRST SENTENCE: The child's name in an exciting discovery moment where ${d.subject || 'knowledge'} is clearly the key to the adventure.
-2. SECOND SENTENCE: Their best friend (${d.friendName}) reacts with excitement or curiosity. The subject (${d.subject || 'learning'}) is woven into the world naturally.
-3. NEXT 2 TO 3 SENTENCES: Build the adventure world where learning IS the superpower. Include ONE interactive moment: pose a question to the listener, then write "Can you work it out?" or "What do you think?" This signals the story talks directly to the child.
-4. FINAL SENTENCE: A challenge or discovery that makes the listener want to hear more. The child is about to use their knowledge to unlock something amazing.`}
-
-${getPreviewAgeBand(d.age)}`;
+PREVIEW STRUCTURE:
+This is the opening of a LEARNING story about ${d.subject || 'the subject'}. It must signal that learning IS the adventure.
+${isMulti ? 'Introduce each child individually discovering the challenge.' : 'Open with the child\'s name in a discovery moment. Their friend (' + (d.friendName || 'best friend') + ') reacts with excitement.'}
+Build the world where knowledge is the superpower. Include one interactive moment: "Can you work it out?"
+End with a challenge that makes the listener desperate to hear more.`;
   }
 };
 
