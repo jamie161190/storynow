@@ -264,9 +264,16 @@ export const handler = async (event) => {
       }
       console.log('[PREVIEW-BG] Text generated in', Date.now() - startTime, 'ms, words:', previewText.split(' ').length);
 
-      // Preview never includes the gift/personal message — that plays only in the full story.
-      // The preview screen copy already tells the parent this.
-      const fullPreviewText = previewText + ' ... ... To hear what happens next, unlock the full story.';
+      // Prepend personal/gift message if present so the parent hears it in the preview
+      let messageIntro = '';
+      if (storyData.isGift && storyData.giftFrom && storyData.giftMessage) {
+        messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... ${storyData.giftMessage} ... And now, your story begins. ... `;
+      } else if (storyData.isGift && storyData.giftFrom) {
+        messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... And now, your story begins. ... `;
+      } else if (storyData.personalMessage) {
+        messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
+      }
+      const fullPreviewText = messageIntro + previewText + ' ... ... To hear what happens next, unlock the full story.';
       const ttsPreviewText = prepareTTSText(fullPreviewText);
 
       // Save partial result before TTS
