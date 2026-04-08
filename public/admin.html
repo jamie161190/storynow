@@ -25,10 +25,6 @@ body { font-family: 'Quicksand', sans-serif; background: #FEFBF6; color: #2D2844
 .tab { padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.82rem; font-weight: 700; cursor: pointer; border: 2px solid #E8E0F0; background: #fff; color: #2D2844; transition: all 0.2s; }
 .tab.active { background: #6B2F93; color: #fff; border-color: #6B2F93; }
 
-.search-bar { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
-.search-bar input { flex: 1; padding: 0.6rem 1rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
-.search-bar button { padding: 0.6rem 1.5rem; background: #6B2F93; color: #fff; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; font-family: inherit; }
-
 .card { background: #fff; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid #F0ECF5; }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
 .card-title { font-weight: 800; font-size: 0.95rem; }
@@ -46,65 +42,30 @@ body { font-family: 'Quicksand', sans-serif; background: #FEFBF6; color: #2D2844
 .badge-orange { background: #FFF3E0; color: #E65100; }
 .badge-purple { background: #F3E8FF; color: #7C3AED; }
 .badge-red { background: #FFEBEE; color: #C62828; }
+.badge-blue { background: #E3F2FD; color: #1565C0; }
 
 .empty { text-align: center; padding: 3rem; color: #999; }
 .loading { text-align: center; padding: 2rem; color: #6B2F93; font-weight: 700; }
 
-.detail-panel { background: #F8F5FF; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
-.detail-panel h3 { font-size: 0.9rem; color: #6B2F93; margin-bottom: 0.75rem; }
-.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1rem; font-size: 0.82rem; }
-.detail-grid dt { color: #999; font-weight: 600; }
-.detail-grid dd { color: #2D2844; font-weight: 700; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.stat-card { background: #fff; border-radius: 16px; padding: 1.25rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid #F0ECF5; text-align: center; }
+.stat-card .stat-value { font-size: 2.2rem; font-weight: 800; color: #6B2F93; line-height: 1; margin-bottom: 0.3rem; }
+.stat-card .stat-label { font-size: 0.72rem; color: #999; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
 
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
-.modal { background: #fff; border-radius: 16px; padding: 1.5rem; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.modal { background: #fff; border-radius: 16px; padding: 1.5rem; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto; }
 .modal h2 { font-size: 1.1rem; color: #6B2F93; margin-bottom: 1rem; }
 .modal label { display: block; font-size: 0.82rem; font-weight: 700; color: #666; margin-bottom: 0.25rem; margin-top: 0.75rem; }
-.modal input, .modal select, .modal textarea { width: 100%; padding: 0.6rem 0.8rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; }
-.modal textarea { height: 80px; resize: vertical; }
+.modal textarea { width: 100%; padding: 0.6rem 0.8rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; height: 100px; resize: vertical; }
 .modal .modal-actions { display: flex; gap: 0.5rem; margin-top: 1.25rem; }
+
+.story-text-preview { background: #F8F5FF; border-radius: 12px; padding: 1rem; margin-top: 0.75rem; max-height: 300px; overflow-y: auto; font-size: 0.82rem; line-height: 1.7; color: #2D2844; white-space: pre-wrap; }
+
 audio { width: 100%; margin-top: 0.5rem; }
-
-/* Analytics Dashboard */
-.metrics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem; }
-.metrics-header h2 { font-size: 1rem; color: #6B2F93; margin: 0; }
-.period-select { padding: 0.4rem 0.8rem; border: 2px solid #E8E0F0; border-radius: 50px; font-family: inherit; font-weight: 700; font-size: 0.78rem; background: #fff; color: #2D2844; cursor: pointer; }
-
-.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.stat-card { background: #fff; border-radius: 16px; padding: 1.5rem 1.25rem 1.25rem; box-shadow: 0 2px 12px rgba(0,0,0,0.05); border: 1px solid #F0ECF5; text-align: center; }
-.stat-card .stat-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
-.stat-card .stat-value { font-size: 2.8rem; font-weight: 800; color: #6B2F93; line-height: 1; margin-bottom: 0.4rem; }
-.stat-card .stat-label { font-size: 0.72rem; color: #999; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; line-height: 1.4; }
-
-/* Live Dashboard */
-@keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-@keyframes fade-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-
-.live-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem; }
-.live-header h2 { font-size: 1rem; color: #6B2F93; margin: 0; display: flex; align-items: center; gap: 0.5rem; }
-.live-header .live-pulse { width: 10px; height: 10px; background: #4CAF50; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
-.live-header .live-ago { font-size: 0.72rem; color: #999; font-weight: 600; }
-
-.live-big-number { text-align: center; margin-bottom: 1.5rem; }
-.live-big-number .big { font-size: 3.5rem; font-weight: 800; color: #6B2F93; line-height: 1; }
-.live-big-number .big-label { font-size: 0.82rem; color: #999; font-weight: 600; margin-top: 0.3rem; }
-
-.live-funnel { margin-bottom: 1.25rem; }
-.live-funnel h3 { font-size: 0.88rem; color: #6B2F93; margin-bottom: 0.75rem; }
-.live-stage { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
-.live-stage .ls-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
-.live-stage .ls-name { font-size: 0.82rem; font-weight: 700; color: #2D2844; flex: 1; }
-.live-stage .ls-count { font-size: 1rem; font-weight: 800; color: #2D2844; min-width: 30px; text-align: right; }
-.live-stage .ls-bar-wrap { flex: 2; height: 8px; background: #F0ECF5; border-radius: 4px; overflow: hidden; }
-.live-stage .ls-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
-
-.live-feed { margin-top: 1.25rem; }
-.live-feed h3 { font-size: 0.88rem; color: #6B2F93; margin-bottom: 0.75rem; }
-.live-event { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.75rem; background: #fff; border-radius: 10px; margin-bottom: 0.4rem; border: 1px solid #F0ECF5; animation: fade-in 0.3s ease; font-size: 0.8rem; }
-.live-event .le-icon { font-size: 1rem; flex-shrink: 0; }
-.live-event .le-text { flex: 1; color: #555; font-weight: 600; }
-.live-event .le-time { color: #bbb; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.filter-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.filter-pill { padding: 0.35rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 2px solid #E8E0F0; background: #fff; color: #666; }
+.filter-pill.active { background: #6B2F93; color: #fff; border-color: #6B2F93; }
 </style>
 </head>
 <body>
@@ -121,22 +82,16 @@ audio { width: 100%; margin-top: 0.5rem; }
 
 <!-- Admin Panel -->
 <div class="admin" id="adminPanel">
-  <h1>Hear Their Name Admin</h1>
+  <h1>Hear Their Name</h1>
   <p class="sub" id="statsLine">Loading...</p>
 
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('customers')">Customers</div>
-    <div class="tab" onclick="switchTab('attempts')">Attempts</div>
-    <div class="tab" onclick="switchTab('retry')">Retry Queue</div>
-    <div class="tab" onclick="switchTab('errors')" id="errorsTab">Errors <span id="errorBadge" style="display:none;background:#FF6B9D;color:#fff;font-size:0.65rem;padding:0.1rem 0.45rem;border-radius:50px;margin-left:0.3rem;vertical-align:middle"></span></div>
-    <div class="tab" onclick="switchTab('analytics')">Analytics</div>
-    <div class="tab" onclick="switchTab('live')" id="liveTab">Live <span id="liveDot" style="display:inline-block;width:8px;height:8px;background:#4CAF50;border-radius:50%;margin-left:0.3rem;vertical-align:middle;animation:pulse-dot 1.5s infinite"></span></div>
-    <div class="tab" onclick="switchTab('referrals')">Referrals</div>
-  </div>
-
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search by email or child name..." onkeydown="if(event.key==='Enter')doSearch()">
-    <button onclick="doSearch()">Search</button>
+    <div class="tab active" onclick="switchTab('queue',this)">Queue</div>
+    <div class="tab" onclick="switchTab('delivered',this)">Delivered</div>
+    <div class="tab" onclick="switchTab('previews',this)">Previews</div>
+    <div class="tab" onclick="switchTab('customers',this)">Customers</div>
+    <div class="tab" onclick="switchTab('funnel',this)">Funnel</div>
+    <div class="tab" onclick="switchTab('stats',this)">Stats</div>
   </div>
 
   <div id="content">
@@ -144,715 +99,409 @@ audio { width: 100%; margin-top: 0.5rem; }
   </div>
 </div>
 
-<!-- Generate Story Modal -->
-<div class="modal-overlay" id="generateModal">
-  <div class="modal" style="max-height:85vh;overflow-y:auto">
-    <h2>Generate Story</h2>
-    <label>Customer email</label>
-    <input type="email" id="genEmail" placeholder="customer@email.com">
-    <label>Child name</label>
-    <input type="text" id="genChildName" placeholder="e.g. Lily">
-    <label>Age</label>
-    <input type="text" id="genAge" placeholder="e.g. 5">
-    <label>Category</label>
-    <select id="genCategory">
-      <option value="bedtime">Bedtime Story</option>
-      <option value="journey">Adventure Story</option>
-      <option value="learning">Learning Adventure</option>
-    </select>
-    <label>Gender</label>
-    <select id="genGender">
-      <option value="girl">Girl</option>
-      <option value="boy">Boy</option>
-      <option value="neutral">Neutral</option>
-    </select>
-    <label>Themes (comma separated)</label>
-    <input type="text" id="genThemes" placeholder="e.g. Dinosaurs, Space, Football">
-    <label>Best friend</label>
-    <input type="text" id="genFriend" placeholder="e.g. Ellis, cousin Amara">
-    <label>Sidekick / adventure companion</label>
-    <input type="text" id="genSidekick" placeholder="e.g. Mum, Daddy, a robot called Sparky">
-    <label>Family members</label>
-    <input type="text" id="genFamily" placeholder="e.g. Mummy, Daddy, baby sister Isla">
-    <label>Pet</label>
-    <div style="display:flex;gap:0.5rem">
-      <input type="text" id="genPetName" placeholder="Pet name" style="flex:1">
-      <input type="text" id="genPetType" placeholder="Pet type" style="flex:1">
-    </div>
-    <label>Teacher name</label>
-    <input type="text" id="genTeacher" placeholder="e.g. Mrs Smith">
-    <label>Favourite teddy</label>
-    <input type="text" id="genTeddy" placeholder="e.g. Mr Snuggles">
-    <label>Proud of (something special about the child)</label>
-    <input type="text" id="genProud" placeholder="e.g. always sharing with friends">
-    <label>Where (setting)</label>
-    <input type="text" id="genWhere" placeholder="e.g. Enchanted Forest, Surprise me">
-    <label>Personal message</label>
-    <textarea id="genMessage" placeholder="e.g. Chase, this is from Daddy. I am so proud of you..."></textarea>
-    <label>Extra details</label>
-    <textarea id="genDetails" placeholder="Anything else..."></textarea>
-    <label>Voice ID (optional)</label>
-    <input type="text" id="genVoice" placeholder="Leave blank for default">
-    <p id="genStatus" style="font-size:0.82rem;color:#6B2F93;margin-top:0.75rem;display:none"></p>
+<!-- Story Text Modal -->
+<div class="modal-overlay" id="storyModal">
+  <div class="modal">
+    <h2 id="storyModalTitle">Story text</h2>
+    <div class="story-text-preview" id="storyModalText"></div>
     <div class="modal-actions">
-      <button class="btn btn-purple" onclick="submitGenerate()">Generate Story</button>
-      <button class="btn btn-outline" onclick="closeModal('generateModal')">Cancel</button>
+      <button class="btn btn-outline" onclick="closeModal('storyModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Regenerate Modal -->
+<div class="modal-overlay" id="regenModal">
+  <div class="modal">
+    <h2>Regenerate story</h2>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:0.5rem">Add notes for the rewrite. The customer's original feedback (if any) will also be included.</p>
+    <label>Your notes</label>
+    <textarea id="regenNotes" placeholder="e.g. Make the dragon less scary, add more dialogue for the friend"></textarea>
+    <p id="regenStatus" style="font-size:0.82rem;color:#6B2F93;margin-top:0.5rem;display:none"></p>
+    <div class="modal-actions">
+      <button class="btn btn-orange" id="regenBtn" onclick="submitRegen()">Regenerate</button>
+      <button class="btn btn-outline" onclick="closeModal('regenModal')">Cancel</button>
     </div>
   </div>
 </div>
 
 <script>
 let adminSecret = '';
-let currentTab = 'customers';
-let allCustomers = [];
-let allAttempts = [];
+let currentTab = 'queue';
+let regenStoryId = null;
 
-// ── Auth ──
+function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ago';
+  const days = Math.floor(hrs / 24);
+  return days + 'd ago';
+}
+
+// Auth
 function adminLogin() {
   adminSecret = document.getElementById('adminPass').value.trim();
   if (!adminSecret) return;
-  // Test with a simple request
-  api('customers').then(data => {
+  queueApi('list', { status: 'pending' }).then(data => {
     if (data.error) {
       document.getElementById('loginErr').style.display = 'block';
       adminSecret = '';
     } else {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminPanel').classList.add('active');
-      allCustomers = data.customers || [];
-      renderCustomers(allCustomers);
-      updateStats();
-      // Pre-load attempts and error count
-      api('attempts').then(d => { allAttempts = d.attempts || []; });
-      loadErrorBadge();
+      renderQueue(data.stories || []);
+      loadStats();
     }
   });
 }
 
-// ── API helper ──
-async function api(action, opts = {}) {
-  const params = new URLSearchParams({ action, ...opts.params });
-  const fetchOpts = {
-    headers: { 'x-admin-secret': adminSecret, 'Content-Type': 'application/json' }
-  };
-  if (opts.body) {
-    fetchOpts.method = 'POST';
-    fetchOpts.body = JSON.stringify(opts.body);
-  }
-  const res = await fetch('/api/admin?' + params.toString(), fetchOpts);
+// Queue API helper
+async function queueApi(action, params = {}, body = null) {
+  const url = new URL('/api/admin-queue', window.location.origin);
+  url.searchParams.set('action', action);
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+  const opts = { headers: { 'x-admin-secret': adminSecret, 'Content-Type': 'application/json' } };
+  if (body) { opts.method = 'POST'; opts.body = JSON.stringify(body); }
+  const res = await fetch(url, opts);
   return res.json();
 }
 
-// ── Tabs ──
-function switchTab(tab) {
+// Admin API helper (for old endpoints)
+async function adminApi(action, params = {}) {
+  const url = new URL('/api/admin', window.location.origin);
+  url.searchParams.set('action', action);
+  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+  const res = await fetch(url, { headers: { 'x-admin-secret': adminSecret } });
+  return res.json();
+}
+
+// Tabs
+function switchTab(tab, el) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  if (tab === 'customers') { renderCustomers(allCustomers); stopLiveRefresh(); }
-  else if (tab === 'attempts') { renderAttempts(allAttempts); stopLiveRefresh(); }
-  else if (tab === 'retry') { loadRetryQueue(); stopLiveRefresh(); }
-  else if (tab === 'errors') { loadErrors(); stopLiveRefresh(); }
-  else if (tab === 'analytics') { loadMetrics(); stopLiveRefresh(); }
-  else if (tab === 'live') { loadLive(); startLiveRefresh(); }
-  else if (tab === 'referrals') { loadReferrals(); stopLiveRefresh(); }
+  if (el) el.classList.add('active');
+  document.getElementById('content').innerHTML = '<div class="loading">Loading...</div>';
+  if (tab === 'queue') loadQueue('pending');
+  else if (tab === 'delivered') loadQueue('delivered');
+  else if (tab === 'previews') loadPreviews();
+  else if (tab === 'customers') loadCustomers();
+  else if (tab === 'funnel') loadFunnel();
+  else if (tab === 'stats') loadStatsTab();
 }
 
-// ── Search ──
-async function doSearch() {
-  const q = document.getElementById('searchInput').value.trim();
-  if (!q) {
-    if (currentTab === 'customers') renderCustomers(allCustomers);
-    else if (currentTab === 'attempts') renderAttempts(allAttempts);
+// ===== QUEUE =====
+async function loadQueue(status) {
+  const data = await queueApi('list', { status });
+  if (status === 'pending') renderQueue(data.stories || []);
+  else renderDelivered(data.stories || []);
+}
+
+function renderQueue(stories) {
+  if (!stories.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No pending orders. All caught up!</div>';
     return;
   }
-  document.getElementById('content').innerHTML = '<div class="loading">Searching...</div>';
-  const data = await api('search', { params: { q } });
-  if (currentTab === 'customers' || currentTab === 'retry') {
-    // Group search results by email
-    const grouped = {};
-    for (const s of (data.stories || [])) {
-      if (!grouped[s.email]) grouped[s.email] = { email: s.email, stories: [], storyCount: 0 };
-      grouped[s.email].stories.push(s);
-      grouped[s.email].storyCount++;
+  let html = '';
+  for (const s of stories) {
+    const sd = s.story_data || {};
+    const isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
+    const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
+    const hasFeedback = s.feedback && s.feedback.trim();
+
+    html += '<div class="card">';
+    html += '<div class="card-header">';
+    html += '<span class="card-title">' + esc(s.child_name || 'Unknown') + '</span>';
+    html += '<span class="card-meta">' + timeAgo(s.created_at) + '</span>';
+    html += '</div>';
+
+    html += '<div class="card-detail">' + catLabel;
+    if (isMulti) html += ' <span class="badge badge-blue">' + sd.children.length + ' children</span>';
+    if (s.is_gift) html += ' <span class="badge badge-purple">Gift</span>';
+    if (s.status === 'generating') html += ' <span class="badge badge-orange">Generating...</span>';
+    if (s.status === 'ready') html += ' <span class="badge badge-green">Audio ready</span>';
+    html += '</div>';
+
+    html += '<div class="card-detail">Email: ' + esc(s.email) + '</div>';
+    if (s.voice_id) html += '<div class="card-detail">Voice: ' + esc(s.voice_id) + '</div>';
+
+    if (hasFeedback) {
+      html += '<div style="background:#FFF8F0;border-radius:8px;padding:0.6rem 0.8rem;margin:0.5rem 0;border-left:3px solid #F1753B">';
+      html += '<p style="font-size:0.72rem;font-weight:700;color:#E65100;margin:0 0 0.2rem">Customer feedback</p>';
+      html += '<p style="font-size:0.82rem;color:#2D2844;margin:0;line-height:1.5">' + esc(s.feedback) + '</p>';
+      html += '</div>';
     }
-    renderCustomers(Object.values(grouped));
-  } else {
-    renderAttempts(data.attempts || []);
+
+    if (s.is_gift && s.gift_delivery_preference) {
+      html += '<div class="card-detail">Gift delivery: ' + (s.gift_delivery_preference === 'auto' ? 'Auto-send to ' + esc(s.gift_email || '?') : 'Buyer will send manually') + '</div>';
+    }
+
+    if (s.audio_url) {
+      html += '<audio controls preload="none" src="' + esc(s.audio_url) + '"></audio>';
+    }
+
+    html += '<div class="card-actions">';
+    html += '<button class="btn btn-outline" onclick="viewStory(\'' + esc(s.id) + '\')">Read story</button>';
+    if (!s.audio_url || s.status !== 'ready') {
+      html += '<button class="btn btn-purple" onclick="generateTTS(\'' + esc(s.id) + '\',this)">Generate audio</button>';
+    }
+    html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate</button>';
+    if (s.audio_url) {
+      html += '<button class="btn btn-green" onclick="sendStory(\'' + esc(s.id) + '\',this)">Send</button>';
+    }
+    html += '</div></div>';
   }
+  document.getElementById('content').innerHTML = html;
 }
 
-// ── Stats ──
-function updateStats() {
-  const totalCustomers = allCustomers.length;
-  const totalStories = allCustomers.reduce((sum, c) => sum + c.storyCount, 0);
-  document.getElementById('statsLine').textContent = totalCustomers + ' customers, ' + totalStories + ' stories generated';
-}
-
-// ── Render customers ──
-function renderCustomers(customers) {
-  if (!customers.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">No customers found</div>';
+function renderDelivered(stories) {
+  if (!stories.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No delivered stories yet</div>';
     return;
   }
-  let html = '<button class="btn btn-green" onclick="openGenerateModal()" style="margin-bottom:1rem">+ Generate New Story</button>';
+  let html = '';
+  for (const s of stories) {
+    const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
+    const date = new Date(s.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    html += '<div class="card">';
+    html += '<div class="card-header"><span class="card-title">' + esc(s.child_name) + '</span><span class="card-meta">' + date + '</span></div>';
+    html += '<div class="card-detail">' + catLabel + ' &middot; ' + esc(s.email) + '</div>';
+    if (s.audio_url) html += '<audio controls preload="none" src="' + esc(s.audio_url) + '"></audio>';
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+// Queue actions
+async function viewStory(id) {
+  const data = await queueApi('get', { id });
+  const s = data.story;
+  if (!s) { alert('Story not found'); return; }
+  document.getElementById('storyModalTitle').textContent = (s.child_name || 'Story') + ' text';
+  document.getElementById('storyModalText').textContent = s.story_text || 'No story text available';
+  document.getElementById('storyModal').classList.add('active');
+}
+
+async function generateTTS(id, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  const data = await queueApi('generate-tts', {}, { storyId: id });
+  if (data.success) {
+    btn.textContent = 'Done!';
+    btn.className = 'btn btn-green';
+    setTimeout(() => loadQueue('pending'), 1000);
+  } else {
+    btn.textContent = 'Failed';
+    btn.disabled = false;
+    alert('TTS generation failed: ' + (data.error || 'Unknown error'));
+  }
+}
+
+function openRegen(id) {
+  regenStoryId = id;
+  document.getElementById('regenNotes').value = '';
+  document.getElementById('regenStatus').style.display = 'none';
+  document.getElementById('regenModal').classList.add('active');
+}
+
+async function submitRegen() {
+  if (!regenStoryId) return;
+  const notes = document.getElementById('regenNotes').value.trim();
+  const status = document.getElementById('regenStatus');
+  const btn = document.getElementById('regenBtn');
+  btn.disabled = true;
+  status.textContent = 'Regenerating story...';
+  status.style.color = '#6B2F93';
+  status.style.display = 'block';
+
+  const data = await queueApi('regenerate', {}, { storyId: regenStoryId, notes });
+  if (data.success) {
+    status.textContent = 'Story regenerated! ' + (data.wordCount || '') + ' words. You can now generate audio.';
+    status.style.color = '#4CAF50';
+    btn.disabled = false;
+    setTimeout(() => { closeModal('regenModal'); loadQueue('pending'); }, 2000);
+  } else {
+    status.textContent = 'Error: ' + (data.error || 'Unknown');
+    status.style.color = '#FF6B9D';
+    btn.disabled = false;
+  }
+}
+
+async function sendStory(id, btn) {
+  if (!confirm('Send the delivery email to the customer?')) return;
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  const data = await queueApi('send', {}, { storyId: id });
+  if (data.success) {
+    btn.textContent = 'Sent!';
+    btn.className = 'btn btn-green';
+    setTimeout(() => loadQueue('pending'), 1500);
+  } else {
+    btn.textContent = 'Failed';
+    btn.disabled = false;
+    alert('Send failed: ' + (data.error || 'Unknown error'));
+  }
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// ===== PREVIEWS =====
+async function loadPreviews() {
+  const data = await adminApi('attempts');
+  const attempts = data.attempts || [];
+  if (!attempts.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No previews generated yet</div>';
+    return;
+  }
+
+  // Check which emails have purchased
+  const customerData = await adminApi('customers');
+  const purchasedEmails = new Set((customerData.customers || []).map(c => c.email));
+
+  let html = '<div class="filter-row">';
+  html += '<button class="filter-pill active" onclick="filterPreviews(\'all\',this)">All</button>';
+  html += '<button class="filter-pill" onclick="filterPreviews(\'converted\',this)">Converted</button>';
+  html += '<button class="filter-pill" onclick="filterPreviews(\'not_converted\',this)">Did not convert</button>';
+  html += '</div>';
+  html += '<div id="previewsList">';
+
+  for (const a of attempts) {
+    const sd = a.story_data || {};
+    const converted = a.email && purchasedEmails.has(a.email);
+    const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[sd.category || a.category] || 'Story';
+    const date = new Date(a.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+    const isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
+
+    html += '<div class="card preview-card" data-converted="' + (converted ? 'yes' : 'no') + '">';
+    html += '<div class="card-header">';
+    html += '<span class="card-title">' + esc(a.child_name || sd.childName || 'Unknown') + '</span>';
+    html += converted ? '<span class="badge badge-green">Converted</span>' : '<span class="badge badge-red">Did not convert</span>';
+    html += '</div>';
+    html += '<div class="card-detail">' + catLabel;
+    if (isMulti) html += ' <span class="badge badge-blue">' + sd.children.length + ' children</span>';
+    html += ' &middot; ' + date + '</div>';
+    if (a.email) html += '<div class="card-detail">Email: ' + esc(a.email) + '</div>';
+    if (sd.themes && sd.themes.length) html += '<div class="card-detail">Themes: ' + esc(sd.themes.join(', ')) + '</div>';
+
+    // Preview audio playback (if job_id exists, try to load from storage)
+    if (a.job_id) {
+      html += '<div class="card-detail" style="font-size:0.72rem;color:var(--purple)">Preview job: ' + esc(a.job_id) + '</div>';
+    }
+
+    html += '</div>';
+  }
+  html += '</div>';
+  document.getElementById('content').innerHTML = html;
+}
+
+function filterPreviews(filter, btn) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.preview-card').forEach(card => {
+    if (filter === 'all') card.style.display = 'block';
+    else if (filter === 'converted') card.style.display = card.dataset.converted === 'yes' ? 'block' : 'none';
+    else card.style.display = card.dataset.converted === 'no' ? 'block' : 'none';
+  });
+}
+
+// ===== CUSTOMERS =====
+async function loadCustomers() {
+  const data = await adminApi('customers');
+  const customers = data.customers || [];
+  if (!customers.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No customers yet</div>';
+    return;
+  }
+  let html = '';
   for (const c of customers) {
     html += '<div class="card">';
     html += '<div class="card-header"><span class="card-title">' + esc(c.email) + '</span><span class="badge badge-purple">' + c.storyCount + ' stories</span></div>';
-    for (const s of c.stories) {
-      const date = new Date(s.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning' }[s.category] || s.category;
+    for (const s of (c.stories || [])) {
+      const date = new Date(s.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+      const cat = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
       html += '<div class="card-detail">' + esc(s.child_name) + ' &middot; ' + cat + ' &middot; ' + date;
-      if (s.audio_url) html += ' <span class="badge badge-green">Audio ready</span>';
-      else html += ' <span class="badge badge-orange">No audio</span>';
+      if (s.status) html += ' <span class="badge badge-' + (s.status === 'delivered' ? 'green' : s.status === 'pending' ? 'orange' : 'purple') + '">' + esc(s.status) + '</span>';
       html += '</div>';
-      if (s.audio_url) {
-        html += '<audio controls preload="none" src="' + esc(s.audio_url) + '"></audio>';
-      }
-    }
-    html += '<div class="card-actions">';
-    html += '<button class="btn btn-purple" onclick="openGenerateModal(\'' + esc(c.email) + '\')">Generate for this customer</button>';
-    html += '</div></div>';
-  }
-  document.getElementById('content').innerHTML = html;
-}
-
-// ── Render attempts ──
-function renderAttempts(attempts) {
-  if (!attempts.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">No attempts found</div>';
-    return;
-  }
-  let html = '';
-  for (const a of attempts) {
-    const date = new Date(a.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-    const sd = a.story_data || {};
-    const cat = { bedtime: 'Bedtime', journey: 'Adventure', learning: 'Learning' }[sd.category || a.category] || (sd.category || a.category || 'Unknown');
-
-    html += '<div class="card">';
-    html += '<div class="card-header"><span class="card-title">' + esc(a.child_name || sd.childName || 'Unknown') + '</span><span class="card-meta">' + date + '</span></div>';
-    html += '<div class="card-detail">Category: ' + cat + '</div>';
-    if (sd.age || sd.childAge) html += '<div class="card-detail">Age: ' + esc(sd.age || sd.childAge) + '</div>';
-    if (sd.gender) html += '<div class="card-detail">Gender: ' + esc(sd.gender) + '</div>';
-    if (sd.themes && sd.themes.length) html += '<div class="card-detail">Themes: ' + esc(sd.themes.join(', ')) + '</div>';
-    if (sd.where) html += '<div class="card-detail">Setting: ' + esc(sd.where) + '</div>';
-    if (sd.proudOf) html += '<div class="card-detail">Proud of: ' + esc(sd.proudOf) + '</div>';
-    if (sd.friendName) html += '<div class="card-detail">Best friend: ' + esc(sd.friendName) + '</div>';
-    if (sd.sidekickName) html += '<div class="card-detail">Sidekick: ' + esc(sd.sidekickName) + '</div>';
-    if (sd.familyMembers) html += '<div class="card-detail">Family: ' + esc(sd.familyMembers) + '</div>';
-    if (sd.teacherName) html += '<div class="card-detail">Teacher: ' + esc(sd.teacherName) + '</div>';
-    if (sd.petName) html += '<div class="card-detail">Pet: ' + esc(sd.petName) + (sd.petType ? ' (' + esc(sd.petType) + ')' : '') + '</div>';
-    if (sd.favTeddy) html += '<div class="card-detail">Teddy: ' + esc(sd.favTeddy) + '</div>';
-    if (sd.extraDetails) html += '<div class="card-detail">Extra: ' + esc(sd.extraDetails) + '</div>';
-    if (sd.personalMessage) html += '<div class="card-detail">Message: ' + esc(sd.personalMessage) + '</div>';
-    if (a.status) html += '<div class="card-detail"><span class="badge badge-orange">' + esc(a.status) + '</span></div>';
-
-    html += '<div class="card-actions">';
-    html += '<button class="btn btn-purple" onclick=\'generateFromAttempt(' + JSON.stringify(a).replace(/'/g, "\\'") + ')\'>Generate this story</button>';
-    html += '</div></div>';
-  }
-  document.getElementById('content').innerHTML = html;
-}
-
-// ── Retry Queue ──
-async function loadRetryQueue() {
-  document.getElementById('content').innerHTML = '<div class="loading">Loading retry queue...</div>';
-  const data = await api('retry-queue');
-  const queue = data.queue || [];
-  if (!queue.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">Retry queue is empty. All good!</div>';
-    return;
-  }
-  let html = '';
-  for (const item of queue) {
-    const date = new Date(item.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    html += '<div class="card">';
-    html += '<div class="card-header"><span class="card-title">' + esc(item.childName || 'Unknown') + '</span><span class="badge badge-red">Attempt ' + item.attempts + '</span></div>';
-    html += '<div class="card-detail">Email: ' + esc(item.customerEmail || 'N/A') + '</div>';
-    html += '<div class="card-detail">Queued: ' + date + '</div>';
-    if (item.lastAttempt) html += '<div class="card-detail">Last tried: ' + new Date(item.lastAttempt).toLocaleString('en-GB') + '</div>';
-    html += '</div>';
-  }
-  document.getElementById('content').innerHTML = html;
-}
-
-// ── Generate Modal ──
-function openGenerateModal(email) {
-  document.getElementById('genEmail').value = email || '';
-  document.getElementById('genChildName').value = '';
-  document.getElementById('genAge').value = '';
-  document.getElementById('genThemes').value = '';
-  document.getElementById('genFriend').value = '';
-  document.getElementById('genSidekick').value = '';
-  document.getElementById('genFamily').value = '';
-  document.getElementById('genPetName').value = '';
-  document.getElementById('genPetType').value = '';
-  document.getElementById('genTeacher').value = '';
-  document.getElementById('genTeddy').value = '';
-  document.getElementById('genProud').value = '';
-  document.getElementById('genWhere').value = '';
-  document.getElementById('genMessage').value = '';
-  document.getElementById('genDetails').value = '';
-  document.getElementById('genVoice').value = '';
-  document.getElementById('genStatus').style.display = 'none';
-  document.getElementById('generateModal').classList.add('active');
-}
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove('active');
-}
-
-function generateFromAttempt(attempt) {
-  const sd = attempt.story_data || {};
-  document.getElementById('genEmail').value = '';
-  document.getElementById('genChildName').value = sd.childName || attempt.child_name || '';
-  document.getElementById('genAge').value = sd.age || sd.childAge || '';
-  document.getElementById('genCategory').value = sd.category || attempt.category || 'journey';
-  document.getElementById('genGender').value = sd.gender || 'neutral';
-  document.getElementById('genThemes').value = (sd.themes || []).join(', ');
-  document.getElementById('genFriend').value = sd.friendName || '';
-  document.getElementById('genSidekick').value = sd.sidekickName || '';
-  document.getElementById('genFamily').value = sd.familyMembers || '';
-  document.getElementById('genPetName').value = sd.petName || '';
-  document.getElementById('genPetType').value = sd.petType || '';
-  document.getElementById('genTeacher').value = sd.teacherName || '';
-  document.getElementById('genTeddy').value = sd.favTeddy || '';
-  document.getElementById('genProud').value = sd.proudOf || '';
-  document.getElementById('genWhere').value = sd.where || '';
-  document.getElementById('genMessage').value = sd.personalMessage || '';
-  document.getElementById('genDetails').value = sd.extraDetails || '';
-  document.getElementById('genVoice').value = attempt.voice_id || '';
-  document.getElementById('genStatus').style.display = 'none';
-  document.getElementById('generateModal').classList.add('active');
-
-  // Prompt for email since attempts don't have one
-  document.getElementById('genEmail').focus();
-}
-
-async function submitGenerate() {
-  const email = document.getElementById('genEmail').value.trim();
-  const childName = document.getElementById('genChildName').value.trim();
-  const age = document.getElementById('genAge').value.trim();
-  const category = document.getElementById('genCategory').value;
-  const gender = document.getElementById('genGender').value;
-  const themes = document.getElementById('genThemes').value.trim();
-  const friendName = document.getElementById('genFriend').value.trim();
-  const sidekickName = document.getElementById('genSidekick').value.trim();
-  const familyMembers = document.getElementById('genFamily').value.trim();
-  const petName = document.getElementById('genPetName').value.trim();
-  const petType = document.getElementById('genPetType').value.trim();
-  const teacherName = document.getElementById('genTeacher').value.trim();
-  const favTeddy = document.getElementById('genTeddy').value.trim();
-  const proudOf = document.getElementById('genProud').value.trim();
-  const where = document.getElementById('genWhere').value.trim();
-  const personalMessage = document.getElementById('genMessage').value.trim();
-  const details = document.getElementById('genDetails').value.trim();
-  const voiceId = document.getElementById('genVoice').value.trim();
-
-  if (!email || !childName) {
-    document.getElementById('genStatus').textContent = 'Email and child name are required';
-    document.getElementById('genStatus').style.color = '#FF6B9D';
-    document.getElementById('genStatus').style.display = 'block';
-    return;
-  }
-
-  document.getElementById('genStatus').textContent = 'Starting generation...';
-  document.getElementById('genStatus').style.color = '#6B2F93';
-  document.getElementById('genStatus').style.display = 'block';
-
-  const storyData = {
-    childName,
-    age: age || '5',
-    gender,
-    category,
-    length: 'full'
-  };
-  if (themes) storyData.themes = themes.split(',').map(t => t.trim()).filter(Boolean);
-  if (friendName) storyData.friendName = friendName;
-  if (sidekickName) storyData.sidekickName = sidekickName;
-  if (familyMembers) storyData.familyMembers = familyMembers;
-  if (petName) storyData.petName = petName;
-  if (petType) storyData.petType = petType;
-  if (teacherName) storyData.teacherName = teacherName;
-  if (favTeddy) storyData.favTeddy = favTeddy;
-  if (proudOf) storyData.proudOf = proudOf;
-  if (where) storyData.where = where;
-  if (personalMessage) storyData.personalMessage = personalMessage;
-  if (details) storyData.extraDetails = details;
-
-  const data = await api('generate', {
-    body: { email, storyData, voiceId: voiceId || undefined }
-  });
-
-  if (data.success) {
-    document.getElementById('genStatus').textContent = 'Story generation started! ' + email + ' will receive an email when it is ready.';
-    document.getElementById('genStatus').style.color = '#4CAF50';
-  } else {
-    document.getElementById('genStatus').textContent = 'Error: ' + (data.error || 'Unknown error');
-    document.getElementById('genStatus').style.color = '#FF6B9D';
-  }
-}
-
-// ── Errors ──
-async function loadErrors() {
-  document.getElementById('content').innerHTML = '<div class="loading">Loading errors...</div>';
-  const data = await api('errors');
-  const errors = data.errors || [];
-  if (!errors.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">No errors in the last 7 days. All clear!</div>';
-    return;
-  }
-  let html = '<p style="font-size:0.78rem;color:#999;margin-bottom:1rem">Last 7 days, newest first</p>';
-  for (const e of errors) {
-    const date = new Date(e.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-    const sevBadge = e.severity === 'critical' ? 'badge-red' : e.severity === 'warning' ? 'badge-orange' : 'badge-purple';
-    html += '<div class="card">';
-    html += '<div class="card-header"><span class="card-title">' + esc(e.source) + '</span><span class="badge ' + sevBadge + '">' + esc(e.severity) + '</span></div>';
-    html += '<div class="card-detail" style="font-weight:600;color:#2D2844">' + esc(e.message) + '</div>';
-    if (e.child_name) html += '<div class="card-detail">Child: ' + esc(e.child_name) + '</div>';
-    if (e.customer_email) html += '<div class="card-detail">Email: ' + esc(e.customer_email) + '</div>';
-    if (e.job_id) html += '<div class="card-detail">Job: ' + esc(e.job_id) + '</div>';
-    html += '<div class="card-meta">' + date + '</div>';
-    if (e.details) {
-      html += '<details style="margin-top:0.4rem"><summary style="font-size:0.75rem;color:#6B2F93;cursor:pointer;font-weight:600">Details</summary>';
-      html += '<pre style="font-size:0.72rem;background:#F8F5FF;padding:0.5rem;border-radius:8px;margin-top:0.3rem;overflow-x:auto;white-space:pre-wrap">' + esc(JSON.stringify(e.details, null, 2)) + '</pre></details>';
     }
     html += '</div>';
   }
   document.getElementById('content').innerHTML = html;
 }
 
-async function loadErrorBadge() {
+// ===== FUNNEL =====
+async function loadFunnel() {
+  const data = await adminApi('funnel', { days: 30 });
+  const steps = data.funnel || [];
+  if (!steps.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No funnel data yet. Steps are tracked as visitors move through the builder.</div>';
+    return;
+  }
+
+  let html = '<h2 style="font-size:1rem;color:#6B2F93;margin-bottom:1rem">Funnel (last 30 days)</h2>';
+  const maxCount = Math.max(...steps.map(s => s.count), 1);
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i];
+    const pct = Math.round((s.count / maxCount) * 100);
+    const dropPct = i > 0 ? Math.round((1 - s.count / steps[i-1].count) * 100) : 0;
+    html += '<div style="margin-bottom:0.75rem">';
+    html += '<div style="display:flex;justify-content:space-between;font-size:0.82rem;font-weight:700;margin-bottom:0.25rem">';
+    html += '<span>' + esc(s.label || s.screen_name) + '</span>';
+    html += '<span>' + s.count;
+    if (i > 0 && dropPct > 0) html += ' <span style="color:#FF6B9D;font-size:0.72rem">(-' + dropPct + '%)</span>';
+    html += '</span></div>';
+    html += '<div style="height:8px;background:#F0ECF5;border-radius:4px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#6B2F93,#F1753B);border-radius:4px"></div></div>';
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+// ===== STATS =====
+async function loadStats() {
   try {
-    const data = await api('error-count');
-    const badge = document.getElementById('errorBadge');
-    if (data.count > 0) {
-      badge.textContent = data.count;
-      badge.style.display = 'inline';
-    } else {
-      badge.style.display = 'none';
-    }
-  } catch (e) { /* silent */ }
-}
-
-// ── Analytics ──
-let metricsDays = 30;
-
-async function loadMetrics(days) {
-  if (days) metricsDays = days;
-  document.getElementById('content').innerHTML = '<div class="loading">Loading analytics...</div>';
-  const data = await api('metrics', { params: { days: metricsDays } });
-  if (data.error) {
-    document.getElementById('content').innerHTML = '<div class="empty">Could not load metrics: ' + esc(data.error) + '</div>';
-    return;
+    const data = await adminApi('metrics', { days: 30 });
+    const s = data.simplified || {};
+    document.getElementById('statsLine').textContent =
+      (s.totalStories || 0) + ' stories delivered, ' +
+      (s.totalCustomers || 0) + ' customers';
+  } catch(e) {
+    document.getElementById('statsLine').textContent = 'Admin ready';
   }
-  renderMetrics(data);
 }
 
-function renderMetrics(data) {
-  const s = data.simplified || {};
+async function loadStatsTab() {
+  let html = '<div class="stat-grid">';
 
-  let html = '';
+  try {
+    const data = await adminApi('metrics', { days: 30 });
+    const s = data.simplified || {};
+    html += statCard(s.totalStories || 0, 'Stories delivered');
+    html += statCard(s.totalCustomers || 0, 'Customers');
+    html += statCard(s.revenue ? '£' + s.revenue : '£0', 'Revenue (30d)');
+    html += statCard(s.conversionRate ? s.conversionRate + '%' : '0%', 'Conversion rate');
+  } catch(e) {
+    html += '<div class="empty">Could not load stats</div>';
+  }
 
-  // Period selector
-  html += '<div class="metrics-header">';
-  html += '<h2>Analytics</h2>';
-  html += '<select class="period-select" onchange="loadMetrics(parseInt(this.value))">';
-  [7, 14, 30, 60, 90].forEach(d => {
-    html += '<option value="' + d + '"' + (d === metricsDays ? ' selected' : '') + '>' + d + ' days</option>';
-  });
-  html += '</select></div>';
-
-  html += '<div class="stat-grid">';
-  html += statCard('👥', s.uniqueVisitors || 0, 'Unique Visitors');
-  html += statCard('✏️', s.creatingStory || 0, 'Creating a Story');
-  html += statCard('▶️', s.playedHomepage || 0, 'Played on Homepage');
-  html += statCard('🎧', s.playedPreview || 0, 'Played a Preview');
   html += '</div>';
+
+  // Pending queue count
+  try {
+    const q = await queueApi('list', { status: 'pending' });
+    const pending = (q.stories || []).length;
+    html += '<div class="card"><div class="card-header"><span class="card-title">Pending orders</span><span class="badge badge-orange">' + pending + '</span></div></div>';
+  } catch(e) {}
 
   document.getElementById('content').innerHTML = html;
 }
 
-function statCard(icon, value, label) {
-  return '<div class="stat-card"><div class="stat-icon">' + icon + '</div><div class="stat-value">' + value + '</div><div class="stat-label">' + label + '</div></div>';
+function statCard(value, label) {
+  return '<div class="stat-card"><div class="stat-value">' + value + '</div><div class="stat-label">' + label + '</div></div>';
 }
 
-// ── Live Dashboard ──
-let liveInterval = null;
-
-function startLiveRefresh() {
-  stopLiveRefresh();
-  liveInterval = setInterval(() => { if (currentTab === 'live') loadLive(true); }, 10000);
-}
-
-function stopLiveRefresh() {
-  if (liveInterval) { clearInterval(liveInterval); liveInterval = null; }
-}
-
-async function loadLive(silent) {
-  if (!silent) document.getElementById('content').innerHTML = '<div class="loading">Loading live data...</div>';
-  const data = await api('live', { params: { minutes: 5 } });
-  if (data.error) {
-    document.getElementById('content').innerHTML = '<div class="empty">Could not load live data: ' + esc(data.error) + '</div>';
-    return;
-  }
-  renderLive(data);
-}
-
-function renderLive(data) {
-  const screens = data.screens || {};
-  const devices = data.devices || {};
-  const events = data.recentEvents || [];
-  const total = data.totalHits || 0;
-  const unique = data.uniqueVisitors || 0;
-
-  // Ordered funnel stages with labels, colors, and emoji
-  const stageConfig = [
-    { key: 'landing', label: 'Homepage', color: '#6B2F93', emoji: '🏠' },
-    { key: 'hp_hero', label: 'Saw Hero', color: '#6B2F93', emoji: '👀' },
-    { key: 'hp_sample', label: 'Saw Sample Player', color: '#6B2F93', emoji: '🎵' },
-    { key: 'sample_play', label: 'Played Sample', color: '#6B2F93', emoji: '▶️' },
-    { key: 'sample_25pct', label: 'Sample 25%', color: '#6B2F93', emoji: '🔊' },
-    { key: 'sample_50pct', label: 'Sample 50%', color: '#6A4CE0', emoji: '🔊' },
-    { key: 'sample_75pct', label: 'Sample 75%', color: '#5A3CC0', emoji: '🔊' },
-    { key: 'sample_100pct', label: 'Sample 100%', color: '#4A2CA0', emoji: '🏆' },
-    { key: 'hp_cta1', label: 'Saw First CTA', color: '#A78BFA', emoji: '🟢' },
-    { key: 'hp_how_it_works', label: 'Saw How It Works', color: '#A78BFA', emoji: '📖' },
-    { key: 'hp_testimonial', label: 'Saw Testimonial', color: '#A78BFA', emoji: '💬' },
-    { key: 'hp_cta2', label: 'Saw Second CTA', color: '#9B59B6', emoji: '🟢' },
-    { key: 'hp_faq', label: 'Saw FAQ', color: '#9B59B6', emoji: '❓' },
-    { key: 'hp_contact', label: 'Saw Contact', color: '#9B59B6', emoji: '✉️' },
-    { key: 'hp_footer', label: 'Reached Footer', color: '#9B59B6', emoji: '🏁' },
-    { key: 'screenCategory', label: 'Choosing Category', color: '#F1753B', emoji: '📂' },
-    { key: 'screenHow', label: 'How It Works', color: '#A78BFA', emoji: '📖' },
-    { key: 'screenSample', label: 'Sample Story', color: '#9B59B6', emoji: '🎧' },
-    { key: 'screenStart', label: 'Start Creating', color: '#F1753B', emoji: '✏️' },
-    { key: 'screenDetails', label: 'Child Details', color: '#F1753B', emoji: '👶' },
-    { key: 'screenThemes', label: 'Choosing Themes', color: '#F1753B', emoji: '🎨' },
-    { key: 'screenVoice', label: 'Voice Selection', color: '#F1753B', emoji: '🎙️' },
-    { key: 'screenLoading', label: 'Generating Preview', color: '#E67E22', emoji: '⏳' },
-    { key: 'screenPreview', label: 'Listening to Preview', color: '#E67E22', emoji: '▶️' },
-    { key: 'screenUnlock', label: 'Unlock / Checkout', color: '#FF6B9D', emoji: '💳' },
-    { key: 'screenGenerating', label: 'Full Story Generating', color: '#4CAF50', emoji: '🔄' },
-    { key: 'screenFull', label: 'Playing Full Story', color: '#4CAF50', emoji: '🎉' },
-    { key: 'screenLogin', label: 'Login', color: '#999', emoji: '🔑' },
-    { key: 'screenLibrary', label: 'My Stories', color: '#999', emoji: '📚' },
-    { key: 'screenShared', label: 'Shared Link', color: '#00B4A0', emoji: '🔗' }
-  ];
-
-  const maxCount = Math.max(...Object.values(screens), 1);
-
-  let html = '';
-
-  // Header
-  html += '<div class="live-header">';
-  html += '<h2><span class="live-pulse"></span> Live Activity</h2>';
-  html += '<span class="live-ago">Last 5 minutes · auto refreshes every 10s</span>';
-  html += '</div>';
-
-  // Big numbers
-  html += '<div style="display:flex;gap:1.5rem;justify-content:center;align-items:center;margin-bottom:0.5rem">';
-  html += '<div class="live-big-number" style="margin-bottom:0"><div class="big">' + total + '</div><div class="big-label">page views</div></div>';
-  html += '<div class="live-big-number" style="margin-bottom:0"><div class="big" style="color:#4CAF50">' + unique + '</div><div class="big-label">unique visitors</div></div>';
-  html += '</div>';
-  html += '<div style="text-align:center;font-size:0.72rem;color:#999;margin-bottom:1rem">last 5 minutes</div>';
-
-  // Device split inline
-  const devParts = [];
-  if (devices.mobile) devParts.push('📱 ' + devices.mobile + ' mobile');
-  if (devices.desktop) devParts.push('💻 ' + devices.desktop + ' desktop');
-  if (devices.tablet) devParts.push('📟 ' + devices.tablet + ' tablet');
-  if (devParts.length) {
-    html += '<div style="text-align:center;font-size:0.78rem;color:#999;font-weight:600;margin-bottom:1.5rem">' + devParts.join(' &nbsp;·&nbsp; ') + '</div>';
-  }
-
-  // Funnel stages
-  html += '<div class="chart-card live-funnel"><h3>Where People Are Right Now</h3>';
-  let hasAny = false;
-  for (const stage of stageConfig) {
-    const count = screens[stage.key] || 0;
-    if (count === 0) continue;
-    hasAny = true;
-    const pct = Math.max(Math.round((count / maxCount) * 100), 6);
-    html += '<div class="live-stage">';
-    html += '<div class="ls-dot" style="background:' + stage.color + '"></div>';
-    html += '<span class="ls-name">' + stage.emoji + ' ' + stage.label + '</span>';
-    html += '<div class="ls-bar-wrap"><div class="ls-bar-fill" style="width:' + pct + '%;background:' + stage.color + '"></div></div>';
-    html += '<span class="ls-count">' + count + '</span>';
-    html += '</div>';
-  }
-
-  // Show any unknown screens
-  for (const [key, count] of Object.entries(screens)) {
-    if (stageConfig.some(s => s.key === key) || !count) continue;
-    hasAny = true;
-    const pct = Math.max(Math.round((count / maxCount) * 100), 6);
-    html += '<div class="live-stage">';
-    html += '<div class="ls-dot" style="background:#ccc"></div>';
-    html += '<span class="ls-name">' + esc(key) + '</span>';
-    html += '<div class="ls-bar-wrap"><div class="ls-bar-fill" style="width:' + pct + '%;background:#ccc"></div></div>';
-    html += '<span class="ls-count">' + count + '</span>';
-    html += '</div>';
-  }
-
-  if (!hasAny) html += '<div style="color:#999;font-size:0.82rem;padding:1rem 0;text-align:center">No activity right now</div>';
-  html += '</div>';
-
-  // Live event feed
-  html += '<div class="chart-card live-feed"><h3>Live Feed</h3>';
-  if (events.length) {
-    for (const ev of events) {
-      const stageInfo = stageConfig.find(s => s.key === ev.screen) || { emoji: '·', label: ev.screen };
-      const timeLabel = ev.secondsAgo < 60 ? ev.secondsAgo + 's ago' : Math.round(ev.secondsAgo / 60) + 'm ago';
-      const deviceIcon = ev.device === 'mobile' ? '📱' : ev.device === 'tablet' ? '📟' : '💻';
-      html += '<div class="live-event">';
-      html += '<span class="le-icon">' + stageInfo.emoji + '</span>';
-      html += '<span class="le-text">' + deviceIcon + ' ' + esc(stageInfo.label);
-      if (ev.source && ev.source !== 'direct') html += ' <span style="color:#bbb">via ' + esc(ev.source) + '</span>';
-      html += '</span>';
-      html += '<span class="le-time">' + timeLabel + '</span>';
-      html += '</div>';
-    }
-  } else {
-    html += '<div style="color:#999;font-size:0.82rem;padding:1rem 0;text-align:center">No recent events</div>';
-  }
-  html += '</div>';
-
-  document.getElementById('content').innerHTML = html;
-}
-
-// ── Referrals ──
-async function loadReferrals() {
-  document.getElementById('content').innerHTML = '<div class="loading">Loading referrals...</div>';
-  const data = await api('referrals');
-  if (data.error) {
-    document.getElementById('content').innerHTML = '<div class="empty">Could not load referrals: ' + esc(data.error) + '</div>';
-    return;
-  }
-  renderReferrals(data.referrals || []);
-}
-
-function renderReferrals(referrals) {
-  const siteUrl = 'https://heartheirname.com';
-  let html = '';
-
-  // Create new referral form
-  html += '<div class="card" style="margin-bottom:1.25rem">';
-  html += '<h3 style="font-size:0.9rem;color:#6B2F93;margin-bottom:0.75rem">Create Referral Link</h3>';
-  html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">';
-  html += '<input type="text" id="refName" placeholder="Name (e.g. Sarah)" style="flex:1;min-width:120px;padding:0.6rem 0.8rem;border:2px solid #E8E0F0;border-radius:10px;font-size:0.9rem;font-family:inherit">';
-  html += '<input type="email" id="refEmail" placeholder="Email (optional)" style="flex:1;min-width:160px;padding:0.6rem 0.8rem;border:2px solid #E8E0F0;border-radius:10px;font-size:0.9rem;font-family:inherit">';
-  html += '<button class="btn btn-purple" onclick="createReferral()">Create Link</button>';
-  html += '</div>';
-  html += '<p id="refError" style="color:#FF6B9D;font-size:0.82rem;margin-top:0.5rem;display:none"></p>';
-  html += '<p id="refSuccess" style="color:#4CAF50;font-size:0.82rem;margin-top:0.5rem;display:none"></p>';
-  html += '</div>';
-
-  // Summary
-  const totalVisits = referrals.reduce((s, r) => s + (r.visits || 0), 0);
-  const totalConversions = referrals.reduce((s, r) => s + (r.conversions || 0), 0);
-  const totalRevenue = referrals.reduce((s, r) => s + (r.revenue || 0), 0);
-
-  html += '<div class="summary-grid" style="margin-bottom:1.25rem">';
-  html += summaryCard(referrals.length, 'Referral Links', '');
-  html += summaryCard(totalVisits, 'Total Visits', '');
-  html += summaryCard(totalConversions, 'Conversions', 'green');
-  html += summaryCard('£' + totalRevenue.toFixed(2), 'Referral Revenue', 'green');
-  html += '</div>';
-
-  // Referral list
-  if (!referrals.length) {
-    html += '<div class="empty">No referral links yet. Create one above.</div>';
-  } else {
-    for (const r of referrals) {
-      const link = siteUrl + '?ref=' + encodeURIComponent(r.ref_code);
-      const date = new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-      const convRate = r.visits > 0 ? ((r.conversions / r.visits) * 100).toFixed(1) : '0.0';
-
-      html += '<div class="card">';
-      html += '<div class="card-header">';
-      html += '<span class="card-title">' + esc(r.referrer_name) + '</span>';
-      html += '<span class="badge ' + (r.conversions > 0 ? 'badge-green' : 'badge-purple') + '">' + r.conversions + ' sales</span>';
-      html += '</div>';
-
-      if (r.referrer_email) html += '<div class="card-detail">' + esc(r.referrer_email) + '</div>';
-      html += '<div class="card-detail" style="margin-top:0.3rem">';
-      html += '<span style="font-weight:700;color:#2D2844">Link:</span> ';
-      html += '<code style="background:#F8F5FF;padding:0.2rem 0.5rem;border-radius:6px;font-size:0.78rem;word-break:break-all">' + esc(link) + '</code>';
-      html += ' <button class="btn btn-outline" style="padding:0.2rem 0.6rem;font-size:0.7rem;margin-left:0.3rem" onclick="copyRefLink(\'' + esc(link) + '\')">Copy</button>';
-      html += '</div>';
-
-      html += '<div style="display:flex;gap:1.5rem;margin-top:0.5rem;font-size:0.8rem">';
-      html += '<span style="color:#666"><strong>' + (r.visits || 0) + '</strong> visits</span>';
-      html += '<span style="color:#666"><strong>' + (r.conversions || 0) + '</strong> conversions</span>';
-      html += '<span style="color:#666"><strong>' + convRate + '%</strong> rate</span>';
-      html += '<span style="color:#666"><strong>£' + (r.revenue || 0).toFixed(2) + '</strong> revenue</span>';
-      html += '</div>';
-
-      if (r.referred_emails && r.referred_emails.length > 0) {
-        html += '<details style="margin-top:0.4rem"><summary style="font-size:0.75rem;color:#6B2F93;cursor:pointer;font-weight:600">Referred customers (' + r.referred_emails.length + ')</summary>';
-        html += '<div style="font-size:0.78rem;color:#666;padding:0.4rem 0">' + r.referred_emails.map(e => esc(e)).join(', ') + '</div></details>';
-      }
-
-      html += '<div class="card-actions">';
-      html += '<button class="btn btn-outline" onclick="deleteReferral(\'' + r.id + '\')">Delete</button>';
-      html += '</div>';
-      html += '<div class="card-meta">' + date + '</div>';
-      html += '</div>';
-    }
-  }
-
-  document.getElementById('content').innerHTML = html;
-}
-
-async function createReferral() {
-  const name = document.getElementById('refName').value.trim();
-  const email = document.getElementById('refEmail').value.trim();
-  const errEl = document.getElementById('refError');
-  const successEl = document.getElementById('refSuccess');
-  errEl.style.display = 'none';
-  successEl.style.display = 'none';
-
-  if (!name) {
-    errEl.textContent = 'Enter a name for this referral link';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const data = await api('create-referral', { body: { name, email } });
-  if (data.error) {
-    errEl.textContent = data.error;
-    errEl.style.display = 'block';
-    return;
-  }
-
-  const link = 'https://heartheirname.com?ref=' + encodeURIComponent(data.referral.ref_code);
-  successEl.innerHTML = 'Created! Link: <code style="background:#E8F5E9;padding:0.15rem 0.4rem;border-radius:4px">' + esc(link) + '</code>';
-  successEl.style.display = 'block';
-  document.getElementById('refName').value = '';
-  document.getElementById('refEmail').value = '';
-
-  // Refresh the list
-  loadReferrals();
-}
-
-async function deleteReferral(id) {
-  if (!confirm('Delete this referral link?')) return;
-  await api('delete-referral', { params: { id } });
-  loadReferrals();
-}
-
-function copyRefLink(link) {
-  navigator.clipboard.writeText(link).then(() => {
-    const btn = event.target;
-    btn.textContent = 'Copied!';
-    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
-  }).catch(() => {});
-}
-
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
 </script>
 </body>
 </html>
