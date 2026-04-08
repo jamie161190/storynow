@@ -3040,11 +3040,7 @@ function selectConfidence(level, el) {
 }
 
 function updateExtrasVisibility() {
-  // Learning subject/goal are now collected on screenLearningSetup, so hide them on Extras
-  document.getElementById('subjectGroup').style.display = 'none';
-  document.getElementById('learningGoalGroup').style.display = 'none';
-  // Hide personal message if gift is selected (gift message replaces it)
-  document.getElementById('personalMessageGroup').style.display = isGiftMode ? 'none' : 'block';
+  // No longer needed, extras visibility handled in goTo override
 }
 
 let isGiftMode = false;
@@ -3066,12 +3062,8 @@ function setGiftMode(isGift, navigate) {
 
   if (isGift) {
     if (fields) fields.style.display = 'block';
-    const pmg = document.getElementById('personalMessageGroup');
-    if (pmg) pmg.style.display = 'none';
   } else {
     if (fields) fields.style.display = 'none';
-    const pmg = document.getElementById('personalMessageGroup');
-    if (pmg) pmg.style.display = 'block';
     if (navigate !== false) {
       trackEvent('FormStep_Gift');
       goTo('screenDetails');
