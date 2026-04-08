@@ -1337,11 +1337,6 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
       <p class="form-hint">The narrator will read this aloud before the story begins.</p>
     </div>
-    <div class="form-group">
-      <label>Who should I send it to? (optional)</label>
-      <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
-      <p class="form-hint">When the story is ready, you can choose to have it sent directly to them or send it yourself from your account.</p>
-    </div>
     <p class="inline-error" id="giftError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
     <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateGift()">Continue</button>
   </div>
@@ -1806,7 +1801,11 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <div id="previewCheckoutSection" style="display:none;width:100%;max-width:340px;margin:1rem auto 0;text-align:center">
       <!-- Gift delivery preference (only shown for gifts with recipient email) -->
       <div id="giftDeliveryPref" style="display:none;margin-bottom:1rem">
-        <p style="font-size:0.82rem;font-weight:700;color:var(--text);margin:0 0 0.5rem">When the story is ready, how should I deliver the gift?</p>
+        <div class="form-group" style="margin-bottom:1rem">
+          <label style="font-size:0.82rem;font-weight:700;color:var(--text)">Who should I send the gift to? (optional)</label>
+          <input type="email" id="giftEmail" placeholder="e.g. mum@email.com" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.95rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box">
+        </div>
+        <p style="font-size:0.82rem;font-weight:700;color:var(--text);margin:0 0 0.5rem">How should I deliver it?</p>
         <div style="display:flex;flex-direction:column;gap:0.5rem">
           <button class="cat-card" id="giftPrefAuto" onclick="setGiftDeliveryPref('auto')" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
             <span style="font-size:1.2rem">&#128232;</span>
@@ -3143,12 +3142,6 @@ function validateGift() {
   hideInlineError('giftError');
   const giftFrom = document.getElementById('giftFrom').value.trim();
   if (!giftFrom) { showInlineError('giftError', 'Please tell me who the gift is from.'); return; }
-  // Validate gift email format if provided (optional field)
-  const giftEmail = document.getElementById('giftEmail').value.trim();
-  if (giftEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(giftEmail)) {
-    showInlineError('giftError', "That email doesn't look right. Please check and try again, or leave it blank to send later.");
-    return;
-  }
   trackEvent('FormStep_Gift');
   goTo('screenDetails');
 }
@@ -3477,7 +3470,7 @@ function goToLength() {
   storyData.length = 'long';
   storyData.isGift = isGiftMode;
   if (storyData.isGift) {
-    storyData.giftEmail = document.getElementById('giftEmail').value.trim();
+    storyData.giftEmail = ''; // captured on preview screen delivery section
     storyData.giftFrom = document.getElementById('giftFrom').value.trim();
     storyData.giftMessage = document.getElementById('giftMessage').value.trim();
     storyData.giftInStory = document.getElementById('giftInStoryToggle').classList.contains('on');
@@ -4170,14 +4163,10 @@ function confirmHappy() {
     }
   }
 
-  // Show gift delivery preference if applicable
-  if (storyData.isGift && storyData.giftEmail) {
+  // Show gift delivery preference for all gift orders
+  if (storyData.isGift) {
     const prefSection = document.getElementById('giftDeliveryPref');
-    if (prefSection) {
-      prefSection.style.display = 'block';
-      const autoEmail = document.getElementById('giftPrefAutoEmail');
-      if (autoEmail) autoEmail.textContent = 'I will email ' + storyData.giftEmail + ' as soon as it is ready';
-    }
+    if (prefSection) prefSection.style.display = 'block';
   }
 
   // Fire Lead event (email captured)
@@ -4230,6 +4219,11 @@ async function unlockFull() {
   if (isCheckingOut) return;
   isCheckingOut = true;
   const previewEmail = document.getElementById('previewEmail').value.trim();
+  // Capture gift email from delivery section (if gift order)
+  if (storyData.isGift) {
+    const ge = document.getElementById('giftEmail');
+    if (ge) storyData.giftEmail = ge.value.trim();
+  }
   const emailErr = document.getElementById('emailError');
 
   // Email should already be validated by confirmHappy, but safety check
