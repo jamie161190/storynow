@@ -70,7 +70,8 @@ export default async (req) => {
         isGift: s.is_gift,
         giftEmail: s.gift_email,
         giftFrom: s.gift_from,
-        giftSent: s.gift_sent
+        giftSent: s.gift_sent,
+        status: s.status || 'delivered'
       }))
     }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 

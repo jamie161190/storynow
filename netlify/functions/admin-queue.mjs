@@ -384,6 +384,34 @@ export default async (req) => {
     }
   }
 
+  // ── REWRITE-REQUEST: Customer requests changes to a delivered story ──
+  if (action === 'rewrite-request' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId, feedback: rewriteFeedback, token } = body;
+    if (!storyId || !rewriteFeedback) return json({ error: 'Missing storyId or feedback' }, 400);
+
+    // Validate customer auth token (not admin secret, this comes from the customer)
+    if (token) {
+      const tokenCheck = await fetch(
+        `${supabaseUrl}/rest/v1/auth_tokens?token=eq.${encodeURIComponent(token)}&select=email&limit=1`,
+        { headers }
+      );
+      if (tokenCheck.ok) {
+        const tokens = await tokenCheck.json();
+        if (!tokens.length) return json({ error: 'Invalid session' }, 401);
+      }
+    }
+
+    // Update the story: set feedback, change status back to pending for queue
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ feedback: rewriteFeedback, status: 'pending' })
+    });
+
+    console.log(`[ADMIN-QUEUE] Rewrite request for ${storyId}: ${rewriteFeedback.slice(0, 100)}`);
+    return json({ success: true });
+  }
+
   return json({ error: 'Unknown action: ' + action }, 400);
 };
 
