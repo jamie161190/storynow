@@ -210,8 +210,7 @@ export default async (req) => {
       body: JSON.stringify({ status: 'generating' })
     });
 
-    // Build full TTS text with message intro
-    const sd = story.story_data || {};
+    // Build full TTS text with message intro (sd already declared above)
     let messageIntro = '';
     if (sd.isGift && sd.giftFrom) {
       messageIntro = `This story was made just for you, ${sd.childName}, with love from ${sd.giftFrom}. ... `;
