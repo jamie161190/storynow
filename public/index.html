@@ -1712,7 +1712,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div id="previewGamePhase" class="preview-container" style="text-align:center">
     <p style="font-size:1.5rem;margin:0 0 0.5rem">&#10024;</p>
     <h2 class="section-title" style="margin-bottom:0.25rem">Creating your preview...</h2>
-    <p class="section-sub" id="previewGameSub">Every word is written from scratch. This usually takes 3 to 4 minutes.</p>
+    <p class="section-sub" id="previewGameSub">Every word is written from scratch, just for them.</p>
 
     <!-- Status indicator -->
     <div id="previewGenStatus" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin:1rem 0">
@@ -3805,7 +3805,7 @@ function showReview() {
 }
 
 async function pollForPreview(jobId) {
-  const maxAttempts = 120; // ~360s (6 min) max wait for full story generation
+  const maxAttempts = 60; // ~150s max wait for preview generation
   const vId = selectedVoiceId || '';
   for (let i = 0; i < maxAttempts; i++) {
     // Poll faster in the first 30s (every 2s), then every 3s
@@ -3865,7 +3865,7 @@ async function pollForFull(jobId) {
 // Preview data stored globally for the reveal transition
 let _pendingPreviewData = null;
 let _previewStartTime = 0;
-const MIN_PREVIEW_WAIT_MS = 120000; // 2 minutes minimum before showing "ready" button
+const MIN_PREVIEW_WAIT_MS = 120000; // 2 minutes minimum before showing ready button
 
 async function generatePreview() {
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
@@ -3885,47 +3885,36 @@ async function generatePreview() {
   _pendingPreviewData = null;
   _previewStartTime = Date.now();
 
-  // Rotating status messages personalised to the story (cover 4+ minutes)
+  // 12 status messages at 10 seconds each = 120 seconds exactly
   const d = storyData;
-  const statusMsgs = [];
-  statusMsgs.push('Planning the story arc...');
+  const statusMsgs = ['Planning the story...'];
   if (d.isMultiChild && d.children && d.children.length > 1) {
-    d.children.forEach(function(c) { statusMsgs.push('Getting to know ' + c.name + '...'); });
+    statusMsgs.push('Getting to know ' + d.children[0].name + '...');
+    statusMsgs.push('Getting to know ' + d.children[1].name + '...');
   } else {
     statusMsgs.push('Getting to know ' + d.childName + '...');
+    if (d.friendName) statusMsgs.push('Bringing ' + d.friendName + ' into the story...');
   }
-  statusMsgs.push('Writing the opening...');
-  if (d.isMultiChild && d.children && d.children.length > 1) {
-    d.children.forEach(function(c) { statusMsgs.push('Writing ' + c.name + "'s entrance..."); });
-    statusMsgs.push('Weaving everyone together...');
-  }
-  if (d.friendName) statusMsgs.push('Giving ' + d.friendName + ' a role in the story...');
-  if (d.hasPet && d.petName) statusMsgs.push('Making sure ' + d.petName + ' does something memorable...');
   if (d.themes && d.themes.length) statusMsgs.push('Building a world around ' + d.themes[0].toLowerCase() + '...');
-  statusMsgs.push('Writing the middle of the story...');
-  if (d.isMultiChild && d.children && d.children.length > 1) {
-    d.children.forEach(function(c) { statusMsgs.push('Giving ' + c.name + ' their moment to shine...'); });
-  } else {
-    statusMsgs.push('Weaving ' + d.childName + "'s name into every scene...");
-  }
-  statusMsgs.push('Building towards the big moment...');
-  if (d.hasVillain && d.villainName) statusMsgs.push('Writing the showdown with ' + d.villainName + '...');
-  statusMsgs.push('Writing the ending...');
-  statusMsgs.push('Choosing the perfect final line...');
-  statusMsgs.push('Now recording the preview audio...');
-  statusMsgs.push('Adding expression and emotion to the narration...');
+  statusMsgs.push('Writing the opening...');
+  if (d.hasPet && d.petName) statusMsgs.push('Making sure ' + d.petName + ' does something memorable...');
+  statusMsgs.push('Weaving in every detail you shared...');
+  statusMsgs.push('Choosing the perfect words...');
+  statusMsgs.push('Adding pauses and emotion...');
+  statusMsgs.push('Now recording the audio...');
+  statusMsgs.push('Adding expression to the narration...');
   statusMsgs.push('Almost ready...');
-  // Cycle every 12 seconds to cover ~4 minutes with ~20 messages
+  // Pad to exactly 12 messages
+  while (statusMsgs.length < 12) statusMsgs.splice(statusMsgs.length - 1, 0, 'Crafting something special...');
   let statusIdx = 0;
   const statusLabel = document.getElementById('previewGenLabel');
+  if (statusLabel) statusLabel.textContent = statusMsgs[0];
   const statusInterval = setInterval(() => {
     statusIdx++;
     if (statusIdx < statusMsgs.length && statusLabel) {
       statusLabel.textContent = statusMsgs[statusIdx];
-    } else if (statusLabel) {
-      statusLabel.textContent = 'Still working, won\'t be long now...';
     }
-  }, 12000);
+  }, 10000);
 
   try {
     const jobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -3954,7 +3943,7 @@ async function generatePreview() {
       const bgRes = await fetch('/.netlify/functions/full-worker-background', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ mode: 'preview-full', storyData, voiceId: selectedVoiceId, jobId })
+        body: JSON.stringify({ mode: 'preview', storyData: { ...storyData, _targetWords: 300 }, voiceId: selectedVoiceId, jobId })
       });
       console.log('Preview background worker triggered:', bgRes.status);
     } catch(bgErr) {

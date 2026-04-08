@@ -2,7 +2,7 @@
 // Actions: list (pending/delivered), generate-tts, regenerate, send, rewrite-request
 // Protected by ADMIN_SECRET header.
 
-import { SYSTEM_PROMPT, buildRegeneratePrompt } from './lib/story-prompts.mjs';
+import { SYSTEM_PROMPT, buildRegeneratePrompt, buildFullStoryPrompt } from './lib/story-prompts.mjs';
 import { logError } from './lib/log-error.mjs';
 
 function json(data, status = 200) {
@@ -154,6 +154,55 @@ export default async (req) => {
     const story = stories[0];
 
     if (!story.story_text) return json({ error: 'No story text to generate audio from' }, 400);
+
+    const sd = story.story_data || {};
+
+    // If story_text is only a preview (~500 words or less), generate the full continuation first
+    const wordCount = story.story_text.split(/\s+/).length;
+    if (wordCount < 600) {
+      console.log(`[ADMIN-QUEUE] Story ${storyId} has only ${wordCount} words (preview). Generating continuation...`);
+      try {
+        const contPrompt = buildFullStoryPrompt(sd, story.story_text);
+        const contRes = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 16000,
+            temperature: 1,
+            thinking: { type: 'adaptive' },
+            system: SYSTEM_PROMPT,
+            messages: [{ role: 'user', content: contPrompt }]
+          })
+        });
+        if (!contRes.ok) throw new Error('Claude API ' + contRes.status);
+        const contResult = await contRes.json();
+        let continuation = '';
+        for (const block of contResult.content) { if (block.type === 'text') continuation += block.text; }
+
+        // Build complete story: message intro + preview + continuation + outro
+        let messageIntro = '';
+        if (sd.isGift && sd.giftFrom) {
+          messageIntro = 'This story was made just for you, ' + sd.childName + ', with love from ' + sd.giftFrom + '. ... ';
+          if (sd.giftMessage) messageIntro += sd.giftMessage + ' ... ';
+          messageIntro += 'And now, your story begins. ... ';
+        } else if (sd.personalMessage) {
+          messageIntro = 'Before we begin, there is a special message for ' + sd.childName + '. ... ' + sd.personalMessage + ' ... And now, on with the story. ... ';
+        }
+        const fullText = messageIntro + story.story_text + '\n\n' + continuation + ' ... ... A Hear Their Name original ... made with love.';
+
+        // Save the full story text
+        await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+          method: 'PATCH', headers: headersJson,
+          body: JSON.stringify({ story_text: fullText })
+        });
+        story.story_text = fullText;
+        console.log(`[ADMIN-QUEUE] Continuation complete: ${fullText.split(/\s+/).length} words total`);
+      } catch (contErr) {
+        console.error('[ADMIN-QUEUE] Continuation error:', contErr.message);
+        return json({ error: 'Story continuation failed: ' + contErr.message }, 500);
+      }
+    }
 
     // Update status
     await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
