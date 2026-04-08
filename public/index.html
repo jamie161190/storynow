@@ -2120,14 +2120,17 @@ function heroStartStory() {
   }).catch(function() {});
 
   if (isGift) {
+    var giftCat = heroGiftSubType === 'adventure' ? 'journey' : 'bedtime';
+    storyData.category = giftCat;
+    applyCategoryTheme(giftCat);
     if (pendingChildName) {
       storyData.childName = pendingChildName;
       var nameInput = document.getElementById('childName');
       if (nameInput) nameInput.value = pendingChildName;
     }
-    trackEvent('HeroStartStory', { content_name: 'gift', child_name_entered: !!pendingChildName });
+    trackEvent('HeroStartStory', { content_name: 'gift_' + giftCat, child_name_entered: !!pendingChildName });
     setGiftMode(true, false);
-    goTo('screenCategory');
+    goTo('screenGift');
   } else if (pendingChildName) {
     storyData.category = cat;
     applyCategoryTheme(cat);
