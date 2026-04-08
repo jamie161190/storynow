@@ -2284,7 +2284,7 @@ function heroStartStory() {
       applyCategoryTheme(cat);
       setGiftMode(false, false);
       trackEvent('HeroStartStory', { content_name: cat + '_multi', child_name_entered: true, children_count: heroNames.length });
-      goTo('screenDetails');
+      goTo('screenGift');
     }
     return;
   }
@@ -2303,10 +2303,8 @@ function heroStartStory() {
     applyCategoryTheme(cat);
     setGiftMode(false, false);
     storyData.childName = pendingChildName;
-    var nameInput = document.getElementById('childName');
-    if (nameInput) nameInput.value = pendingChildName;
     trackEvent('HeroStartStory', { content_name: cat, child_name_entered: true });
-    goTo('screenDetails');
+    goTo('screenGift');
   } else {
     trackEvent('HeroStartStory', { content_name: 'no_name', child_name_entered: false });
     goTo('screenCategory');
