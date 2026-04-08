@@ -1338,9 +1338,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <p class="form-hint">The narrator will read this aloud before the story begins.</p>
     </div>
     <div class="form-group">
-      <label>Recipient's email (optional)</label>
+      <label>Who should I send it to? (optional)</label>
       <input type="email" id="giftEmail" placeholder="e.g. mum@email.com">
-      <p class="form-hint">I will email them a link to listen to their story. You can also send it from your account later.</p>
+      <p class="form-hint">When the story is ready, you can choose to have it sent directly to them or send it yourself from your account.</p>
     </div>
     <p class="inline-error" id="giftError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
     <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateGift()">Continue</button>
@@ -2247,7 +2247,20 @@ function resetDemoBtn(tab) {
   btn.innerHTML = '<div class="play-icon" style="' + getPlayIconStyle(tab) + '"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div> &#9654; Play this story';
 }
 
+function stopAllDemoAudio() {
+  if (typeof demoAudios !== 'undefined') {
+    for (var key in demoAudios) {
+      if (demoAudios[key] && !demoAudios[key].paused) {
+        demoAudios[key].pause();
+        demoAudios[key].currentTime = 0;
+      }
+    }
+  }
+  if (typeof currentDemoTab !== 'undefined') currentDemoTab = null;
+}
+
 function heroStartStory() {
+  stopAllDemoAudio();
   pendingChildName = (document.getElementById('heroChildName').value || '').trim();
   var isGift = heroIsGift;
   var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
@@ -2937,6 +2950,8 @@ function restoreFormState() {
 const _origGoTo = goTo;
 goTo = function(id, skipHistory) {
   _origGoTo(id, skipHistory);
+  // Stop homepage demo audio when entering funnel
+  if (id !== 'screenLanding' && typeof stopAllDemoAudio === 'function') stopAllDemoAudio();
   if (['screenDetails','screenPeople','screenThemeSetting','screenExtras','screenVoice','screenReview'].includes(id)) {
     saveFormState();
   }
