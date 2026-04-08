@@ -746,7 +746,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <img src="/images/logo-stacked.png" alt="Hear Their Name" class="logo-img">
     </div>
     <h1 class="tagline">A story made<br><em>just for them.</em></h1>
-    <p class="hero-sub">Their name. Their best friend. Their favourite things. All woven into 15 minutes of story, made only for them.</p>
+    <p class="hero-sub">Their name. Their best friend. Their world. All woven into 15 minutes of story, personally crafted for a child you love.</p>
 
     <!-- NAME CAPTURE CARD -->
     <div class="name-card">
@@ -758,24 +758,19 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <div class="type-pills">
         <button class="type-pill active" id="heroPillBedtime" onclick="setPill(this,'bedtime')">&#127769; Bedtime</button>
         <button class="type-pill" id="heroPillAdventure" onclick="setPill(this,'adventure')">&#9876;&#65039; Adventure</button>
-        <button class="type-pill" id="heroPillGift" onclick="setPill(this,'gift')">&#127873; Gift</button>
       </div>
-      <!-- Gift sub-picker -->
-      <div id="giftSubPicker" style="display:none;margin-bottom:14px;padding:12px 14px;background:var(--purple-light);border-radius:12px;border:1.5px solid var(--border)">
-        <span style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--purple);display:block;margin-bottom:8px">What type of story for the gift?</span>
-        <div style="display:flex;gap:8px">
-          <button class="gift-sub-pill active" data-sub="bedtime" onclick="setGiftSub(this)" style="flex:1;padding:9px 6px;border:2px solid var(--purple-soft);border-radius:99px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;background:#fff;color:var(--purple);transition:all 0.2s">&#127769; Bedtime</button>
-          <button class="gift-sub-pill" data-sub="adventure" onclick="setGiftSub(this)" style="flex:1;padding:9px 6px;border:2px solid var(--border);border-radius:99px;font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;cursor:pointer;background:#fff;color:var(--text-muted);transition:all 0.2s">&#9876;&#65039; Adventure</button>
-        </div>
+      <a id="heroGiftToggle" onclick="toggleHeroGift()" style="display:block;font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;margin:0.5rem 0 0.75rem;text-align:center">&#127873; This is a gift for someone else's child</a>
+      <div id="heroGiftActive" style="display:none;background:var(--purple-light);border-radius:10px;padding:0.5rem 0.75rem;margin-bottom:0.75rem;text-align:center">
+        <p style="font-size:0.78rem;color:var(--purple);font-weight:700;margin:0">&#127873; Gift mode active <a onclick="toggleHeroGift()" style="color:var(--text-muted);cursor:pointer;margin-left:0.5rem;font-size:0.72rem">remove</a></p>
       </div>
       <button class="hero-btn" id="heroBtn" onclick="heroStartStory()">Start their story</button>
-      <p class="hero-price">Free preview first &nbsp;&middot;&nbsp; &pound;19.99 to keep it forever &nbsp;&middot;&nbsp; No account needed</p>
+      <p class="hero-price">Free preview first &nbsp;&middot;&nbsp; <span class="price-display">&pound;19.99</span> &nbsp;&middot;&nbsp; I personally review every story</p>
     </div>
 
     <div class="trust-dots">
-      <span class="trust-dot">&#10003; Ages 2 to 10</span>
+      <span class="trust-dot">&#10003; All ages</span>
+      <span class="trust-dot">&#10003; For one child or the whole family</span>
       <span class="trust-dot">&#10003; Hear their name spoken aloud</span>
-      <span class="trust-dot">&#10003; One payment forever</span>
     </div>
   </div>
 
@@ -1039,44 +1034,75 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:0.65rem;color:var(--text-muted);font-weight:600">&#128274; One payment. No subscription. Theirs forever.</p>
   </div>
 
+  <!-- GIFT SECTION -->
+  <div style="width:100%;max-width:440px;margin-top:2rem;background:linear-gradient(135deg,#F8F5FF,#FFF0F5);border:2px solid var(--purple-light);border-radius:16px;padding:1.5rem;text-align:center">
+    <p style="font-size:1.5rem;margin:0 0 0.5rem">&#127873;</p>
+    <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text);margin:0 0 0.5rem">Know a child who would love this?</p>
+    <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.6;margin:0 0 1rem">A personalised story with their name, their friends, their world. Narrated and delivered to their family. The perfect gift for any occasion.</p>
+    <button class="btn btn-primary" onclick="heroIsGift=true;toggleHeroGift();document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'})" style="padding:0.75rem 2rem;font-size:0.95rem">Create a gift story</button>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div style="width:100%;max-width:440px;margin-top:2rem">
+    <p style="font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:900;color:var(--text);text-align:center;margin-bottom:1.25rem">How it works</p>
+    <div style="display:flex;flex-direction:column;gap:1rem">
+      <div style="display:flex;align-items:flex-start;gap:0.85rem">
+        <div style="width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;flex-shrink:0;background:var(--purple-light);color:var(--purple)">1</div>
+        <div><p style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">Tell me about the children</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0;line-height:1.5">Names, ages, interests, friends, pets. Every detail shapes the story.</p></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:0.85rem">
+        <div style="width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;flex-shrink:0;background:#FFF0E5;color:#F1753B">2</div>
+        <div><p style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">Hear the opening of their story</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0;line-height:1.5">A free 2-minute preview. Hear their name, their friend, their world. Give feedback if anything needs adjusting.</p></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:0.85rem">
+        <div style="width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;flex-shrink:0;background:#E8F5E9;color:#2E7D32">3</div>
+        <div><p style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">I craft the full story personally</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0;line-height:1.5">Every story is personally reviewed before it reaches your family. Your feedback is worked in.</p></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:0.85rem">
+        <div style="width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;flex-shrink:0;background:#FFF8E1;color:#F57F17">4</div>
+        <div><p style="font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">Delivered to your inbox</p><p style="font-size:0.8rem;color:var(--text-muted);margin:0;line-height:1.5">Within 24 hours. Play it, download it, share it with the whole family. Theirs forever.</p></div>
+      </div>
+    </div>
+  </div>
+
   <!-- FAQ -->
   <div class="faq-section" id="sectionFaq" style="margin-top:20px">
     <p style="font-family:'Nunito',sans-serif;font-size:0.92rem;font-weight:800;color:var(--text);margin-bottom:10px;text-align:center">Common questions</p>
     <details>
       <summary>Can I hear it before I pay?</summary>
-      <p>Yes. You get a free preview of your child's story before you spend anything. Only pay if you love it.</p>
+      <p>Yes. You get a free 2-minute preview before you spend anything. Hear their name in the story, give feedback, then decide.</p>
     </details>
     <details>
       <summary>How long is the full story?</summary>
       <p>Around 15 minutes of narrated audio. Long enough for bedtime, a rainy afternoon, or a long journey.</p>
     </details>
     <details>
-      <summary>What if I don't like the full version?</summary>
-      <p>Just let me know and I'll write a brand new one. No hassle, no questions asked.</p>
+      <summary>How long does delivery take?</summary>
+      <p>Within 24 hours. Every story is personally reviewed before it reaches your family. I will email you the moment it is ready.</p>
     </details>
     <details>
-      <summary>Is this a gift?</summary>
-      <p>Perfect for birthdays, Christmas, or just because. Add a personal message and it'll be read aloud by the narrator at the very start. The recipient gets a private link to listen anytime.</p>
-    </details>
-    <details>
-      <summary>What age is it suitable for?</summary>
-      <p>Best for children aged 2 to 10. Bedtime stories are written to be gentle and soothing for younger children. Adventure stories have a bit more pace and humour for older ones.</p>
-    </details>
-    <details>
-      <summary>How do they get the story?</summary>
-      <p>After checkout, the story is generated and delivered as a private link, usually within a few minutes. They can listen in any browser, no app needed. You can share the link with grandparents, aunties, anyone.</p>
-    </details>
-    <details>
-      <summary>Can they listen more than once?</summary>
-      <p>As many times as they like. The link is theirs to keep. Most kids ask for it on repeat. You've been warned.</p>
-    </details>
-    <details>
-      <summary>Can I share it with family?</summary>
-      <p>One tap. Hit share and send the link to grandparents, aunties, uncles by email or WhatsApp. You can also download the audio. No extra cost, no limits.</p>
+      <summary>What if I am not happy with it?</summary>
+      <p>I will rewrite it. No questions asked. You can also give feedback before the full story is written, and I will adjust it based on what you tell me.</p>
     </details>
     <details>
       <summary>How many children can be in one story?</summary>
       <p>Up to 5. One child, two siblings, three cousins, a whole friend group. Everyone gets their own moments, their own personality, their own name spoken throughout. Same price whether it is one hero or five.</p>
+    </details>
+    <details>
+      <summary>Is this a gift?</summary>
+      <p>Perfect for birthdays, Christmas, or just because. Add a personal message and it will be read aloud by the narrator at the very start. You choose when to send it to the recipient.</p>
+    </details>
+    <details>
+      <summary>What ages does it work for?</summary>
+      <p>All ages. The story adapts to how old the children are. A gentle, warm bedtime story for a toddler. A clever, witty adventure for an older child. Every story is written specifically for the children in it.</p>
+    </details>
+    <details>
+      <summary>Can they listen more than once?</summary>
+      <p>As many times as they like. The link is theirs to keep. Most kids ask for it on repeat. You have been warned.</p>
+    </details>
+    <details>
+      <summary>Can I share it with family?</summary>
+      <p>One tap. Hit share and send the link to grandparents, aunties, uncles by email or WhatsApp. You can also download the audio. No extra cost, no limits.</p>
     </details>
   </div>
 
@@ -1102,15 +1128,11 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 </div>
 
-<!-- STICKY BAR -->
+<!-- STICKY BAR (slim CTA, scrolls to hero) -->
 <div class="sticky-bar" id="stickyBar">
-  <div class="sticky-bar-inner">
-    <div class="sticky-bar-left">
-      <label class="sticky-bar-label" for="stickyNameInput">Whose story is this?</label>
-      <input type="text" id="stickyNameInput" class="sticky-bar-input" placeholder="Their name..." autocomplete="off" maxlength="40" oninput="updateStickyBtn(this.value)">
-    </div>
-    <button class="sticky-bar-btn" id="stickyBtn" onclick="stickyBarStart()">
-      <strong id="stickyBtnText">Start their story</strong>
+  <div class="sticky-bar-inner" style="justify-content:center">
+    <button class="sticky-bar-btn" onclick="document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){document.getElementById('heroChildName').focus()},500)" style="width:100%;max-width:340px;text-align:center">
+      <strong>Start their story</strong>
       <span>For one child or the whole family.</span>
     </button>
   </div>
@@ -2041,15 +2063,23 @@ let heroCategory = 'bedtime';
 
 var heroGiftSubType = 'bedtime';
 
+var heroIsGift = false;
 function setPill(el, type) {
   document.querySelectorAll('.type-pill').forEach(function(p) { p.classList.remove('active'); });
   el.classList.add('active');
   heroCategory = type;
-  var subPicker = document.getElementById('giftSubPicker');
-  if (subPicker) subPicker.style.display = (type === 'gift') ? 'block' : 'none';
   // Sync cinema tab
-  var tabBtn = document.querySelector('.story-tab[onclick*="' + (type === 'gift' ? 'gift' : type === 'adventure' ? 'adventure' : 'bedtime') + '"]');
-  if (tabBtn) switchTab(type === 'adventure' ? 'adventure' : type === 'gift' ? 'gift' : 'bedtime', tabBtn);
+  var tabBtn = document.querySelector('.story-tab[onclick*="' + (type === 'adventure' ? 'adventure' : 'bedtime') + '"]');
+  if (tabBtn) switchTab(type === 'adventure' ? 'adventure' : 'bedtime', tabBtn);
+  updateHeroBtn();
+}
+
+function toggleHeroGift() {
+  heroIsGift = !heroIsGift;
+  var toggle = document.getElementById('heroGiftToggle');
+  var active = document.getElementById('heroGiftActive');
+  if (toggle) toggle.style.display = heroIsGift ? 'none' : 'block';
+  if (active) active.style.display = heroIsGift ? 'block' : 'none';
   updateHeroBtn();
 }
 
@@ -2068,7 +2098,7 @@ function setGiftSub(el) {
 function updateHeroBtn() {
   var heroBtn = document.getElementById('heroBtn');
   if (!heroBtn) return;
-  heroBtn.textContent = (heroCategory === 'gift') ? 'Create their gift story' : 'Start their story';
+  heroBtn.textContent = heroIsGift ? 'Create their gift story' : 'Start their story';
 }
 
 // Hero multi-name input
@@ -2168,7 +2198,7 @@ function resetDemoBtn(tab) {
 
 function heroStartStory() {
   pendingChildName = (document.getElementById('heroChildName').value || '').trim();
-  var isGift = (heroCategory === 'gift');
+  var isGift = heroIsGift;
   var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
 
   // Collect extra hero names for multi-child
@@ -2193,9 +2223,8 @@ function heroStartStory() {
     storyData.isMultiChild = true;
     storyData.children = heroNames.map(function(n) { return { name: n, age: '', gender: '' }; });
     if (isGift) {
-      var giftCat = heroGiftSubType === 'adventure' ? 'journey' : 'bedtime';
-      storyData.category = giftCat;
-      applyCategoryTheme(giftCat);
+      storyData.category = cat;
+      applyCategoryTheme(cat);
       setGiftMode(true, false);
       trackEvent('HeroStartStory', { content_name: 'gift_multi', child_name_entered: true, children_count: heroNames.length });
       goTo('screenGift');
@@ -2210,15 +2239,12 @@ function heroStartStory() {
   }
 
   if (isGift) {
-    var giftCat = heroGiftSubType === 'adventure' ? 'journey' : 'bedtime';
-    storyData.category = giftCat;
-    applyCategoryTheme(giftCat);
+    storyData.category = cat;
+    applyCategoryTheme(cat);
     if (pendingChildName) {
       storyData.childName = pendingChildName;
-      var nameInput = document.getElementById('childName');
-      if (nameInput) nameInput.value = pendingChildName;
     }
-    trackEvent('HeroStartStory', { content_name: 'gift_' + giftCat, child_name_entered: !!pendingChildName });
+    trackEvent('HeroStartStory', { content_name: 'gift_' + cat, child_name_entered: !!pendingChildName });
     setGiftMode(true, false);
     goTo('screenGift');
   } else if (pendingChildName) {
