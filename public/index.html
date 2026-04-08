@@ -469,12 +469,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .story-book-footer{padding:12px 20px 16px;text-align:center}
 .story-book-footer p{font-size:0.7rem;color:rgba(180,150,255,0.6);font-weight:600;margin:0;letter-spacing:0.03em}
 
-.audio-player{width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,var(--purple-soft)));display:flex;align-items:center;justify-content:center;margin:0 auto 2rem;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 40px var(--cat-glow,rgba(124,92,252,0.25));position:relative}
-.audio-player:hover{transform:scale(1.05);box-shadow:0 12px 48px var(--cat-glow,rgba(124,92,252,0.35))}
-.audio-player:active{transform:scale(0.98)}
-.audio-player::before{content:'';position:absolute;inset:-6px;border-radius:50%;background:var(--cat-accent,var(--purple));opacity:0.15;animation:glow 3s ease-in-out infinite}
+.audio-player{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,var(--purple-soft)));display:flex;align-items:center;justify-content:center;margin:0 auto 0.5rem;cursor:pointer;transition:all 0.3s;box-shadow:0 6px 24px var(--cat-glow,rgba(124,92,252,0.25));position:relative}
+.audio-player:hover{transform:scale(1.08);box-shadow:0 8px 32px var(--cat-glow,rgba(124,92,252,0.35))}
+.audio-player:active{transform:scale(0.95)}
+.audio-player::before{content:'';position:absolute;inset:-4px;border-radius:50%;background:var(--cat-accent,var(--purple));opacity:0.15;animation:glow 3s ease-in-out infinite}
 @keyframes glow{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:0.25;transform:scale(1.04)}}
-.play-icon{width:48px;height:48px;fill:#fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));position:relative;z-index:1}
+.play-icon{width:28px;height:28px;fill:#fff;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));position:relative;z-index:1}
 
 .unlock-btn{width:100%;padding:1.15rem;background:linear-gradient(135deg,var(--cat-accent,var(--orange)),var(--cat-accent-dark,var(--orange-glow)));color:#fff;border:none;border-radius:var(--radius);font-size:1.05rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 24px var(--cat-glow,rgba(255,140,66,0.3));transition:all 0.25s}
 .unlock-btn:hover{transform:translateY(-2px);box-shadow:0 6px 32px var(--cat-glow,rgba(255,140,66,0.4))}
@@ -1739,6 +1739,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <div style="display:flex;justify-content:space-between;margin-top:0.2rem"><span id="previewTime" style="font-size:0.7rem;color:var(--text-muted)">0:00</span><span id="previewDuration" style="font-size:0.7rem;color:var(--text-muted)">0:00</span></div>
     </div>
     <audio id="previewAudio"></audio>
+    <p id="previewPlayPrompt" style="font-size:0.85rem;color:var(--text);font-weight:700;text-align:center;margin:0.25rem 0 0">&#127911; Press play and hear their name</p>
 
     <!-- Summary -->
     <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.75rem 1rem;margin:1rem auto 0;text-align:center;max-width:340px;width:100%"></div>
@@ -4012,6 +4013,10 @@ function revealPreview() {
   const catLabels = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
   const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
   document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
+
+  // Update play prompt for multi/single child
+  const playPrompt = document.getElementById('previewPlayPrompt');
+  if (playPrompt) playPrompt.innerHTML = storyData.isMultiChild ? '&#127911; Press play and hear their names' : '&#127911; Press play and hear their name';
 
   if (storyData.isMultiChild) {
     document.getElementById('previewTitle').textContent = 'Their story is waiting';
