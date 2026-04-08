@@ -1630,14 +1630,28 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin-top:1rem;max-width:340px">If anything goes wrong, your payment is safe and I will sort it out personally. <a href="mailto:jamie@heartheirname.com" style="color:var(--purple);font-weight:600">jamie@heartheirname.com</a></p>
 </div>
 
-<!-- PREVIEW -->
+<!-- PREVIEW (two phases: game while generating, then preview + feedback + checkout) -->
 <div class="screen" id="screenPreview">
-  <div class="preview-container">
+  <!-- PHASE 1: Game while preview generates -->
+  <div id="previewGamePhase" class="preview-container" style="text-align:center">
+    <p style="font-size:1.5rem;margin:0 0 0.5rem">&#10024;</p>
+    <h2 class="section-title" style="margin-bottom:0.25rem">Preparing something special...</h2>
+    <p class="section-sub" id="previewGameSub">While I write the opening, why not play a quick game?</p>
+
+    <div id="previewGameBoard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;max-width:280px;margin:1.5rem auto 0"></div>
+    <p id="previewGameScore" style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin:0.5rem 0 0;font-weight:600"></p>
+    <p id="previewGameReady" style="display:none;text-align:center;margin-top:1rem">
+      <button class="btn btn-primary" onclick="revealPreview()" style="padding:0.8rem 2rem">&#127911; Your preview is ready. Listen now!</button>
+    </p>
+  </div>
+
+  <!-- PHASE 2: The actual preview + feedback + checkout -->
+  <div id="previewContentPhase" class="preview-container" style="display:none">
     <div class="preview-badge">&#10003; Preview ready</div>
     <p class="preview-title" id="previewTitle">Have a listen</p>
     <p class="preview-sub" id="previewSub">This is just the opening. Press play and hear their name in the story.</p>
 
-    <!-- Player FIRST: the single most important action -->
+    <!-- Player -->
     <div class="audio-player" onclick="playPreview()" style="margin-bottom:0.25rem">
       <svg class="play-icon" id="previewPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     </div>
@@ -1648,42 +1662,94 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <audio id="previewAudio"></audio>
     <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin:0.6rem 0 0;text-align:center">Can't listen right now? The written version is below &#8595;</p>
 
-    <!-- Summary of what they built (below player) -->
+    <!-- Summary -->
     <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.85rem 1rem;margin:1.25rem auto 0;text-align:center;max-width:340px;width:100%"></div>
 
     <!-- Story text display -->
     <div id="previewStoryDisplay" style="display:none;width:100%;max-width:340px;margin:1.25rem auto 0"></div>
 
-    <!-- Social proof -->
-
-    <div id="previewError"></div>
-
-    <!-- Guarantee card -->
-    <div style="background:linear-gradient(135deg,#F0FFF4,#F8F5FF);border:2px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin:1.25rem auto 0;max-width:340px;width:100%;text-align:center">
-      <p style="font-size:0.85rem;font-weight:800;color:var(--text);margin:0 0 0.2rem">&#128154; Not happy with the full story? I will rewrite it for free.</p>
-      <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin:0">If it does not feel magical enough once you have heard it, just say the word.</p>
-    </div>
-
-    <!-- Email (low friction, just above unlock) -->
-    <div id="previewEmailWrap" style="width:100%;max-width:340px;margin:1.25rem auto 0">
-      <div id="previewEmailConfirm" style="display:none;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;text-align:left">
-        <p style="font-size:0.72rem;color:var(--text-muted);margin:0 0 0.15rem;font-weight:600">I will send the full story to:</p>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <p id="previewEmailDisplay" style="font-size:0.92rem;font-weight:700;color:var(--purple);margin:0"></p>
-          <a onclick="document.getElementById('previewEmailConfirm').style.display='none';document.getElementById('previewEmailEdit').style.display='block';document.getElementById('previewEmail').focus()" style="font-size:0.72rem;color:var(--purple);font-weight:700;cursor:pointer">Change</a>
+    <!-- Conditional feedback prompts -->
+    <div id="previewFeedbackSection" style="width:100%;max-width:340px;margin:1.25rem auto 0">
+      <!-- Message feedback (shown if personal message or gift message exists) -->
+      <div id="messageFeedbackGroup" style="display:none;margin-bottom:1rem">
+        <div style="background:#FFF8F0;border-radius:12px;padding:0.85rem 1rem">
+          <p style="margin:0 0 0.4rem;font-size:0.82rem;font-weight:700;color:var(--text)">How does your message sound?</p>
+          <p style="margin:0 0 0.5rem;font-size:0.72rem;color:var(--text-muted)">Your message plays at the very start of the full story. You heard it in the preview.</p>
+          <a id="editMessageLink" onclick="editPreviewMessage()" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Edit your message</a>
+          <div id="editMessageWrap" style="display:none;margin-top:0.5rem">
+            <textarea id="editMessageText" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:60px;resize:vertical;box-sizing:border-box"></textarea>
+          </div>
         </div>
       </div>
-      <div id="previewEmailEdit" style="display:none">
-        <label style="font-size:0.8rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Where should I send the full story?</label>
-        <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
+
+      <!-- Character feedback (shown if gift giver toggled "put me in the story") -->
+      <div id="characterFeedbackGroup" style="display:none;margin-bottom:1rem">
+        <div style="background:#F8F5FF;border-radius:12px;padding:0.85rem 1rem">
+          <p style="margin:0 0 0.4rem;font-size:0.82rem;font-weight:700;color:var(--text)">Happy with how you appear in the story?</p>
+          <p style="margin:0;font-size:0.72rem;color:var(--text-muted)">Let me know if you would like your character adjusted.</p>
+        </div>
       </div>
+
+      <!-- General feedback -->
+      <div class="form-group" style="margin-bottom:0">
+        <label style="font-size:0.82rem;font-weight:700;color:var(--text)">Any feedback on the story? (optional)</label>
+        <textarea id="previewFeedback" placeholder="e.g. Can the dragon be a bit sillier? Could there be more about their friendship?" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:60px;resize:vertical;box-sizing:border-box"></textarea>
+        <p class="form-hint" style="margin-top:0.25rem">Not quite right? Tell me what to change and I will adjust it before writing the full story.</p>
+      </div>
+    </div>
+
+    <!-- Guarantee -->
+    <div style="background:linear-gradient(135deg,#F0FFF4,#F8F5FF);border:2px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin:1.25rem auto 0;max-width:340px;width:100%;text-align:center">
+      <p style="font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.2rem">&#128154; Not happy with the full story? I will rewrite it for free.</p>
+      <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin:0">If it does not feel magical enough once you have heard it, just say the word. No questions asked.</p>
+    </div>
+
+    <!-- Jamie personal note -->
+    <div style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin:1rem auto 0;max-width:340px;width:100%;text-align:center">
+      <p style="font-size:0.82rem;color:var(--text);line-height:1.6;margin:0;font-weight:500">I'm Jamie. I started this because my son asked why he wasn't in any of his stories. I personally review every story before it reaches your family.</p>
+    </div>
+
+    <!-- Email capture -->
+    <div id="previewEmailWrap" style="width:100%;max-width:340px;margin:1.25rem auto 0">
+      <label style="font-size:0.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email</label>
+      <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
+      <p class="form-hint" style="margin-top:0.25rem;text-align:left">So I can send you the full story when it is ready.</p>
       <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
     </div>
 
-    <!-- Unlock CTA -->
-    <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()" style="margin-top:1rem">&#128275; Unlock the full story for <span class="price-display">£19.99</span></button>
-    <p class="unlock-price" id="unlockSub" style="margin-top:0.5rem;margin-bottom:0">The full story is 15 minutes of magic. Download it, share it, keep it forever.</p>
-    <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.4rem 0 0">&#128274; Secure payment via Stripe. No subscription, no hidden fees.</p>
+    <!-- "I'm happy" gate + checkout -->
+    <div id="previewHappySection" style="width:100%;max-width:340px;margin:1.25rem auto 0;text-align:center">
+      <button class="btn btn-primary" id="happyBtn" onclick="confirmHappy()" style="width:100%;padding:0.85rem;font-size:0.95rem">I'm happy with this</button>
+    </div>
+
+    <!-- Post-happy: gift delivery preference + unlock (hidden until happy clicked) -->
+    <div id="previewCheckoutSection" style="display:none;width:100%;max-width:340px;margin:1rem auto 0;text-align:center">
+      <!-- Gift delivery preference (only shown for gifts with recipient email) -->
+      <div id="giftDeliveryPref" style="display:none;margin-bottom:1rem">
+        <p style="font-size:0.82rem;font-weight:700;color:var(--text);margin:0 0 0.5rem">When the story is ready, how should I deliver the gift?</p>
+        <div style="display:flex;flex-direction:column;gap:0.5rem">
+          <button class="cat-card" id="giftPrefAuto" onclick="setGiftDeliveryPref('auto')" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
+            <span style="font-size:1.2rem">&#128232;</span>
+            <div>
+              <p style="margin:0;font-size:0.85rem;font-weight:700;color:var(--text)">Send it straight to them</p>
+              <p style="margin:0.1rem 0 0;font-size:0.72rem;color:var(--text-muted)" id="giftPrefAutoEmail"></p>
+            </div>
+          </button>
+          <button class="cat-card" id="giftPrefManual" onclick="setGiftDeliveryPref('manual')" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
+            <span style="font-size:1.2rem">&#128229;</span>
+            <div>
+              <p style="margin:0;font-size:0.85rem;font-weight:700;color:var(--text)">I will send it myself when the time is right</p>
+              <p style="margin:0.1rem 0 0;font-size:0.72rem;color:var(--text-muted)">It will be in your account ready to share</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()" style="width:100%">&#128275; Unlock the full story for <span class="price-display">£19.99</span></button>
+      <p class="unlock-price" id="unlockSub" style="margin-top:0.5rem;margin-bottom:0">The full story is 15 minutes of magic. Download it, share it, keep it forever.</p>
+      <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.4rem 0 0">&#128274; Secure payment via Stripe. No subscription, no hidden fees.</p>
+    </div>
+
     <a onclick="goTo('screenReview')" style="font-size:0.75rem;color:var(--text-muted);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">&#8592; Edit story details</a>
   </div>
 </div>
@@ -3704,93 +3770,29 @@ async function pollForFull(jobId) {
   return null;
 }
 
+// Preview data stored globally for the reveal transition
+let _pendingPreviewData = null;
+
 async function generatePreview() {
-  // Make sure we have a valid voice selected
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
   applyCategoryTheme(storyData.category);
-  trackEvent('AddToCart', { content_name: storyData.category, value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP' });
-  goTo('screenLoading');
 
-  // Personalised loading messages
-  const d = storyData;
-  const msgs = [];
-  if (d.isMultiChild && d.children && d.children.length > 1) {
-    d.children.forEach(c => msgs.push(`Writing ${c.name}'s entrance...`));
-    msgs.push('Weaving everyone together...');
-    d.children.forEach(c => msgs.push(`Giving ${c.name} their big moment...`));
-    if (d.friendName) msgs.push(`Adding ${d.friendName} to the adventure...`);
-    if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} does something unforgettable...`);
-    if (d.themes && d.themes.length) msgs.push(`Building a world around ${d.themes[0].toLowerCase()}...`);
-  } else {
-    msgs.push(`Writing ${d.childName}'s story from scratch...`);
-    msgs.push(`Weaving ${d.childName}'s name into every scene...`);
-    if (d.friendName) msgs.push(`Giving ${d.friendName} a starring role...`);
-    if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} does something unforgettable...`);
-    if (d.sidekickName) msgs.push(`Writing ${d.sidekickName} into the adventure...`);
-    if (d.themes && d.themes.length) msgs.push(`Building a world around ${d.themes[0].toLowerCase()}...`);
-    if (d.familyMembers) msgs.push(`Writing in the people ${d.childName} loves most...`);
-  }
-  msgs.push('Choosing the perfect opening line...');
-  msgs.push('Almost there, something special is taking shape...');
-  let msgIdx = 0;
-  const loadingText = document.querySelector('.loading-text');
-  const loadingSub = document.querySelector('.loading-sub');
-  loadingText.textContent = msgs[0];
-  loadingSub.textContent = 'Every detail you shared is being woven in. This usually takes about a minute.';
+  // Show the game phase on screenPreview
+  const gamePhase = document.getElementById('previewGamePhase');
+  const contentPhase = document.getElementById('previewContentPhase');
+  if (gamePhase) gamePhase.style.display = 'block';
+  if (contentPhase) contentPhase.style.display = 'none';
+  const readyBtn = document.getElementById('previewGameReady');
+  if (readyBtn) readyBtn.style.display = 'none';
 
-  // Animated detail pills: show each personal detail appearing one by one
-  const detailsWrap = document.getElementById('loadingDetails');
-  detailsWrap.innerHTML = '';
-  const catLabelsLoading = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
-  const pills = [];
-  if (d.isMultiChild && d.children && d.children.length > 1) {
-    d.children.forEach(c => pills.push(escHtml(c.name)));
-  } else {
-    pills.push(escHtml(d.childName));
-    if (d.age) pills.push('Age ' + escHtml(String(d.age)));
-  }
-  pills.push(escHtml(catLabelsLoading[d.category] || 'Story'));
-  if (d.friendName) pills.push(escHtml(d.friendName));
-  if (d.sidekickName) pills.push(escHtml(d.sidekickName));
-  if (d.hasPet && d.petName) pills.push(escHtml(d.petName) + ' the ' + escHtml(d.petType || 'pet'));
-  if (d.themes && d.themes.length) d.themes.forEach(t => pills.push(escHtml(t)));
-  if (d.setting && d.setting !== 'Surprise me') pills.push(escHtml(d.setting));
-  if (d.favTeddy) pills.push(escHtml(d.favTeddy));
-  if (d.familyMembers) pills.push(escHtml(d.familyMembers));
+  goTo('screenPreview');
+  initPreviewGame();
 
-  let pillIdx = 0;
-  const pillInterval = setInterval(() => {
-    if (pillIdx >= pills.length) { clearInterval(pillInterval); return; }
-    const span = document.createElement('span');
-    span.textContent = pills[pillIdx];
-    span.style.cssText = 'display:inline-block;background:var(--cat-accent-light,var(--purple-light));color:var(--cat-accent,var(--purple));font-size:0.72rem;font-weight:700;padding:0.3rem 0.7rem;border-radius:20px;opacity:0;transform:scale(0.8);transition:all 0.4s ease';
-    detailsWrap.appendChild(span);
-    requestAnimationFrame(() => { span.style.opacity = '1'; span.style.transform = 'scale(1)'; });
-    pillIdx++;
-  }, 1800);
-
-  // Progress bar animation
-  const progressBar = document.getElementById('loadingProgress');
-  if (progressBar) progressBar.style.width = '0%';
-  let progressPct = 0;
-  const progressInterval = setInterval(() => {
-    progressPct += Math.random() * 8 + 2;
-    if (progressPct > 90) progressPct = 90;
-    if (progressBar) progressBar.style.width = progressPct + '%';
-  }, 3000);
-
-  const msgInterval = setInterval(() => {
-    msgIdx++;
-    if (msgIdx < msgs.length) loadingText.textContent = msgs[msgIdx];
-    else clearInterval(msgInterval);
-  }, 5000);
+  _pendingPreviewData = null;
 
   try {
-    // Generate a job ID so we can recover the result if the connection times out
     const jobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     window._currentJobId = jobId;
-    const loadStartTime = Date.now();
-    const MIN_LOADING_MS = 30000; // Show loading for at least 30 seconds
     let data;
 
     // Rate-limit check (fast, returns immediately)
@@ -3829,18 +3831,12 @@ async function generatePreview() {
     if (!data) throw new Error('Story generation timed out. Please try again.');
     if (!data.success) throw new Error(data.error || 'Story generation failed. Please try again.');
 
-    // Ensure loading screen shows for at least 30 seconds (feels like real crafting)
-    const elapsed = Date.now() - loadStartTime;
-    if (elapsed < MIN_LOADING_MS) {
-      loadingText.textContent = 'Adding the finishing touches...';
-      await new Promise(r => setTimeout(r, MIN_LOADING_MS - elapsed));
-    }
-
+    // Store the preview data and show the "ready" button on the game phase
+    _pendingPreviewData = data;
     previewStoryText = data.previewStory || '';
     fullStoryText = data.fullStory || previewStoryText;
-    trackEvent('PreviewGenerated', { content_name: storyData.category, child_age: storyData.childAge });
 
-    // Save this attempt so admin can see what they tried to generate
+    // Save attempt for admin previews tab
     try {
       fetch('/api/save-attempt', {
         method: 'POST',
@@ -3848,128 +3844,240 @@ async function generatePreview() {
         body: JSON.stringify({ storyData, voiceId: selectedVoiceId, previewStory: previewStoryText, jobId })
       });
     } catch(e) { /* non-blocking */ }
-    const audio = document.getElementById('previewAudio');
-    audio.volume = 0.75;
-    audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
 
-    // Remove stale listeners before adding new ones (prevents accumulation on regenerate)
-    if (audio._stMeta) audio.removeEventListener('loadedmetadata', audio._stMeta);
-    if (audio._stTime) audio.removeEventListener('timeupdate', audio._stTime);
-    if (audio._stEnd) audio.removeEventListener('ended', audio._stEnd);
+    trackEvent('PreviewGenerated', { content_name: storyData.category });
 
-    audio._stMeta = function() {
-      document.getElementById('previewDuration').textContent = formatTime(audio.duration);
-    };
-    audio._stTime = function() {
-      if (audio.duration) {
-        const pct = (audio.currentTime / audio.duration) * 100;
-        document.getElementById('previewProgress').style.width = pct + '%';
-        document.getElementById('previewTime').textContent = formatTime(audio.currentTime);
-      }
-    };
-    audio._stEnd = function() {
-      document.getElementById('previewPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-      bgMusic.stop();
-    };
-    audio.addEventListener('loadedmetadata', audio._stMeta);
-    audio.addEventListener('timeupdate', audio._stTime);
-    audio.addEventListener('ended', audio._stEnd);
-
-    // Personalise unlock button
-    if (storyData.isMultiChild) {
-      document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock their full story &mdash; ' + (window.pricing ? window.pricing.display : '£19.99');
-    } else {
-      document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story &mdash; ' + (window.pricing ? window.pricing.display : '£19.99');
-    }
-
-    clearInterval(msgInterval);
-    clearInterval(pillInterval);
-    clearInterval(progressInterval);
-    if (progressBar) progressBar.style.width = '100%';
-
-    // Populate preview screen with story summary
-    const catLabels = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
-    const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
-    document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
-    if (storyData.isMultiChild) {
-      document.getElementById('previewTitle').textContent = 'Their story is waiting';
-      document.getElementById('previewSub').textContent = 'This is just the opening. The full story is 15 minutes of adventure.';
-    } else {
-      document.getElementById('previewTitle').textContent = `${storyData.childName}'s story is waiting`;
-      document.getElementById('previewSub').textContent = `This is just the opening. The full story is 15 minutes of ${storyData.childName} as the hero.`;
-    }
-    let summary = `<p style="font-size:0.78rem;color:var(--cat-accent-dark,var(--purple));font-weight:700;margin:0 0 0.4rem;text-align:center">What you built:</p>`;
-    summary += `<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500;text-align:center">`;
-    if (storyData.isMultiChild && storyData.children && storyData.children.length > 1) {
-      const boldNames = storyData.children.map(c => `<strong>${escHtml(c.name)}</strong>`).join(', ').replace(/, ([^,]*)$/, ' & $1');
-      summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} starring ${boldNames}`;
-    } else {
-      summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} for <strong>${escHtml(storyData.childName)}</strong>`;
-    }
-    if (storyData.friendName) summary += ` with ${storyData.isMultiChild ? '' : 'best friend '}<strong>${escHtml(storyData.friendName)}</strong>`;
-    if (storyData.hasPet && storyData.petName) summary += `, ${escHtml(storyData.petName)} the ${escHtml(storyData.petType || 'pet')}`;
-    if (storyData.themes && storyData.themes.length) summary += `, featuring ${escHtml(storyData.themes.join(', ').toLowerCase())}`;
-    if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${escHtml(storyData.setting.toLowerCase())}`;
-    summary += `.</p>`;
-    // Add personalised message reassurance if they wrote one
-    const hasPersonalMsg = storyData.isGift ? (storyData.giftMessage && storyData.giftMessage.trim()) : (storyData.personalMessage && storyData.personalMessage.trim());
-    if (hasPersonalMsg) {
-      const childFirst = escHtml(storyData.childName);
-      if (storyData.isGift && storyData.giftFrom) {
-        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; Your message from ${escHtml(storyData.giftFrom)} plays at the very start of the full story, not in this preview.</p>`;
-      } else {
-        summary += `<p style="font-size:0.75rem;color:var(--cat-accent-dark,var(--purple));margin:0.6rem 0 0;line-height:1.5;font-weight:600">&#128155; Your personal message plays at the very start of the full story, not in this preview.</p>`;
-      }
-    }
-    document.getElementById('previewSummary').innerHTML = summary;
-
-    // Populate story text display
-    const storyDisplay = document.getElementById('previewStoryDisplay');
-    if (storyDisplay && previewStoryText) {
-      // Strip audio cues and pause markers for display
-      const cleanText = previewStoryText
-        .replace(/\[whispers\]/gi, '')
-        .replace(/\[laughs?(?: softly)?\]/gi, '')
-        .replace(/\[sighs?\]/gi, '')
-        .replace(/\[gasps?\]/gi, '')
-        .replace(/\[excitedly\]/gi, '')
-        .replace(/\.\.\. \.\.\./g, '')
-        .replace(/\.\.\./g, '')
-        .trim();
-
-      const nameEsc = escHtml(storyData.childName);
-      const nameTag = `<span style="color:var(--orange);font-weight:800">${nameEsc}</span>`;
-
-      const paras = cleanText.split(/\n+/).filter(p => p.trim());
-      const paraHtml = paras.map(p => {
-        const escaped = escHtml(p.trim());
-        const highlighted = escaped.split(nameEsc).join(nameTag);
-        return `<p>${highlighted}</p>`;
-      }).join('');
-
-      storyDisplay.innerHTML = `
-        <div class="story-book">
-          <div class="story-book-body">${paraHtml}</div>
-          <div class="story-book-fade"></div>
-          <div class="story-book-footer">
-            <p>✨ The full story is 15 minutes long</p>
-          </div>
-        </div>`;
-      storyDisplay.style.display = 'block';
-    }
-
-    goTo('screenPreview');
+    // Show the "ready" button on the game screen
+    const readyBtn = document.getElementById('previewGameReady');
+    if (readyBtn) readyBtn.style.display = 'block';
   } catch(err) {
-    clearInterval(msgInterval);
-    clearInterval(pillInterval);
-    clearInterval(progressInterval);
     console.error('Preview generation error:', err.message);
-    // Show error on the loading screen with a retry button
-    const loadingText = document.querySelector('.loading-text');
-    const loadingSub = document.querySelector('.loading-sub');
-    if (loadingText) loadingText.textContent = 'Oops, something went wrong';
-    if (loadingSub) loadingSub.innerHTML = '<p style="margin:0.5rem 0;color:var(--text-muted);font-size:0.85rem">' + escHtml(err.message) + '</p><button class="btn btn-primary" style="margin-top:1rem;padding:0.75rem 2rem" onclick="generatePreview()">Try again</button><br><a onclick="goTo(\'screenReview\')" style="font-size:0.78rem;color:var(--purple);cursor:pointer;display:inline-block;margin-top:0.75rem;font-weight:600">or go back and edit</a>';
+    // Show error on the game phase
+    const gameSub = document.getElementById('previewGameSub');
+    if (gameSub) gameSub.innerHTML = '<p style="color:#FF6B9D;font-size:0.85rem;margin:0.5rem 0">' + escHtml(err.message) + '</p><button class="btn btn-primary" style="margin-top:0.75rem;padding:0.75rem 2rem" onclick="generatePreview()">Try again</button><br><a onclick="goTo(\'screenReview\')" style="font-size:0.78rem;color:var(--purple);cursor:pointer;display:inline-block;margin-top:0.75rem;font-weight:600">or go back and edit</a>';
   }
+}
+
+// Transition from game phase to preview content phase
+function revealPreview() {
+  const data = _pendingPreviewData;
+  if (!data) return;
+
+  // Set up audio
+  const audio = document.getElementById('previewAudio');
+  audio.volume = 0.75;
+  audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
+  if (audio._stMeta) audio.removeEventListener('loadedmetadata', audio._stMeta);
+  if (audio._stTime) audio.removeEventListener('timeupdate', audio._stTime);
+  if (audio._stEnd) audio.removeEventListener('ended', audio._stEnd);
+  audio._stMeta = function() { document.getElementById('previewDuration').textContent = formatTime(audio.duration); };
+  audio._stTime = function() {
+    if (audio.duration) {
+      document.getElementById('previewProgress').style.width = (audio.currentTime / audio.duration) * 100 + '%';
+      document.getElementById('previewTime').textContent = formatTime(audio.currentTime);
+    }
+  };
+  audio._stEnd = function() {
+    document.getElementById('previewPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    bgMusic.stop();
+  };
+  audio.addEventListener('loadedmetadata', audio._stMeta);
+  audio.addEventListener('timeupdate', audio._stTime);
+  audio.addEventListener('ended', audio._stEnd);
+
+  // Populate preview content
+  const catLabels = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
+  const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
+  document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
+
+  if (storyData.isMultiChild) {
+    document.getElementById('previewTitle').textContent = 'Their story is waiting';
+    document.getElementById('previewSub').textContent = 'This is just the opening. The full story is 15 minutes of adventure.';
+  } else {
+    document.getElementById('previewTitle').textContent = storyData.childName + "'s story is waiting";
+    document.getElementById('previewSub').textContent = 'This is just the opening. The full story is 15 minutes of ' + storyData.childName + ' as the hero.';
+  }
+
+  // Unlock button
+  if (storyData.isMultiChild) {
+    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock their full story, ' + (window.pricing ? window.pricing.display : '£19.99');
+  } else {
+    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + "'s full story, " + (window.pricing ? window.pricing.display : '£19.99');
+  }
+
+  // Summary
+  let summary = '<p style="font-size:0.78rem;color:var(--cat-accent-dark,var(--purple));font-weight:700;margin:0 0 0.4rem;text-align:center">What you built:</p>';
+  summary += '<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500;text-align:center">';
+  if (storyData.isMultiChild && storyData.children && storyData.children.length > 1) {
+    const boldNames = storyData.children.map(c => '<strong>' + escHtml(c.name) + '</strong>').join(', ').replace(/, ([^,]*)$/, ' & $1');
+    summary += 'A ' + escHtml((catLabels[storyData.category]||'story').toLowerCase()) + ' starring ' + boldNames;
+  } else {
+    summary += 'A ' + escHtml((catLabels[storyData.category]||'story').toLowerCase()) + ' for <strong>' + escHtml(storyData.childName) + '</strong>';
+  }
+  if (storyData.friendName) summary += ' with <strong>' + escHtml(storyData.friendName) + '</strong>';
+  if (storyData.hasPet && storyData.petName) summary += ', ' + escHtml(storyData.petName) + ' the ' + escHtml(storyData.petType || 'pet');
+  if (storyData.themes && storyData.themes.length) summary += ', featuring ' + escHtml(storyData.themes.join(', ').toLowerCase());
+  if (storyData.setting && storyData.setting !== 'Surprise me') summary += ', set in ' + escHtml(storyData.setting.toLowerCase());
+  summary += '.</p>';
+  document.getElementById('previewSummary').innerHTML = summary;
+
+  // Story text display
+  const storyDisplay = document.getElementById('previewStoryDisplay');
+  if (storyDisplay && previewStoryText) {
+    const cleanText = previewStoryText
+      .replace(/\[whispers\]/gi, '').replace(/\[laughs?(?: softly)?\]/gi, '')
+      .replace(/\[sighs?\]/gi, '').replace(/\[gasps?\]/gi, '').replace(/\[excitedly\]/gi, '')
+      .replace(/\.\.\. \.\.\./g, '').replace(/\.\.\./g, '').trim();
+    const paras = cleanText.split(/\n+/).filter(p => p.trim());
+    const paraHtml = paras.map(p => '<p>' + escHtml(p.trim()) + '</p>').join('');
+    storyDisplay.innerHTML = '<div class="story-book"><div class="story-book-body">' + paraHtml + '</div><div class="story-book-fade"></div><div class="story-book-footer"><p>The full story is 15 minutes long</p></div></div>';
+    storyDisplay.style.display = 'block';
+  }
+
+  // Show conditional feedback prompts
+  const hasMessage = storyData.isGift ? (storyData.giftMessage && storyData.giftMessage.trim()) : (storyData.personalMessage && storyData.personalMessage.trim());
+  const msgGroup = document.getElementById('messageFeedbackGroup');
+  if (msgGroup) msgGroup.style.display = hasMessage ? 'block' : 'none';
+  if (hasMessage) {
+    const msgText = document.getElementById('editMessageText');
+    if (msgText) msgText.value = storyData.isGift ? (storyData.giftMessage || '') : (storyData.personalMessage || '');
+  }
+
+  const charGroup = document.getElementById('characterFeedbackGroup');
+  if (charGroup) charGroup.style.display = (storyData.isGift && storyData.giftInStory) ? 'block' : 'none';
+
+  // Fire AddToCart (they heard the preview)
+  trackEvent('AddToCart', { content_name: storyData.category, value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP' });
+
+  // Switch phases
+  document.getElementById('previewGamePhase').style.display = 'none';
+  document.getElementById('previewContentPhase').style.display = 'block';
+
+  // Scroll to top of preview
+  document.getElementById('screenPreview').scrollTo(0, 0);
+}
+
+// Memory match game for the preview generation wait
+function initPreviewGame() {
+  const board = document.getElementById('previewGameBoard');
+  if (!board) return;
+  const emojis = ['🐶','🦄','🚀','🌙','🐱','🦕','🧸','⭐'];
+  const pairs = [...emojis, ...emojis];
+  // Shuffle
+  for (let i = pairs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pairs[i], pairs[j]] = [pairs[j], pairs[i]];
+  }
+  board.innerHTML = '';
+  let flipped = [];
+  let matched = 0;
+  const scoreEl = document.getElementById('previewGameScore');
+  pairs.forEach((emoji, idx) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'aspect-ratio:1;background:var(--purple-light);border:2px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;cursor:pointer;transition:all 0.3s;user-select:none';
+    card.textContent = '?';
+    card.dataset.emoji = emoji;
+    card.dataset.idx = idx;
+    card.onclick = function() {
+      if (flipped.length >= 2 || this.dataset.matched || this.dataset.flipped) return;
+      this.textContent = emoji;
+      this.dataset.flipped = '1';
+      this.style.background = '#fff';
+      flipped.push(this);
+      if (flipped.length === 2) {
+        if (flipped[0].dataset.emoji === flipped[1].dataset.emoji) {
+          matched++;
+          flipped[0].dataset.matched = '1';
+          flipped[1].dataset.matched = '1';
+          flipped[0].style.borderColor = 'var(--green, #4ECB71)';
+          flipped[1].style.borderColor = 'var(--green, #4ECB71)';
+          flipped = [];
+          if (scoreEl) scoreEl.textContent = matched + ' of ' + emojis.length + ' pairs found';
+          if (matched === emojis.length && scoreEl) scoreEl.textContent = 'All pairs found!';
+        } else {
+          setTimeout(() => {
+            flipped.forEach(c => { c.textContent = '?'; c.style.background = 'var(--purple-light)'; delete c.dataset.flipped; });
+            flipped = [];
+          }, 800);
+        }
+      }
+    };
+    board.appendChild(card);
+  });
+  if (scoreEl) scoreEl.textContent = 'Find the matching pairs!';
+}
+
+// "I'm happy" confirmation gate
+function confirmHappy() {
+  const emailEl = document.getElementById('previewEmail');
+  const email = emailEl ? emailEl.value.trim() : '';
+  const emailErr = document.getElementById('emailError');
+
+  if (!email) {
+    if (emailErr) { emailErr.textContent = 'Please enter your email so I can send you the story.'; emailErr.style.display = 'block'; }
+    if (emailEl) emailEl.focus();
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (emailErr) { emailErr.textContent = "That doesn't look like a valid email. Please check and try again."; emailErr.style.display = 'block'; }
+    if (emailEl) emailEl.focus();
+    return;
+  }
+  if (emailErr) emailErr.style.display = 'none';
+
+  // Store email and feedback on storyData for checkout
+  storyData.email = email;
+  storyData._previewFeedback = (document.getElementById('previewFeedback')?.value || '').trim() || null;
+
+  // Check for edited message
+  const editedMsg = document.getElementById('editMessageText');
+  if (editedMsg && document.getElementById('editMessageWrap')?.style.display !== 'none') {
+    if (storyData.isGift) {
+      storyData.giftMessage = editedMsg.value.trim();
+    } else {
+      storyData.personalMessage = editedMsg.value.trim();
+    }
+  }
+
+  // Show gift delivery preference if applicable
+  if (storyData.isGift && storyData.giftEmail) {
+    const prefSection = document.getElementById('giftDeliveryPref');
+    if (prefSection) {
+      prefSection.style.display = 'block';
+      const autoEmail = document.getElementById('giftPrefAutoEmail');
+      if (autoEmail) autoEmail.textContent = 'I will email ' + storyData.giftEmail + ' as soon as it is ready';
+    }
+  }
+
+  // Fire Lead event (email captured)
+  if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: storyData.category || '' });
+  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('SubmitForm', { content_name: storyData.category || '' });
+
+  // Show the checkout section
+  document.getElementById('previewCheckoutSection').style.display = 'block';
+  document.getElementById('happyBtn').style.display = 'none';
+
+  // Scroll to checkout
+  document.getElementById('previewCheckoutSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function setGiftDeliveryPref(pref) {
+  storyData._giftDeliveryPref = pref;
+  const autoBtn = document.getElementById('giftPrefAuto');
+  const manualBtn = document.getElementById('giftPrefManual');
+  if (autoBtn) {
+    autoBtn.style.borderColor = pref === 'auto' ? 'var(--purple)' : 'var(--border)';
+    autoBtn.style.background = pref === 'auto' ? 'var(--purple-light)' : 'var(--card)';
+  }
+  if (manualBtn) {
+    manualBtn.style.borderColor = pref === 'manual' ? 'var(--purple)' : 'var(--border)';
+    manualBtn.style.background = pref === 'manual' ? 'var(--purple-light)' : 'var(--card)';
+  }
+}
+
+function editPreviewMessage() {
+  const wrap = document.getElementById('editMessageWrap');
+  if (wrap) wrap.style.display = wrap.style.display === 'none' ? 'block' : 'none';
 }
 
 function playPreview() {
@@ -3990,51 +4098,40 @@ let isCheckingOut = false;
 async function unlockFull() {
   if (isCheckingOut) return;
   isCheckingOut = true;
-  // Validate email before proceeding
   const previewEmail = document.getElementById('previewEmail').value.trim();
   const emailErr = document.getElementById('emailError');
-  if (!previewEmail) {
-    emailErr.textContent = 'Please enter your email so I can send you the story.';
-    emailErr.style.display = 'block';
-    document.getElementById('previewEmail').focus();
+
+  // Email should already be validated by confirmHappy, but safety check
+  if (!previewEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(previewEmail)) {
+    if (emailErr) { emailErr.textContent = 'Please enter a valid email.'; emailErr.style.display = 'block'; }
     isCheckingOut = false;
     return;
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(previewEmail)) {
-    emailErr.textContent = 'That doesn\'t look like a valid email. Please check and try again.';
-    emailErr.style.display = 'block';
-    document.getElementById('previewEmail').focus();
-    isCheckingOut = false;
-    return;
-  }
-  emailErr.style.display = 'none';
+  if (emailErr) emailErr.style.display = 'none';
 
   trackEvent('InitiateCheckout', { value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP', content_name: storyData.category });
-  // TikTok uses different standard event names
   if (typeof ttq !== 'undefined' && ttq.track) ttq.track('PlaceAnOrder', { value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP', content_name: storyData.category });
 
   goTo('screenLoading');
   document.querySelector('.loading-text').textContent = 'Taking you to checkout...';
   document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';
   try {
-
-    // Save story data so we can retrieve it after Stripe redirect
+    // Save story data with feedback so it survives Stripe redirect
     sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, previewStoryText, selectedVoiceId }));
 
     const res = await fetch('/api/create-checkout', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ storyData, customerEmail: previewEmail || undefined, previewStoryText, selectedVoiceId, currency: window.pricing ? window.pricing.currency : 'GBP', unitAmount: window.pricing ? window.pricing.amountMinor : 1999, ...getTrackingParams() })
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ storyData, customerEmail: previewEmail, previewStoryText, selectedVoiceId, currency: window.pricing ? window.pricing.currency : 'GBP', unitAmount: window.pricing ? window.pricing.amountMinor : 1999, ...getTrackingParams() })
     });
     const data = await res.json();
-    if(!data.success) throw new Error(data.error || 'Something went wrong');
-    // Redirect to Stripe Checkout
+    if (!data.success) throw new Error(data.error || 'Something went wrong');
     window.location.href = data.checkoutUrl;
   } catch(err) {
     goTo('screenPreview');
     isCheckingOut = false;
-    emailErr.textContent = 'Something went wrong. Please try again, or email jamie@heartheirname.com if the problem continues.';
-    emailErr.style.display = 'block';
+    // Show error on the content phase
+    if (emailErr) { emailErr.textContent = 'Something went wrong. Please try again, or email jamie@heartheirname.com if the problem continues.'; emailErr.style.display = 'block'; }
   }
 }
 
