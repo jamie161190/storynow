@@ -1705,9 +1705,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div id="previewGamePhase" class="preview-container" style="text-align:center">
     <p style="font-size:1.5rem;margin:0 0 0.5rem">&#10024;</p>
     <h2 class="section-title" style="margin-bottom:0.25rem">Preparing something special...</h2>
-    <p class="section-sub" id="previewGameSub">While I write the opening, why not play a quick game?</p>
+    <p class="section-sub" id="previewGameSub">I'm writing the story now. This takes a couple of minutes.</p>
 
-    <div id="previewGameBoard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;max-width:280px;margin:1.5rem auto 0"></div>
+    <!-- Status indicator -->
+    <div id="previewGenStatus" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin:1rem 0">
+      <span style="width:8px;height:8px;background:var(--purple);border-radius:50%;animation:pulse 1.5s infinite"></span>
+      <span id="previewGenLabel" style="font-size:0.78rem;font-weight:700;color:var(--purple)">Writing the story...</span>
+    </div>
+    <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}</style>
+
+    <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;margin:0 0 1rem">While you wait, find the matching pairs!</p>
+    <div id="previewGameBoard" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;max-width:280px;margin:0 auto"></div>
     <p id="previewGameScore" style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin:0.5rem 0 0;font-weight:600"></p>
     <p id="previewGameReady" style="display:none;text-align:center;margin-top:1rem">
       <button class="btn btn-primary" onclick="revealPreview()" style="padding:0.8rem 2rem">&#127911; Your preview is ready. Listen now!</button>
@@ -3884,6 +3892,29 @@ async function generatePreview() {
   _pendingPreviewData = null;
   _previewStartTime = Date.now();
 
+  // Rotating status messages personalised to the story
+  const d = storyData;
+  const statusMsgs = ['Writing the story...'];
+  if (d.isMultiChild && d.children && d.children.length > 1) {
+    d.children.forEach(function(c) { statusMsgs.push('Writing ' + c.name + "'s entrance..."); });
+    statusMsgs.push('Weaving everyone together...');
+    d.children.forEach(function(c) { statusMsgs.push('Giving ' + c.name + ' their big moment...'); });
+  } else {
+    statusMsgs.push('Weaving ' + d.childName + "'s name into every scene...");
+  }
+  if (d.friendName) statusMsgs.push('Giving ' + d.friendName + ' a starring role...');
+  if (d.hasPet && d.petName) statusMsgs.push('Making sure ' + d.petName + ' does something unforgettable...');
+  if (d.themes && d.themes.length) statusMsgs.push('Building a world around ' + d.themes[0].toLowerCase() + '...');
+  statusMsgs.push('Choosing the perfect opening line...');
+  statusMsgs.push('Adding the finishing touches...');
+  statusMsgs.push('Nearly there...');
+  let statusIdx = 0;
+  const statusLabel = document.getElementById('previewGenLabel');
+  const statusInterval = setInterval(() => {
+    statusIdx++;
+    if (statusIdx < statusMsgs.length && statusLabel) statusLabel.textContent = statusMsgs[statusIdx];
+  }, 15000);
+
   try {
     const jobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
     window._currentJobId = jobId;
@@ -3947,10 +3978,15 @@ async function generatePreview() {
       await new Promise(r => setTimeout(r, MIN_PREVIEW_WAIT_MS - elapsed));
     }
 
-    // Show the "ready" button on the game screen
+    // Clear status messages and show the "ready" button
+    clearInterval(statusInterval);
+    if (statusLabel) statusLabel.textContent = 'Your preview is ready!';
+    const statusDot = document.querySelector('#previewGenStatus span:first-child');
+    if (statusDot) { statusDot.style.background = 'var(--green, #4CAF50)'; statusDot.style.animation = 'none'; }
     const readyBtn = document.getElementById('previewGameReady');
     if (readyBtn) readyBtn.style.display = 'block';
   } catch(err) {
+    clearInterval(statusInterval);
     console.error('Preview generation error:', err.message);
     // Show error on the game phase
     const gameSub = document.getElementById('previewGameSub');
