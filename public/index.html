@@ -1744,8 +1744,8 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <!-- Summary -->
     <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.75rem 1rem;margin:1rem auto 0;text-align:center;max-width:340px;width:100%"></div>
 
-    <!-- Story text (collapsed) -->
-    <div id="previewStoryDisplay" style="display:none;width:100%;max-width:340px;margin:0.5rem auto 0"></div>
+    <!-- Story text (compact, expandable) -->
+    <div id="previewStoryDisplay" style="display:none;width:100%;max-width:340px;margin:0.75rem auto 0"></div>
 
     <!-- Feedback (simple, not buried) -->
     <div style="width:100%;max-width:340px;margin:1.25rem auto 0">
@@ -1789,8 +1789,6 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
             <p style="margin:0;font-size:0.72rem;color:var(--text-muted)">Let me know if you would like it adjusted.</p>
           </div>
         </div>
-        <!-- Read along -->
-        <a onclick="var d=document.getElementById('previewStoryDisplay');d.style.display=d.style.display==='none'?'block':'none';this.textContent=d.style.display==='none'?'Read along \u25BC':'Hide text \u25B2'" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;display:block;text-align:center">Read along &#9660;</a>
       </div>
     </div>
 
@@ -4060,7 +4058,7 @@ function revealPreview() {
   summary += '.</p>';
   document.getElementById('previewSummary').innerHTML = summary;
 
-  // Story text display
+  // Story text display (compact, expandable)
   const storyDisplay = document.getElementById('previewStoryDisplay');
   if (storyDisplay && previewStoryText) {
     const cleanText = previewStoryText
@@ -4068,8 +4066,8 @@ function revealPreview() {
       .replace(/\[sighs?\]/gi, '').replace(/\[gasps?\]/gi, '').replace(/\[excitedly\]/gi, '')
       .replace(/\.\.\. \.\.\./g, '').replace(/\.\.\./g, '').trim();
     const paras = cleanText.split(/\n+/).filter(p => p.trim());
-    const paraHtml = paras.map(p => '<p>' + escHtml(p.trim()) + '</p>').join('');
-    storyDisplay.innerHTML = '<div class="story-book"><div class="story-book-body">' + paraHtml + '</div><div class="story-book-fade"></div><div class="story-book-footer"><p>The full story is 15 minutes long</p></div></div>';
+    const paraHtml = paras.map(p => '<p style="margin:0 0 0.6rem;font-size:0.82rem;line-height:1.7;color:var(--text)">' + escHtml(p.trim()) + '</p>').join('');
+    storyDisplay.innerHTML = '<a onclick="var box=document.getElementById(\'previewTextBox\');box.style.display=box.style.display===\'none\'?\'block\':\'none\';this.textContent=box.style.display===\'none\'?\'\\uD83D\\uDCD6 Read along \\u25BC\':\'\\uD83D\\uDCD6 Hide text \\u25B2\'" style="display:block;text-align:center;font-size:0.82rem;color:var(--purple);font-weight:700;cursor:pointer;margin-bottom:0.5rem">&#128214; Read along &#9660;</a><div id="previewTextBox" style="display:none"><div id="previewTextInner" style="max-height:120px;overflow:hidden;position:relative;padding:0.75rem;background:var(--card);border:1.5px solid var(--border);border-radius:12px">' + paraHtml + '<div style="position:absolute;bottom:0;left:0;right:0;height:50px;background:linear-gradient(transparent,var(--card));pointer-events:none" id="previewTextFade"></div></div><a onclick="var inner=document.getElementById(\'previewTextInner\');var fade=document.getElementById(\'previewTextFade\');if(inner.style.maxHeight===\'none\'){inner.style.maxHeight=\'120px\';fade.style.display=\'block\';this.textContent=\'Show less \\u25B2\'}else{inner.style.maxHeight=\'none\';fade.style.display=\'none\';this.textContent=\'Read more \\u25BC\'}" style="display:block;text-align:center;font-size:0.75rem;color:var(--purple);font-weight:700;cursor:pointer;margin-top:0.4rem">Read more &#9660;</a></div>';
     storyDisplay.style.display = 'block';
   }
 
