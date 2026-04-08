@@ -653,7 +653,7 @@ ${isMulti
   : '- The child\'s name appears at least 3 times'}
 - Include natural pauses ( ... ) for the narrator to breathe
 - NO generic openings (no "once upon a time", no waking up, no "it was a [adjective] day")
-${isShortPreview ? '- NO resolution, NO wrapping up, NO moral lessons' : '- Build a complete story arc with a satisfying ending'}
+${targetWords <= 80 ? '- NO resolution, NO wrapping up, NO moral lessons' : targetWords < 500 ? '- This is a PREVIEW. Stop at a compelling cliffhanger moment. The listener MUST need to hear what happens next. NO resolution, NO wrapping up, NO ending. Leave them desperate for more.' : '- Build a complete story arc with a satisfying ending'}
 - The preview must feel like the story already knows and loves this child
 - Use [whispers] or [laughs softly] audio tags at emotionally appropriate moments
 
