@@ -753,7 +753,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <label class="field-label">What's their name?</label>
       <input type="text" class="name-input" id="heroChildName" placeholder="Type their name here..." autocomplete="off" oninput="updateStickyBtn(this.value);showHeroAddChild()">
       <div id="heroExtraNames" style="display:none"></div>
-      <a id="heroAddChildLink" onclick="addHeroChildInput()" style="display:none;font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;margin:6px 0 10px;text-align:left;display:block">+ Add another child</a>
+      <a id="heroAddChildLink" onclick="addHeroChildInput()" style="display:none;font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;margin:6px 0 10px;text-align:left;display:block">+ Add a brother or sister</a>
       <span class="type-label">Choose a story type</span>
       <div class="type-pills">
         <button class="type-pill active" id="heroPillBedtime" onclick="setPill(this,'bedtime')">&#127769; Bedtime</button>
@@ -1353,7 +1353,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div id="childCards" style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:440px"></div>
 
   <button id="addChildBtn" onclick="addChildCard()" style="display:flex;align-items:center;gap:0.5rem;margin-top:0.75rem;padding:0.6rem 1rem;border:2px dashed var(--border);border-radius:var(--radius);background:transparent;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;color:var(--purple);width:100%;max-width:440px;justify-content:center;transition:all 0.2s">
-    + Add another child
+    + Add a brother or sister
   </button>
   <p id="maxChildrenHint" style="display:none;font-size:0.75rem;color:var(--text-muted);text-align:center;margin:0.25rem 0 0">Maximum 5 children per story</p>
 
