@@ -199,6 +199,7 @@ export default async (req) => {
     const session = event.data.object;
     const email = session.customer_details?.email || session.customer_email;
     const childName = session.metadata?.childName || '';
+    const isMultiChild = session.metadata?.isMultiChild === 'true';
 
     if (!email) {
       console.log('Expired session has no email, skipping');
@@ -258,7 +259,7 @@ export default async (req) => {
       return new Response(JSON.stringify({ received: true, error: 'email_not_configured' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const html = abandonedCartEmail(childName);
+    const html = abandonedCartEmail(childName, isMultiChild);
 
     try {
       const emailRes = await fetch('https://api.resend.com/emails', {
@@ -270,9 +271,9 @@ export default async (req) => {
         body: JSON.stringify({
           from: 'Jamie from Hear Their Name <jamie@heartheirname.com>',
           to: [email],
-          subject: childName
-            ? `${esc(childName)}'s story is still waiting for you`
-            : `Your story is still waiting for you`,
+          subject: isMultiChild
+            ? `Their story is still waiting for you`
+            : childName ? `${esc(childName)}'s story is still waiting for you` : `Your story is still waiting for you`,
           html
         })
       });
@@ -292,7 +293,7 @@ export default async (req) => {
   return new Response(JSON.stringify({ received: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 };
 
-function abandonedCartEmail(childName) {
+function abandonedCartEmail(childName, isMultiChild) {
   const safeChild = esc(childName);
   const hasChild = !!childName;
 
@@ -308,12 +309,14 @@ function abandonedCartEmail(childName) {
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:28px;text-align:center;margin:0 0 8px;">🎧</p>
       <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 20px;">
-        ${hasChild ? `${safeChild}'s story is still waiting` : `Your story is still waiting`}
+        ${isMultiChild ? `Their story is still waiting` : hasChild ? `${safeChild}'s story is still waiting` : `Your story is still waiting`}
       </h2>
       <p style="color:#666;font-size:15px;line-height:1.7;margin:0 0 20px;">
-        ${hasChild
-          ? `You were so close to creating something magical for ${safeChild}. A personalised audio story where ${safeChild} is the hero, narrated with their name woven into every chapter.`
-          : `You were so close to creating something magical. A personalised audio story where a child you love is the hero, with their name woven into every chapter.`
+        ${isMultiChild
+          ? `You were so close to creating something magical. A personalised audio story starring ${safeChild}, with every child's name woven into every chapter.`
+          : hasChild
+            ? `You were so close to creating something magical for ${safeChild}. A personalised audio story where ${safeChild} is the hero, narrated with their name woven into every chapter.`
+            : `You were so close to creating something magical. A personalised audio story where a child you love is the hero, with their name woven into every chapter.`
         }
       </p>
       <p style="color:#666;font-size:15px;line-height:1.7;margin:0 0 24px;">

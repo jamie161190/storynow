@@ -20,7 +20,7 @@ export default async (req) => {
     }
 
     const body = await req.json();
-    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText, contactName, contactEmail, contactText, discountCode, discountPercent } = body;
+    const { type, to, childName, giftFrom, giftMessage, category, length, storyId, sessionId, reviewName, reviewChildName, reviewText, contactName, contactEmail, contactText, discountCode, discountPercent, isMultiChild } = body;
 
     if (!type || !to) {
       return new Response(JSON.stringify({ error: 'Missing type or recipient email' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
@@ -132,11 +132,13 @@ export default async (req) => {
     let subject, html;
 
     if (type === 'purchase') {
-      subject = `${esc(childName)}'s story is ready! 🎧`;
-      html = purchaseEmail(childName, category, length, to, storyId, discountCode, discountPercent);
+      subject = isMultiChild ? `Their story is ready! 🎧` : `${esc(childName)}'s story is ready! 🎧`;
+      html = purchaseEmail(childName, category, length, to, storyId, discountCode, discountPercent, isMultiChild);
     } else if (type === 'gift') {
-      subject = `${esc(giftFrom)} made something special for ${esc(childName)} 🎁`;
-      html = giftEmail(childName, giftFrom, giftMessage, storyId);
+      subject = isMultiChild
+        ? `${esc(giftFrom) || 'Someone special'} made something magical 🎁`
+        : `${esc(giftFrom) || 'Someone special'} made something special for ${esc(childName)} 🎁`;
+      html = giftEmail(childName, giftFrom, giftMessage, storyId, isMultiChild);
     } else if (type === 'review') {
       subject = `New review from ${esc(reviewName)}`;
       html = `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:20px"><h2>New Review Submitted</h2><p><strong>From:</strong> ${esc(reviewName)}</p>${reviewChildName ? `<p><strong>Child:</strong> ${esc(reviewChildName)}</p>` : ''}<p><strong>Review:</strong></p><blockquote style="border-left:3px solid #7C3AED;padding-left:12px;color:#333">${esc(reviewText)}</blockquote></div>`;
@@ -179,14 +181,16 @@ export default async (req) => {
   }
 };
 
-function purchaseEmail(childName, category, length, customerEmail, storyId, discountCode, discountPercent) {
+function purchaseEmail(childName, category, length, customerEmail, storyId, discountCode, discountPercent, isMultiChild) {
   const safeChild = esc(childName);
   const safeEmail = esc(customerEmail);
   const lengthLabel = '~15 min';
   const categoryLabel = category === 'learning' ? 'Learning Adventure' : category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
   const listenUrl = storyId ? `https://heartheirname.com?listen=${encodeURIComponent(storyId)}&utm_source=email&utm_medium=purchase_email&utm_campaign=story_delivery` : 'https://heartheirname.com';
   const waShareUrl = storyId ? `https://heartheirname.com?listen=${encodeURIComponent(storyId)}&utm_source=share&utm_medium=whatsapp&utm_campaign=purchase_email_share` : 'https://heartheirname.com';
-  const waText = encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${waShareUrl}\n\nMade with heartheirname.com`);
+  const waText = isMultiChild
+    ? encodeURIComponent(`Listen to a story made for ${childName}!\n\n${waShareUrl}\n\nMade with heartheirname.com`)
+    : encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${waShareUrl}\n\nMade with heartheirname.com`);
 
   return `
 <!DOCTYPE html>
@@ -195,21 +199,23 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://heartheirname.com/images/logo-email.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
+      <img src="https://heartheirname.com/logo-email.png" alt="Hear Their Name" style="height:56px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:24px;text-align:center;margin:0 0 8px;">🎧</p>
-      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">${safeChild}'s story is ready!</h2>
+      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">${isMultiChild ? 'Their story is ready!' : safeChild + "'s story is ready!"}</h2>
       <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        Thank you for creating something truly special. ${safeChild}'s personalised ${categoryLabel.toLowerCase()} (${lengthLabel}) has been created and is ready to enjoy.
+        ${isMultiChild
+          ? `Thank you for creating something truly special. A personalised ${categoryLabel.toLowerCase()} starring ${safeChild} (${lengthLabel}) has been created and is ready to enjoy.`
+          : `Thank you for creating something truly special. ${safeChild}'s personalised ${categoryLabel.toLowerCase()} (${lengthLabel}) has been created and is ready to enjoy.`}
       </p>
       ${storyId ? `
       <div style="text-align:center;margin:0 0 24px;">
-        <a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">Listen to ${safeChild}'s story</a>
+        <a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">${isMultiChild ? 'Listen to their story' : 'Listen to ' + safeChild + "'s story"}</a>
       </div>` : ''}
       <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
         <p style="margin:0 0 8px;font-size:15px;color:#2D2844;font-weight:700;">Share with the whole family</p>
-        <p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;">Grandparents, aunties, uncles. Let everyone hear ${safeChild}'s story. No extra cost.</p>
+        <p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;">Grandparents, aunties, uncles. Let everyone hear ${isMultiChild ? 'their story' : safeChild + "'s story"}. No extra cost.</p>
         <a href="https://wa.me/?text=${waText}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;">Share on WhatsApp</a>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
@@ -219,7 +225,7 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
         <p style="margin:0;font-size:16px;font-weight:700;color:#6B2F93;">${safeEmail}</p>
       </div>
       <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        I hope ${safeChild} loves every second of it.
+        ${isMultiChild ? 'I hope they love every second of it.' : 'I hope ' + safeChild + ' loves every second of it.'}
       </p>
       ${discountCode ? `
       <div style="background:#E3FAEB;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
@@ -239,7 +245,7 @@ function purchaseEmail(childName, category, length, customerEmail, storyId, disc
 </html>`;
 }
 
-function giftEmail(childName, giftFrom, giftMessage, storyId) {
+function giftEmail(childName, giftFrom, giftMessage, storyId, isMultiChild) {
   const safeChild = esc(childName);
   const safeFrom = esc(giftFrom);
   const safeMsg = esc(giftMessage);
@@ -251,7 +257,7 @@ function giftEmail(childName, giftFrom, giftMessage, storyId) {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://heartheirname.com/images/logo-email.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
+      <img src="https://heartheirname.com/logo-email.png" alt="Hear Their Name" style="height:56px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:32px;text-align:center;margin:0 0 8px;">🎁</p>
@@ -261,7 +267,6 @@ function giftEmail(childName, giftFrom, giftMessage, storyId) {
       </p>
       ${giftMessage ? `
       <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;border-left:4px solid #F1753B;">
-        <p style="margin:0 0 4px;font-size:13px;color:#999;">A message from ${safeFrom}:</p>
         <p style="margin:0;font-size:15px;color:#2D2844;font-style:italic;line-height:1.5;">"${safeMsg}"</p>
       </div>` : ''}
       <div style="text-align:center;margin:24px 0;">
@@ -289,7 +294,7 @@ function shareEmail(childName, fromName, message, storyId) {
 <body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
   <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
     <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://heartheirname.com/images/logo-email.png" alt="Hear Their Name" style="height:60px;width:auto;margin:0;" />
+      <img src="https://heartheirname.com/logo-email.png" alt="Hear Their Name" style="height:56px;width:auto;margin:0;" />
     </div>
     <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <p style="font-size:32px;text-align:center;margin:0 0 8px;">🎧</p>

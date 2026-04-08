@@ -751,7 +751,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <!-- NAME CAPTURE CARD -->
     <div class="name-card">
       <label class="field-label">What's their name?</label>
-      <input type="text" class="name-input" id="heroChildName" placeholder="Type their name here..." autocomplete="off" oninput="updateStickyBtn(this.value)">
+      <input type="text" class="name-input" id="heroChildName" placeholder="Type their name here..." autocomplete="off" oninput="updateStickyBtn(this.value);showHeroAddChild()">
+      <div id="heroExtraNames" style="display:none"></div>
+      <a id="heroAddChildLink" onclick="addHeroChildInput()" style="display:none;font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;margin:-4px 0 8px;text-align:left">+ Add another child</a>
       <span class="type-label">Choose a story type</span>
       <div class="type-pills">
         <button class="type-pill active" id="heroPillBedtime" onclick="setPill(this,'bedtime')">&#127769; Bedtime</button>
@@ -1072,6 +1074,10 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <summary>Can I share it with family?</summary>
       <p>One tap. Hit share and send the link to grandparents, aunties, uncles by email or WhatsApp. You can also download the audio. No extra cost, no limits.</p>
     </details>
+    <details>
+      <summary>How many children can be in one story?</summary>
+      <p>Up to 5. One child, two siblings, three cousins, a whole friend group. Everyone gets their own moments, their own personality, their own name spoken throughout. Same price whether it is one hero or five.</p>
+    </details>
   </div>
 
   <!-- CONTACT -->
@@ -1105,7 +1111,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     </div>
     <button class="sticky-bar-btn" id="stickyBtn" onclick="stickyBarStart()">
       <strong id="stickyBtnText">Start their story</strong>
-      <span>Free preview. Full story &pound;19.99.</span>
+      <span>For one child or the whole family.</span>
     </button>
   </div>
 </div>
@@ -1270,45 +1276,31 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
 </div>
 
+<!-- HOW MANY CHILDREN -->
+<!-- UNIFIED DETAILS: 1 to 5 children on one screen -->
 <div class="screen" id="screenDetails">
-  <button class="back-btn" onclick="goTo('screenGift')">&#8592; Back</button>
+  <button class="back-btn" onclick="goTo(isGiftMode?'screenGift':'screenCategory')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressDetails"></div><p class="progress-step-label">Step 2 of 7</p></div>
-  <h2 class="section-title">The main character</h2>
-  <p class="section-sub">This is who the story is all about. Their name, their world, their adventure.</p>
+  <h2 class="section-title">Who are the heroes?</h2>
+  <p class="section-sub">Tell me about the children in this story.</p>
 
-  <div class="form-group">
-    <label>Their name</label>
-    <input type="text" id="childName" placeholder="e.g. Chase">
-  </div>
-  <div class="form-row">
-    <div class="form-group" style="flex:1">
-      <label>Age</label>
-      <input type="number" id="age" min="2" max="14" placeholder="e.g. 7">
-    </div>
-    <div class="form-group" style="flex:1">
-      <label>Gender</label>
-      <select id="gender">
-        <option value="">Choose</option>
-        <option value="boy">Boy</option>
-        <option value="girl">Girl</option>
-        <option value="neutral">Prefer not to say</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-group" id="proudOfGroup">
-    <label id="proudOfLabel">Is there an occasion? (optional)</label>
-    <input type="text" id="proudOf" placeholder="e.g. Their birthday, starting school">
-    <p class="form-hint" id="proudOfHint">If there is a birthday, achievement, or milestone, I will weave it into the heart of the story.</p>
-  </div>
+  <div id="childCards" style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:440px"></div>
 
-  <div class="form-group">
-    <label>Your email</label>
-    <input type="email" id="earlyEmail" placeholder="e.g. your@email.com">
-    <p class="form-hint">So I can send you the story when it is ready. No spam, ever.</p>
+  <button id="addChildBtn" onclick="addChildCard()" style="display:flex;align-items:center;gap:0.5rem;margin-top:0.75rem;padding:0.6rem 1rem;border:2px dashed var(--border);border-radius:var(--radius);background:transparent;cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;color:var(--purple);width:100%;max-width:440px;justify-content:center;transition:all 0.2s">
+    + Add another child
+  </button>
+  <p id="maxChildrenHint" style="display:none;font-size:0.75rem;color:var(--text-muted);text-align:center;margin:0.25rem 0 0">Maximum 5 children per story</p>
+
+  <div style="width:100%;max-width:440px;margin-top:1.25rem">
+    <div class="form-group">
+      <label>Is there an occasion? (optional)</label>
+      <input type="text" id="proudOf" placeholder="e.g. Their birthday, starting school, a family trip">
+      <p class="form-hint">If there is a birthday, achievement, or milestone, I will weave it into the heart of the story.</p>
+    </div>
   </div>
 
   <p class="inline-error" id="detailsError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateDetails()">Continue</button>
+  <button class="btn btn-primary" style="width:100%;max-width:440px;margin-top:0.5rem" onclick="validateDetails()">Continue</button>
   <p style="font-size:0.62rem;color:var(--text-muted);text-align:center;margin-top:0.6rem">&#128274; Their details are only used to write the story. Nothing is shared or sold. Ever.</p>
 </div>
 
@@ -1377,11 +1369,11 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validatePeople()">Continue</button>
 </div>
 
-<!-- DETAILS: THEME -->
-<div class="screen" id="screenTheme">
+<!-- THEME + SETTING (merged) -->
+<div class="screen" id="screenThemeSetting">
   <button class="back-btn" onclick="goTo('screenPeople')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressTheme"></div><p class="progress-step-label">Step 4 of 7</p></div>
-  <h2 class="section-title">What are they into?</h2>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressThemeSetting"></div><p class="progress-step-label">Step 4 of 7</p></div>
+  <h2 class="section-title">What's their story about?</h2>
   <p class="section-sub" id="themeSubtext">Pick as many as you like. These shape the whole story.</p>
 
   <div class="theme-grid" id="themeGrid">
@@ -1417,17 +1409,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <input type="text" id="customTheme" placeholder="e.g. Minecraft, ballet, cooking, trains">
   </div>
 
-  <p class="inline-error" id="themeError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateTheme()">Continue</button>
-</div>
-
-<!-- DETAILS: WHERE + MEMORABLE THINGS (merged) -->
-<div class="screen" id="screenWhere">
-  <button class="back-btn" onclick="goTo('screenTheme')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressWhere"></div><p class="progress-step-label">Step 5 of 7</p></div>
-  <h2 class="section-title">Where does the story happen?</h2>
-  <p class="section-sub">Pick a setting or let me surprise them.</p>
-
+  <h3 style="font-size:0.95rem;font-weight:700;color:var(--text);margin:1.5rem 0 0.5rem">Where does it take place?</h3>
   <div class="theme-grid" id="whereGrid">
     <div class="theme-tile" onclick="toggleWhere(this)" data-where="Their bedroom"><span class="theme-icon">&#128716;</span><span class="theme-label">Bedroom</span></div>
     <div class="theme-tile" onclick="toggleWhere(this)" data-where="A magical forest"><span class="theme-icon">&#127794;</span><span class="theme-label">Magic forest</span></div>
@@ -1444,21 +1426,24 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <input type="text" id="customWhere" placeholder="e.g. Grandma's garden, the park on Elm Street, Disneyland">
   </div>
 
-  <div class="form-group" style="margin-top:1rem">
-    <label>Favourite teddy, toy, or comfort item (optional)</label>
-    <input type="text" id="favTeddy" placeholder="e.g. a small white bunny called Mr Flopsy, a red fire engine, her yellow blanket">
-    <p class="form-hint">Include the colour and what it looks like. This will appear in the story exactly as you describe it.</p>
-  </div>
-
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep5_Where');goTo('screenExtras')">Continue</button>
+  <p class="inline-error" id="themeError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateThemeSetting()">Continue</button>
 </div>
 
-<!-- DETAILS: LEARNING + EXTRAS + MESSAGE -->
+<!-- EXTRAS (conditional: multi-child or learning only) -->
 <div class="screen" id="screenExtras">
-  <button class="back-btn" onclick="goTo('screenWhere')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressExtras"></div><p class="progress-step-label">Step 6 of 7</p></div>
-  <h2 class="section-title">Final touches</h2>
-  <p class="section-sub">Almost there. These are the details that make it unforgettable.</p>
+  <button class="back-btn" onclick="goTo('screenThemeSetting')">&#8592; Back</button>
+  <div class="progress-steps"><div class="progress-steps-bar" id="progressExtras"></div><p class="progress-step-label">Step 5 of 7</p></div>
+  <h2 class="section-title" id="extrasTitle">A few more details</h2>
+  <p class="section-sub" id="extrasSub">These are the details that make it unforgettable.</p>
+
+  <div id="multiDynamicsGroup" style="display:none">
+    <div class="form-group">
+      <label>How do they get along?</label>
+      <textarea id="siblingDynamics" placeholder="e.g. Emma bosses Liam around but he secretly loves it. They argue over who sits in the middle. Sophie copies everything Emma does." style="height:80px"></textarea>
+      <p class="form-hint">Do they argue and make up? Is one always the leader? Do they have inside jokes? This makes the story feel real.</p>
+    </div>
+  </div>
 
   <div class="form-group" id="subjectGroup" style="display:none">
     <label>What subject area?</label>
@@ -1475,30 +1460,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </div>
   <div class="form-group" id="learningGoalGroup" style="display:none">
     <label>What specifically are they working on?</label>
-    <textarea id="learningGoal" placeholder="e.g. Their 7 times table, dividing by 2 and 3, letter sounds like ch and sh, spelling 'because' and 'together', the alphabet, counting in 10s..." style="height:80px"></textarea>
+    <textarea id="learningGoal" placeholder="e.g. Their 7 times table, dividing by 2 and 3, letter sounds like ch and sh..." style="height:80px"></textarea>
     <p class="form-hint">Be as specific as you can. The narrator will pause and let them answer before revealing the answer in the story.</p>
   </div>
 
-
-  <div class="form-group">
-    <label>What makes them them? (optional)</label>
-    <textarea id="extraDetails" placeholder="e.g. He's scared of thunder but pretends he's not. She calls spaghetti 'pasketti'. He's obsessed with becoming a footballer. She sleeps with four teddies and names them all." style="height:100px"></textarea>
-    <p class="form-hint">Quirks, fears, obsessions, funny habits. The more specific you are, the more the story feels like it was written just for them.</p>
-  </div>
-
-  <div class="form-group" id="personalMessageGroup">
-    <label>Add a personal message (optional)</label>
-    <textarea id="personalMessage" placeholder="e.g. Chase, this is from Daddy. I am so proud of you..."></textarea>
-    <p class="form-hint">This will be read aloud at the start of the story.</p>
-  </div>
-
-  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep7_Extras');goToLength()">Continue</button>
+  <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="trackEvent('FormStep_Extras');goToVoice()">Continue</button>
 </div>
 
 
 <!-- VOICE -->
 <div class="screen" id="screenVoice">
-  <button class="back-btn" onclick="goTo('screenExtras')">&#8592; Back</button>
+  <button class="back-btn" onclick="goTo(needsExtrasScreen()?'screenExtras':'screenThemeSetting')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressVoice"></div><p class="progress-step-label">Last step!</p></div>
   <h2 class="section-title">Choose a storyteller</h2>
   <p class="section-sub" id="voiceSubtext">Pick the voice that feels right.</p>
@@ -1995,7 +1967,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 </div>
 
 <script>
-let storyData = { category:'', length:'long', themes:[], where:'Surprise me' };
+let storyData = { category:'', length:'long', themes:[], where:'Surprise me', isMultiChild:false, children:[] };
 
 // Hero name capture
 let pendingChildName = '';
@@ -2031,6 +2003,28 @@ function updateHeroBtn() {
   var heroBtn = document.getElementById('heroBtn');
   if (!heroBtn) return;
   heroBtn.textContent = (heroCategory === 'gift') ? 'Create their gift story' : 'Start their story';
+}
+
+// Hero multi-name input
+var heroExtraCount = 0;
+function showHeroAddChild() {
+  var val = document.getElementById('heroChildName').value.trim();
+  var link = document.getElementById('heroAddChildLink');
+  if (link) link.style.display = val.length > 0 ? 'block' : 'none';
+}
+
+function addHeroChildInput() {
+  if (heroExtraCount >= 4) return; // max 5 total (1 main + 4 extra)
+  heroExtraCount++;
+  var wrap = document.getElementById('heroExtraNames');
+  wrap.style.display = 'block';
+  var div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:6px';
+  div.innerHTML = '<input type="text" class="name-input hero-extra-name" placeholder="Another child\'s name" style="flex:1;font-size:0.95rem;padding:0.6rem 0.8rem" autocomplete="off">' +
+    '<button onclick="this.parentElement.remove();heroExtraCount--; if(heroExtraCount<4)document.getElementById(\'heroAddChildLink\').style.display=\'block\'" style="background:none;border:none;font-size:1.1rem;color:var(--text-muted);cursor:pointer;padding:4px">&times;</button>';
+  wrap.appendChild(div);
+  div.querySelector('input').focus();
+  if (heroExtraCount >= 4) document.getElementById('heroAddChildLink').style.display = 'none';
 }
 
 function switchTab(tab, el) {
@@ -2111,6 +2105,15 @@ function heroStartStory() {
   var isGift = (heroCategory === 'gift');
   var cat = heroCategory === 'adventure' ? 'journey' : 'bedtime';
 
+  // Collect extra hero names for multi-child
+  var heroExtraInputs = document.querySelectorAll('.hero-extra-name');
+  var heroNames = [];
+  if (pendingChildName) heroNames.push(pendingChildName);
+  heroExtraInputs.forEach(function(inp) {
+    var n = inp.value.trim();
+    if (n) heroNames.push(n);
+  });
+
   // Track hero CTA click to Supabase for admin funnel
   var device = window.innerWidth < 768 ? 'mobile' : window.innerWidth < 1024 ? 'tablet' : 'desktop';
   fetch('/api/track-pageview', {
@@ -2118,6 +2121,27 @@ function heroStartStory() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ page: '/', screen_name: pendingChildName ? 'hero_start_name' : 'hero_start_noname', device: device, visitor_id: stVisitorId })
   }).catch(function() {});
+
+  // Multi-child: if 2+ names entered on hero, pre-populate and skip to multi flow
+  if (heroNames.length >= 2) {
+    storyData.isMultiChild = true;
+    storyData.children = heroNames.map(function(n) { return { name: n, age: '', gender: '' }; });
+    if (isGift) {
+      var giftCat = heroGiftSubType === 'adventure' ? 'journey' : 'bedtime';
+      storyData.category = giftCat;
+      applyCategoryTheme(giftCat);
+      setGiftMode(true, false);
+      trackEvent('HeroStartStory', { content_name: 'gift_multi', child_name_entered: true, children_count: heroNames.length });
+      goTo('screenGift');
+    } else {
+      storyData.category = cat;
+      applyCategoryTheme(cat);
+      setGiftMode(false, false);
+      trackEvent('HeroStartStory', { content_name: cat + '_multi', child_name_entered: true, children_count: heroNames.length });
+      goTo('screenDetails');
+    }
+    return;
+  }
 
   if (isGift) {
     var giftCat = heroGiftSubType === 'adventure' ? 'journey' : 'bedtime';
@@ -2617,14 +2641,18 @@ function goTo(id, skipHistory) {
   }
 
   // Update progress bar
-  const progressMap = {screenCategory:1,screenGift:1,screenDetails:2,screenPeople:3,screenTheme:4,screenWhere:5,screenExtras:6,screenVoice:7};
+  const showExtras = storyData.isMultiChild || storyData.category === 'learning';
+  const totalSteps = showExtras ? 7 : 6;
+  const progressMap = showExtras
+    ? {screenCategory:1,screenGift:1,screenDetails:2,screenPeople:3,screenThemeSetting:4,screenExtras:5,screenVoice:6}
+    : {screenCategory:1,screenGift:1,screenDetails:2,screenPeople:3,screenThemeSetting:4,screenVoice:5};
   const stepNum = progressMap[id];
   if (stepNum) {
     const barId = 'progress' + id.replace('screen','');
     const bar = document.getElementById(barId);
     if (bar) {
       let dots = '';
-      for (let i = 1; i <= 7; i++) {
+      for (let i = 1; i <= totalSteps; i++) {
         dots += `<div class="progress-dot ${i < stepNum ? 'done' : ''} ${i === stepNum ? 'active' : ''}"></div>`;
       }
       bar.innerHTML = dots;
@@ -2632,24 +2660,66 @@ function goTo(id, skipHistory) {
   }
 
   if(id === 'screenVoice') showVoices();
-  if(id === 'screenExtras') updateExtrasVisibility();
+  // screenExtras visibility is handled in the goTo override below
   // Multi-child removed: each child gets their own purchase
   if(id === 'screenCategory') restoreCategory();
-  if(id === 'screenDetails') restoreDetails();
+  if(id === 'screenDetails') {
+    // Ensure at least one child card exists
+    if (!storyData.children || storyData.children.length === 0) {
+      storyData.children = [{ name: pendingChildName || '', age: '', gender: '', about: '' }];
+    }
+    renderChildCards();
+    if (storyData.proudOf) {
+      const el = document.getElementById('proudOf');
+      if (el) el.value = storyData.proudOf;
+    }
+  }
   if(id === 'screenPeople') {
     document.getElementById('teacherGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
-    // Show villain toggle for adventure stories
     const showVillain = storyData.category === 'journey';
     document.getElementById('villainSection').style.display = showVillain ? 'block' : 'none';
+    // Multi-child: update people screen labels and title
+    if (storyData.isMultiChild) {
+      const displayNames = formatChildrenNames(storyData.children);
+      const title = document.querySelector('#screenPeople .section-title');
+      const sub = document.querySelector('#screenPeople .section-sub');
+      if (title) title.textContent = 'Who else is in their story?';
+      if (sub) sub.textContent = displayNames + ' are already the heroes. Add anyone else you would like in the adventure.';
+      const friendLabel = document.querySelector('#friendName')?.previousElementSibling;
+      if (friendLabel && friendLabel.tagName === 'LABEL') friendLabel.textContent = 'Someone else they all know (optional)';
+      const friendInput = document.getElementById('friendName');
+      if (friendInput) friendInput.placeholder = 'e.g. a family friend, cousin, or someone they all know';
+      const sidekickGroup = document.getElementById('sidekickName')?.closest('.form-group');
+      if (sidekickGroup) sidekickGroup.style.display = 'none';
+    } else {
+      const title = document.querySelector('#screenPeople .section-title');
+      const sub = document.querySelector('#screenPeople .section-sub');
+      if (title) title.textContent = "Who's in the story?";
+      if (sub) sub.textContent = 'The people and pets that make it personal.';
+      const friendLabel = document.querySelector('#friendName')?.previousElementSibling;
+      if (friendLabel && friendLabel.tagName === 'LABEL') friendLabel.textContent = 'Best friend or favourite person';
+      const friendInput = document.getElementById('friendName');
+      if (friendInput) friendInput.placeholder = "e.g. their best friend, a cousin, favourite person";
+      const sidekickGroup = document.getElementById('sidekickName')?.closest('.form-group');
+      if (sidekickGroup) sidekickGroup.style.display = 'block';
+    }
   }
-if(id === 'screenLearningSetup') restoreLearningSetup();
-  if(id === 'screenTheme') {
+  if(id === 'screenLearningSetup') restoreLearningSetup();
+  if(id === 'screenThemeSetting') {
     const sub = document.getElementById('themeSubtext');
     if (storyData.category === 'learning') {
       sub.textContent = 'These set the world for the adventure. The learning happens inside it.';
     } else {
       sub.textContent = 'Pick as many as you like. These shape the whole story.';
     }
+  }
+  if(id === 'screenExtras') {
+    const multiGroup = document.getElementById('multiDynamicsGroup');
+    const subjectGroup = document.getElementById('subjectGroup');
+    const learningGoalGroup = document.getElementById('learningGoalGroup');
+    if (multiGroup) multiGroup.style.display = storyData.isMultiChild ? 'block' : 'none';
+    if (subjectGroup) subjectGroup.style.display = storyData.category === 'learning' ? 'block' : 'none';
+    if (learningGoalGroup) learningGoalGroup.style.display = storyData.category === 'learning' ? 'block' : 'none';
   }
 }
 
@@ -2668,7 +2738,7 @@ history.replaceState({ screen: 'screenLanding' }, '', '');
 
 // ===== FORM STATE PERSISTENCE =====
 // Save form inputs so interrupted parents don't lose progress
-const FORM_FIELDS = ['childName','age','gender','proudOf','earlyEmail','friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','customTheme','themeDetail','customWhere','favTeddy','extraDetails','personalMessage','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2'];
+const FORM_FIELDS = ['proudOf','friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','customTheme','themeDetail','customWhere','siblingDynamics','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2'];
 
 function saveFormState() {
   try {
@@ -2708,7 +2778,7 @@ function restoreFormState() {
 const _origGoTo = goTo;
 goTo = function(id, skipHistory) {
   _origGoTo(id, skipHistory);
-  if (['screenDetails','screenPeople','screenTheme','screenWhere','screenExtras','screenVoice','screenReview'].includes(id)) {
+  if (['screenDetails','screenPeople','screenThemeSetting','screenExtras','screenVoice','screenReview'].includes(id)) {
     saveFormState();
   }
   // Preview screen: show email as confirmation if already filled, or as input if empty
@@ -2734,26 +2804,16 @@ function restoreCategory() {
 }
 
 function restoreDetails() {
-  if (storyData.childName) document.getElementById('childName').value = storyData.childName;
-  if (storyData.age) document.getElementById('age').value = storyData.age;
-  if (storyData.gender) document.getElementById('gender').value = storyData.gender;
-  if (storyData.friendName) document.getElementById('friendName').value = storyData.friendName;
-  if (storyData.sidekickName) document.getElementById('sidekickName').value = storyData.sidekickName;
-  if (storyData.proudOf) document.getElementById('proudOf').value = storyData.proudOf;
-  // Restore early email from preview email if available
-  const earlyEmailEl = document.getElementById('earlyEmail');
-  const prevEmail = document.getElementById('previewEmail');
-  if (earlyEmailEl && prevEmail && prevEmail.value) earlyEmailEl.value = prevEmail.value;
-  if (storyData.familyMembers) document.getElementById('familyMembers').value = storyData.familyMembers;
-  if (storyData.teacherName) document.getElementById('teacherName').value = storyData.teacherName;
-  if (storyData.petName) document.getElementById('petName').value = storyData.petName;
-  if (storyData.petType) document.getElementById('petType').value = storyData.petType;
-  if (storyData.favTeddy) document.getElementById('favTeddy').value = storyData.favTeddy;
-  if (storyData.customWhere) document.getElementById('customWhere').value = storyData.customWhere;
-  if (storyData.subject) document.getElementById('subject').value = storyData.subject;
-  if (storyData.learningGoal) document.getElementById('learningGoal').value = storyData.learningGoal;
-  if (storyData.extraDetails) document.getElementById('extraDetails').value = storyData.extraDetails;
-  if (storyData.personalMessage) document.getElementById('personalMessage').value = storyData.personalMessage;
+  // Restore form fields that persist across screens
+  if (storyData.friendName) { const el = document.getElementById('friendName'); if (el) el.value = storyData.friendName; }
+  if (storyData.sidekickName) { const el = document.getElementById('sidekickName'); if (el) el.value = storyData.sidekickName; }
+  if (storyData.familyMembers) { const el = document.getElementById('familyMembers'); if (el) el.value = storyData.familyMembers; }
+  if (storyData.teacherName) { const el = document.getElementById('teacherName'); if (el) el.value = storyData.teacherName; }
+  if (storyData.petName) { const el = document.getElementById('petName'); if (el) el.value = storyData.petName; }
+  if (storyData.petType) { const el = document.getElementById('petType'); if (el) el.value = storyData.petType; }
+  if (storyData.customWhere) { const el = document.getElementById('customWhere'); if (el) el.value = storyData.customWhere; }
+  if (storyData.subject) { const el = document.getElementById('subject'); if (el) el.value = storyData.subject; }
+  if (storyData.learningGoal) { const el = document.getElementById('learningGoal'); if (el) el.value = storyData.learningGoal; }
   if (storyData.hasPet) {
     const pt = document.getElementById('petToggle');
     if (pt && !pt.classList.contains('on')) pt.classList.add('on');
@@ -2763,18 +2823,9 @@ function restoreDetails() {
   if (storyData.isGift || isGiftMode) {
     isGiftMode = true;
     setGiftMode(true, false);
-    if (storyData.giftEmail) document.getElementById('giftEmail').value = storyData.giftEmail;
-    if (storyData.giftFrom) document.getElementById('giftFrom').value = storyData.giftFrom;
-    if (storyData.giftMessage) document.getElementById('giftMessage').value = storyData.giftMessage;
-    const gis = document.getElementById('giftInStoryToggle');
-    if (storyData.giftInStory === false) {
-      if (gis && gis.classList.contains('on')) gis.classList.remove('on');
-      document.getElementById('giftInStoryHint').textContent = 'Your name will still be in the opening message, but you won\'t appear as a character.';
-    } else {
-      if (gis && !gis.classList.contains('on')) gis.classList.add('on');
-    }
-    const pmg = document.getElementById('personalMessageGroup');
-    if (pmg) pmg.style.display = 'none';
+    if (storyData.giftEmail) { const el = document.getElementById('giftEmail'); if (el) el.value = storyData.giftEmail; }
+    if (storyData.giftFrom) { const el = document.getElementById('giftFrom'); if (el) el.value = storyData.giftFrom; }
+    if (storyData.giftMessage) { const el = document.getElementById('giftMessage'); if (el) el.value = storyData.giftMessage; }
   }
   // Restore theme selections
   if (storyData.themes && storyData.themes.length) {
@@ -2783,7 +2834,7 @@ function restoreDetails() {
     });
     updateThemeFollowUp();
   }
-  if (storyData.themeDetail) document.getElementById('themeDetail').value = storyData.themeDetail;
+  if (storyData.themeDetail) { const el = document.getElementById('themeDetail'); if (el) el.value = storyData.themeDetail; }
   // Restore where selection
   if (storyData.where) {
     document.querySelectorAll('#whereGrid .theme-tile').forEach(t => {
@@ -2937,6 +2988,90 @@ function toggleGift() {
   setGiftMode(!isGiftMode);
 }
 
+// ===== MULTI-CHILD FLOW =====
+function formatChildrenNames(children) {
+  const names = children.map(c => c.name).filter(Boolean);
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return names[0] + ' & ' + names[1];
+  return names.slice(0, -1).join(', ') + ' & ' + names[names.length - 1];
+}
+
+// selectChildCount removed: unified details screen handles 1-5 children
+
+function renderChildCards() {
+  const container = document.getElementById('childCards');
+  if (!container) return;
+  container.innerHTML = '';
+  storyData.children.forEach((child, i) => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem;position:relative';
+    const nameLabel = child.name ? `Tell me about ${escHtml(child.name)}` : 'Tell me about them';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+        <p style="margin:0;font-size:0.82rem;font-weight:700;color:var(--purple)">Child ${i + 1}</p>
+        ${storyData.children.length > 1 ? `<button onclick="removeChildCard(${i})" style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--text-muted);padding:0 0.25rem" title="Remove">&times;</button>` : ''}
+      </div>
+      <div class="form-group" style="margin-bottom:0.5rem">
+        <input type="text" id="mcName${i}" placeholder="Their name" value="${escHtml(child.name)}" oninput="updateChildData(${i})" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
+        <input type="number" id="mcAge${i}" placeholder="Age" value="${child.age}" oninput="updateChildData(${i})" style="flex:1;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
+        <select id="mcGender${i}" onchange="updateChildData(${i})" style="flex:1;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
+          <option value="">Gender</option>
+          <option value="boy"${child.gender==='boy'?' selected':''}>Boy</option>
+          <option value="girl"${child.gender==='girl'?' selected':''}>Girl</option>
+          <option value="neutral"${child.gender==='neutral'?' selected':''}>Prefer not to say</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin:0">
+        <label id="mcAboutLabel${i}" style="font-size:0.78rem;color:var(--text-muted);font-weight:600">${nameLabel} (optional)</label>
+        <textarea id="mcAbout${i}" placeholder="What do they love? What makes them laugh? Any milestones, quirks, or favourite things?" oninput="updateChildData(${i})" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:50px;resize:vertical">${escHtml(child.about || '')}</textarea>
+      </div>`;
+    container.appendChild(card);
+  });
+  // Show/hide add button and hint
+  const addBtn = document.getElementById('addChildBtn');
+  const hint = document.getElementById('maxChildrenHint');
+  if (addBtn) addBtn.style.display = storyData.children.length >= 5 ? 'none' : 'flex';
+  if (hint) hint.style.display = storyData.children.length >= 5 ? 'block' : 'none';
+}
+
+function updateChildData(i) {
+  const name = document.getElementById('mcName' + i);
+  const age = document.getElementById('mcAge' + i);
+  const gender = document.getElementById('mcGender' + i);
+  const about = document.getElementById('mcAbout' + i);
+  if (name) {
+    storyData.children[i].name = name.value.trim();
+    // Update the "tell me about" label dynamically
+    const label = document.getElementById('mcAboutLabel' + i);
+    if (label) label.textContent = name.value.trim() ? 'Tell me about ' + escHtml(name.value.trim()) + ' (optional)' : 'Tell me about them (optional)';
+  }
+  if (age) storyData.children[i].age = age.value;
+  if (gender) storyData.children[i].gender = gender.value;
+  if (about) storyData.children[i].about = about.value.trim();
+}
+
+function addChildCard() {
+  if (storyData.children.length >= 5) return;
+  storyData.children.push({ name: '', age: '', gender: '' });
+  renderChildCards();
+  // Focus the new name input
+  setTimeout(() => {
+    const el = document.getElementById('mcName' + (storyData.children.length - 1));
+    if (el) el.focus();
+  }, 50);
+}
+
+function removeChildCard(i) {
+  if (storyData.children.length <= 1) return;
+  storyData.children.splice(i, 1);
+  renderChildCards();
+}
+
+// validateMultiChildren removed: unified validateDetails handles 1-5 children
+
 function toggleGiftInStory() {
   const t = document.getElementById('giftInStoryToggle');
   t.classList.toggle('on');
@@ -3062,104 +3197,138 @@ function hideInlineError(id) {
   if (el) { el.style.display = 'none'; }
 }
 
+// Unified details validator: works for 1 to 5 children
 function validateDetails() {
   hideInlineError('detailsError');
-  const name = document.getElementById('childName').value.trim();
-  const age = document.getElementById('age').value;
-  const gender = document.getElementById('gender').value;
-  const email = document.getElementById('earlyEmail').value.trim();
-  if (!name) { showInlineError('detailsError', 'Please tell me their name.'); return; }
-  if (name.split(/\s+/).length > 4 || name.length > 45) { showInlineError('detailsError', "That looks like more than a name — just their first name is perfect, for example 'Chase' or 'Emma'."); return; }
-  if (!age) { showInlineError('detailsError', 'Please tell us their age.'); return; }
-  if (!gender) { showInlineError('detailsError', 'Please select boy or girl.'); return; }
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showInlineError('detailsError', 'Please enter a valid email so I can send you the story.'); return; }
-  // Pre-fill the preview email field
-  const previewEmailEl = document.getElementById('previewEmail');
-  if (previewEmailEl && !previewEmailEl.value) previewEmailEl.value = email;
-  trackEvent('FormStep2_Details');
-  // Facebook Lead event when email captured
-  if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: storyData.category || '' });
-  // TikTok SubmitForm
-  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('SubmitForm', { content_name: storyData.category || '' });
+  // Read latest values from all child card inputs
+  storyData.children.forEach((c, i) => updateChildData(i));
+
+  // Remove empty cards (no name at all)
+  const filled = storyData.children.filter(c => c.name);
+  if (filled.length === 0) {
+    showInlineError('detailsError', 'Please tell me their name.');
+    return;
+  }
+
+  // Validate each filled child
+  for (let i = 0; i < storyData.children.length; i++) {
+    const c = storyData.children[i];
+    if (!c.name && !c.age && !c.gender) continue; // skip truly empty cards
+    if (!c.name) { showInlineError('detailsError', 'Please fill in the name for each child, or remove empty cards.'); return; }
+    if (c.name.split(/\s+/).length > 4 || c.name.length > 45) { showInlineError('detailsError', "Just their first name is perfect, for example 'Chase' or 'Emma'."); return; }
+    if (!c.age) { showInlineError('detailsError', 'Please add an age for ' + c.name + '.'); return; }
+    if (!c.gender) { showInlineError('detailsError', 'Please select a gender for ' + c.name + '.'); return; }
+  }
+
+  // Remove truly empty cards
+  storyData.children = storyData.children.filter(c => c.name);
+
+  // Set multi-child flag
+  storyData.isMultiChild = storyData.children.length > 1;
+
+  // Compute display fields
+  storyData.childName = formatChildrenNames(storyData.children);
+  if (storyData.children.length === 1) {
+    storyData.age = storyData.children[0].age;
+    storyData.gender = storyData.children[0].gender;
+  } else {
+    storyData.age = Math.min(...storyData.children.map(c => parseInt(c.age) || 99));
+    const genders = [...new Set(storyData.children.map(c => c.gender))];
+    storyData.gender = genders.length === 1 ? genders[0] : 'neutral';
+  }
+  storyData.proudOf = document.getElementById('proudOf').value.trim();
+
+  trackEvent('FormStep2_Details', { children_count: storyData.children.length });
   goTo('screenPeople');
 }
 
 function validatePeople() {
   hideInlineError('peopleError');
   const friend = document.getElementById('friendName').value.trim();
-  if (!friend) { showInlineError('peopleError', 'Please tell us their best friend or favourite person\'s name. A cousin or family member works too!'); return; }
+  if (!friend && !storyData.isMultiChild) { showInlineError('peopleError', "Please tell us their best friend or favourite person's name. A cousin or family member works too!"); return; }
   trackEvent('FormStep3_People');
-  goTo('screenTheme');
+  goTo('screenThemeSetting');
 }
 
-function validateTheme() {
+function validateThemeSetting() {
   hideInlineError('themeError');
   const themes = getSelectedThemes();
-  if (themes.length === 0) { showInlineError('themeError', 'Please pick at least one thing they love, or type something in.'); return; }
-  trackEvent('FormStep4_Theme');
-  goTo('screenWhere');
+  const customTheme = document.getElementById('customTheme').value.trim();
+  if (themes.length === 0 && !customTheme) { showInlineError('themeError', 'Pick at least one interest or tell me something they love.'); return; }
+  trackEvent('FormStep4_ThemeSetting');
+  if (needsExtrasScreen()) {
+    goTo('screenExtras');
+  } else {
+    goToVoice();
+  }
 }
 
-function goToLength() {
-  // Validation already done per screen, just collect all data
-  const name = document.getElementById('childName').value.trim();
-  const age = document.getElementById('age').value;
-  const gender = document.getElementById('gender').value;
-  if(!name || !age || !gender) { goTo('screenDetails'); return; }
-  const friend = document.getElementById('friendName').value.trim();
-  if(!friend) { goTo('screenPeople'); return; }
-  const themes = getSelectedThemes();
-  if(themes.length === 0) { goTo('screenTheme'); return; }
+function needsExtrasScreen() {
+  return storyData.isMultiChild || storyData.category === 'learning';
+}
 
-  storyData.childName = name;
-  storyData.age = age;
-  storyData.gender = gender;
-  storyData.proudOf = document.getElementById('proudOf').value.trim();
-  storyData.friendName = friend;
-  storyData.sidekickName = document.getElementById('sidekickName').value.trim();
+function goToVoice() {
+  goToLength(); // collects all data, then navigates to screenVoice
+}
+
+// validateTheme removed: replaced by validateThemeSetting
+
+// Collect all story data from all screens and navigate to voice
+function goToLength() {
+  // Children data already set by validateDetails
+  if (!storyData.children || storyData.children.length === 0) { goTo('screenDetails'); return; }
+
+  // People
+  storyData.friendName = document.getElementById('friendName').value.trim();
+  storyData.sidekickName = storyData.isMultiChild ? '' : (document.getElementById('sidekickName')?.value?.trim() || '');
   storyData.familyMembers = document.getElementById('familyMembers').value.trim();
   storyData.teacherName = (storyData.category === 'learning') ? document.getElementById('teacherName').value.trim() : '';
-  storyData.themes = themes;
-  storyData.interest = themes.join(', ');
-  storyData.themeDetail = document.getElementById('themeDetail').value.trim();
   storyData.hasPet = document.getElementById('petToggle').classList.contains('on');
   storyData.petName = document.getElementById('petName').value.trim();
   storyData.petType = document.getElementById('petType').value.trim();
   storyData.hasVillain = document.getElementById('villainToggle').classList.contains('on');
   storyData.villainName = storyData.hasVillain ? document.getElementById('villainName').value.trim() : '';
-  storyData.favTeddy = document.getElementById('favTeddy').value.trim();
+
+  // Themes + setting (merged screen)
+  storyData.themes = getSelectedThemes();
+  storyData.interest = storyData.themes.join(', ');
+  storyData.themeDetail = document.getElementById('themeDetail').value.trim();
   storyData.customWhere = document.getElementById('customWhere').value.trim();
-  // Combine tile setting with custom detail so Claude gets both
   if (storyData.customWhere && storyData.where && storyData.where !== 'Surprise me') {
     storyData.setting = storyData.where + ' (' + storyData.customWhere + ')';
   } else {
     storyData.setting = storyData.customWhere || storyData.where;
   }
-  // All stories are 15 minutes (length screen removed)
-  storyData.length = 'long';
-  // Learning subject and goal come from screenLearningSetup (if learning category)
-  if (storyData.category === 'learning') {
-    storyData.subject = selectedSubject || document.getElementById('subject').value;
-    storyData.learningGoal = document.getElementById('learningGoal2').value.trim() || document.getElementById('learningGoal').value.trim();
-    storyData.confidence = selectedConfidence || 'practising';
-  } else {
-    storyData.subject = document.getElementById('subject').value;
-    storyData.learningGoal = document.getElementById('learningGoal').value.trim();
+
+  // Extras (conditional screen)
+  if (storyData.isMultiChild) {
+    const dynEl = document.getElementById('siblingDynamics');
+    if (dynEl) storyData.siblingDynamics = dynEl.value.trim();
   }
-  storyData.extraDetails = document.getElementById('extraDetails').value.trim();
-  storyData.email = document.getElementById('earlyEmail').value.trim();
+  if (storyData.category === 'learning') {
+    storyData.subject = selectedSubject || document.getElementById('subject')?.value || '';
+    storyData.learningGoal = (document.getElementById('learningGoal2')?.value?.trim()) || (document.getElementById('learningGoal')?.value?.trim()) || '';
+    storyData.confidence = selectedConfidence || 'practising';
+  }
+
+  // Combine per-child "about" into extraDetails for the prompt
+  if (storyData.children.length > 0) {
+    const childAbouts = storyData.children
+      .filter(c => c.about)
+      .map(c => c.name + ': ' + c.about);
+    storyData.extraDetails = childAbouts.join('\n');
+  }
+
+  storyData.length = 'long';
   storyData.isGift = isGiftMode;
-  if(storyData.isGift) {
+  if (storyData.isGift) {
     storyData.giftEmail = document.getElementById('giftEmail').value.trim();
     storyData.giftFrom = document.getElementById('giftFrom').value.trim();
     storyData.giftMessage = document.getElementById('giftMessage').value.trim();
     storyData.giftInStory = document.getElementById('giftInStoryToggle').classList.contains('on');
-    // Gift message is the audio intro only,do NOT copy to personalMessage
-    // or the AI prompt will also echo it throughout the story (double exposure)
     storyData.personalMessage = '';
-  } else {
-    storyData.personalMessage = document.getElementById('personalMessage').value.trim();
   }
+
   goTo('screenVoice');
 }
 
@@ -3396,12 +3565,22 @@ function showReview() {
   let html = '';
 
   // Story type hero
-  html += `<div style="background:var(--cat-accent-light,var(--purple-light));border:2px solid var(--cat-accent,var(--purple));border-radius:14px;padding:1rem;text-align:center;margin-bottom:0.5rem">
-    <span style="font-size:1.8rem">${catEmoji[d.category] || '&#128214;'}</span>
-    <p style="margin:0.3rem 0 0;font-size:1rem;font-weight:800;color:var(--text)">${catLabel[d.category] || d.category} for ${escHtml(d.childName)}</p>
-    <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${escHtml(d.gender)}, age ${escHtml(d.age)}${d.proudOf ? ' &middot; ' + escHtml(d.proudOf) : ''}</p>
-    ${pencil('screenDetails')}
-  </div>`;
+  if (d.isMultiChild && d.children && d.children.length > 1) {
+    const childList = d.children.map(c => `${escHtml(c.name)} (${escHtml(c.gender)}, ${escHtml(c.age)})`).join(' &middot; ');
+    html += `<div style="background:var(--cat-accent-light,var(--purple-light));border:2px solid var(--cat-accent,var(--purple));border-radius:14px;padding:1rem;text-align:center;margin-bottom:0.5rem">
+      <span style="font-size:1.8rem">${catEmoji[d.category] || '&#128214;'}</span>
+      <p style="margin:0.3rem 0 0;font-size:1rem;font-weight:800;color:var(--text)">${catLabel[d.category] || d.category} for ${escHtml(d.childName)}</p>
+      <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${childList}${d.proudOf ? ' &middot; ' + escHtml(d.proudOf) : ''}</p>
+      ${pencil('screenDetails')}
+    </div>`;
+  } else {
+    html += `<div style="background:var(--cat-accent-light,var(--purple-light));border:2px solid var(--cat-accent,var(--purple));border-radius:14px;padding:1rem;text-align:center;margin-bottom:0.5rem">
+      <span style="font-size:1.8rem">${catEmoji[d.category] || '&#128214;'}</span>
+      <p style="margin:0.3rem 0 0;font-size:1rem;font-weight:800;color:var(--text)">${catLabel[d.category] || d.category} for ${escHtml(d.childName)}</p>
+      <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${escHtml(d.gender)}, age ${escHtml(d.age)}${d.proudOf ? ' &middot; ' + escHtml(d.proudOf) : ''}</p>
+      ${pencil('screenDetails')}
+    </div>`;
+  }
 
   // Characters card
   const charItems = [['Best friend', d.friendName]];
@@ -3416,7 +3595,7 @@ function showReview() {
   const worldItems = [['Interests', d.themes.join(', ') + (d.themeDetail ? ' (' + d.themeDetail + ')' : '')]];
   if (d.favTeddy) worldItems.push(['Special item', d.favTeddy]);
   worldItems.push(['Setting', d.setting || 'Surprise me']);
-  html += card('Story world', 'screenTheme', worldItems);
+  html += card('Story world', 'screenThemeSetting', worldItems);
 
   // Learning card (if applicable)
   if (d.category === 'learning' && (d.subject || d.learningGoal)) {
@@ -3534,15 +3713,23 @@ async function generatePreview() {
 
   // Personalised loading messages
   const d = storyData;
-  const msgs = [
-    `Writing ${d.childName}'s story from scratch...`,
-    `Weaving ${d.childName}'s name into every scene...`,
-  ];
-  if (d.friendName) msgs.push(`Giving ${d.friendName} a starring role...`);
-  if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} does something unforgettable...`);
-  if (d.sidekickName) msgs.push(`Writing ${d.sidekickName} into the adventure...`);
-  if (d.themes && d.themes.length) msgs.push(`Building a world around ${d.themes[0].toLowerCase()}...`);
-  if (d.familyMembers) msgs.push(`Writing in the people ${d.childName} loves most...`);
+  const msgs = [];
+  if (d.isMultiChild && d.children && d.children.length > 1) {
+    d.children.forEach(c => msgs.push(`Writing ${c.name}'s entrance...`));
+    msgs.push('Weaving everyone together...');
+    d.children.forEach(c => msgs.push(`Giving ${c.name} their big moment...`));
+    if (d.friendName) msgs.push(`Adding ${d.friendName} to the adventure...`);
+    if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} does something unforgettable...`);
+    if (d.themes && d.themes.length) msgs.push(`Building a world around ${d.themes[0].toLowerCase()}...`);
+  } else {
+    msgs.push(`Writing ${d.childName}'s story from scratch...`);
+    msgs.push(`Weaving ${d.childName}'s name into every scene...`);
+    if (d.friendName) msgs.push(`Giving ${d.friendName} a starring role...`);
+    if (d.hasPet && d.petName) msgs.push(`Making sure ${d.petName} does something unforgettable...`);
+    if (d.sidekickName) msgs.push(`Writing ${d.sidekickName} into the adventure...`);
+    if (d.themes && d.themes.length) msgs.push(`Building a world around ${d.themes[0].toLowerCase()}...`);
+    if (d.familyMembers) msgs.push(`Writing in the people ${d.childName} loves most...`);
+  }
   msgs.push('Choosing the perfect opening line...');
   msgs.push('Almost there, something special is taking shape...');
   let msgIdx = 0;
@@ -3556,8 +3743,12 @@ async function generatePreview() {
   detailsWrap.innerHTML = '';
   const catLabelsLoading = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
   const pills = [];
-  pills.push(escHtml(d.childName));
-  if (d.age) pills.push('Age ' + escHtml(String(d.age)));
+  if (d.isMultiChild && d.children && d.children.length > 1) {
+    d.children.forEach(c => pills.push(escHtml(c.name)));
+  } else {
+    pills.push(escHtml(d.childName));
+    if (d.age) pills.push('Age ' + escHtml(String(d.age)));
+  }
   pills.push(escHtml(catLabelsLoading[d.category] || 'Story'));
   if (d.friendName) pills.push(escHtml(d.friendName));
   if (d.sidekickName) pills.push(escHtml(d.sidekickName));
@@ -3624,7 +3815,7 @@ async function generatePreview() {
       const bgRes = await fetch('/.netlify/functions/full-worker-background', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ mode: 'preview', storyData, voiceId: selectedVoiceId, jobId })
+        body: JSON.stringify({ mode: 'preview-full', storyData, voiceId: selectedVoiceId, jobId })
       });
       console.log('Preview background worker triggered:', bgRes.status);
     } catch(bgErr) {
@@ -3684,8 +3875,12 @@ async function generatePreview() {
     audio.addEventListener('timeupdate', audio._stTime);
     audio.addEventListener('ended', audio._stEnd);
 
-    // Personalise unlock button with child's name
-    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story &mdash; ' + (window.pricing ? window.pricing.display : '£19.99');
+    // Personalise unlock button
+    if (storyData.isMultiChild) {
+      document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock their full story &mdash; ' + (window.pricing ? window.pricing.display : '£19.99');
+    } else {
+      document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story &mdash; ' + (window.pricing ? window.pricing.display : '£19.99');
+    }
 
     clearInterval(msgInterval);
     clearInterval(pillInterval);
@@ -3696,12 +3891,22 @@ async function generatePreview() {
     const catLabels = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
     const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
     document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
-    document.getElementById('previewTitle').textContent = `${storyData.childName}'s story is waiting`;
-    document.getElementById('previewSub').textContent = `This is just the opening. The full story is 15 minutes of ${storyData.childName} as the hero.`;
+    if (storyData.isMultiChild) {
+      document.getElementById('previewTitle').textContent = 'Their story is waiting';
+      document.getElementById('previewSub').textContent = 'This is just the opening. The full story is 15 minutes of adventure.';
+    } else {
+      document.getElementById('previewTitle').textContent = `${storyData.childName}'s story is waiting`;
+      document.getElementById('previewSub').textContent = `This is just the opening. The full story is 15 minutes of ${storyData.childName} as the hero.`;
+    }
     let summary = `<p style="font-size:0.78rem;color:var(--cat-accent-dark,var(--purple));font-weight:700;margin:0 0 0.4rem;text-align:center">What you built:</p>`;
     summary += `<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500;text-align:center">`;
-    summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} for <strong>${escHtml(storyData.childName)}</strong>`;
-    if (storyData.friendName) summary += ` with best friend <strong>${escHtml(storyData.friendName)}</strong>`;
+    if (storyData.isMultiChild && storyData.children && storyData.children.length > 1) {
+      const boldNames = storyData.children.map(c => `<strong>${escHtml(c.name)}</strong>`).join(', ').replace(/, ([^,]*)$/, ' & $1');
+      summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} starring ${boldNames}`;
+    } else {
+      summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} for <strong>${escHtml(storyData.childName)}</strong>`;
+    }
+    if (storyData.friendName) summary += ` with ${storyData.isMultiChild ? '' : 'best friend '}<strong>${escHtml(storyData.friendName)}</strong>`;
     if (storyData.hasPet && storyData.petName) summary += `, ${escHtml(storyData.petName)} the ${escHtml(storyData.petType || 'pet')}`;
     if (storyData.themes && storyData.themes.length) summary += `, featuring ${escHtml(storyData.themes.join(', ').toLowerCase())}`;
     if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${escHtml(storyData.setting.toLowerCase())}`;
@@ -3944,15 +4149,9 @@ async function handleStripeReturn() {
   if (!sessionId) return;
   lastStripeSessionId = sessionId;
 
-  // NOTE: Do NOT clean the URL yet. If something fails, a page refresh must
-  // re-trigger handleStripeReturn so the customer doesn't lose their paid story.
-  // URL is cleaned after successful generation below.
-
-  // Restore saved story data (try sessionStorage first, fall back to server)
+  // Restore saved story data
   let saved = sessionStorage.getItem('storytold_story');
   if (!saved) {
-    // sessionStorage was wiped during redirect (common on mobile browsers)
-    // Recover from server-side backup with retries
     goTo('screenLoading');
     document.querySelector('.loading-text').textContent = 'Restoring your story...';
     document.querySelector('.loading-sub').textContent = 'Just a moment.';
@@ -3965,16 +4164,13 @@ async function handleStripeReturn() {
           body: JSON.stringify({ sessionId })
         });
         const pendingData = await pendingRes.json();
-        if (pendingData.success) {
-          saved = JSON.stringify(pendingData);
-        }
+        if (pendingData.success) saved = JSON.stringify(pendingData);
       } catch (e) {
-        console.error('Pending story recovery attempt ' + (attempt + 1) + ' failed:', e);
+        console.error('Recovery attempt ' + (attempt + 1) + ' failed:', e);
       }
     }
   }
   if (!saved) {
-    // Session expired - show inline message instead of alert
     const expBanner = document.createElement('div');
     expBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF8F0;border-bottom:2px solid var(--orange);padding:1rem;text-align:center;z-index:9999;font-size:0.85rem;color:#995500;font-weight:600';
     expBanner.innerHTML = 'Your session expired. Please create your story again. <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:1rem;font-size:1.1rem">&times;</span>';
@@ -3982,202 +4178,125 @@ async function handleStripeReturn() {
     return;
   }
   const parsed = JSON.parse(saved);
-  const { storyData: savedData, previewStoryText: savedPreview, fullStoryText: savedStory, selectedVoiceId: savedVoice } = parsed;
+  const { storyData: savedData, previewStoryText: savedPreview, selectedVoiceId: savedVoice } = parsed;
   Object.assign(storyData, savedData);
-  previewStoryText = savedPreview || savedStory || '';
-  fullStoryText = savedStory || savedPreview || '';
+  previewStoryText = savedPreview || '';
   selectedVoiceId = savedVoice || 'EXAVITQu4vr4xnSDxMaL';
-  applyCategoryTheme(storyData.category);
 
   // Verify payment
   goTo('screenLoading');
   document.querySelector('.loading-text').textContent = 'Confirming your payment...';
-  document.querySelector('.loading-sub').textContent = 'Just a moment while we verify everything.';
+  document.querySelector('.loading-sub').textContent = 'Just a moment.';
 
   try {
     const verifyRes = await fetch('/api/verify-payment', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ session_id: sessionId })
     });
     const verifyData = await verifyRes.json();
-    if (!verifyData.success) throw new Error('Payment not confirmed. Please contact support.');
+    if (!verifyData.success) throw new Error('Payment not confirmed.');
 
-    // Update Meta pixel with customer email for better advanced matching
+    // Update Meta pixel with customer email
     if (typeof fbq === 'function' && verifyData.customerEmail) {
       fbq('init', '1656775315345896', { em: verifyData.customerEmail.trim().toLowerCase() });
     }
 
-    // Fire Purchase event across all pixels (eventID matches server-side for dedup)
+    // Fire Purchase event
     trackEvent('Purchase', { value: window.pricing ? window.pricing.amount : 19.99, currency: window.pricing ? window.pricing.currency : 'GBP', content_name: storyData.category }, { eventID: 'purchase_' + sessionId });
 
-    // Payment confirmed, switch to dedicated generation screen
-    startGeneratingScreen(storyData.childName);
+    // Create pending order (no real-time generation)
+    const orderRes = await fetch('/api/generate-full', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        storyData,
+        sessionId,
+        jobId: window._currentJobId || '',
+        customerEmail: verifyData.customerEmail,
+        voiceId: selectedVoiceId,
+        feedback: storyData._previewFeedback || null,
+        giftDeliveryPreference: storyData._giftDeliveryPref || null
+      })
+    });
+    const orderData = await orderRes.json();
+    console.log('Pending order created:', orderData);
 
-    const fullJobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const bgPayload = JSON.stringify({ storyData, previewStory: previewStoryText, voiceId: selectedVoiceId, childName: storyData.childName, sessionId, jobId: fullJobId, customerEmail: verifyData.customerEmail });
-
-    // Call background function with retry
-    let bgTriggered = false;
-    let bgErrorStatus = '';
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        const bgRes = await fetch('/.netlify/functions/full-worker-background', {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: bgPayload
-        });
-        if (bgRes.ok || bgRes.status === 202) { bgTriggered = true; break; }
-        bgErrorStatus = 'Status ' + bgRes.status;
-        console.error(`BG trigger attempt ${attempt + 1}: ${bgRes.status}`, await bgRes.text().catch(() => ''));
-      } catch(e) {
-        bgErrorStatus = e.message;
-        console.error(`BG trigger attempt ${attempt + 1}:`, e.message);
-      }
-      if (attempt < 2) await new Promise(r => setTimeout(r, 2000));
-    }
-
-    if (!bgTriggered) {
-      throw new Error('Story generation could not start. Your payment is safe. Please contact jamie@heartheirname.com');
-    }
-
-    // Poll for result
-    let data = await pollForFull(fullJobId);
-
-    // If the story was queued for retry (will be emailed when ready)
-    if (data && data.queued) {
-      stopGeneratingScreen();
-      goTo('screenFull');
-      document.getElementById('fullTitle').textContent = 'Almost there!';
-      document.getElementById('fullStoryFor').textContent = '';
-      document.querySelector('#screenFull .full-hero').insertAdjacentHTML('afterend',
-        '<div style="text-align:center;padding:1.5rem;max-width:400px;margin:0 auto">' +
-        '<p style="font-size:1rem;color:var(--text);line-height:1.7;margin:0 0 1rem">' +
-        'Our story engine is very busy right now, but do not worry. ' + escHtml(storyData.childName) + '\'s story is in the queue and will be ready shortly.</p>' +
-        '<p style="font-size:0.95rem;color:var(--text);line-height:1.7;margin:0 0 1.5rem">' +
-        'We will email you as soon as it is ready to listen. You can close this page safely.</p>' +
-        '<p style="font-size:0.82rem;color:var(--text-muted)">Your payment is confirmed. No action needed.</p>' +
-        '</div>'
-      );
-      document.querySelector('#screenFull .full-player').style.display = 'none';
-      window.history.replaceState({}, '', window.location.pathname);
-      sessionStorage.removeItem('storytold_story');
-      return;
-    }
-
-    if (!data || !data.success) {
-      throw new Error('Audio generation timed out. Your payment is safe. Please contact jamie@heartheirname.com');
-    }
-
-    stopGeneratingScreen();
-
-    // Save story to DB
-    if (verifyData.customerEmail) {
-      try {
-        const saveRes = await fetch('/api/save-story', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: verifyData.customerEmail,
-            storyData,
-            audioUrl: data.audioUrl,
-            stripeSessionId: sessionId,
-            voiceId: selectedVoiceId
-          })
-        });
-        const saveData = await saveRes.json();
-        if (saveData.success && saveData.storyId) lastSavedStoryId = saveData.storyId;
-      } catch(e) { console.error('Save failed:', e); }
-    }
-
-    // ── Set up the full story screen ──
-    const audio = document.getElementById('fullStoryAudio');
-    audio.volume = 0.75;
-    audio.src = data.audioUrl;
-    document.getElementById('fullStoryFor').textContent = 'A story for ' + storyData.childName;
-    document.getElementById('fullTitle').textContent = storyData.isGift ? storyData.childName + "'s gift is ready" : 'Their story is ready';
-
-    document.getElementById('sendGiftBtn').style.display = storyData.isGift ? 'block' : 'none';
-    document.getElementById('giftSentMsg').style.display = 'none';
-
-    // Generate discount code and send purchase email
-    let discountCode = null;
-    let discountPercent = 25;
-    if (verifyData.customerEmail) {
-      try {
-        const discRes = await fetch('/api/create-discount', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ customerEmail: verifyData.customerEmail })
-        });
-        const discData = await discRes.json();
-        if (discData.success && discData.code) {
-          discountCode = discData.code;
-          discountPercent = discData.percentOff || 25;
-        }
-      } catch(e) { console.error('Discount code generation failed:', e); }
-
-      sendPurchaseEmail(verifyData.customerEmail, sessionId, lastSavedStoryId, discountCode, discountPercent);
-
-      // If it's a gift and they provided an email, send gift email
-      if (storyData.isGift && storyData.giftEmail) {
-        try {
-          await fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'gift',
-              to: storyData.giftEmail,
-              childName: storyData.childName,
-              giftFrom: storyData.giftFrom,
-              giftMessage: storyData.giftMessage,
-              storyId: lastSavedStoryId,
-              sessionId
-            })
-          });
-          document.getElementById('sendGiftBtn').style.display = 'none';
-          document.getElementById('giftSentMsg').style.display = 'block';
-        } catch(e) { /* non-blocking */ }
-      }
-
-      document.getElementById('savedEmailAddr').textContent = verifyData.customerEmail;
-      document.getElementById('savedEmailNote').style.display = 'block';
-    }
-
-    // Story card, read along, play count (post-purchase enhancements)
-    populateStoryCard(storyData.childName, storyData.category, storyData);
-    setupReadAlong(fullStoryText);
-    if (lastSavedStoryId) incrementPlayCount(lastSavedStoryId);
-
-    // Everything worked: clean URL and clear saved session
+    // Show confirmation screen
     window.history.replaceState({}, '', window.location.pathname);
     sessionStorage.removeItem('storytold_story');
-    goTo('screenFull');
-    showNextStoryBanner(verifyData.customerEmail, discountCode, discountPercent);
-    launchConfetti();
-    // After confetti, scroll down to the play button so the user knows the story is ready
-    setTimeout(() => {
-      const playBtn = document.getElementById('fullPlayBtn');
-      if (playBtn) playBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 1500);
+    showConfirmationScreen(storyData, verifyData.customerEmail);
+
   } catch(err) {
-    stopGeneratingScreen();
-    console.error('Story generation error:', err.message, err.stack);
-    // Always offer retry. The session_id is still in the URL so a reload will re-trigger handleStripeReturn.
-    // Story data will be recovered from sessionStorage or Supabase pending backup.
+    console.error('Post-payment error:', err.message);
     goTo('screenLanding');
     const errBanner = document.createElement('div');
-    errBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF8F0;border-bottom:2px solid var(--orange, #E8A040);padding:1.25rem 1rem;text-align:center;z-index:9999;font-size:0.88rem;color:#8B6914;font-weight:600;line-height:1.6';
-    let bannerHtml = 'Something went wrong creating your story, but your payment is 100% safe.';
-    if (sessionId) {
-      bannerHtml += '<br><button onclick="window.location.href=window.location.pathname+\'?session_id=' + sessionId + '\'" style="margin-top:0.6rem;padding:0.6rem 1.5rem;border-radius:50px;border:none;background:var(--purple,#6B2F93);color:white;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:inherit">Try again</button>';
-    }
-    bannerHtml += '<br><span style="font-size:0.78rem;font-weight:500">If it still doesn\'t work, email <a href="mailto:jamie@heartheirname.com" style="color:var(--purple,#6B2F93);font-weight:700">jamie@heartheirname.com</a> and I will sort it personally.</span>';
-    bannerHtml += '<span onclick="this.parentElement.remove()" style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;font-size:1.2rem;color:#8B6914">&times;</span>';
-    errBanner.style.position = 'fixed';
-    errBanner.innerHTML = bannerHtml;
+    errBanner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#FFF8F0;border-bottom:2px solid var(--orange);padding:1rem;text-align:center;z-index:9999;font-size:0.85rem;color:#995500;font-weight:600;line-height:1.6';
+    errBanner.innerHTML = 'Something went wrong, but your payment is 100% safe. Email <a href="mailto:jamie@heartheirname.com" style="color:var(--purple);font-weight:700">jamie@heartheirname.com</a> and I will sort it personally. <span onclick="this.parentElement.remove()" style="cursor:pointer;margin-left:1rem;font-size:1.1rem">&times;</span>';
     document.body.prepend(errBanner);
   }
+}
+
+// Confirmation screen after payment (replaces the old generating screen)
+function showConfirmationScreen(data, email) {
+  const isMulti = data.isMultiChild && data.children && data.children.length > 1;
+  const displayName = isMulti ? formatChildrenNames(data.children) : data.childName;
+
+  goTo('screenFull');
+  document.getElementById('fullTitle').textContent = 'Thank you so much.';
+  document.getElementById('fullStoryFor').textContent = '';
+
+  // Replace the player area with confirmation content
+  const playerArea = document.querySelector('#screenFull .full-player');
+  if (playerArea) playerArea.style.display = 'none';
+
+  // Build confirmation content
+  let html = '<div style="text-align:center;padding:1.5rem;max-width:420px;margin:0 auto">';
+  html += '<p style="font-size:1.1rem;color:var(--text);line-height:1.7;margin:0 0 1rem;font-weight:600">';
+  html += "I'm going to make this perfect. " + (isMulti ? 'Their' : escHtml(displayName) + "'s") + ' full story will be delivered to your inbox within 24 hours.';
+  html += '</p>';
+
+  if (data._previewFeedback) {
+    html += '<div style="background:var(--purple-light);border-radius:12px;padding:1rem;margin:0 0 1rem;text-align:left">';
+    html += '<p style="margin:0 0 0.3rem;font-size:0.78rem;font-weight:700;color:var(--purple)">Your feedback</p>';
+    html += '<p style="margin:0;font-size:0.85rem;color:var(--text);line-height:1.5">' + escHtml(data._previewFeedback) + '</p>';
+    html += '</div>';
+    html += '<p style="font-size:0.88rem;color:var(--text);line-height:1.6;margin:0 0 1rem">I have noted your feedback and will work it into the full story.</p>';
+  }
+
+  // Order summary
+  html += '<div style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:1rem;margin:0 0 1.5rem;text-align:left">';
+  html += '<p style="margin:0 0 0.5rem;font-size:0.78rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.05em">Order summary</p>';
+  html += '<p style="margin:0;font-size:0.88rem;color:var(--text);line-height:1.6">';
+  if (isMulti) {
+    html += 'Story starring <strong>' + escHtml(displayName) + '</strong>';
+  } else {
+    html += 'Story for <strong>' + escHtml(displayName) + '</strong>';
+  }
+  const catLabels = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' };
+  html += '<br>' + (catLabels[data.category] || 'Story');
+  html += '<br>Delivered to: ' + escHtml(email);
+  html += '</p></div>';
+
+  html += '<p style="font-size:0.88rem;color:var(--text-muted);line-height:1.6;margin:0 0 1rem">If you have any questions, reach out to me at <a href="mailto:jamie@heartheirname.com" style="color:var(--purple);font-weight:700">jamie@heartheirname.com</a></p>';
+  html += '<p style="font-size:0.85rem;color:var(--text-muted);line-height:1.5;margin:0">Not happy with the final story? I will rewrite it. No questions asked.</p>';
+  html += '</div>';
+
+  // Insert after the hero section
+  const hero = document.querySelector('#screenFull .full-hero');
+  if (hero) {
+    // Remove any previous confirmation content
+    const existing = document.getElementById('confirmationContent');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.id = 'confirmationContent';
+    div.innerHTML = html;
+    hero.insertAdjacentElement('afterend', div);
+  }
+
+  // Hide post-purchase elements that don't apply
+  const elements = ['sendGiftBtn', 'giftSentMsg', 'savedEmailNote', 'nextStoryBanner', 'feedbackPrompt'];
+  elements.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
 }
 
 function showImproveFeedback() {
@@ -4456,13 +4575,14 @@ function startGeneratingScreen(childName) {
 
   // Fun facts / reassurance messages
   const cn = childName ? escHtml(childName) : 'Your child';
+  const isMulti = storyData.isMultiChild && storyData.children && storyData.children.length > 1;
   const facts = [
-    `Every story is unique. No two children will ever hear the same thing.`,
+    `Every story is unique. No two ${isMulti ? 'families' : 'children'} will ever hear the same thing.`,
     `The narrator is recording every line with real emotion and expression.`,
-    `${cn}'s name will appear at least 8 times throughout the story.`,
+    isMulti ? `Every child's name will be woven naturally throughout the story.` : `${cn}'s name will appear at least 8 times throughout the story.`,
     `The story has been planned from start to finish before a single word was written.`,
     `Every detail you shared is being woven into the plot, not just mentioned once.`,
-    `The best friend gets their own personality, dialogue, and at least 3 standout moments.`,
+    isMulti ? `Each child gets their own personality, their own moments, their own dialogue.` : `The best friend gets their own personality, dialogue, and at least 3 standout moments.`,
     `You can share and replay this story as many times as you like. It's yours forever.`,
     `If it's not magical enough, I'll rewrite it for free. That's a genuine promise.`,
     `Stories are written for the ear, not the eye. Pauses, rhythm, and pacing are all built in.`,
@@ -4728,7 +4848,8 @@ async function sendPurchaseEmail(email, stripeSessionId, storyId, discountCode, 
         sessionId: stripeSessionId,
         storyId: storyId || null,
         discountCode: discountCode || null,
-        discountPercent: discountPercent || 25
+        discountPercent: discountPercent || 25,
+        isMultiChild: storyData.isMultiChild || false
       })
     });
   } catch(e) { /* silent */ }
@@ -5113,6 +5234,7 @@ async function sendGiftEmail() {
         giftFrom: giftSendStory.giftFrom || 'Someone special',
         giftMessage: null,
         storyId: giftSendStory.id,
+        isMultiChild: storyData.isMultiChild || false,
         token
       })
     });

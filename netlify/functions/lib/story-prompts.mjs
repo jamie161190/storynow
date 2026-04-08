@@ -24,6 +24,13 @@ export function sanitiseStoryData(d) {
   for (const f of textFields) {
     if (s[f]) s[f] = sanitiseInput(s[f]);
   }
+  // Sanitise multi-child names
+  if (s.children && Array.isArray(s.children)) {
+    s.children = s.children.map(c => ({
+      ...c,
+      name: c.name ? sanitiseInput(c.name) : c.name
+    }));
+  }
   return s;
 }
 
@@ -247,11 +254,111 @@ IMPORTANT: If the villain is a real person (like "Daddy" or "Mrs Thompson"), mak
 ${d.extraDetails}`;
   }
 
-  if (d.personalMessage) {
-    block += `\n\nPERSONAL MESSAGE FROM THE PARENT (read aloud before the story starts):
-"${d.personalMessage}"
-You do NOT need to include this message in the story text. It will be read separately before the story begins. However, you should be AWARE of it because it sets the emotional tone. If the message says "Happy birthday," the story should feel celebratory. If it says "I am so proud of you," the story should make the child feel capable and valued. Let the message and the story feel like they belong together.
-ECHO THE MESSAGE: The story must echo the message's sentiment at least once in the middle and once near the end. If the message says "I am so proud of you," the story's climax should include a moment where the child proves they are worthy of pride, and the resolution should reference that feeling. The personal message and the story should feel like one continuous emotional experience, not two separate pieces.`;
+  // Personal message is NOT passed to the AI — it plays as a separate audio intro
+  // before the story begins and has no bearing on the story content.
+
+  return block;
+}
+
+// Multi-child character block: replaces characterBlock when story has multiple children
+export function multiChildCharacterBlock(d) {
+  const children = d.children || [];
+  if (children.length < 2) return characterBlock(d); // fallback
+
+  // Build individual child descriptions with pronouns
+  const childDescriptions = children.map((c, i) => {
+    const g = (c.gender || '').toLowerCase();
+    const pronouns = g === 'boy' ? 'he/him/his' : g === 'girl' ? 'she/her/hers' : 'they/them/their';
+    return `- ${c.name} (${c.gender || 'child'}, age ${c.age}) — Use ${pronouns} pronouns.`;
+  }).join('\n');
+
+  const allNames = children.map(c => c.name);
+  const nameList = allNames.length === 2
+    ? allNames.join(' and ')
+    : allNames.slice(0, -1).join(', ') + ', and ' + allNames[allNames.length - 1];
+
+  let themesSection = '';
+  if (d.interest) {
+    const themes = d.interest.split(',').map(t => t.trim()).filter(Boolean);
+    if (themes.length > 1) {
+      themesSection = `PRIMARY THEME: ${themes[0]}
+This theme shapes the entire world, setting, and central conflict. It is the heartbeat of the story.
+SECONDARY THEMES: ${themes.slice(1).join(', ')}
+Weave these in naturally as subplots, character traits, or setting details.`;
+    } else {
+      themesSection = `THEMES AND INTERESTS: ${d.interest}
+The themes must drive the world and the plot, not just decorate it.`;
+    }
+    if (d.themeDetail) {
+      themesSection += `\nSPECIFIC DETAILS FROM THE PARENT: "${d.themeDetail}"
+This is critical. Use the REAL names, teams, characters, and details they gave you.`;
+    }
+  }
+
+  let block = `THE CO-PROTAGONISTS:
+This story stars MULTIPLE children as heroes. They are on this adventure TOGETHER — siblings, cousins, or friends sharing the same story.
+
+${childDescriptions}
+
+CRITICAL MULTI-CHILD RULES:
+1. EVERY child's name must appear at least 6 times throughout the story. COUNT THEM. If any child has fewer than 6 mentions, add more.
+2. Each child MUST have at least ONE moment where THEY specifically shine — solve something, show bravery, make everyone laugh, notice something others missed, or save the day. No child should be a passenger in their own story.
+3. The children must interact WITH EACH OTHER — encouraging, teasing, helping, disagreeing then making up. This is what makes it feel real. They are not a group moving as one unit. They are individuals who happen to be together.
+4. Dialogue must reflect their different ages.${children.filter(c => parseInt(c.age) <= 4).length > 0 ? ' The youngest children speak in very short, simple sentences.' : ''} Older children are more thoughtful, younger ones more instinctive and excitable.
+5. Give them DISTINCT roles in the adventure: the brave one, the clever one, the funny one, the curious one, the caring one. These roles should emerge naturally from their ages and personalities. Do not make them interchangeable.
+6. The sign-off must read: "This story was made just for ${nameList}."
+
+NATURAL INTRODUCTION RULE (CRITICAL):
+NEVER list all children's names in one sentence like a roll call. NEVER clump them together as "${allNames.join(', ')} did X" or "${allNames.join(' and ')} walked into..." Introduce each child INDIVIDUALLY with their own moment, action, or line of dialogue. Each child should enter the story in a way that reveals their personality. The listener meets them one at a time, not as a group.
+
+BAD: "${allNames.join(' and ')} walked into the forest together."
+BAD: "${allNames.join(', ')} all looked up at the sky."
+GOOD: "${allNames[0]} heard it first. A low rumble from somewhere behind the wall ... ${allNames[1]} was already running. ${allNames[1]} always was ... ${allNames.length > 2 ? allNames[2] + ' tugged ' + (children[0].gender === 'girl' ? 'her' : children[0].gender === 'boy' ? 'his' : 'their') + ' sleeve. "I want to see."' : ''}"
+
+Throughout the story, use individual names in their own sentences. Two names together is fine when natural ("${allNames[1]} grabbed ${allNames[0]}'s hand"). All names together should be RARE — only for the sign-off or a genuine group moment near the climax.
+
+${d.proudOf ? `OCCASION: ${d.proudOf}
+The parent told you about this occasion because it matters to them. Weave it into the story as a source of pride, courage, or celebration for the whole group.` : ''}
+
+PEOPLE IN THE STORY:
+${d.friendName ? `- Shared friend: ${d.friendName} (a friend they all know — give them at least 2 meaningful moments)` : '- No additional friend specified — the children are each other\'s companions'}
+${d.sidekickName ? `- Sidekick: ${d.sidekickName} (a loyal companion throughout — distinct personality from the children)` : ''}
+${d.familyMembers ? '- Family: ' + d.familyMembers + '\nEvery family member listed MUST appear with dialogue or a meaningful action.' : ''}
+${d.teacherName ? '- Teacher: ' + d.teacherName : ''}
+${d.isGift && d.giftFrom && d.giftInStory ? `- Gift giver: ${d.giftFrom}
+THIS STORY IS A GIFT from ${d.giftFrom} to the children. ${d.giftFrom} MUST appear in the story as a real character with at least THREE meaningful moments. Make their presence unforgettable.` : ''}
+
+${themesSection}
+
+SETTING: ${d.setting || 'Surprise me'}
+${!d.setting || d.setting === 'Surprise me' ? 'Choose a setting that fits the themes and category perfectly.' : 'Set the story in or around this place. Use ALL detail the parent provided. The setting is not just a backdrop. It is a character.'}`;
+
+  if (d.hasPet && d.petName) {
+    block += `\n\nPET: ${d.petName}${d.petType ? ' (a ' + d.petType + ')' : ''}
+The pet must do something memorable — not "wagged his tail" but something the children would retell to their friends.
+${d.petType ? `Make ${d.petName} behave like a real ${d.petType} would. The children will know the difference.` : ''}`;
+  }
+
+  if (d.favTeddy) {
+    block += `\n\nFAVOURITE TOY/COMFORT ITEM: ${d.favTeddy}
+This item should appear in the story. Use ONLY the description the parent gave. NEVER invent colours, sizes, or details they did not mention.`;
+  }
+
+  if (d.hasVillain && d.villainName) {
+    const youngestAge = Math.min(...children.map(c => parseInt(c.age)));
+    block += `\n\nVILLAIN: ${d.villainName}
+The cheeky antagonist for the whole group. Causes trouble, creates obstacles, makes the adventure exciting. NOT truly evil or scary.
+- Appears at least 3 times, escalating each time
+- Has a funny catchphrase or signature move
+- Underestimates ALL the children every single time
+- Is defeated when the children work TOGETHER — each contributing something different based on their age and personality`;
+    if (youngestAge <= 4) block += `\n- With a child as young as ${youngestAge} in this story, the villain must be extremely gentle and silly — more of a nuisance than a threat.`;
+    block += `\nIMPORTANT: If the villain is a real person (like "Daddy"), make it CLEARLY playful and affectionate.`;
+  }
+
+  if (d.extraDetails) {
+    block += `\n\nEXTRA DETAILS FROM THE PARENT (these are gold, weave them in naturally):
+${d.extraDetails}`;
   }
 
   return block;
@@ -261,7 +368,7 @@ export const STORY_PROMPTS = {
   bedtime: (d) => `STORY TYPE: Bedtime
 TONE: Warm, calming, soothing. This story exists to help a child fall asleep. Every creative decision you make should serve that goal. The story should wind down gradually. The first half can have gentle discovery or a small journey, but the second half must slow. The final quarter should feel drowsy. The last two sentences should be rhythmic and slow, almost like a lullaby in prose.
 
-${characterBlock(d)}
+${d.isMultiChild && d.children && d.children.length > 1 ? multiChildCharacterBlock(d) : characterBlock(d)}
 
 SENSORY LANGUAGE: Use warmth, soft light, gentle sounds, cosiness. Stars, blankets, rain on windows, a cat purring, warm milk, the smell of toast, fairy lights in a treehouse, the hum of crickets outside. Make the listener FEEL sleepy through the words. Every paragraph after the midpoint should contain at least one sensory detail that evokes warmth, softness, or comfort.
 ${d.sidekickName ? `
@@ -289,7 +396,7 @@ Write the story now. Start immediately, no preamble.`,
   journey: (d) => `STORY TYPE: Journey / Adventure
 TONE: Exciting, gripping, but with emotional range. This story is designed to captivate a child completely. They cannot look away because the story IS their entire world for the next 15 minutes. It must hold them completely.
 
-${characterBlock(d)}
+${d.isMultiChild && d.children && d.children.length > 1 ? multiChildCharacterBlock(d) : characterBlock(d)}
 
 STRUCTURE: 4 acts with 5 to 6 distinct scenes, at least 2 twists, and a subplot involving the best friend or a new character. Scene transitions should be sharp. Not "and then they rested." More like "The door swung open. And standing there, grinning, was someone ${d.childName} had never expected to see."
 
@@ -324,7 +431,7 @@ Write the story now. Start immediately with action or intrigue.`,
   learning: (d) => `STORY TYPE: Learning Adventure
 TONE: Exciting, immersive, and secretly educational. The child should be so caught up in the adventure that they do not realise they are learning. This is NOT a quiz with a story wrapper. It is a real adventure where knowledge happens to be the superpower.
 
-${characterBlock(d)}
+${d.isMultiChild && d.children && d.children.length > 1 ? multiChildCharacterBlock(d) : characterBlock(d)}
 
 SUBJECT AREA: ${d.subject}
 ${d.learningGoal ? 'SPECIFIC LEARNING GOAL: The parent says their child is working on: "' + d.learningGoal + '". This is the most important instruction in this entire prompt.' : ''}
@@ -466,40 +573,61 @@ function getPreviewAgeBand(age) {
 
 // Category-specific preview selling formulas
 const PREVIEW_FORMULAS = {
-  bedtime: (d) => `
+  bedtime: (d) => {
+    const isMulti = d.isMultiChild && d.children && d.children.length > 1;
+    const names = isMulti ? d.children.map(c => c.name) : [d.childName];
+    return `
 IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them feel the warmth and magic.
 
 BEDTIME PREVIEW FORMULA:
 This is a BEDTIME story preview. It must feel intimate, warm, and safe. NOT adventurous or high energy.
-1. FIRST SENTENCE: The child's name in a quiet, sensory moment. Something gentle is happening. A soft glow, a whisper, a familiar comfort. Example: "${d.childName} pulled the blanket up to their chin, and that is when the ceiling began to sparkle."
+${isMulti ? `1. FIRST FEW SENTENCES: Introduce each child one at a time in a quiet, sensory moment. Each child enters individually — NEVER list them together. Example: "${names[0]} pulled the blanket up to her chin. Beside her, ${names[1]} was already half asleep. But ${names.length > 2 ? names[2] : names[1]}? ${names.length > 2 ? names[2] : names[1]} had heard something."
+2. NEXT 2 TO 3 SENTENCES: Build a sensory world. Warmth, soft light, gentle sounds. Weave in ONE personal detail (pet, teddy, or interest) naturally. The parent hearing the preview needs to hear EACH child's name spoken individually within the first 30 seconds.
+3. FINAL SENTENCE: A gentle moment of wonder that makes the parent lean in. Not a cliffhanger, but a soft invitation.`
+: `1. FIRST SENTENCE: The child's name in a quiet, sensory moment. Something gentle is happening. A soft glow, a whisper, a familiar comfort. Example: "${d.childName} pulled the blanket up to their chin, and that is when the ceiling began to sparkle."
 2. SECOND SENTENCE: Their best friend (${d.friendName}) is there, close and comforting. A whispered word, a shared glance, a warm presence.
 3. NEXT 2 TO 3 SENTENCES: Build a sensory world. Warmth, soft light, gentle sounds. Weave in ONE personal detail (pet, teddy, or interest) naturally. Every sentence should include something the child can feel, hear, or see. Do NOT introduce more than 2 named characters total.
-4. FINAL SENTENCE: A gentle moment of wonder that makes the parent lean in. Not a cliffhanger, but a soft invitation. The listener wants to know where this gentle journey leads.
+4. FINAL SENTENCE: A gentle moment of wonder that makes the parent lean in. Not a cliffhanger, but a soft invitation. The listener wants to know where this gentle journey leads.`}
 
-${getPreviewAgeBand(d.age)}`,
+${getPreviewAgeBand(d.age)}`;
+  },
 
-  journey: (d) => `
+  journey: (d) => {
+    const isMulti = d.isMultiChild && d.children && d.children.length > 1;
+    const names = isMulti ? d.children.map(c => c.name) : [d.childName];
+    return `
 IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them cry, gasp, or smile so wide they cannot say no.
 
 JOURNEY PREVIEW FORMULA:
-1. FIRST SENTENCE: The child's name in a moment of wonder or emotion, not walking or waking up. Something is already happening TO them or BECAUSE of them. Example: "${d.childName} could not believe what just landed in the garden."
+${isMulti ? `1. FIRST FEW SENTENCES: Each child reacts differently to the inciting moment. Introduce them INDIVIDUALLY — NEVER list them together. Example: "${names[0]} froze. She could hear it. ${names[1]} was already running toward the noise. ${names.length > 2 ? names[2] + ' tugged at ' + (d.children[0].gender === 'girl' ? 'her' : 'his') + ' sleeve and whispered, "I want to see."' : ''}"
+2. NEXT 2 TO 3 SENTENCES: Stack personal details fast. The pet, theme, or interest becomes the world around them.${d.hasVillain && d.villainName ? ' Hint at the villain (' + d.villainName + ') with playful menace.' : ''} The parent must hear EACH child's name individually within the first 30 seconds.
+3. FINAL SENTENCE: Stop mid-action at an impossible, wonderful moment. The listener MUST need to know what happens next.`
+: `1. FIRST SENTENCE: The child's name in a moment of wonder or emotion, not walking or waking up. Something is already happening TO them or BECAUSE of them. Example: "${d.childName} could not believe what just landed in the garden."
 2. SECOND SENTENCE: Their best friend (${d.friendName}) reacts, speaks, or does something that proves this story KNOWS this child's world.
 3. NEXT 2 TO 3 SENTENCES: Stack personal details fast. The pet does something memorable. The interest or theme becomes the world around them.${d.hasVillain && d.villainName ? ' Hint at the villain (' + d.villainName + ') with playful menace.' : ''} Every sentence should make the parent think "how does it know all this?"
-4. FINAL SENTENCE: Stop mid-action at an impossible, wonderful moment. The child is about to discover, face, or unlock something extraordinary. The listener MUST need to know what happens next.
+4. FINAL SENTENCE: Stop mid-action at an impossible, wonderful moment. The child is about to discover, face, or unlock something extraordinary. The listener MUST need to know what happens next.`}
 
-${getPreviewAgeBand(d.age)}`,
+${getPreviewAgeBand(d.age)}`;
+  },
 
-  learning: (d) => `
+  learning: (d) => {
+    const isMulti = d.isMultiChild && d.children && d.children.length > 1;
+    const names = isMulti ? d.children.map(c => c.name) : [d.childName];
+    return `
 IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to prove this story teaches AND entertains.
 
 LEARNING PREVIEW FORMULA:
 This preview must signal that this is an INTERACTIVE learning story about ${d.subject || 'the subject'}.
-1. FIRST SENTENCE: The child's name in an exciting discovery moment where ${d.subject || 'knowledge'} is clearly the key to the adventure.
+${isMulti ? `1. FIRST FEW SENTENCES: Introduce each child individually discovering the learning challenge. Example: "${names[0]} stared at the puzzle. ${names[1]} was already counting on ${d.children[1]?.gender === 'girl' ? 'her' : 'his'} fingers.${names.length > 2 ? ' ' + names[2] + ' pointed at the screen. "I know that one!"' : ''}"
+2. NEXT 2 TO 3 SENTENCES: Build the adventure world where learning IS the superpower. Include ONE interactive moment with "Can you work it out?" The children must each contribute something different to solving the challenge.
+3. FINAL SENTENCE: A challenge that makes the listener want to hear more.`
+: `1. FIRST SENTENCE: The child's name in an exciting discovery moment where ${d.subject || 'knowledge'} is clearly the key to the adventure.
 2. SECOND SENTENCE: Their best friend (${d.friendName}) reacts with excitement or curiosity. The subject (${d.subject || 'learning'}) is woven into the world naturally.
 3. NEXT 2 TO 3 SENTENCES: Build the adventure world where learning IS the superpower. Include ONE interactive moment: pose a question to the listener, then write "Can you work it out?" or "What do you think?" This signals the story talks directly to the child.
-4. FINAL SENTENCE: A challenge or discovery that makes the listener want to hear more. The child is about to use their knowledge to unlock something amazing.
+4. FINAL SENTENCE: A challenge or discovery that makes the listener want to hear more. The child is about to use their knowledge to unlock something amazing.`}
 
-${getPreviewAgeBand(d.age)}`
+${getPreviewAgeBand(d.age)}`;
+  }
 };
 
 // Build a short preview prompt from the full story prompt
@@ -515,10 +643,14 @@ export function buildPreviewPrompt(storyData) {
   const targetWords = storyData._targetWords || 80;
   const isShortPreview = targetWords <= 80;
 
+  const isMulti = safe.isMultiChild && safe.children && safe.children.length > 1;
+
   return fullPrompt + categoryFormula + `
 
 RULES:
-- The child's name appears at least 3 times
+${isMulti
+  ? '- EVERY child\'s name must appear at least once in the preview. Introduce each child individually.'
+  : '- The child\'s name appears at least 3 times'}
 - Include natural pauses ( ... ) for the narrator to breathe
 - NO generic openings (no "once upon a time", no waking up, no "it was a [adjective] day")
 ${isShortPreview ? '- NO resolution, NO wrapping up, NO moral lessons' : '- Build a complete story arc with a satisfying ending'}
@@ -547,15 +679,46 @@ ${previewStory}
 Continue this story now. Write the REMAINING portion (approximately ${getWordCount(storyData.length, storyData.age) - 80} words) to complete the full story. The listener will hear the opening above followed immediately by what you write now, so the transition must be seamless. Do not repeat the opening. Do not summarise what happened. Just continue.`;
 }
 
-// Build a complete story prompt from scratch (used for admin-generated stories)
+// Build a complete story prompt from scratch with preview-quality opening
 export function buildCompleteStoryPrompt(storyData) {
   const safe = sanitiseStoryData(storyData);
   const promptFn = STORY_PROMPTS[safe.category];
   if (!promptFn) throw new Error('Invalid category: ' + safe.category);
   const fullPrompt = promptFn(safe);
   const wordCount = storyData._targetWords || getWordCount(safe.length, safe.age);
+  const isMulti = safe.isMultiChild && safe.children && safe.children.length > 1;
+
+  // Opening rules: the first ~250 words will be used as a 2-minute audio preview.
+  // They must be incredible because they sell the story.
+  const formulaFn = PREVIEW_FORMULAS[safe.category] || PREVIEW_FORMULAS.journey;
+  const openingFormula = formulaFn(safe)
+    // Strip the "IMPORTANT OVERRIDE" and word count from preview formulas since this is a full story
+    .replace(/IMPORTANT OVERRIDE:.*?(?=\n\n)/s, '')
+    .replace(/Write ONLY the opening.*?(?=\n)/s, '')
+    .replace(/approximately 60 to 80 words\./g, '');
 
   return fullPrompt + `
 
-Write the COMPLETE story from beginning to end. Approximately ${wordCount} words. This is the full, finished story that will be read aloud in one sitting. Start with a gripping, personal opening that uses the child's name in the first two sentences. Build through rising action to a satisfying climax and resolution. Include natural pauses ( ... ) throughout for the narrator to breathe.`;
+OPENING QUALITY (CRITICAL):
+The first ~250 words of this story will be played as a 2-minute audio preview to the parent BEFORE they purchase. This opening must be so good that they cannot say no. Every word in the first 250 words is a sales pitch wrapped in story. After that, the story continues to its full arc.
+
+${openingFormula}
+
+After the opening, continue into the full story arc. Build through rising action to a satisfying climax and resolution.
+
+Write the COMPLETE story from beginning to end. Approximately ${wordCount} words. This is the full, finished story that will be read aloud in one sitting. Include natural pauses ( ... ) throughout for the narrator to breathe.
+${isMulti ? '\nRemember: introduce each child INDIVIDUALLY in the opening. Never list them together. The parent needs to hear each name spoken separately within the first 2 minutes.' : ''}`;
+}
+
+// Build a complete story prompt with feedback adjustments (for admin regeneration)
+export function buildRegeneratePrompt(storyData, feedbackNotes) {
+  const basePrompt = buildCompleteStoryPrompt(storyData);
+  if (!feedbackNotes) return basePrompt;
+
+  return basePrompt + `
+
+CUSTOMER FEEDBACK (incorporate these changes):
+${feedbackNotes}
+
+The customer heard the preview and provided this feedback. Adjust the story to address their notes while maintaining the overall quality and structure.`;
 }

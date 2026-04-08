@@ -3,7 +3,7 @@
 // then generates TTS audio, uploads to Supabase.
 // Uses direct fetch() calls - ZERO SDK dependencies.
 
-import { SYSTEM_PROMPT, buildPreviewPrompt, buildFullStoryPrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
+import { SYSTEM_PROMPT, buildPreviewPrompt, buildFullStoryPrompt, buildCompleteStoryPrompt, buildRegeneratePrompt } from './lib/story-prompts.mjs';
 import { logError } from './lib/log-error.mjs';
 
 // Preprocess story text so ElevenLabs TTS creates natural pauses
@@ -306,7 +306,132 @@ export const handler = async (event) => {
       return { statusCode: 200 };
     }
 
-    // ── FULL STORY MODE (original flow) ──
+    // ── PREVIEW-FULL MODE: Write complete story, TTS only first ~250 words for preview ──
+    if (mode === 'preview-full') {
+      console.log('[PREVIEW-FULL] Starting full story + preview TTS for job:', jobId);
+      const startTime = Date.now();
+
+      if (!process.env.ANTHROPIC_API_KEY || !process.env.ELEVENLABS_API_KEY) {
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Service not configured' });
+        return { statusCode: 200 };
+      }
+
+      // Step 1: Generate the COMPLETE story with Claude (one pass)
+      const completePrompt = buildCompleteStoryPrompt(storyData);
+      const apiBody = JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 16000,
+        temperature: 1,
+        thinking: { type: 'adaptive' },
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: completePrompt }]
+      });
+
+      let apiResponse;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+          apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'x-api-key': process.env.ANTHROPIC_API_KEY,
+              'anthropic-version': '2023-06-01',
+              'Content-Type': 'application/json'
+            },
+            body: apiBody
+          });
+        } catch (networkErr) {
+          console.log('[PREVIEW-FULL] Network error attempt ' + (attempt + 1) + ': ' + networkErr.message);
+          if (attempt < 4) { await new Promise(r => setTimeout(r, 4000 * (attempt + 1))); continue; }
+          throw networkErr;
+        }
+        if (apiResponse.ok) break;
+        const shouldRetry = apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500;
+        if (attempt < 4 && shouldRetry) {
+          const waitMs = apiResponse.status === 429 ? 8000 : 4000 * (attempt + 1);
+          console.log('[PREVIEW-FULL] Anthropic ' + apiResponse.status + ', retry in ' + waitMs + 'ms');
+          await new Promise(r => setTimeout(r, waitMs));
+          continue;
+        }
+      }
+
+      if (!apiResponse.ok) {
+        const errBody = await apiResponse.text();
+        console.error('[PREVIEW-FULL] Anthropic error:', apiResponse.status, errBody);
+        await logError({ source: 'preview-full', message: 'Anthropic failed: ' + apiResponse.status, severity: 'error', childName: storyData?.childName, jobId });
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Story generation is busy. Please try again.' });
+        return { statusCode: 200 };
+      }
+
+      const apiResult = await apiResponse.json();
+      let fullStoryText = '';
+      for (const block of apiResult.content) {
+        if (block.type === 'text') fullStoryText += block.text;
+      }
+      console.log('[PREVIEW-FULL] Full story generated in', Date.now() - startTime, 'ms, words:', fullStoryText.split(' ').length);
+
+      // Step 2: Extract the first ~250 words for the preview audio
+      const words = fullStoryText.split(/\s+/);
+      let previewSnippet = words.slice(0, 250).join(' ');
+      // Cut at the last sentence boundary for clean audio
+      const lastEnd = previewSnippet.search(/[.!?][^.!?]*$/);
+      if (lastEnd > 100) previewSnippet = previewSnippet.substring(0, lastEnd + 1);
+
+      // Build the preview TTS text (includes personal message if present)
+      let previewTTSText = '';
+      if (storyData.isGift && storyData.giftFrom && storyData.giftMessage) {
+        previewTTSText = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... ${storyData.giftMessage} ... And now, your story begins. ... `;
+      } else if (storyData.isGift && storyData.giftFrom) {
+        previewTTSText = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... And now, your story begins. ... `;
+      } else if (storyData.personalMessage) {
+        previewTTSText = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
+      }
+      previewTTSText += previewSnippet;
+      previewTTSText += ' ... ... To hear what happens next, unlock the full story.';
+      previewTTSText = prepareTTSText(previewTTSText);
+
+      // Save partial result before TTS
+      await savePreviewResult(supabaseUrl, supabaseKey, jobId, {
+        status: 'generating_audio', fullStory: fullStoryText, previewStory: previewSnippet, storyData
+      });
+
+      // Step 3: Generate TTS for preview only (~250 words, fast)
+      const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'EXAVITQu4vr4xnSDxMaL';
+      const ttsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
+        method: 'POST',
+        headers: {
+          'xi-api-key': process.env.ELEVENLABS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: previewTTSText,
+          model_id: 'eleven_v3',
+          voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 }
+        })
+      });
+
+      if (!ttsResponse.ok) {
+        console.error('[PREVIEW-FULL] TTS error:', ttsResponse.status);
+        await logError({ source: 'preview-full', message: 'TTS failed: ' + ttsResponse.status, severity: 'error', childName: storyData?.childName, jobId });
+        // Still save the story text even if TTS fails
+        await savePreviewResult(supabaseUrl, supabaseKey, jobId, { success: false, error: 'Voice generation failed. Please try again.', fullStory: fullStoryText, storyData });
+        return { statusCode: 200 };
+      }
+
+      const audioBase64 = Buffer.from(await ttsResponse.arrayBuffer()).toString('base64');
+      console.log('[PREVIEW-FULL] Complete in', Date.now() - startTime, 'ms');
+
+      // Save complete result: full story text + preview audio
+      await savePreviewResult(supabaseUrl, supabaseKey, jobId, {
+        success: true,
+        previewAudio: audioBase64,
+        previewStory: previewSnippet,
+        fullStory: fullStoryText,
+        storyData
+      });
+      return { statusCode: 200 };
+    }
+
+    // ── FULL STORY MODE (original flow, kept for backward compat) ──
     console.log('[FULL-BG] Starting full story generation for job:', jobId);
 
     // ── Step 1: Generate the rest of the story with Anthropic (direct fetch) ──
@@ -385,13 +510,16 @@ export const handler = async (event) => {
     // ── Step 2: Build the complete story text ──
     let messageIntro = '';
     if (storyData.isGift && storyData.giftFrom) {
-      const giftMsg = storyData.giftMessage || storyData.personalMessage;
+      // Gift intro: giftMessage appears in the recipient email AND plays here as the story intro.
+      // personalMessage is kept blank for gift orders so the AI does not echo it through the story.
+      const giftMsg = storyData.giftMessage;
       messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... `;
       if (giftMsg) {
         messageIntro += `${giftMsg} ... `;
       }
       messageIntro += `And now, your story begins. ... `;
     } else if (storyData.personalMessage) {
+      // Non-gift: parent's personal message plays at the start of the story only.
       messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
     }
 

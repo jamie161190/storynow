@@ -106,11 +106,12 @@ export default async () => {
 
       // Build personalised details from story_data
       const sd = story_data || {};
+      const isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
       const friendName = sd.friendName || '';
       const themes = sd.themes || [];
       const setting = sd.setting || sd.where || '';
 
-      const html = abandonedPreviewEmail(child_name, category, job_id, friendName, themes, setting);
+      const html = abandonedPreviewEmail(child_name, category, job_id, friendName, themes, setting, isMulti);
       const safeChild = esc(child_name);
 
       const emailRes = await fetch('https://api.resend.com/emails', {
@@ -119,7 +120,7 @@ export default async () => {
         body: JSON.stringify({
           from: 'Jamie from Hear Their Name <jamie@heartheirname.com>',
           to: [email],
-          subject: `${safeChild}'s story is only just beginning...`,
+          subject: isMulti ? `Their story is only just beginning...` : `${safeChild}'s story is only just beginning...`,
           html
         })
       });
@@ -143,7 +144,7 @@ export default async () => {
 
 function esc(s) { return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
-function abandonedPreviewEmail(childName, category, jobId, friendName, themes, setting) {
+function abandonedPreviewEmail(childName, category, jobId, friendName, themes, setting, isMulti) {
   const safe = esc(childName);
   const catLabels = { bedtime: 'bedtime story', journey: 'adventure', learning: 'learning story' };
   const catLabel = catLabels[category] || 'story';
@@ -170,11 +171,13 @@ function abandonedPreviewEmail(childName, category, jobId, friendName, themes, s
         You heard the opening.
       </h2>
       <p style="color:#6B2F93;font-size:16px;text-align:center;margin:0 0 24px;font-weight:700;">
-        ${safe}'s full story is waiting.
+        ${isMulti ? 'Their full story is waiting.' : safe + "'s full story is waiting."}
       </p>
 
       <p style="color:#666;font-size:15px;line-height:1.7;margin:0 0 16px;">
-        You created something special for ${safe} &mdash; a one-of-a-kind ${esc(catLabel)} where ${safe} is the hero. You heard the first minute. The full story is 15 minutes of magic, adventure, and their name woven through every chapter.
+        ${isMulti
+          ? `You created something special &mdash; a one-of-a-kind ${esc(catLabel)} starring ${safe}. You heard the first minute. The full story is 15 minutes of magic, adventure, and every child's name woven through every chapter.`
+          : `You created something special for ${safe} &mdash; a one-of-a-kind ${esc(catLabel)} where ${safe} is the hero. You heard the first minute. The full story is 15 minutes of magic, adventure, and their name woven through every chapter.`}
       </p>
 
       <p style="color:#666;font-size:15px;line-height:1.7;margin:0 0 24px;">
@@ -182,7 +185,7 @@ function abandonedPreviewEmail(childName, category, jobId, friendName, themes, s
       </p>
 
       <div style="text-align:center;margin:0 0 28px;">
-        <a href="${returnUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:16px 40px;border-radius:50px;font-size:16px;font-weight:700;letter-spacing:0.3px;">Continue ${safe}'s story</a>
+        <a href="${returnUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:16px 40px;border-radius:50px;font-size:16px;font-weight:700;letter-spacing:0.3px;">${isMulti ? 'Continue their story' : 'Continue ' + safe + "'s story"}</a>
       </div>
 
       <div style="background:#FFF8F0;border-radius:14px;padding:20px;margin:0 0 24px;">
@@ -211,7 +214,7 @@ function abandonedPreviewEmail(childName, category, jobId, friendName, themes, s
       </div>
 
       <p style="color:#999;font-size:13px;text-align:center;line-height:1.6;margin:0;">
-        ${safe} deserves to hear their name in a story made just for them.
+        ${isMulti ? 'They deserve to hear their names in a story made just for them.' : safe + ' deserves to hear their name in a story made just for them.'}
       </p>
 
     </div>

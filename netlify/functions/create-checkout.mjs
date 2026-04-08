@@ -23,14 +23,31 @@ export default async (req) => {
     const refCode = body.ref_code || '';
 
     // Accept localised currency/amount from frontend (set by get-pricing)
-    // Validate to prevent manipulation: only allow supported currencies and sane amounts
-    const SUPPORTED_CURRENCIES = new Set(['gbp','eur','usd','cad','aud','nzd','sgd','hkd','jpy','inr','zar','nok','sek','dkk','chf','brl','mxn','pln','aed','sar','ils','myr','php','thb','krw']);
+    // Validate to prevent manipulation: only allow Stripe-supported currencies and sane amounts
+    const SUPPORTED_CURRENCIES = new Set([
+      // Major
+      'gbp','eur','usd','cad','aud','nzd',
+      // Europe
+      'nok','sek','dkk','chf','pln','czk','huf','ron','bgn','hrk','isk','try','rsd',
+      'uah','all','bam','mkd','gel','amd','azn','mdl',
+      // Asia Pacific
+      'sgd','hkd','jpy','inr','myr','php','thb','krw','twd','idr','vnd','cny',
+      'bdt','pkr','lkr','npr','mmk','khr','bnd','mop',
+      // Middle East
+      'aed','sar','qar','kwd','bhd','omr','jod','ils',
+      // Africa
+      'zar','ngn','kes','ghs','egp','tzs','ugx','xof','xaf','mad','dzd','tnd',
+      'zmw','bwp','mwk','mzn','rwf',
+      // Americas
+      'mxn','brl','ars','clp','cop','pen','uyu','bob','pyg','gtq','crc','dop',
+      'ttd','jmd','bsd','bbd'
+    ]);
     const requestedCurrency = (body.currency || 'gbp').toLowerCase();
     const requestedAmount = parseInt(body.unitAmount, 10) || 1999;
     const currency = SUPPORTED_CURRENCIES.has(requestedCurrency) ? requestedCurrency : 'gbp';
-    // Sanity check: amount must be between £5 and £200 equivalent (in minor units)
+    // Sanity check: min £5 equivalent; max is generous to cover high-rate zero-decimal currencies (VND, IDR)
     const MIN_AMOUNT = 500;
-    const MAX_AMOUNT = 200 * 200; // generous upper bound for high-rate currencies
+    const MAX_AMOUNT = 100_000_000;
     const unitAmount = (requestedAmount >= MIN_AMOUNT && requestedAmount <= MAX_AMOUNT) ? requestedAmount : 1999;
 
     const stripeKey = process.env.STRIPE_SECRET_KEY;
@@ -63,6 +80,8 @@ export default async (req) => {
       cancel_url: siteUrl,
       metadata: {
         childName: childName,
+        isMultiChild: storyData.isMultiChild ? 'true' : 'false',
+        childrenCount: String((storyData.children || []).length || 1),
         category: storyData.category || '',
         length: storyData.length || '',
         utm_source: utmSource,
