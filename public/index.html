@@ -1602,6 +1602,13 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p class="form-hint" id="musicOptionHint" style="margin-top:0.3rem">Soft ambient music will play underneath the narration, matching the mood of the story.</p>
   </div>
 
+  <!-- Extra details (added at the end so parent knows what's already captured) -->
+  <div class="form-group" style="margin-top:1.25rem">
+    <label style="font-weight:700">Anything else I should know? (optional)</label>
+    <textarea id="extraDetailsReview" placeholder="e.g. scared of thunder but pretends not to be, calls spaghetti pasketti, always wears odd socks, copies everything big sister does" style="height:70px;resize:vertical"></textarea>
+    <p class="form-hint">Personality quirks, funny habits, fears, things that make them laugh. The details no form can capture. These are gold.</p>
+  </div>
+
   <button class="btn btn-primary" style="width:100%;margin-top:1.2rem" onclick="generatePreview()">Looks good, create my preview!</button>
 </div>
 
@@ -1704,8 +1711,8 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <!-- PHASE 1: Game while preview generates -->
   <div id="previewGamePhase" class="preview-container" style="text-align:center">
     <p style="font-size:1.5rem;margin:0 0 0.5rem">&#10024;</p>
-    <h2 class="section-title" style="margin-bottom:0.25rem">Preparing something special...</h2>
-    <p class="section-sub" id="previewGameSub">I'm writing the story now. This takes a couple of minutes.</p>
+    <h2 class="section-title" style="margin-bottom:0.25rem">Creating your preview...</h2>
+    <p class="section-sub" id="previewGameSub">I'm crafting a preview of the story. This takes a couple of minutes.</p>
 
     <!-- Status indicator -->
     <div id="previewGenStatus" style="display:flex;align-items:center;justify-content:center;gap:0.5rem;margin:1rem 0">
@@ -3175,7 +3182,6 @@ function renderChildCards() {
   storyData.children.forEach((child, i) => {
     const card = document.createElement('div');
     card.style.cssText = 'background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1rem;position:relative';
-    const nameLabel = child.name ? `Tell me about ${escHtml(child.name)}` : 'Tell me about them';
     card.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
         <p style="margin:0;font-size:0.82rem;font-weight:700;color:var(--purple)">Child ${i + 1}</p>
@@ -3193,10 +3199,7 @@ function renderChildCards() {
           <option value="neutral"${child.gender==='neutral'?' selected':''}>Prefer not to say</option>
         </select>
       </div>
-      <div class="form-group" style="margin:0">
-        <label id="mcAboutLabel${i}" style="font-size:0.78rem;color:var(--text-muted);font-weight:600">${nameLabel} (optional)</label>
-        <textarea id="mcAbout${i}" placeholder="What do they love? What makes them laugh? Any milestones, quirks, or favourite things?" oninput="updateChildData(${i})" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:50px;resize:vertical">${escHtml(child.about || '')}</textarea>
-      </div>`;
+      `;
     container.appendChild(card);
   });
   // Show/hide add button and hint
@@ -3211,15 +3214,9 @@ function updateChildData(i) {
   const age = document.getElementById('mcAge' + i);
   const gender = document.getElementById('mcGender' + i);
   const about = document.getElementById('mcAbout' + i);
-  if (name) {
-    storyData.children[i].name = name.value.trim();
-    // Update the "tell me about" label dynamically
-    const label = document.getElementById('mcAboutLabel' + i);
-    if (label) label.textContent = name.value.trim() ? 'Tell me about ' + escHtml(name.value.trim()) + ' (optional)' : 'Tell me about them (optional)';
-  }
+  if (name) storyData.children[i].name = name.value.trim();
   if (age) storyData.children[i].age = age.value;
   if (gender) storyData.children[i].gender = gender.value;
-  if (about) storyData.children[i].about = about.value.trim();
 }
 
 function addChildCard() {
@@ -3479,13 +3476,9 @@ function goToLength() {
     storyData.confidence = selectedConfidence || 'practising';
   }
 
-  // Combine per-child "about" into extraDetails for the prompt
-  if (storyData.children.length > 0) {
-    const childAbouts = storyData.children
-      .filter(c => c.about)
-      .map(c => c.name + ': ' + c.about);
-    storyData.extraDetails = childAbouts.join('\n');
-  }
+  // Extra details from review screen
+  const extraEl = document.getElementById('extraDetailsReview');
+  storyData.extraDetails = extraEl ? extraEl.value.trim() : '';
 
   storyData.length = 'long';
   storyData.isGift = isGiftMode;
@@ -3894,7 +3887,7 @@ async function generatePreview() {
 
   // Rotating status messages personalised to the story
   const d = storyData;
-  const statusMsgs = ['Writing the story...'];
+  const statusMsgs = ['Crafting the preview...'];
   if (d.isMultiChild && d.children && d.children.length > 1) {
     d.children.forEach(function(c) { statusMsgs.push('Writing ' + c.name + "'s entrance..."); });
     statusMsgs.push('Weaving everyone together...');
