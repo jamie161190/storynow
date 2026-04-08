@@ -2727,6 +2727,18 @@ function goTo(id, skipHistory) {
   // Track screen views for funnel analysis
   trackEvent('ScreenView', { screen_name: id, content_name: storyData.category || '' });
 
+  // Fire funnel step tracking for admin analytics
+  const funnelScreens = ['screenCategory','screenGift','screenDetails','screenPeople','screenThemeSetting','screenExtras','screenVoice','screenReview','screenPreview'];
+  if (funnelScreens.includes(id)) {
+    try {
+      fetch('/api/track-pageview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page: '/', screen_name: 'funnel_' + id.replace('screen','').toLowerCase(), device: window.innerWidth < 768 ? 'mobile' : 'desktop', visitor_id: stVisitorId })
+      }).catch(function() {});
+    } catch(e) {}
+  }
+
   // Push to browser history so back button works
   if (!skipHistory) {
     history.pushState({ screen: id }, '', '');
@@ -3732,9 +3744,6 @@ function showReview() {
   }
 
   document.getElementById('reviewContent').innerHTML = html;
-  // Facebook CompleteRegistration + TikTok CompleteRegistration when form is done
-  if (typeof fbq === 'function') fbq('track', 'CompleteRegistration', { content_name: storyData.category || '', value: 19.99, currency: 'GBP' });
-  if (typeof ttq !== 'undefined' && ttq.track) ttq.track('CompleteRegistration', { content_name: storyData.category || '' });
   goTo('screenReview');
 }
 
