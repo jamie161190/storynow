@@ -2955,18 +2955,7 @@ goTo = function(id, skipHistory) {
   if (['screenDetails','screenPeople','screenThemeSetting','screenExtras','screenVoice','screenReview'].includes(id)) {
     saveFormState();
   }
-  // Preview screen: show email as confirmation if already filled, or as input if empty
-  if (id === 'screenPreview') {
-    const email = document.getElementById('previewEmail').value.trim();
-    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      document.getElementById('previewEmailDisplay').textContent = email;
-      document.getElementById('previewEmailConfirm').style.display = 'block';
-      document.getElementById('previewEmailEdit').style.display = 'none';
-    } else {
-      document.getElementById('previewEmailConfirm').style.display = 'none';
-      document.getElementById('previewEmailEdit').style.display = 'block';
-    }
-  }
+  // Preview screen email handling removed (email is now a simple input on the preview content phase)
 };
 
 function restoreCategory() {
