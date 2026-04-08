@@ -3144,6 +3144,7 @@ function goToLength() {
     storyData.learningGoal = document.getElementById('learningGoal').value.trim();
   }
   storyData.extraDetails = document.getElementById('extraDetails').value.trim();
+  storyData.email = document.getElementById('earlyEmail').value.trim();
   storyData.isGift = isGiftMode;
   if(storyData.isGift) {
     storyData.giftEmail = document.getElementById('giftEmail').value.trim();
@@ -3593,6 +3594,7 @@ async function generatePreview() {
   try {
     // Generate a job ID so we can recover the result if the connection times out
     const jobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    window._currentJobId = jobId;
     const loadStartTime = Date.now();
     const MIN_LOADING_MS = 30000; // Show loading for at least 30 seconds
     let data;
@@ -3649,7 +3651,7 @@ async function generatePreview() {
       fetch('/api/save-attempt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ storyData, voiceId: selectedVoiceId, previewStory: previewStoryText })
+        body: JSON.stringify({ storyData, voiceId: selectedVoiceId, previewStory: previewStoryText, jobId })
       });
     } catch(e) { /* non-blocking */ }
     const audio = document.getElementById('previewAudio');
@@ -3827,6 +3829,110 @@ async function unlockFull() {
     emailErr.style.display = 'block';
   }
 }
+
+// Handle return from abandoned preview email link
+async function restorePreviewFromEmail(jobId) {
+  goTo('screenLoading');
+  document.querySelector('.loading-text').textContent = 'Loading your preview...';
+  document.querySelector('.loading-sub').textContent = 'Just a moment while we bring back your story.';
+  try {
+    const res = await fetch('/api/check-preview?jobId=' + encodeURIComponent(jobId));
+    const data = await res.json();
+    if (!data.ready || !data.success || !data.previewAudio) throw new Error('Preview not found');
+
+    // Restore story data
+    if (data.storyData) {
+      Object.assign(storyData, data.storyData);
+    }
+    previewStoryText = data.previewStory || '';
+    fullStoryText = data.fullStory || previewStoryText;
+    window._currentJobId = jobId;
+
+    // Set up audio
+    const audio = document.getElementById('previewAudio');
+    audio.volume = 0.75;
+    audio.src = 'data:audio/mpeg;base64,' + data.previewAudio;
+    if (audio._stMeta) audio.removeEventListener('loadedmetadata', audio._stMeta);
+    if (audio._stTime) audio.removeEventListener('timeupdate', audio._stTime);
+    if (audio._stEnd) audio.removeEventListener('ended', audio._stEnd);
+    audio._stMeta = function() { document.getElementById('previewDuration').textContent = formatTime(audio.duration); };
+    audio._stTime = function() {
+      if (audio.duration) {
+        document.getElementById('previewProgress').style.width = (audio.currentTime / audio.duration) * 100 + '%';
+        document.getElementById('previewTime').textContent = formatTime(audio.currentTime);
+      }
+    };
+    audio._stEnd = function() {
+      document.getElementById('previewPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+      bgMusic.stop();
+    };
+    audio.addEventListener('loadedmetadata', audio._stMeta);
+    audio.addEventListener('timeupdate', audio._stTime);
+    audio.addEventListener('ended', audio._stEnd);
+
+    // Populate preview screen
+    document.getElementById('unlockBtn').innerHTML = '&#128275; Unlock ' + escHtml(storyData.childName) + '\'s full story &mdash; ' + (window.pricing ? window.pricing.display : '£19.99');
+    const catLabels = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
+    const theme = CAT_THEMES[storyData.category] || CAT_THEMES.journey;
+    document.querySelector('.preview-badge').innerHTML = `&#10003; ${theme.label} preview ready`;
+    document.getElementById('previewTitle').textContent = `${storyData.childName}'s story is waiting`;
+    document.getElementById('previewSub').textContent = `This is just the opening. The full story is 15 minutes of ${storyData.childName} as the hero.`;
+    let summary = `<p style="font-size:0.78rem;color:var(--cat-accent-dark,var(--purple));font-weight:700;margin:0 0 0.4rem;text-align:center">What you built:</p>`;
+    summary += `<p style="font-size:0.82rem;color:var(--text);margin:0;line-height:1.6;font-weight:500;text-align:center">`;
+    summary += `A ${escHtml((catLabels[storyData.category]||'story').toLowerCase())} for <strong>${escHtml(storyData.childName)}</strong>`;
+    if (storyData.friendName) summary += ` with best friend <strong>${escHtml(storyData.friendName)}</strong>`;
+    if (storyData.hasPet && storyData.petName) summary += `, ${escHtml(storyData.petName)} the ${escHtml(storyData.petType || 'pet')}`;
+    if (storyData.themes && storyData.themes.length) summary += `, featuring ${escHtml(storyData.themes.join(', ').toLowerCase())}`;
+    if (storyData.setting && storyData.setting !== 'Surprise me') summary += `, set in ${escHtml(storyData.setting.toLowerCase())}`;
+    summary += `.</p>`;
+    document.getElementById('previewSummary').innerHTML = summary;
+
+    // Populate story text display
+    const storyDisplay = document.getElementById('previewStoryDisplay');
+    if (storyDisplay && previewStoryText) {
+      const cleanText = previewStoryText
+        .replace(/\[whispers\]/gi, '').replace(/\[laughs?(?: softly)?\]/gi, '')
+        .replace(/\[sighs?\]/gi, '').replace(/\[gasps?\]/gi, '').replace(/\[excitedly\]/gi, '')
+        .replace(/\.\.\. \.\.\./g, '').replace(/\.\.\./g, '').trim();
+      const nameEsc = escHtml(storyData.childName);
+      const nameTag = `<span style="color:var(--orange);font-weight:800">${nameEsc}</span>`;
+      const paras = cleanText.split(/\n+/).filter(p => p.trim());
+      const paraHtml = paras.map(p => {
+        const escaped = escHtml(p.trim());
+        return `<p>${escaped.split(nameEsc).join(nameTag)}</p>`;
+      }).join('');
+      storyDisplay.innerHTML = `<div class="story-book"><div class="story-book-body">${paraHtml}</div><div class="story-book-fade"></div><div class="story-book-footer"><p>✨ The full story is 15 minutes long</p></div></div>`;
+      storyDisplay.style.display = 'block';
+    }
+
+    // Pre-fill email if available
+    const previewEmailEl = document.getElementById('previewEmail');
+    if (previewEmailEl && storyData.email) previewEmailEl.value = storyData.email;
+
+    history.replaceState({}, '', '/');
+    goTo('screenPreview');
+  } catch(err) {
+    console.error('Preview restore failed:', err.message);
+    history.replaceState({}, '', '/');
+    goTo('screenLanding');
+  }
+}
+
+// Save email to attempt when user fills in preview email field
+(function() {
+  const el = document.getElementById('previewEmail');
+  if (!el) return;
+  el.addEventListener('blur', function() {
+    const email = this.value.trim();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && window._currentJobId) {
+      fetch('/api/update-attempt-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId: window._currentJobId, email })
+      }).catch(() => {});
+    }
+  });
+})();
 
 // Handle return from Stripe checkout
 async function handleStripeReturn() {
@@ -4234,6 +4340,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const listenId = new URLSearchParams(window.location.search).get('listen');
   if (listenId) {
     loadSharedStory(listenId);
+    return;
+  }
+  // Check for abandoned preview return link
+  const previewJobId = new URLSearchParams(window.location.search).get('preview');
+  if (previewJobId && /^[a-zA-Z0-9_-]+$/.test(previewJobId)) {
+    restorePreviewFromEmail(previewJobId);
     return;
   }
   // Check if returning from Stripe checkout

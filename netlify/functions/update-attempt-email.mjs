@@ -1,5 +1,5 @@
-// Saves a story generation attempt (preview) so admin can see what customers tried to create.
-// Non-blocking, fire-and-forget from the client side.
+// Updates the email on a story_attempt record when the user enters/edits
+// their email on the preview screen. Fire-and-forget from the client.
 
 export default async (req) => {
   if (req.method !== 'POST') {
@@ -7,8 +7,11 @@ export default async (req) => {
   }
 
   try {
-    const { storyData, voiceId, previewStory, jobId } = await req.json();
-    if (!storyData || !storyData.childName) {
+    const { jobId, email } = await req.json();
+    if (!jobId || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(jobId)) {
       return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
 
@@ -18,30 +21,21 @@ export default async (req) => {
       return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
     }
 
-    await fetch(`${supabaseUrl}/rest/v1/story_attempts`, {
-      method: 'POST',
+    await fetch(`${supabaseUrl}/rest/v1/story_attempts?job_id=eq.${encodeURIComponent(jobId)}`, {
+      method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${supabaseKey}`,
         'apikey': supabaseKey,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        child_name: storyData.childName,
-        email: storyData.email || null,
-        category: storyData.category,
-        story_data: storyData,
-        voice_id: voiceId || null,
-        preview_story: previewStory || null,
-        job_id: jobId || null,
-        status: 'preview_generated'
-      })
+      body: JSON.stringify({ email })
     });
 
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (e) {
-    console.error('Save attempt error:', e.message);
+    console.error('Update attempt email error:', e.message);
     return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 };
 
-export const config = { path: '/api/save-attempt' };
+export const config = { path: '/api/update-attempt-email' };

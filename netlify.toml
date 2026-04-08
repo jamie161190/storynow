@@ -27,6 +27,9 @@
 [functions."retry-worker"]
   schedule = "*/5 * * * *"
 
+[functions."abandoned-preview-worker"]
+  schedule = "*/30 * * * *"
+
 
 [[edge_functions]]
   path = "/*"
