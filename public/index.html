@@ -4259,7 +4259,7 @@ async function unlockFull() {
   document.querySelector('.loading-sub').textContent = 'You will be redirected to our secure payment page.';
   try {
     // Save story data with feedback so it survives Stripe redirect
-    sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, previewStoryText, selectedVoiceId }));
+    sessionStorage.setItem('storytold_story', JSON.stringify({ storyData, previewStoryText, selectedVoiceId, jobId: window._currentJobId || '' }));
 
     const res = await fetch('/api/create-checkout', {
       method: 'POST',
@@ -4417,10 +4417,11 @@ async function handleStripeReturn() {
     return;
   }
   const parsed = JSON.parse(saved);
-  const { storyData: savedData, previewStoryText: savedPreview, selectedVoiceId: savedVoice } = parsed;
+  const { storyData: savedData, previewStoryText: savedPreview, selectedVoiceId: savedVoice, jobId: savedJobId } = parsed;
   Object.assign(storyData, savedData);
   previewStoryText = savedPreview || '';
   selectedVoiceId = savedVoice || 'EXAVITQu4vr4xnSDxMaL';
+  if (savedJobId) window._currentJobId = savedJobId;
 
   // Verify payment
   goTo('screenLoading');
@@ -4455,7 +4456,8 @@ async function handleStripeReturn() {
         customerEmail: verifyData.customerEmail,
         voiceId: selectedVoiceId,
         feedback: storyData._previewFeedback || null,
-        giftDeliveryPreference: storyData._giftDeliveryPref || null
+        giftDeliveryPreference: storyData._giftDeliveryPref || null,
+        previewStoryText: previewStoryText || null
       })
     });
     const orderData = await orderRes.json();

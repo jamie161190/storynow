@@ -10,7 +10,7 @@ import Stripe from 'stripe';
 export default async (req) => {
   try {
     const body = await req.json();
-    const { storyData, sessionId, jobId, customerEmail, voiceId, feedback, giftDeliveryPreference } = body;
+    const { storyData, sessionId, jobId, customerEmail, voiceId, feedback, giftDeliveryPreference, previewStoryText } = body;
 
     if (!sessionId) {
       return new Response(JSON.stringify({ error: 'Missing payment session' }), {
@@ -59,7 +59,7 @@ export default async (req) => {
       }
     }
 
-    // Fetch the full story text from the preview job
+    // Fetch the story text from the preview job, fall back to request body
     let storyText = '';
     if (jobId && /^[a-zA-Z0-9_-]+$/.test(jobId)) {
       try {
@@ -71,6 +71,10 @@ export default async (req) => {
       } catch (e) {
         console.error('Failed to fetch preview job:', e.message);
       }
+    }
+    // Fallback: use preview text from the request body (survives mobile redirect via sessionStorage)
+    if (!storyText && previewStoryText) {
+      storyText = previewStoryText;
     }
 
     const email = customerEmail || session.customer_details?.email || session.customer_email || '';
