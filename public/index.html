@@ -1387,6 +1387,12 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     </div>
   </div>
 
+  <div class="form-group" style="margin-top:1rem">
+    <label>Favourite toy or comfort item (optional)</label>
+    <input type="text" id="favTeddy" placeholder="e.g. a small white bunny called Mr Flopsy, a red fire engine, their yellow blanket">
+    <p class="form-hint">Include the colour and what it looks like. It will appear in the story exactly as you describe it.</p>
+  </div>
+
   <p class="inline-error" id="peopleError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
   <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validatePeople()">Continue</button>
 </div>
@@ -2842,7 +2848,7 @@ history.replaceState({ screen: 'screenLanding' }, '', '');
 
 // ===== FORM STATE PERSISTENCE =====
 // Save form inputs so interrupted parents don't lose progress
-const FORM_FIELDS = ['proudOf','friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','customTheme','themeDetail','customWhere','siblingDynamics','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2'];
+const FORM_FIELDS = ['proudOf','friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','favTeddy','customTheme','themeDetail','customWhere','siblingDynamics','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2'];
 
 function saveFormState() {
   try {
@@ -3384,6 +3390,7 @@ function goToLength() {
   storyData.petType = document.getElementById('petType').value.trim();
   storyData.hasVillain = document.getElementById('villainToggle').classList.contains('on');
   storyData.villainName = storyData.hasVillain ? document.getElementById('villainName').value.trim() : '';
+  storyData.favTeddy = document.getElementById('favTeddy').value.trim();
 
   // Themes + setting (merged screen)
   storyData.themes = getSelectedThemes();
@@ -3799,6 +3806,8 @@ async function pollForFull(jobId) {
 
 // Preview data stored globally for the reveal transition
 let _pendingPreviewData = null;
+let _previewStartTime = 0;
+const MIN_PREVIEW_WAIT_MS = 120000; // 2 minutes minimum before showing "ready" button
 
 async function generatePreview() {
   if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
@@ -3816,6 +3825,7 @@ async function generatePreview() {
   initPreviewGame();
 
   _pendingPreviewData = null;
+  _previewStartTime = Date.now();
 
   try {
     const jobId = Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -3873,6 +3883,12 @@ async function generatePreview() {
     } catch(e) { /* non-blocking */ }
 
     trackEvent('PreviewGenerated', { content_name: storyData.category });
+
+    // Wait for 2-minute minimum before showing "ready" button
+    const elapsed = Date.now() - _previewStartTime;
+    if (elapsed < MIN_PREVIEW_WAIT_MS) {
+      await new Promise(r => setTimeout(r, MIN_PREVIEW_WAIT_MS - elapsed));
+    }
 
     // Show the "ready" button on the game screen
     const readyBtn = document.getElementById('previewGameReady');

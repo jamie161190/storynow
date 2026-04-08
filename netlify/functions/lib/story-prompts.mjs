@@ -341,7 +341,7 @@ ${d.petType ? `Make ${d.petName} behave like a real ${d.petType} would. The chil
 
   if (d.favTeddy) {
     block += `\n\nFAVOURITE TOY/COMFORT ITEM: ${d.favTeddy}
-This item should appear in the story. Use ONLY the description the parent gave. NEVER invent colours, sizes, or details they did not mention.`;
+This should appear in the story. Use ONLY the description the parent gave. NEVER invent colours, sizes, or details they did not mention. If multiple children are in the story and different items are described for each child, match each item to the correct child based on the names mentioned.`;
   }
 
   if (d.hasVillain && d.villainName) {
