@@ -638,7 +638,7 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 .type-pill.active{background:linear-gradient(135deg,var(--purple),var(--purple-soft));color:#fff;border-color:transparent;box-shadow:0 2px 12px rgba(107,47,147,0.25)}
 .hero-btn{width:100%;padding:15px;border:none;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--orange),#D4601E);box-shadow:0 4px 20px rgba(241,117,59,0.35);cursor:pointer;transition:all 0.25s}
 .hero-btn:hover{transform:translateY(-2px);box-shadow:0 6px 28px rgba(241,117,59,0.45)}
-.hero-price{font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:10px;font-weight:500}
+.hero-price{font-size:0.82rem;color:var(--text);text-align:center;margin-top:12px;font-weight:600}
 .trust-dots{display:flex;justify-content:center;gap:16px;margin-top:14px;flex-wrap:wrap}
 .trust-dot{font-size:0.72rem;color:var(--text-muted);font-weight:600}
 /* ===== STORY CINEMA ===== */
@@ -764,7 +764,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         <p style="font-size:0.78rem;color:var(--purple);font-weight:700;margin:0">&#127873; Gift mode active <a onclick="toggleHeroGift()" style="color:var(--text-muted);cursor:pointer;margin-left:0.5rem;font-size:0.72rem">remove</a></p>
       </div>
       <button class="hero-btn" id="heroBtn" onclick="heroStartStory()">Start their story</button>
-      <p class="hero-price">Free preview first &nbsp;&middot;&nbsp; <span class="price-display">&pound;19.99</span> for the full story &nbsp;&middot;&nbsp; One payment, theirs forever</p>
+      <p class="hero-price">Free preview first &nbsp;&middot;&nbsp; <span class="price-display" style="color:var(--purple);font-weight:800">&pound;19.99</span> for the full story &nbsp;&middot;&nbsp; Theirs forever</p>
     </div>
 
     <div class="trust-dots">
@@ -1182,7 +1182,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div class="sticky-bar-inner" style="justify-content:center">
     <button class="sticky-bar-btn" onclick="document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){document.getElementById('heroChildName').focus()},500)" style="width:100%;max-width:340px;text-align:center">
       <strong>Start their story</strong>
-      <span>For one child or the whole family.</span>
+      <span>Free preview &nbsp;&middot;&nbsp; &pound;19.99 for the full story</span>
     </button>
   </div>
 </div>
