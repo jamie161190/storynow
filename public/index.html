@@ -1430,8 +1430,8 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <div class="form-group" style="margin-top:1rem">
     <label>Favourite toy or comfort item (optional)</label>
-    <input type="text" id="favTeddy" placeholder="e.g. a small white bunny called Mr Flopsy, a red fire engine, their yellow blanket">
-    <p class="form-hint">Include the colour and what it looks like. It will appear in the story exactly as you describe it.</p>
+    <input type="text" id="favTeddy" placeholder="e.g. Isla has a pink bunny, Oliver has a toy digger called Digby">
+    <p class="form-hint">If each child has their own, just list them. They will each appear in the story.</p>
   </div>
 
   <p class="inline-error" id="peopleError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
@@ -2830,6 +2830,16 @@ function goTo(id, skipHistory) {
     const showVillain = storyData.category === 'journey';
     document.getElementById('villainSection').style.display = showVillain ? 'block' : 'none';
     // Multi-child: update people screen labels and title
+    // Adapt teddy placeholder for single vs multi
+    const teddyInput = document.getElementById('favTeddy');
+    const teddyHint = teddyInput?.nextElementSibling;
+    if (storyData.isMultiChild) {
+      if (teddyInput) teddyInput.placeholder = 'e.g. ' + (storyData.children[0]?.name || 'Isla') + ' has a pink bunny, ' + (storyData.children[1]?.name || 'Oliver') + ' has a toy digger called Digby';
+      if (teddyHint) teddyHint.textContent = 'If each child has their own, just list them. They will each appear in the story.';
+    } else {
+      if (teddyInput) teddyInput.placeholder = 'e.g. a small white bunny called Mr Flopsy, a red fire engine, their yellow blanket';
+      if (teddyHint) teddyHint.textContent = 'Include the colour and what it looks like. It will appear in the story exactly as you describe it.';
+    }
     if (storyData.isMultiChild) {
       const displayNames = formatChildrenNames(storyData.children);
       const title = document.querySelector('#screenPeople .section-title');
