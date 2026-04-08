@@ -786,7 +786,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <div class="story-tabs">
       <button class="story-tab active" onclick="switchTab('bedtime',this)">&#127769; Bedtime</button>
       <button class="story-tab" onclick="switchTab('adventure',this)">&#9876;&#65039; Adventure</button>
-      <button class="story-tab" onclick="switchTab('gift',this)">&#127873; Gift</button>
+      <button class="story-tab" onclick="switchTab('siblings',this)">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102; Siblings</button>
     </div>
 
     <!-- BEDTIME -->
@@ -930,65 +930,114 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     </div>
 
     <!-- GIFT -->
-    <div class="story-section" id="tab-gift">
+    <div class="story-section" id="tab-siblings">
       <div class="recipe-card">
         <div class="recipe-header">
-          <div class="recipe-icon" style="background:#E3FAEB">&#127873;</div>
+          <div class="recipe-icon" style="background:#E8F0FE">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102;</div>
           <div>
-            <div class="recipe-title">A Gift from Grandma to Livvie</div>
-            <div class="recipe-sub">Here's what Grandma told us...</div>
+            <div class="recipe-title">Isla &amp; Oliver's Adventure</div>
+            <div class="recipe-sub">Here's what their mum told us...</div>
           </div>
         </div>
         <div class="recipe-chips">
-          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">For</span>&nbsp;<span class="chip-val">Livvie</span></div>
-          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Age</span>&nbsp;<span class="chip-val">4</span></div>
-          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Story type</span>&nbsp;<span class="chip-val">&#127769; Bedtime</span></div>
-          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Loves</span>&nbsp;<span class="chip-val">butterflies &amp; dancing</span></div>
-          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Cuddly toy</span>&nbsp;<span class="chip-val">Mr Elephant</span></div>
-          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Setting</span>&nbsp;<span class="chip-val">secret butterfly meadow</span></div>
-          <div class="recipe-chip"><div class="chip-check" style="background:#9B59B6">&#10003;</div><span class="chip-label">Their thing</span>&nbsp;<span class="chip-val">does a bow after every dance, even in Tesco</span></div>
-          <div class="recipe-chip"><div class="chip-check" style="background:#4ECB71">&#10003;</div><span class="chip-label">Gift from</span>&nbsp;<span class="chip-val">Grandma</span></div>
-          <div class="recipe-chip"><div class="chip-check" style="background:#4ECB71">&#10003;</div><span class="chip-label">Grandma in the story</span>&nbsp;<span class="chip-val">Yes</span></div>
-          <div class="recipe-chip"><div class="chip-check" style="background:#4ECB71">&#10003;</div><span class="chip-label">Personal message</span>&nbsp;<span class="chip-val">Read aloud first</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Isla</span>&nbsp;<span class="chip-val">girl, age 7</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Oliver</span>&nbsp;<span class="chip-val">boy, age 4</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">About Isla</span>&nbsp;<span class="chip-val">loves ballet, always in charge, scared of spiders</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">About Oliver</span>&nbsp;<span class="chip-val">obsessed with diggers, calls spaghetti "pasketti"</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Comfort item</span>&nbsp;<span class="chip-val">Digby (toy excavator)</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Pet</span>&nbsp;<span class="chip-val">Pepper the cat</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Loves</span>&nbsp;<span class="chip-val">dinosaurs &amp; magic</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Setting</span>&nbsp;<span class="chip-val">a magical forest</span></div>
+          <div class="recipe-chip"><div class="chip-check" style="background:#9B59B6">&#10003;</div><span class="chip-label">Dynamic</span>&nbsp;<span class="chip-val">Isla bosses Oliver around but he doesn't mind</span></div>
+          <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Narrator voice</span>&nbsp;<span class="chip-val">Sarah</span></div>
         </div>
       </div>
       <div class="recipe-arrow">&#8595; this became...</div>
       <div class="story-reader">
         <div class="reader-header">
-          <button class="reader-play-btn" style="background:#E3FAEB;color:#2D8A50;border-color:#C8E6C9" onclick="playDemoStory('gift',this)">
-            <div class="play-icon" style="background:#4ECB71"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
+          <button class="reader-play-btn" style="background:#E8F0FE;color:#1565C0;border-color:#C5CAE9" onclick="playDemoStory('siblings',this)">
+            <div class="play-icon" style="background:#5C6BC0"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
             &#9654; Play this story
           </button>
-          <div class="reader-meta"><span style="color:#4ECB71;font-weight:800">Gift message</span> read aloud first</div>
+          <div class="reader-meta"><span style="color:#5C6BC0;font-weight:800">2 children</span> in one story</div>
         </div>
-        <div class="story-text">
-          <p style="background:#E3FAEB;border-left:3px solid #4ECB71;padding:10px 12px;border-radius:8px;font-style:italic;color:#2D6A4F;font-size:0.85rem;margin-bottom:16px">"My darling <span class="cn">Livvie</span>, this story is just for you, from <span class="cf">Grandma</span>, because you are the most wonderful little dancer I have ever seen. I hope it makes you smile as big as your hugs. All my love, always." <span style="display:block;font-size:0.7rem;color:#81C784;margin-top:4px;font-style:normal;font-weight:700">&#8593; Read aloud by the narrator at the very start</span></p>
-          <p>Once upon a very quiet morning, a little girl named <span class="cn">Livvie</span> was dancing in her bedroom.</p>
-          <p>She was dancing with <span class="cf">Mr Elephant</span>, who was an excellent partner and never complained when <span class="cn">Livvie</span> changed the music halfway through. She spun, she twirled, she leapt as high as the top of the bed,and then, with the greatest dignity you have ever seen in someone wearing pyjamas, <span class="cn">Livvie</span> took a deep bow.</p>
-          <p><span class="cf">Mr Elephant</span> seemed very impressed.</p>
-          <p>Outside the window, a butterfly watched from the garden. It was the colour of sunshine and peach blossom, and it had been watching <span class="cn">Livvie</span> dance for a very long time.</p>
-          <p>When <span class="cn">Livvie</span> spotted it, she pressed her nose to the glass. "Hello," she said.</p>
-          <p>The butterfly fluttered once, twice,and then, to <span class="cn">Livvie</span>'s absolute amazement, it beckoned with one wing.</p>
-          <p>She pulled on her shoes, tucked <span class="cf">Mr Elephant</span> carefully under her arm, and followed.</p>
-          <p>The butterfly led her through the garden, through the little gate at the bottom, and into a place <span class="cn">Livvie</span> had never seen before. A meadow,but not just any meadow. A secret butterfly meadow, where the air was thick and soft and full of colour, and butterflies of every shade you could imagine drifted like living flowers through the long grass.</p>
-          <p>There were hundreds of them. Blue ones and gold ones and ones the colour of deep summer sky. Some were small as fingernails. Some were wide as open books. And all around her, the meadow hummed with a sound that was almost, almost like music.</p>
-          <p><span class="cn">Livvie</span> did what <span class="cn">Livvie</span> always did when there was music. She danced.</p>
-          <p>She danced through the meadow with <span class="cf">Mr Elephant</span> held high, and the butterflies swirled around her like a living, breathing rainbow. She leapt and she spun and she dipped,and when the music in the air reached its most beautiful moment, <span class="cn">Livvie</span> came to a stop, and she took her bow.</p>
-          <p>A perfect, deep, very serious bow. The butterflies rose in a great shimmering cloud and filled the sky above her.</p>
-          <p>And then a hand reached down and took hers.</p>
-          <p><span class="cn">Livvie</span> looked up. It was <span class="cf">Grandma</span>.</p>
-          <p><span class="cf">Grandma</span> was there in the meadow, and she was smiling the smile she always saved just for <span class="cn">Livvie</span>. "I wondered if you'd find this place," <span class="cf">Grandma</span> said softly. "I found it a very long time ago. I always hoped you would come here one day."</p>
-          <p><span class="cn">Livvie</span> took <span class="cf">Grandma</span>'s hand properly in both of hers. "Did you dance here too?" she asked.</p>
-          <p>"Every chance I got," said <span class="cf">Grandma</span>. "And I always bowed at the end."</p>
-          <p><span class="cn">Livvie</span> beamed. "I do that too. Even in the supermarket."</p>
-          <p>"I know," said <span class="cf">Grandma</span>, and her eyes went very bright and warm. "I have seen you. And every single time, <span class="cn">Livvie</span>, it is the most wonderful thing."</p>
-          <p>They sat together in the long grass for a while, <span class="cf">Grandma</span> and <span class="cn">Livvie</span> and <span class="cf">Mr Elephant</span>, while the butterflies drifted and the meadow hummed. <span class="cn">Livvie</span> leaned her head against <span class="cf">Grandma</span>'s arm and felt the warmth of it,the particular warmth that only <span class="cf">Grandma</span> had, like sunshine and home all at once.</p>
-          <p>"Will we be able to come back?" <span class="cn">Livvie</span> asked quietly.</p>
-          <p><span class="cf">Grandma</span> squeezed her hand. "Whenever you dance with your whole heart," she said, "this meadow is always here."</p>
-          <p>When <span class="cn">Livvie</span> found herself back in her bedroom, <span class="cf">Mr Elephant</span> was still tucked under her arm and the morning light was coming soft through the curtains. She stood in the middle of the floor for a moment. Then she danced, just a few steps, just for the joy of it.</p>
-          <p>And at the end, she bowed.</p>
-          <p>Somewhere, in a meadow full of colour and light, the butterflies rose.</p>
-          <p>This story was made just for <span class="cn">Livvie</span>.</p>
+        <div class="story-text" id="story-siblings">
+          <p><span class="cn">Isla</span> saw it first.</p>
+          <p>A flash of grey. A flick of tail. Meoooow! <span class="cf">Pepper</span> the cat shot past her feet and was gone. Right into the big, tall forest at the bottom of the garden. Whoooosh!</p>
+          <p>"<span class="cf">Pepper</span>!" called <span class="cn">Isla</span>. "Come back!"</p>
+          <p>But <span class="cf">Pepper</span> did not come back.</p>
+          <p><span class="cn">Oliver</span> was sitting in the mud. He was driving <span class="cf">Digby</span> very carefully through a little pile of dirt. Scritch, scritch, scritch. <span class="cn">Oliver</span> always had <span class="cf">Digby</span>. Everywhere <span class="cn">Oliver</span> went, <span class="cf">Digby</span> went too.</p>
+          <p><span class="cn">Oliver</span> looked up. "Where <span class="cf">Pepper</span> gone?"</p>
+          <p>"Into the forest," said <span class="cn">Isla</span>. She stood up very straight, the way she always did. "We have to go in. We have to find her."</p>
+          <p><span class="cn">Oliver</span> stood up. He held <span class="cf">Digby</span> tight. "Okay," he said. "<span class="cf">Digby</span> come too."</p>
+          <p>And into the forest they went ...</p>
+          <p>The trees were very tall. Taller than a house. Taller than anything <span class="cn">Isla</span> had ever seen. And they glowed. Soft lights, gold and pink, flickered on every branch. Blink. Blink. Blink.</p>
+          <p>"Oooooh," said <span class="cn">Oliver</span>.</p>
+          <p>"I know," whispered <span class="cn">Isla</span>.</p>
+          <p>The ground was soft and springy under their feet. And there, right in the middle of the path, were footprints. Big footprints. Enormous footprints.</p>
+          <p>BOOM. BOOM. BOOM.</p>
+          <p><span class="cn">Oliver</span> crouched right down. He put his whole hand inside one footprint. His whole hand. It fitted easily.</p>
+          <p>"Big foot," said <span class="cn">Oliver</span>.</p>
+          <p><span class="cn">Isla</span> looked very, very carefully. "<span class="cn">Oliver</span>," she said slowly ... "that is a dinosaur footprint."</p>
+          <p><span class="cn">Oliver</span>'s eyes went enormous. "DINOSAUR?"</p>
+          <p>"Shhhhh," said <span class="cn">Isla</span>. But she was smiling.</p>
+          <p>And then, from somewhere deep in the trees, they heard it ...</p>
+          <p>Rumble. Rumble. Rumble.</p>
+          <p>There were footprints everywhere. Going deeper and deeper into the glowing forest. And right in the middle of them, sitting very still, was <span class="cf">Pepper</span>.</p>
+          <p>Meoooow.</p>
+          <p><span class="cf">Pepper</span> was staring at something behind a big shining tree. Something that made a very small, very sad little sound.</p>
+          <p>Eeeeeep.</p>
+          <p><span class="cn">Isla</span> stepped forward. <span class="cn">Oliver</span> held <span class="cf">Digby</span> tight. And there, curled up in the roots of the tree, was a baby dinosaur. It had huge, round eyes. It had a tiny little tail. It was no bigger than a dog. And it was crying.</p>
+          <p>"Oh," said <span class="cn">Isla</span> softly. "Oh, you poor little thing."</p>
+          <p><span class="cn">Oliver</span> took one very careful step forward. Then another. He held <span class="cf">Digby</span> out slowly. "Hello," he said. "This <span class="cf">Digby</span>."</p>
+          <p>The baby dinosaur sniffed at <span class="cf">Digby</span>. It blinked once. Then, very slowly, it stopped crying.</p>
+          <p><span class="cn">Oliver</span> smiled the biggest smile in the whole forest. "<span class="cf">Digby</span> did it," he breathed.</p>
+          <p>The baby dinosaur made a soft sound. Prrrrm. Prrrrm. And it pointed, with one tiny claw, deeper into the trees.</p>
+          <p>"It wants to go home," said <span class="cn">Isla</span>. "Its family must be in there somewhere. We have to help." She looked at <span class="cn">Oliver</span>. "Are you ready?"</p>
+          <p><span class="cn">Oliver</span> stood up very tall. He held <span class="cf">Digby</span> high. "DIGBY DIG IT," he declared.</p>
+          <p>And they walked, and they walked, and they walked ...</p>
+          <p>"I hungry," said <span class="cn">Oliver</span>, after a while.</p>
+          <p>"<span class="cn">Oliver</span>," said <span class="cn">Isla</span>, "we are in the middle of a dinosaur rescue."</p>
+          <p>"After?" said <span class="cn">Oliver</span> hopefully. "Pasketti?"</p>
+          <p>"Yes," said <span class="cn">Isla</span> firmly. "After. Pasketti."</p>
+          <p><span class="cn">Oliver</span> nodded. That was good enough for him.</p>
+          <p>Then <span class="cn">Isla</span> stopped. She stopped very suddenly ...</p>
+          <p>Right across the path was a web. A huge, glittery, shimmering web. It stretched from tree to tree, all the way across. And it was very, very spider-y.</p>
+          <p><span class="cn">Isla</span> took one step back. Her voice went small. "Spiders," she said.</p>
+          <p>"<span class="cn">Isla</span> scared?" said <span class="cn">Oliver</span>.</p>
+          <p>"A little bit," <span class="cn">Isla</span> admitted. And <span class="cn">Isla</span> NEVER admitted things like that.</p>
+          <p>"DIGBY DIG IT!" shouted <span class="cn">Oliver</span>.</p>
+          <p>He dropped to his knees. He scooped with <span class="cf">Digby</span>. Scritch scritch scritch. He dug, and he dug, and he dug. A little tunnel appeared, right underneath the web. Just big enough.</p>
+          <p>"<span class="cn">Oliver</span>," said <span class="cn">Isla</span>, and her voice was full of something warm, "that is absolutely brilliant."</p>
+          <p>"<span class="cf">Digby</span> brilliant," said <span class="cn">Oliver</span>. "And me."</p>
+          <p>They were through ...</p>
+          <p>The forest opened wide. And <span class="cn">Isla</span> stopped breathing for just a moment.</p>
+          <p>There was a huge, magical clearing. And in the middle, there was a bridge. Long and thin and glittering, made of pure light. It went up, up, up into the branches above.</p>
+          <p><span class="cn">Oliver</span> looked at it. Then he looked at <span class="cn">Isla</span>. "You can do it," he said simply. "You do dancing."</p>
+          <p><span class="cn">Isla</span> stood up straight. Arms out. Chin up. She took a deep breath ...</p>
+          <p>And she danced across the bridge. Step, step, step, step. Light as a feather. Just like ballet class, except the floor was made of light and there were dinosaurs below and her little brother was watching.</p>
+          <p>Then <span class="cf">Pepper</span> did something nobody expected.</p>
+          <p>She took the baby dinosaur's tiny tail very gently in her teeth. And she marched. Straight toward a cluster of glowing flowers at the edge of the clearing.</p>
+          <p><span class="cn">Oliver</span> burst out laughing. The real kind, the falling-over kind. "<span class="cf">Pepper</span> more bossy than <span class="cn">Isla</span>!"</p>
+          <p>"OLIVER," said <span class="cn">Isla</span>. But she was laughing too, and she couldn't stop.</p>
+          <p>And then the glowing flowers parted ...</p>
+          <p>Three enormous dinosaurs stood in the golden light. Big, kind eyes. Long, gentle necks. And when the baby dinosaur saw them, it made the biggest sound the forest had ever heard.</p>
+          <p>PRRRRRRRRM.</p>
+          <p><span class="cn">Isla</span> felt it in her chest. She looked at <span class="cn">Oliver</span>. <span class="cn">Oliver</span> looked at <span class="cn">Isla</span>.</p>
+          <p>"We did it," said <span class="cn">Oliver</span>.</p>
+          <p>"We did," said <span class="cn">Isla</span>. "You dug. I danced. <span class="cf">Pepper</span> bossed the dinosaur."</p>
+          <p>"Good team," said <span class="cn">Oliver</span>. He held <span class="cf">Digby</span> up high one last time. "DIGBY DIG IT."</p>
+          <p><span class="cf">Pepper</span> trotted back and rubbed her head against <span class="cn">Oliver</span>'s leg. Purrrrrr.</p>
+          <p>And they walked, and they walked, and they walked ...</p>
+          <p>... back out into the garden, just as the very last bit of sun turned the sky pink.</p>
+          <p><span class="cn">Oliver</span> sat down in his mud. He gave <span class="cf">Digby</span> an important pat. <span class="cn">Isla</span> sat beside him. <span class="cf">Pepper</span> curled between them, purring loudly. Everything was still. Everything was warm.</p>
+          <p>"<span class="cn">Oliver</span>," said <span class="cn">Isla</span> quietly.</p>
+          <p>"Yeah?"</p>
+          <p>"Good digging today."</p>
+          <p><span class="cn">Oliver</span> thought about this very seriously. Then he said, "Tomorrow ... more dinosaurs?"</p>
+          <p><span class="cn">Isla</span> looked back at the forest. One tiny light was still glowing, just inside the trees. Blinking slowly ... like a wink.</p>
+          <p>"I think so," said <span class="cn">Isla</span>. "I really think so."</p>
+          <p>This story was made just for <span class="cn">Isla</span> and <span class="cn">Oliver</span>.</p>
         </div>
         <div class="reader-fade"></div>
         <div class="reader-footer">
@@ -997,7 +1046,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
             <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#127911; 15 mins of magic</span>
             <span class="benefit-tag" style="background:#FFF8E7;color:#B8860B">&#128156; Theirs to keep forever</span>
           </div>
-          <button class="read-more-btn" style="background:#E3FAEB;color:#2D8A50" onclick="expandStory(this)">Read full story &#8595;</button>
+          <button class="read-more-btn" style="background:#E8F0FE;color:#1565C0" onclick="expandStory(this)">Read full story &#8595;</button>
         </div>
       </div>
     </div>
