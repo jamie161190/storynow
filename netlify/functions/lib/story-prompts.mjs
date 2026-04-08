@@ -577,7 +577,7 @@ const PREVIEW_FORMULAS = {
     const isMulti = d.isMultiChild && d.children && d.children.length > 1;
     const names = isMulti ? d.children.map(c => c.name) : [d.childName];
     return `
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them feel the warmth and magic.
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write the opening of the story. The parent is listening to decide whether to buy. You have 30 seconds to make them feel the warmth and magic.
 
 BEDTIME PREVIEW FORMULA:
 This is a BEDTIME story preview. It must feel intimate, warm, and safe. NOT adventurous or high energy.
@@ -596,7 +596,7 @@ ${getPreviewAgeBand(d.age)}`;
     const isMulti = d.isMultiChild && d.children && d.children.length > 1;
     const names = isMulti ? d.children.map(c => c.name) : [d.childName];
     return `
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to make them cry, gasp, or smile so wide they cannot say no.
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write the opening of the story. The parent is listening to decide whether to buy. You have 30 seconds to make them cry, gasp, or smile so wide they cannot say no.
 
 JOURNEY PREVIEW FORMULA:
 ${isMulti ? `1. FIRST FEW SENTENCES: Each child reacts differently to the inciting moment. Introduce them INDIVIDUALLY — NEVER list them together. Example: "${names[0]} froze. She could hear it. ${names[1]} was already running toward the noise. ${names.length > 2 ? names[2] + ' tugged at ' + (d.children[0].gender === 'girl' ? 'her' : 'his') + ' sleeve and whispered, "I want to see."' : ''}"
@@ -614,7 +614,7 @@ ${getPreviewAgeBand(d.age)}`;
     const isMulti = d.isMultiChild && d.children && d.children.length > 1;
     const names = isMulti ? d.children.map(c => c.name) : [d.childName];
     return `
-IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write ONLY the opening, approximately 60 to 80 words. The parent is listening to decide whether to buy. You have 30 seconds to prove this story teaches AND entertains.
+IMPORTANT OVERRIDE: This is a PREVIEW ONLY. Write the opening of the story. The parent is listening to decide whether to buy. You have 30 seconds to prove this story teaches AND entertains.
 
 LEARNING PREVIEW FORMULA:
 This preview must signal that this is an INTERACTIVE learning story about ${d.subject || 'the subject'}.

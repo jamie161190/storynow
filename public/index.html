@@ -1741,61 +1741,59 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <audio id="previewAudio"></audio>
 
     <!-- Summary -->
-    <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.85rem 1rem;margin:1.25rem auto 0;text-align:center;max-width:340px;width:100%"></div>
+    <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.75rem 1rem;margin:1rem auto 0;text-align:center;max-width:340px;width:100%"></div>
 
-    <!-- Story text (collapsed, tap to read) -->
-    <div style="width:100%;max-width:340px;margin:0.75rem auto 0;text-align:center">
-      <a onclick="var d=document.getElementById('previewStoryDisplay');d.style.display=d.style.display==='none'?'block':'none';this.textContent=d.style.display==='none'?'Read along \u25BC':'Hide text \u25B2'" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Read along &#9660;</a>
-    </div>
+    <!-- Story text (collapsed) -->
     <div id="previewStoryDisplay" style="display:none;width:100%;max-width:340px;margin:0.5rem auto 0"></div>
 
-    <!-- Feedback section -->
-    <div id="previewFeedbackSection" style="width:100%;max-width:340px;margin:1.25rem auto 0">
-      <!-- Message feedback (shown if personal message or gift message exists) -->
-      <div id="messageFeedbackGroup" style="display:none;margin-bottom:1rem">
-        <div style="background:#FFF8F0;border-radius:12px;padding:0.85rem 1rem">
-          <p style="margin:0 0 0.4rem;font-size:0.82rem;font-weight:700;color:var(--text)">How does your message sound?</p>
-          <p style="margin:0 0 0.5rem;font-size:0.72rem;color:var(--text-muted)">Your message plays at the very start of the full story.</p>
-          <a id="editMessageLink" onclick="editPreviewMessage()" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Edit your message</a>
-          <div id="editMessageWrap" style="display:none;margin-top:0.5rem">
-            <textarea id="editMessageText" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:60px;resize:vertical;box-sizing:border-box"></textarea>
+    <!-- Feedback (simple, not buried) -->
+    <div style="width:100%;max-width:340px;margin:1.25rem auto 0">
+      <div class="form-group" style="margin:0">
+        <label style="font-size:0.82rem;font-weight:700;color:var(--text)">Anything I should know? (optional)</label>
+        <textarea id="previewFeedback" placeholder="e.g. Could the tone be funnier? I forgot to mention they love swimming!" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:50px;resize:vertical;box-sizing:border-box"></textarea>
+      </div>
+    </div>
+
+    <!-- Email + CTA -->
+    <div style="width:100%;max-width:340px;margin:1rem auto 0">
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label style="font-size:0.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem">Your email</label>
+        <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
+        <p class="form-hint" style="margin-top:0.25rem">So I can send you the full story when it is ready.</p>
+        <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
+      </div>
+      <button class="btn btn-primary" id="happyBtn" onclick="confirmHappy()" style="width:100%;padding:0.85rem;font-size:0.95rem">I'm happy, let's go!</button>
+      <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin:0.5rem 0 0">&#128154; Not magical enough? I will rewrite it for free.</p>
+    </div>
+
+    <!-- "Want to change anything?" (collapsed, expands on tap) -->
+    <div style="width:100%;max-width:340px;margin:1rem auto 0;text-align:center">
+      <a id="adjustToggle" onclick="document.getElementById('adjustSection').style.display=document.getElementById('adjustSection').style.display==='none'?'block':'none'" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Want to adjust anything?</a>
+      <div id="adjustSection" style="display:none;margin-top:0.75rem;text-align:left">
+        <!-- Message feedback (conditional) -->
+        <div id="messageFeedbackGroup" style="display:none;margin-bottom:0.75rem">
+          <div style="background:#FFF8F0;border-radius:10px;padding:0.75rem">
+            <p style="margin:0 0 0.3rem;font-size:0.82rem;font-weight:700;color:var(--text)">Your message</p>
+            <a id="editMessageLink" onclick="editPreviewMessage()" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Edit your message</a>
+            <div id="editMessageWrap" style="display:none;margin-top:0.4rem">
+              <textarea id="editMessageText" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:55px;resize:vertical;box-sizing:border-box"></textarea>
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- Character feedback (shown if gift giver toggled "put me in the story") -->
-      <div id="characterFeedbackGroup" style="display:none;margin-bottom:1rem">
-        <div style="background:#F8F5FF;border-radius:12px;padding:0.85rem 1rem">
-          <p style="margin:0 0 0.4rem;font-size:0.82rem;font-weight:700;color:var(--text)">Happy with how you appear in the story?</p>
-          <p style="margin:0;font-size:0.72rem;color:var(--text-muted)">Let me know if you would like your character adjusted.</p>
+        <!-- Character feedback (conditional) -->
+        <div id="characterFeedbackGroup" style="display:none;margin-bottom:0.75rem">
+          <div style="background:#F8F5FF;border-radius:10px;padding:0.75rem">
+            <p style="margin:0 0 0.2rem;font-size:0.82rem;font-weight:700;color:var(--text)">Your character in the story</p>
+            <p style="margin:0;font-size:0.72rem;color:var(--text-muted)">Let me know if you would like it adjusted.</p>
+          </div>
         </div>
-      </div>
-
-      <!-- General feedback -->
-      <div class="form-group" style="margin-bottom:0">
-        <label style="font-size:0.82rem;font-weight:700;color:var(--text)">Anything I should know? (optional)</label>
-        <textarea id="previewFeedback" placeholder="e.g. Love it! Could the tone be funnier? I forgot to mention they love swimming!" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:55px;resize:vertical;box-sizing:border-box"></textarea>
-        <p class="form-hint" style="margin-top:0.25rem">Forgotten something? Want a different tone? The full story picks up right where this left off.</p>
+        <!-- Read along -->
+        <a onclick="var d=document.getElementById('previewStoryDisplay');d.style.display=d.style.display==='none'?'block':'none';this.textContent=d.style.display==='none'?'Read along \u25BC':'Hide text \u25B2'" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;display:block;text-align:center">Read along &#9660;</a>
       </div>
     </div>
 
-    <!-- Guarantee -->
-    <div style="background:linear-gradient(135deg,#F0FFF4,#F8F5FF);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;margin:1rem auto 0;max-width:340px;width:100%;text-align:center">
-      <p style="font-size:0.78rem;font-weight:700;color:var(--text);margin:0">&#128154; Not magical enough? I will rewrite it for free. No questions asked.</p>
-    </div>
-
-    <!-- Email capture -->
-    <div id="previewEmailWrap" style="width:100%;max-width:340px;margin:1.25rem auto 0">
-      <label style="font-size:0.82rem;font-weight:700;color:var(--text);display:block;margin-bottom:0.35rem;text-align:left">Your email</label>
-      <input type="email" id="previewEmail" placeholder="e.g. your@email.com" style="width:100%;padding:0.75rem 1rem;border:2px solid var(--border);border-radius:12px;font-size:1rem;font-family:'Quicksand',sans-serif;background:var(--card);box-sizing:border-box" required>
-      <p class="form-hint" style="margin-top:0.25rem;text-align:left">So I can send you the full story when it is ready.</p>
-      <p class="inline-error" id="emailError" style="color:#FF6B9D;font-size:0.78rem;text-align:left;margin:0.25rem 0 0;display:none"></p>
-    </div>
-
-    <!-- "I'm happy" gate + checkout -->
-    <div id="previewHappySection" style="width:100%;max-width:340px;margin:1.25rem auto 0;text-align:center">
-      <button class="btn btn-primary" id="happyBtn" onclick="confirmHappy()" style="width:100%;padding:0.85rem;font-size:0.95rem">I'm happy, let's go!</button>
-    </div>
+    <!-- Hidden happy section for post-happy flow -->
+    <div id="previewHappySection" style="display:none"></div>
 
     <!-- Post-happy: gift delivery preference + unlock (hidden until happy clicked) -->
     <div id="previewCheckoutSection" style="display:none;width:100%;max-width:340px;margin:1rem auto 0;text-align:center">
