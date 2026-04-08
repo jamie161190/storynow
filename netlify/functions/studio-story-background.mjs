@@ -296,4 +296,4 @@ export const handler = async (event) => {
   }
 };
 
-export const config = { path: '/api/studio-story-background' };
+// Background function cannot have a path config
