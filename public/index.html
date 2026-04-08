@@ -1039,7 +1039,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:1.5rem;margin:0 0 0.5rem">&#127873;</p>
     <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text);margin:0 0 0.5rem">Know a child who would love this?</p>
     <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.6;margin:0 0 1rem">A personalised story with their name, their friends, their world. Narrated and delivered to their family. The perfect gift for any occasion.</p>
-    <button class="btn btn-primary" onclick="heroIsGift=true;toggleHeroGift();document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'})" style="padding:0.75rem 2rem;font-size:0.95rem">Create a gift story</button>
+    <button class="btn btn-primary" onclick="setHeroGift(true);document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'})" style="padding:0.75rem 2rem;font-size:0.95rem">Create a gift story</button>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -2081,7 +2081,11 @@ function setPill(el, type) {
 }
 
 function toggleHeroGift() {
-  heroIsGift = !heroIsGift;
+  setHeroGift(!heroIsGift);
+}
+
+function setHeroGift(isGift) {
+  heroIsGift = isGift;
   var toggle = document.getElementById('heroGiftToggle');
   var active = document.getElementById('heroGiftActive');
   if (toggle) toggle.style.display = heroIsGift ? 'none' : 'block';
@@ -3081,6 +3085,12 @@ function validateGift() {
   hideInlineError('giftError');
   const giftFrom = document.getElementById('giftFrom').value.trim();
   if (!giftFrom) { showInlineError('giftError', 'Please tell me who the gift is from.'); return; }
+  // Validate gift email format if provided (optional field)
+  const giftEmail = document.getElementById('giftEmail').value.trim();
+  if (giftEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(giftEmail)) {
+    showInlineError('giftError', "That email doesn't look right. Please check and try again, or leave it blank to send later.");
+    return;
+  }
   trackEvent('FormStep_Gift');
   goTo('screenDetails');
 }
