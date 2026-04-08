@@ -2837,6 +2837,17 @@ function goTo(id, skipHistory) {
   // screenExtras visibility is handled in the goTo override below
   // Multi-child removed: each child gets their own purchase
   if(id === 'screenCategory') restoreCategory();
+  if(id === 'screenGift') {
+    // Reset both buttons to neutral unless gift mode was set from hero
+    if (!isGiftMode) {
+      const yesBtn = document.getElementById('giftYesBtn');
+      const noBtn = document.getElementById('giftNoBtn');
+      if (yesBtn) { yesBtn.style.borderColor = 'var(--border)'; yesBtn.style.background = 'var(--card)'; }
+      if (noBtn) { noBtn.style.borderColor = 'var(--border)'; noBtn.style.background = 'var(--card)'; }
+      const fields = document.getElementById('giftFields');
+      if (fields) fields.style.display = 'none';
+    }
+  }
   if(id === 'screenDetails') {
     // Ensure at least one child card exists
     if (!storyData.children || storyData.children.length === 0) {
@@ -3175,11 +3186,11 @@ function renderChildCards() {
         ${storyData.children.length > 1 ? `<button onclick="removeChildCard(${i})" style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--text-muted);padding:0 0.25rem" title="Remove">&times;</button>` : ''}
       </div>
       <div class="form-group" style="margin-bottom:0.5rem">
-        <input type="text" id="mcName${i}" placeholder="Their name" value="${escHtml(child.name)}" oninput="updateChildData(${i})" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
+        <input type="text" id="mcName${i}" placeholder="Their name" value="${escHtml(child.name)}" oninput="updateChildData(${i})" style="width:100%;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.95rem;font-family:'Nunito',sans-serif;background:var(--card);box-sizing:border-box">
       </div>
       <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
-        <input type="number" id="mcAge${i}" placeholder="Age" value="${child.age}" oninput="updateChildData(${i})" style="flex:1;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
-        <select id="mcGender${i}" onchange="updateChildData(${i})" style="flex:1;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="mcAge${i}" placeholder="Age" value="${child.age}" oninput="updateChildData(${i})" style="flex:1;min-width:0;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.95rem;font-family:'Nunito',sans-serif;background:var(--card);box-sizing:border-box">
+        <select id="mcGender${i}" onchange="updateChildData(${i})" style="flex:1;min-width:0;padding:0.6rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.95rem;font-family:'Nunito',sans-serif;background:var(--card);box-sizing:border-box">
           <option value="">Gender</option>
           <option value="boy"${child.gender==='boy'?' selected':''}>Boy</option>
           <option value="girl"${child.gender==='girl'?' selected':''}>Girl</option>
