@@ -228,4 +228,4 @@ function abandonedPreviewEmail(childName, category, jobId, friendName, themes, s
 </html>`;
 }
 
-export const config = { path: '/api/abandoned-preview-worker' };
+// Scheduled function, no HTTP path (scheduled functions cannot have routes)
