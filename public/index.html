@@ -1362,14 +1362,6 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   </button>
   <p id="maxChildrenHint" style="display:none;font-size:0.75rem;color:var(--text-muted);text-align:center;margin:0.25rem 0 0">Maximum 5 children per story</p>
 
-  <div style="width:100%;max-width:440px;margin-top:1.25rem">
-    <div class="form-group">
-      <label>Is there an occasion? (optional)</label>
-      <input type="text" id="proudOf" placeholder="e.g. Their birthday, starting school, a family trip">
-      <p class="form-hint">If there is a birthday, achievement, or milestone, I will weave it into the heart of the story.</p>
-    </div>
-  </div>
-
   <p class="inline-error" id="detailsError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
   <button class="btn btn-primary" style="width:100%;max-width:440px;margin-top:0.5rem" onclick="validateDetails()">Continue</button>
   <p style="font-size:0.62rem;color:var(--text-muted);text-align:center;margin-top:0.6rem">&#128274; Their details are only used to write the story. Nothing is shared or sold. Ever.</p>
@@ -2832,10 +2824,6 @@ function goTo(id, skipHistory) {
       storyData.children = [{ name: pendingChildName || '', age: '', gender: '', about: '' }];
     }
     renderChildCards();
-    if (storyData.proudOf) {
-      const el = document.getElementById('proudOf');
-      if (el) el.value = storyData.proudOf;
-    }
   }
   if(id === 'screenPeople') {
     document.getElementById('teacherGroup').style.display = storyData.category === 'learning' ? 'block' : 'none';
@@ -2901,7 +2889,7 @@ history.replaceState({ screen: 'screenLanding' }, '', '');
 
 // ===== FORM STATE PERSISTENCE =====
 // Save form inputs so interrupted parents don't lose progress
-const FORM_FIELDS = ['proudOf','friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','favTeddy','customTheme','themeDetail','customWhere','siblingDynamics','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2'];
+const FORM_FIELDS = ['friendName','sidekickName','familyMembers','teacherName','petName','petType','villainName','favTeddy','customTheme','themeDetail','customWhere','siblingDynamics','giftFrom','giftMessage','giftEmail','learningGoal','learningGoal2'];
 
 function saveFormState() {
   try {
@@ -3397,8 +3385,6 @@ function validateDetails() {
     const genders = [...new Set(storyData.children.map(c => c.gender))];
     storyData.gender = genders.length === 1 ? genders[0] : 'neutral';
   }
-  storyData.proudOf = document.getElementById('proudOf').value.trim();
-
   trackEvent('FormStep2_Details', { children_count: storyData.children.length });
   goTo('screenPeople');
 }
@@ -3732,14 +3718,14 @@ function showReview() {
     html += `<div style="background:var(--cat-accent-light,var(--purple-light));border:2px solid var(--cat-accent,var(--purple));border-radius:14px;padding:1rem;text-align:center;margin-bottom:0.5rem">
       <span style="font-size:1.8rem">${catEmoji[d.category] || '&#128214;'}</span>
       <p style="margin:0.3rem 0 0;font-size:1rem;font-weight:800;color:var(--text)">${catLabel[d.category] || d.category} for ${escHtml(d.childName)}</p>
-      <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${childList}${d.proudOf ? ' &middot; ' + escHtml(d.proudOf) : ''}</p>
+      <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${childList}</p>
       ${pencil('screenDetails')}
     </div>`;
   } else {
     html += `<div style="background:var(--cat-accent-light,var(--purple-light));border:2px solid var(--cat-accent,var(--purple));border-radius:14px;padding:1rem;text-align:center;margin-bottom:0.5rem">
       <span style="font-size:1.8rem">${catEmoji[d.category] || '&#128214;'}</span>
       <p style="margin:0.3rem 0 0;font-size:1rem;font-weight:800;color:var(--text)">${catLabel[d.category] || d.category} for ${escHtml(d.childName)}</p>
-      <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${escHtml(d.gender)}, age ${escHtml(d.age)}${d.proudOf ? ' &middot; ' + escHtml(d.proudOf) : ''}</p>
+      <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:600">${escHtml(d.gender)}, age ${escHtml(d.age)}</p>
       ${pencil('screenDetails')}
     </div>`;
   }
