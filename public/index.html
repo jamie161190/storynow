@@ -1744,21 +1744,23 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <div style="display:flex;justify-content:space-between;margin-top:0.2rem"><span id="previewTime" style="font-size:0.7rem;color:var(--text-muted)">0:00</span><span id="previewDuration" style="font-size:0.7rem;color:var(--text-muted)">0:00</span></div>
     </div>
     <audio id="previewAudio"></audio>
-    <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin:0.6rem 0 0;text-align:center">Can't listen right now? The written version is below &#8595;</p>
 
     <!-- Summary -->
     <div id="previewSummary" style="background:var(--cat-accent-light,var(--purple-light));border-radius:12px;padding:0.85rem 1rem;margin:1.25rem auto 0;text-align:center;max-width:340px;width:100%"></div>
 
-    <!-- Story text display -->
-    <div id="previewStoryDisplay" style="display:none;width:100%;max-width:340px;margin:1.25rem auto 0"></div>
+    <!-- Story text (collapsed, tap to read) -->
+    <div style="width:100%;max-width:340px;margin:0.75rem auto 0;text-align:center">
+      <a onclick="var d=document.getElementById('previewStoryDisplay');d.style.display=d.style.display==='none'?'block':'none';this.textContent=d.style.display==='none'?'Read along \u25BC':'Hide text \u25B2'" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Read along &#9660;</a>
+    </div>
+    <div id="previewStoryDisplay" style="display:none;width:100%;max-width:340px;margin:0.5rem auto 0"></div>
 
-    <!-- Conditional feedback prompts -->
+    <!-- Feedback section -->
     <div id="previewFeedbackSection" style="width:100%;max-width:340px;margin:1.25rem auto 0">
       <!-- Message feedback (shown if personal message or gift message exists) -->
       <div id="messageFeedbackGroup" style="display:none;margin-bottom:1rem">
         <div style="background:#FFF8F0;border-radius:12px;padding:0.85rem 1rem">
           <p style="margin:0 0 0.4rem;font-size:0.82rem;font-weight:700;color:var(--text)">How does your message sound?</p>
-          <p style="margin:0 0 0.5rem;font-size:0.72rem;color:var(--text-muted)">Your message plays at the very start of the full story. You heard it in the preview.</p>
+          <p style="margin:0 0 0.5rem;font-size:0.72rem;color:var(--text-muted)">Your message plays at the very start of the full story.</p>
           <a id="editMessageLink" onclick="editPreviewMessage()" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Edit your message</a>
           <div id="editMessageWrap" style="display:none;margin-top:0.5rem">
             <textarea id="editMessageText" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:60px;resize:vertical;box-sizing:border-box"></textarea>
@@ -1776,21 +1778,15 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
       <!-- General feedback -->
       <div class="form-group" style="margin-bottom:0">
-        <label style="font-size:0.82rem;font-weight:700;color:var(--text)">Are we on the right track? (optional)</label>
-        <textarea id="previewFeedback" placeholder="e.g. Love it but could the tone be funnier? I forgot to mention they love swimming! Can there be more about their dog?" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:60px;resize:vertical;box-sizing:border-box"></textarea>
-        <p class="form-hint" style="margin-top:0.25rem">Anything you want emphasised? Anything you forgot to mention? The full story continues from this opening and I will work in your notes.</p>
+        <label style="font-size:0.82rem;font-weight:700;color:var(--text)">Anything I should know? (optional)</label>
+        <textarea id="previewFeedback" placeholder="e.g. Love it! Could the tone be funnier? I forgot to mention they love swimming!" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:55px;resize:vertical;box-sizing:border-box"></textarea>
+        <p class="form-hint" style="margin-top:0.25rem">Forgotten something? Want a different tone? The full story picks up right where this left off.</p>
       </div>
     </div>
 
     <!-- Guarantee -->
-    <div style="background:linear-gradient(135deg,#F0FFF4,#F8F5FF);border:2px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin:1.25rem auto 0;max-width:340px;width:100%;text-align:center">
-      <p style="font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.2rem">&#128154; The full story continues from this opening.</p>
-      <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin:0">I write the rest based on what you have heard. If the finished story is not magical enough, I will rewrite it for free. No questions asked.</p>
-    </div>
-
-    <!-- Jamie personal note -->
-    <div style="background:var(--card);border:2px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin:1rem auto 0;max-width:340px;width:100%;text-align:center">
-      <p style="font-size:0.82rem;color:var(--text);line-height:1.6;margin:0;font-weight:500">I'm Jamie. I started this because my son asked why he wasn't in any of his stories. I personally review every story before it reaches your family.</p>
+    <div style="background:linear-gradient(135deg,#F0FFF4,#F8F5FF);border:2px solid var(--border);border-radius:12px;padding:0.75rem 1rem;margin:1rem auto 0;max-width:340px;width:100%;text-align:center">
+      <p style="font-size:0.78rem;font-weight:700;color:var(--text);margin:0">&#128154; Not magical enough? I will rewrite it for free. No questions asked.</p>
     </div>
 
     <!-- Email capture -->
@@ -1803,7 +1799,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
     <!-- "I'm happy" gate + checkout -->
     <div id="previewHappySection" style="width:100%;max-width:340px;margin:1.25rem auto 0;text-align:center">
-      <button class="btn btn-primary" id="happyBtn" onclick="confirmHappy()" style="width:100%;padding:0.85rem;font-size:0.95rem">I'm happy with this</button>
+      <button class="btn btn-primary" id="happyBtn" onclick="confirmHappy()" style="width:100%;padding:0.85rem;font-size:0.95rem">I'm happy, let's go!</button>
     </div>
 
     <!-- Post-happy: gift delivery preference + unlock (hidden until happy clicked) -->
@@ -1830,11 +1826,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </div>
 
       <button class="unlock-btn" id="unlockBtn" onclick="unlockFull()" style="width:100%">&#128275; Unlock the full story for <span class="price-display">£19.99</span></button>
-      <p class="unlock-price" id="unlockSub" style="margin-top:0.5rem;margin-bottom:0">The full story is 15 minutes of magic. Download it, share it, keep it forever.</p>
+      <p class="unlock-price" id="unlockSub" style="margin-top:0.5rem;margin-bottom:0">15 minutes of magic. Download it, share it, keep it forever.</p>
       <p style="font-size:0.65rem;color:var(--text-muted);text-align:center;margin:0.4rem 0 0">&#128274; Secure payment via Stripe. No subscription, no hidden fees.</p>
     </div>
-
-    <a onclick="goTo('screenReview')" style="font-size:0.75rem;color:var(--text-muted);cursor:pointer;display:block;text-align:center;margin-top:0.75rem;font-weight:600">&#8592; Edit story details</a>
   </div>
 </div>
 
