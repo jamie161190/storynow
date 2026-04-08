@@ -753,7 +753,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <label class="field-label">What's their name?</label>
       <input type="text" class="name-input" id="heroChildName" placeholder="Type their name here..." autocomplete="off" oninput="updateStickyBtn(this.value);showHeroAddChild()">
       <div id="heroExtraNames" style="display:none"></div>
-      <a id="heroAddChildLink" onclick="addHeroChildInput()" style="display:none;font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;margin:-4px 0 8px;text-align:left">+ Add another child</a>
+      <a id="heroAddChildLink" onclick="addHeroChildInput()" style="display:none;font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;margin:6px 0 10px;text-align:left;display:block">+ Add another child</a>
       <span class="type-label">Choose a story type</span>
       <div class="type-pills">
         <button class="type-pill active" id="heroPillBedtime" onclick="setPill(this,'bedtime')">&#127769; Bedtime</button>
