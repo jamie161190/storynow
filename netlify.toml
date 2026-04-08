@@ -24,8 +24,9 @@
 [functions."stripe-webhook"]
   external_node_modules = ["stripe"]
 
-[functions."retry-worker"]
-  schedule = "*/5 * * * *"
+# Retry worker disabled — moving to queued delivery system
+# [functions."retry-worker"]
+#   schedule = "*/5 * * * *"
 
 [functions."abandoned-preview-worker"]
   schedule = "*/30 * * * *"
