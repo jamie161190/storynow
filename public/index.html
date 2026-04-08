@@ -3942,7 +3942,7 @@ async function generatePreview() {
       const bgRes = await fetch('/.netlify/functions/full-worker-background', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ mode: 'preview-full', storyData, voiceId: selectedVoiceId, jobId })
+        body: JSON.stringify({ mode: 'preview', storyData, voiceId: selectedVoiceId, jobId })
       });
       console.log('Preview background worker triggered:', bgRes.status);
     } catch(bgErr) {
