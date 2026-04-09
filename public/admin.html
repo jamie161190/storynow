@@ -511,8 +511,40 @@ async function loadCustomers() {
 
 // ===== FUNNEL =====
 async function loadFunnel() {
-  const data = await adminApi('funnel', { days: 30 });
-  const steps = data.funnel || [];
+  // Funnel data comes from page_views with screen_name starting with 'funnel_'
+  const data = await adminApi('metrics', { days: 30 });
+  const funnelRaw = data.funnel || {};
+
+  // Convert to ordered steps
+  const stepOrder = [
+    { key: 'funnel_category', label: 'Category' },
+    { key: 'funnel_gift', label: 'Gift question' },
+    { key: 'funnel_details', label: 'Children details' },
+    { key: 'funnel_people', label: 'People & pets' },
+    { key: 'funnel_themesetting', label: 'Theme & setting' },
+    { key: 'funnel_extras', label: 'Extras' },
+    { key: 'funnel_voice', label: 'Voice selection' },
+    { key: 'funnel_review', label: 'Review' },
+    { key: 'funnel_preview', label: 'Preview' },
+    { key: 'hero_start_name', label: 'Hero (with name)' },
+    { key: 'hero_start_noname', label: 'Hero (no name)' },
+    { key: 'landing', label: 'Landing page' }
+  ];
+
+  // Build steps from raw data, include any screen_name that has data
+  const steps = [];
+  // First add landing and hero
+  if (funnelRaw['landing']) steps.push({ label: 'Landing page', count: funnelRaw['landing'] });
+  if (funnelRaw['hero_start_name'] || funnelRaw['hero_start_noname']) {
+    steps.push({ label: 'Started story', count: (funnelRaw['hero_start_name'] || 0) + (funnelRaw['hero_start_noname'] || 0) });
+  }
+  // Then funnel steps
+  for (const s of stepOrder) {
+    if (s.key.startsWith('funnel_') && funnelRaw[s.key]) {
+      steps.push({ label: s.label, count: funnelRaw[s.key] });
+    }
+  }
+
   if (!steps.length) {
     document.getElementById('content').innerHTML = '<div class="empty">No funnel data yet. Steps are tracked as visitors move through the builder.</div>';
     return;
