@@ -510,9 +510,11 @@ async function loadCustomers() {
 }
 
 // ===== FUNNEL =====
-async function loadFunnel() {
+let funnelDays = 7;
+async function loadFunnel(days) {
+  if (days) funnelDays = days;
   // Funnel data comes from page_views with screen_name starting with 'funnel_'
-  const data = await adminApi('metrics', { days: 30 });
+  const data = await adminApi('metrics', { days: funnelDays });
   const funnelRaw = data.funnel || {};
 
   // Convert to ordered steps
@@ -550,7 +552,13 @@ async function loadFunnel() {
     return;
   }
 
-  let html = '<h2 style="font-size:1rem;color:#6B2F93;margin-bottom:1rem">Funnel (last 30 days)</h2>';
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">';
+  html += '<h2 style="font-size:1rem;color:#6B2F93;margin:0">Funnel</h2>';
+  html += '<div style="display:flex;gap:0.3rem">';
+  html += '<button class="filter-pill' + (funnelDays === 1 ? ' active' : '') + '" onclick="loadFunnel(1)">Today</button>';
+  html += '<button class="filter-pill' + (funnelDays === 7 ? ' active' : '') + '" onclick="loadFunnel(7)">7 days</button>';
+  html += '<button class="filter-pill' + (funnelDays === 30 ? ' active' : '') + '" onclick="loadFunnel(30)">30 days</button>';
+  html += '</div></div>';
   const maxCount = Math.max(...steps.map(s => s.count), 1);
   for (let i = 0; i < steps.length; i++) {
     const s = steps[i];
