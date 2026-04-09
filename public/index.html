@@ -1442,7 +1442,8 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <button class="back-btn" onclick="goTo('screenPeople')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressThemeSetting"></div><p class="progress-step-label">Step 4 of 7</p></div>
   <h2 class="section-title">What's their story about?</h2>
-  <p class="section-sub" id="themeSubtext">Pick as many as you like. These shape the whole story.</p>
+  <p class="section-sub" id="themeSubtext">Select up to 3. These shape the whole story.</p>
+  <p id="themeMaxHint" style="display:none;font-size:0.78rem;color:#F1753B;font-weight:700;text-align:center;margin:0.25rem 0">3 is the max. The more focused, the more magical the story feels.</p>
 
   <div class="theme-grid" id="themeGrid">
     <div class="theme-tile" onclick="toggleTheme(this)" data-theme="Dinosaurs"><span class="theme-icon">&#129430;</span><span class="theme-label">Dinosaurs</span></div>
@@ -3286,6 +3287,13 @@ const THEME_FOLLOWUPS = {
 };
 
 function toggleTheme(el) {
+  const currentlySelected = document.querySelectorAll('#themeGrid .theme-tile.selected').length;
+  if (!el.classList.contains('selected') && currentlySelected >= 3) {
+    // Already at max, show hint
+    const hint = document.getElementById('themeMaxHint');
+    if (hint) { hint.style.display = 'block'; setTimeout(function() { hint.style.display = 'none'; }, 3000); }
+    return;
+  }
   el.classList.toggle('selected');
   updateThemeFollowUp();
 }
