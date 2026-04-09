@@ -759,10 +759,6 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         <button class="type-pill active" id="heroPillBedtime" onclick="setPill(this,'bedtime')">&#127769; Bedtime</button>
         <button class="type-pill" id="heroPillAdventure" onclick="setPill(this,'adventure')">&#9876;&#65039; Adventure</button>
       </div>
-      <a id="heroGiftToggle" onclick="toggleHeroGift()" style="display:block;font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer;margin:0.5rem 0 0.75rem;text-align:center">&#127873; This is a gift</a>
-      <div id="heroGiftActive" style="display:none;background:var(--purple-light);border-radius:10px;padding:0.5rem 0.75rem;margin-bottom:0.75rem;text-align:center">
-        <p style="font-size:0.78rem;color:var(--purple);font-weight:700;margin:0">&#127873; Gift mode active <a onclick="toggleHeroGift()" style="color:var(--text-muted);cursor:pointer;margin-left:0.5rem;font-size:0.72rem">remove</a></p>
-      </div>
       <button class="hero-btn" id="heroBtn" onclick="heroStartStory()">Start their story</button>
       <p class="hero-price">Free preview first &nbsp;&middot;&nbsp; <span class="price-display" style="color:var(--purple);font-weight:800">&pound;19.99</span> for the full story &nbsp;&middot;&nbsp; Theirs forever</p>
     </div>
@@ -1088,7 +1084,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p style="font-size:1.5rem;margin:0 0 0.5rem">&#127873;</p>
     <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--text);margin:0 0 0.5rem">Know someone who would love this?</p>
     <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.6;margin:0 0 1rem">A personalised story with their names, their friends, their world. One child or the whole family. Narrated and delivered. The perfect gift for any occasion.</p>
-    <button class="btn btn-primary" onclick="setHeroGift(true);document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'})" style="padding:0.75rem 2rem;font-size:0.95rem">Create a gift story</button>
+    <button class="btn btn-primary" onclick="document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){document.getElementById('heroChildName').focus()},500)" style="padding:0.75rem 2rem;font-size:0.95rem">Create a gift story</button>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -1276,7 +1272,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </div>
     </div>
 
-    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenGift')">Continue</button>
+    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="goTo('screenDetails')">Continue</button>
   </div>
 </div>
 
@@ -1302,54 +1298,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 </div>
 
 <!-- GIFT MINI-STEP -->
-<div class="screen" id="screenGift">
-  <button class="back-btn" onclick="goTo(storyData.category==='learning'?'screenLearningSetup':'screenCategory')">&#8592; Back</button>
-  <div class="progress-steps"><div class="progress-steps-bar" id="progressGift"></div><p class="progress-step-label">Quick question before we start</p></div>
-  <h2 class="section-title">Is this a gift?</h2>
-  <p class="section-sub">If you are making this for someone else's child, I can make it extra special.</p>
-
-  <div style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:440px;margin-top:0.5rem">
-    <button class="cat-card" onclick="setGiftMode(true)" id="giftYesBtn" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
-      <span style="font-size:1.8rem">&#127873;</span>
-      <div>
-        <p style="margin:0;font-size:0.95rem;font-weight:700;color:var(--text)">Yes, it's a gift</p>
-        <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:500">I'm making this for someone else's child</p>
-      </div>
-    </button>
-    <button class="cat-card" onclick="setGiftMode(false)" id="giftNoBtn" style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;text-align:left;width:100%">
-      <span style="font-size:1.8rem">&#128106;</span>
-      <div>
-        <p style="margin:0;font-size:0.95rem;font-weight:700;color:var(--text)">No, it's for my own child</p>
-        <p style="margin:0.15rem 0 0;font-size:0.78rem;color:var(--text-muted);font-weight:500">I'll fill in their details next</p>
-      </div>
-    </button>
-  </div>
-
-  <!-- Gift fields, shown when "Yes" is tapped -->
-  <div id="giftFields" style="display:none;margin-top:1rem;width:100%;max-width:440px">
-    <div class="form-group">
-      <label>Your name (the gift giver)</label>
-      <input type="text" id="giftFrom" placeholder="e.g. Grandma, Auntie Sarah">
-    </div>
-    <div class="toggle-row" style="margin-bottom:0.75rem">
-      <button class="toggle" id="giftInStoryToggle" onclick="toggleGiftInStory()"></button>
-      <span class="toggle-label">Put me in the story as a character</span>
-    </div>
-    <p class="form-hint" id="giftInStoryHint" style="margin-top:-0.5rem">Toggle this on and you will be IN the adventure with them, not just mentioned.</p>
-    <div class="form-group" style="margin-top:1.25rem">
-      <label>A message for them (optional)</label>
-      <textarea id="giftMessage" placeholder="e.g. Happy birthday Chase! This is a special story just for you, with love from Grandma."></textarea>
-      <p class="form-hint">The narrator will read this aloud before the story begins.</p>
-    </div>
-    <p class="inline-error" id="giftError" style="color:#FF6B9D;font-size:0.82rem;text-align:center;margin:0.5rem 0 0;display:none"></p>
-    <button class="btn btn-primary" style="width:100%;margin-top:0.5rem" onclick="validateGift()">Continue</button>
-  </div>
-</div>
-
-<!-- HOW MANY CHILDREN -->
 <!-- UNIFIED DETAILS: 1 to 5 children on one screen -->
 <div class="screen" id="screenDetails">
-  <button class="back-btn" onclick="goTo(isGiftMode?'screenGift':'screenCategory')">&#8592; Back</button>
+  <button class="back-btn" onclick="goTo('screenCategory')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressDetails"></div><p class="progress-step-label">Step 2 of 7</p></div>
   <h2 class="section-title">Who are the heroes?</h2>
   <p class="section-sub">Tell me about the children in this story.</p>
@@ -1609,6 +1560,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <p class="form-hint">Personality quirks, funny habits, fears, things that make them laugh. The details no form can capture. These are gold.</p>
   </div>
 
+  <!-- Voice message (non-gift only, gift users record on the gift screen) -->
+  <div id="reviewVoiceRecord" style="margin-top:1.25rem;display:none">
+    <label style="display:block;font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:0.4rem">Record a voice message (optional)</label>
+    <p class="form-hint" style="margin-bottom:0.6rem">Record a personal message in your own voice. It will play before the story begins.</p>
+    <div id="reviewVoiceIdle">
+      <button onclick="startVoiceRecord()" style="display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1.25rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:700;color:var(--purple);width:100%;justify-content:center">
+        <span style="width:12px;height:12px;background:#FF4444;border-radius:50%;flex-shrink:0"></span> Tap to record
+      </button>
+    </div>
+  </div>
+
   <button class="btn btn-primary" style="width:100%;margin-top:1.2rem" onclick="generatePreview()">Looks good, create my preview!</button>
 </div>
 
@@ -1777,17 +1739,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <div style="width:100%;max-width:340px;margin:1rem auto 0;text-align:center">
       <a id="adjustToggle" onclick="document.getElementById('adjustSection').style.display=document.getElementById('adjustSection').style.display==='none'?'block':'none'" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Want to adjust anything?</a>
       <div id="adjustSection" style="display:none;margin-top:0.75rem;text-align:left">
-        <!-- Message feedback (conditional) -->
-        <div id="messageFeedbackGroup" style="display:none;margin-bottom:0.75rem">
-          <div style="background:#FFF8F0;border-radius:10px;padding:0.75rem">
-            <p style="margin:0 0 0.3rem;font-size:0.82rem;font-weight:700;color:var(--text)">Your message</p>
-            <a id="editMessageLink" onclick="editPreviewMessage()" style="font-size:0.78rem;color:var(--purple);font-weight:700;cursor:pointer">Edit your message</a>
-            <div id="editMessageWrap" style="display:none;margin-top:0.4rem">
-              <textarea id="editMessageText" style="width:100%;padding:0.5rem 0.8rem;border:2px solid var(--border);border-radius:10px;font-size:0.85rem;font-family:'Nunito',sans-serif;background:var(--card);height:55px;resize:vertical;box-sizing:border-box"></textarea>
-            </div>
-          </div>
-        </div>
-        <!-- Character feedback (conditional) -->
+        <!-- Character feedback (conditional, gift giver in story) -->
         <div id="characterFeedbackGroup" style="display:none;margin-bottom:0.75rem">
           <div style="background:#F8F5FF;border-radius:10px;padding:0.75rem">
             <p style="margin:0 0 0.2rem;font-size:0.82rem;font-weight:700;color:var(--text)">Your character in the story</p>
@@ -2293,42 +2245,19 @@ function heroStartStory() {
     body: JSON.stringify({ page: '/', screen_name: pendingChildName ? 'hero_start_name' : 'hero_start_noname', device: device, visitor_id: stVisitorId })
   }).catch(function() {});
 
-  // Multi-child: if 2+ names entered on hero, pre-populate and skip to multi flow
+  // Multi-child: if 2+ names entered on hero, pre-populate children array
   if (heroNames.length >= 2) {
     storyData.isMultiChild = true;
     storyData.children = heroNames.map(function(n) { return { name: n, age: '', gender: '' }; });
-    if (isGift) {
-      storyData.category = cat;
-      applyCategoryTheme(cat);
-      setGiftMode(true, false);
-      trackEvent('HeroStartStory', { content_name: 'gift_multi', child_name_entered: true, children_count: heroNames.length });
-      goTo('screenGift');
-    } else {
-      storyData.category = cat;
-      applyCategoryTheme(cat);
-      setGiftMode(false, false);
-      trackEvent('HeroStartStory', { content_name: cat + '_multi', child_name_entered: true, children_count: heroNames.length });
-      goTo('screenGift');
-    }
-    return;
   }
 
-  if (isGift) {
-    storyData.category = cat;
-    applyCategoryTheme(cat);
-    if (pendingChildName) {
-      storyData.childName = pendingChildName;
-    }
-    trackEvent('HeroStartStory', { content_name: 'gift_' + cat, child_name_entered: !!pendingChildName });
-    setGiftMode(true, false);
-    goTo('screenGift');
-  } else if (pendingChildName) {
-    storyData.category = cat;
-    applyCategoryTheme(cat);
-    setGiftMode(false, false);
+  storyData.category = cat;
+  applyCategoryTheme(cat);
+
+  if (pendingChildName) {
     storyData.childName = pendingChildName;
-    trackEvent('HeroStartStory', { content_name: cat, child_name_entered: true });
-    goTo('screenGift');
+    trackEvent('HeroStartStory', { content_name: cat, child_name_entered: true, children_count: heroNames.length });
+    goTo('screenDetails');
   } else {
     trackEvent('HeroStartStory', { content_name: 'no_name', child_name_entered: false });
     goTo('screenCategory');
@@ -2801,7 +2730,7 @@ function goTo(id, skipHistory) {
   trackEvent('ScreenView', { screen_name: id, content_name: storyData.category || '' });
 
   // Fire funnel step tracking for admin analytics
-  const funnelScreens = ['screenCategory','screenGift','screenDetails','screenPeople','screenThemeSetting','screenExtras','screenVoice','screenReview','screenPreview'];
+  const funnelScreens = ['screenCategory','screenDetails','screenPeople','screenThemeSetting','screenExtras','screenVoice','screenReview','screenPreview'];
   if (funnelScreens.includes(id)) {
     try {
       fetch('/api/track-pageview', {
@@ -2821,8 +2750,8 @@ function goTo(id, skipHistory) {
   const showExtras = storyData.isMultiChild || storyData.category === 'learning';
   const totalSteps = showExtras ? 7 : 6;
   const progressMap = showExtras
-    ? {screenCategory:1,screenGift:1,screenDetails:2,screenPeople:3,screenThemeSetting:4,screenExtras:5,screenVoice:6}
-    : {screenCategory:1,screenGift:1,screenDetails:2,screenPeople:3,screenThemeSetting:4,screenVoice:5};
+    ? {screenCategory:1,screenDetails:2,screenPeople:3,screenThemeSetting:4,screenExtras:5,screenVoice:6}
+    : {screenCategory:1,screenDetails:2,screenPeople:3,screenThemeSetting:4,screenVoice:5};
   const stepNum = progressMap[id];
   if (stepNum) {
     const barId = 'progress' + id.replace('screen','');
@@ -2840,17 +2769,6 @@ function goTo(id, skipHistory) {
   // screenExtras visibility is handled in the goTo override below
   // Multi-child removed: each child gets their own purchase
   if(id === 'screenCategory') restoreCategory();
-  if(id === 'screenGift') {
-    // Reset both buttons to neutral unless gift mode was set from hero
-    if (!isGiftMode) {
-      const yesBtn = document.getElementById('giftYesBtn');
-      const noBtn = document.getElementById('giftNoBtn');
-      if (yesBtn) { yesBtn.style.borderColor = 'var(--border)'; yesBtn.style.background = 'var(--card)'; }
-      if (noBtn) { noBtn.style.borderColor = 'var(--border)'; noBtn.style.background = 'var(--card)'; }
-      const fields = document.getElementById('giftFields');
-      if (fields) fields.style.display = 'none';
-    }
-  }
   if(id === 'screenDetails') {
     // Ensure at least one child card exists
     if (!storyData.children || storyData.children.length === 0) {
@@ -3069,7 +2987,7 @@ function selectCategory(cat, el) {
   applyCategoryTheme(cat);
   trackEvent('ViewContent', { content_name: cat, content_category: 'story_type' });
   // Learning goes to its own setup screen first
-  setTimeout(() => goTo(cat === 'learning' ? 'screenLearningSetup' : 'screenGift'), 300);
+  setTimeout(() => goTo(cat === 'learning' ? 'screenLearningSetup' : 'screenDetails'), 300);
 }
 
 // ===== LEARNING SETUP =====
@@ -3491,14 +3409,7 @@ function goToLength() {
   storyData.length = 'long';
   const musicToggle = document.getElementById('musicOptionToggle');
   storyData.wantsMusic = musicToggle ? musicToggle.classList.contains('on') : true;
-  storyData.isGift = isGiftMode;
-  if (storyData.isGift) {
-    storyData.giftEmail = ''; // captured on preview screen delivery section
-    storyData.giftFrom = document.getElementById('giftFrom').value.trim();
-    storyData.giftMessage = document.getElementById('giftMessage').value.trim();
-    storyData.giftInStory = document.getElementById('giftInStoryToggle').classList.contains('on');
-    storyData.personalMessage = '';
-  }
+  // Gift details captured on preview screen after "I'm happy"
 
   goTo('screenVoice');
 }
@@ -3783,14 +3694,7 @@ function showReview() {
   if (!d.isGift && d.personalMessage) extraItems.push(['Personal message', d.personalMessage]);
   if (extraItems.length) html += card('Extras', 'screenExtras', extraItems);
 
-  // Gift card
-  if (d.isGift) {
-    const giftItems = [];
-    if (d.giftFrom) giftItems.push(['From', d.giftFrom + (d.giftInStory ? ' (in story)' : '')]);
-    if (d.giftMessage) giftItems.push(['Message', d.giftMessage]);
-    giftItems.push(['Send to', d.giftEmail || 'You can send later from your account']);
-    html += card('&#127873; Gift', 'screenGift', giftItems);
-  }
+  // Gift details captured on preview screen, not shown in review
 
   // Voice card
   const voiceObj = ALL_VOICES.find(v => v.id === selectedVoiceId);
@@ -3811,6 +3715,9 @@ function showReview() {
   }
 
   document.getElementById('reviewContent').innerHTML = html;
+  // Show voice record for non-gift users (gift users already have it on gift screen)
+  var rvr = document.getElementById('reviewVoiceRecord');
+  if (rvr) rvr.style.display = isGiftMode ? 'none' : 'block';
   goTo('screenReview');
 }
 
@@ -4190,6 +4097,18 @@ function confirmHappy() {
     }
   }
 
+  // Upload voice recording if present
+  if (_voiceBlob && storyData._hasVoiceMessage) {
+    const voiceId = 'voice_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    storyData._voiceMessageId = voiceId;
+    // Upload via a small proxy (fire and forget, the blob is also kept in memory for retry)
+    const formData = new FormData();
+    formData.append('audio', _voiceBlob, voiceId + '.webm');
+    formData.append('voiceId', voiceId);
+    fetch('/api/upload-voice-message', { method: 'POST', body: formData })
+      .catch(function(e) { console.error('Voice upload failed:', e); });
+  }
+
   // Show gift delivery preference for all gift orders
   if (storyData.isGift) {
     const prefSection = document.getElementById('giftDeliveryPref');
@@ -4220,6 +4139,88 @@ function setGiftDeliveryPref(pref) {
     manualBtn.style.borderColor = pref === 'manual' ? 'var(--purple)' : 'var(--border)';
     manualBtn.style.background = pref === 'manual' ? 'var(--purple-light)' : 'var(--card)';
   }
+}
+
+// ===== VOICE RECORDING =====
+let _mediaRecorder = null;
+let _audioChunks = [];
+let _voiceBlob = null;
+let _voiceUrl = null;
+let _recordTimer = null;
+let _recordSeconds = 0;
+
+async function startVoiceRecord() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    _audioChunks = [];
+    _mediaRecorder = new MediaRecorder(stream);
+    _mediaRecorder.ondataavailable = function(e) { if (e.data.size > 0) _audioChunks.push(e.data); };
+    _mediaRecorder.onstop = function() {
+      stream.getTracks().forEach(t => t.stop());
+      _voiceBlob = new Blob(_audioChunks, { type: 'audio/webm' });
+      _voiceUrl = URL.createObjectURL(_voiceBlob);
+      storyData._hasVoiceMessage = true;
+      // Show recorded state
+      var idle = document.getElementById('voiceRecordIdle');
+      var recording = document.getElementById('voiceRecording');
+      var recorded = document.getElementById('voiceRecorded');
+      if (idle) idle.style.display = 'none';
+      if (recording) recording.style.display = 'none';
+      if (recorded) recorded.style.display = 'block';
+      var dur = document.getElementById('voiceDuration');
+      if (dur) dur.textContent = formatRecordTime(_recordSeconds);
+      // Also hide the review voice section if it was there
+      var reviewIdle = document.getElementById('reviewVoiceIdle');
+      if (reviewIdle) reviewIdle.innerHTML = '<div style="background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:0.75rem;display:flex;align-items:center;gap:0.5rem"><span style="color:var(--purple);font-weight:700;font-size:0.82rem">&#10003; Voice message recorded</span></div>';
+    };
+    _mediaRecorder.start();
+    _recordSeconds = 0;
+    // Show recording state
+    var idle = document.getElementById('voiceRecordIdle');
+    var recording = document.getElementById('voiceRecording');
+    var recorded = document.getElementById('voiceRecorded');
+    if (idle) idle.style.display = 'none';
+    if (recording) recording.style.display = 'block';
+    if (recorded) recorded.style.display = 'none';
+    _recordTimer = setInterval(function() {
+      _recordSeconds++;
+      var el = document.getElementById('recordTimer');
+      if (el) el.textContent = formatRecordTime(_recordSeconds);
+      if (_recordSeconds >= 30) stopVoiceRecord(); // Max 30 seconds
+    }, 1000);
+  } catch(e) {
+    alert('Could not access your microphone. Please allow microphone access and try again.');
+  }
+}
+
+function stopVoiceRecord() {
+  if (_mediaRecorder && _mediaRecorder.state === 'recording') {
+    _mediaRecorder.stop();
+  }
+  if (_recordTimer) { clearInterval(_recordTimer); _recordTimer = null; }
+}
+
+function playVoiceRecording() {
+  if (_voiceUrl) {
+    var audio = new Audio(_voiceUrl);
+    audio.play();
+  }
+}
+
+function deleteVoiceRecording() {
+  _voiceBlob = null;
+  if (_voiceUrl) { URL.revokeObjectURL(_voiceUrl); _voiceUrl = null; }
+  storyData._hasVoiceMessage = false;
+  var idle = document.getElementById('voiceRecordIdle');
+  var recording = document.getElementById('voiceRecording');
+  var recorded = document.getElementById('voiceRecorded');
+  if (idle) idle.style.display = 'block';
+  if (recording) recording.style.display = 'none';
+  if (recorded) recorded.style.display = 'none';
+}
+
+function formatRecordTime(s) {
+  return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60);
 }
 
 function editPreviewMessage() {

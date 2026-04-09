@@ -264,14 +264,17 @@ export const handler = async (event) => {
       }
       console.log('[PREVIEW-BG] Text generated in', Date.now() - startTime, 'ms, words:', previewText.split(' ').length);
 
-      // Prepend personal/gift message if present so the parent hears it in the preview
+      // Voice messages are recorded by the user and stitched in admin queue, not TTS'd
+      // Only add TTS message intro for legacy text messages (no voice recording)
       let messageIntro = '';
-      if (storyData.isGift && storyData.giftFrom && storyData.giftMessage) {
-        messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... ${storyData.giftMessage} ... And now, your story begins. ... `;
-      } else if (storyData.isGift && storyData.giftFrom) {
-        messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... And now, your story begins. ... `;
-      } else if (storyData.personalMessage) {
-        messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
+      if (!storyData._hasVoiceMessage) {
+        if (storyData.isGift && storyData.giftFrom && storyData.giftMessage) {
+          messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... ${storyData.giftMessage} ... And now, your story begins. ... `;
+        } else if (storyData.isGift && storyData.giftFrom) {
+          messageIntro = `This story was made just for you, ${storyData.childName}, with love from ${storyData.giftFrom}. ... And now, your story begins. ... `;
+        } else if (storyData.personalMessage) {
+          messageIntro = `Before we begin, there is a special message for ${storyData.childName}. ... ${storyData.personalMessage} ... And now, on with the story. ... `;
+        }
       }
       const fullPreviewText = messageIntro + previewText + ' ... ... To hear what happens next, unlock the full story.';
       const ttsPreviewText = prepareTTSText(fullPreviewText);
