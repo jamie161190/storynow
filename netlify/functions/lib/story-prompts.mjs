@@ -250,12 +250,12 @@ This item should appear in the story. Give it a role, a moment, a reason to matt
   const childAge = parseInt(d.age) || 5;
   if (d.hasVillain && d.villainName && childAge >= 3) {
     block += `\n\nVILLAIN: ${d.villainName}
-This is the story's cheeky antagonist, chosen by the parent. They cause trouble, create obstacles, and make the adventure exciting. But they are NOT truly evil or scary. Think mischievous, silly, or bumbling rather than threatening. The villain should:`;
+This is the story's cheeky antagonist, chosen by the parent. They cause trouble, create obstacles, and make the adventure exciting. But they are NOT truly evil or scary. Think mischievous, silly, or bumbling rather than threatening. The villain should:
 - Appear at least 3 times throughout the story, escalating each time
 - Have a funny catchphrase or signature move
 - Underestimate ${d.childName} every single time
 - Be defeated or outsmarted in a satisfying, clever way at the climax
-- For ages 2 to 4: the villain is extremely gentle and silly, more of a nuisance than a threat. Think of a grumpy cloud that keeps blocking the sun, or a cheeky monkey stealing bananas.
+- For ages 3 to 4: the villain is extremely gentle and silly, more of a nuisance than a threat. Think of a grumpy cloud that keeps blocking the sun, or a cheeky monkey stealing bananas.
 - For ages 5 to 7: the villain is comedic and bumbling, always one step behind. Think classic cartoon villain.
 - For ages 8 to 10: the villain can be more cunning and provide real challenge, but humour undercuts any genuine menace.
 - For ages 11 to 14: the villain can have depth, maybe even a sympathetic motivation, but ${d.childName} still comes out on top.
