@@ -3481,6 +3481,8 @@ function goToLength() {
   storyData.extraDetails = extraEl ? extraEl.value.trim() : '';
 
   storyData.length = 'long';
+  const musicToggle = document.getElementById('musicOptionToggle');
+  storyData.wantsMusic = musicToggle ? musicToggle.classList.contains('on') : true;
   storyData.isGift = isGiftMode;
   if (storyData.isGift) {
     storyData.giftEmail = ''; // captured on preview screen delivery section

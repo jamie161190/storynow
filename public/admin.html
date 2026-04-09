@@ -228,6 +228,7 @@ function renderQueue(stories) {
 
     html += '<div class="card-detail">Email: ' + esc(s.email) + '</div>';
     if (s.voice_id) html += '<div class="card-detail">Voice: ' + esc(s.voice_id) + '</div>';
+    html += '<div class="card-detail">Music: ' + (sd.wantsMusic === false ? 'No' : 'Yes') + '</div>';
 
     if (hasFeedback) {
       html += '<div style="background:#FFF8F0;border-radius:8px;padding:0.6rem 0.8rem;margin:0.5rem 0;border-left:3px solid #F1753B">';
@@ -350,9 +351,11 @@ async function sendStory(id, btn) {
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
 // ===== PREVIEWS =====
+let _previewAttempts = [];
 async function loadPreviews() {
   const data = await adminApi('attempts');
   const attempts = data.attempts || [];
+  _previewAttempts = attempts;
   if (!attempts.length) {
     document.getElementById('content').innerHTML = '<div class="empty">No previews generated yet</div>';
     return;
@@ -388,7 +391,7 @@ async function loadPreviews() {
     if (sd.themes && sd.themes.length) html += '<div class="card-detail">Themes: ' + esc(sd.themes.join(', ')) + '</div>';
 
     html += '<div class="card-actions">';
-    html += '<button class="btn btn-outline" onclick=\'viewPreviewDetails(' + JSON.stringify(a).replace(/'/g, "\\'").replace(/</g, "\\x3c") + ')\'>View details</button>';
+    html += '<button class="btn btn-outline" data-idx="' + attempts.indexOf(a) + '" onclick="viewPreviewDetails(_previewAttempts[this.dataset.idx])">View details</button>';
     if (a.job_id) {
       html += '<button class="btn btn-purple" onclick="playPreviewAudio(\'' + esc(a.job_id) + '\',this)">Play preview</button>';
     }
@@ -446,6 +449,7 @@ function viewPreviewDetails(attempt) {
   }
 
   if (sd.personalMessage) html += '<div class="detail-row"><strong>Personal message:</strong> ' + esc(sd.personalMessage) + '</div>';
+  html += '<div class="detail-row"><strong>Music:</strong> ' + (sd.wantsMusic === false ? 'No' : 'Yes') + '</div>';
 
   // Preview text
   if (attempt.preview_story) {
