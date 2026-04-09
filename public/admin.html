@@ -387,10 +387,12 @@ async function loadPreviews() {
     if (a.email) html += '<div class="card-detail">Email: ' + esc(a.email) + '</div>';
     if (sd.themes && sd.themes.length) html += '<div class="card-detail">Themes: ' + esc(sd.themes.join(', ')) + '</div>';
 
-    // Preview audio playback (if job_id exists, try to load from storage)
+    html += '<div class="card-actions">';
+    html += '<button class="btn btn-outline" onclick=\'viewPreviewDetails(' + JSON.stringify(a).replace(/'/g, "\\'").replace(/</g, "\\x3c") + ')\'>View details</button>';
     if (a.job_id) {
-      html += '<div class="card-detail" style="font-size:0.72rem;color:var(--purple)">Preview job: ' + esc(a.job_id) + '</div>';
+      html += '<button class="btn btn-purple" onclick="playPreviewAudio(\'' + esc(a.job_id) + '\',this)">Play preview</button>';
     }
+    html += '</div>';
 
     html += '</div>';
   }
@@ -406,6 +408,77 @@ function filterPreviews(filter, btn) {
     else if (filter === 'converted') card.style.display = card.dataset.converted === 'yes' ? 'block' : 'none';
     else card.style.display = card.dataset.converted === 'no' ? 'block' : 'none';
   });
+}
+
+function viewPreviewDetails(attempt) {
+  const sd = attempt.story_data || {};
+  let html = '';
+
+  // Children
+  if (sd.children && sd.children.length) {
+    sd.children.forEach(function(c, i) {
+      html += '<div class="detail-row"><strong>Child ' + (i+1) + ':</strong> ' + esc(c.name) + ' (' + esc(c.gender || '') + ', age ' + esc(c.age || '') + ')</div>';
+      if (c.about) html += '<div class="detail-row" style="margin-left:1rem;color:#666">About: ' + esc(c.about) + '</div>';
+    });
+  } else {
+    html += '<div class="detail-row"><strong>Child:</strong> ' + esc(sd.childName || attempt.child_name || '') + ' (' + esc(sd.gender || '') + ', age ' + esc(sd.age || '') + ')</div>';
+  }
+
+  if (sd.friendName) html += '<div class="detail-row"><strong>Friend:</strong> ' + esc(sd.friendName) + '</div>';
+  if (sd.sidekickName) html += '<div class="detail-row"><strong>Sidekick:</strong> ' + esc(sd.sidekickName) + '</div>';
+  if (sd.familyMembers) html += '<div class="detail-row"><strong>Family:</strong> ' + esc(sd.familyMembers) + '</div>';
+  if (sd.hasPet && sd.petName) html += '<div class="detail-row"><strong>Pet:</strong> ' + esc(sd.petName) + (sd.petType ? ' (' + esc(sd.petType) + ')' : '') + '</div>';
+  if (sd.hasVillain && sd.villainName) html += '<div class="detail-row"><strong>Villain:</strong> ' + esc(sd.villainName) + '</div>';
+  if (sd.favTeddy) html += '<div class="detail-row"><strong>Comfort item:</strong> ' + esc(sd.favTeddy) + '</div>';
+  if (sd.themes && sd.themes.length) html += '<div class="detail-row"><strong>Themes:</strong> ' + esc(sd.themes.join(', ')) + '</div>';
+  if (sd.themeDetail) html += '<div class="detail-row"><strong>Theme detail:</strong> ' + esc(sd.themeDetail) + '</div>';
+  if (sd.setting) html += '<div class="detail-row"><strong>Setting:</strong> ' + esc(sd.setting) + '</div>';
+  if (sd.extraDetails) html += '<div class="detail-row"><strong>Extra details:</strong> ' + esc(sd.extraDetails) + '</div>';
+  if (sd.siblingDynamics) html += '<div class="detail-row"><strong>Sibling dynamics:</strong> ' + esc(sd.siblingDynamics) + '</div>';
+
+  // Gift info
+  if (sd.isGift) {
+    html += '<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #E8E0F0">';
+    html += '<div class="detail-row"><strong>Gift from:</strong> ' + esc(sd.giftFrom || '') + (sd.giftInStory ? ' (in story)' : '') + '</div>';
+    if (sd.giftMessage) html += '<div class="detail-row"><strong>Gift message:</strong> ' + esc(sd.giftMessage) + '</div>';
+    if (sd.giftEmail) html += '<div class="detail-row"><strong>Send to:</strong> ' + esc(sd.giftEmail) + '</div>';
+    html += '</div>';
+  }
+
+  if (sd.personalMessage) html += '<div class="detail-row"><strong>Personal message:</strong> ' + esc(sd.personalMessage) + '</div>';
+
+  // Preview text
+  if (attempt.preview_story) {
+    html += '<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #E8E0F0">';
+    html += '<strong style="font-size:0.82rem">Preview text:</strong>';
+    html += '<div class="story-text-preview" style="margin-top:0.5rem">' + esc(attempt.preview_story) + '</div>';
+    html += '</div>';
+  }
+
+  document.getElementById('storyModalTitle').textContent = esc(attempt.child_name || sd.childName || 'Preview') + ' details';
+  document.getElementById('storyModalText').innerHTML = html;
+  document.getElementById('storyModal').classList.add('active');
+}
+
+async function playPreviewAudio(jobId, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  try {
+    const res = await fetch('https://heartheirname.com/api/check-preview?jobId=' + encodeURIComponent(jobId));
+    const data = await res.json();
+    if (data.ready && data.previewAudio) {
+      const audio = new Audio('data:audio/mpeg;base64,' + data.previewAudio);
+      audio.play();
+      btn.textContent = 'Playing...';
+      audio.onended = function() { btn.textContent = 'Play preview'; btn.disabled = false; };
+    } else {
+      btn.textContent = 'No audio';
+      setTimeout(function() { btn.textContent = 'Play preview'; btn.disabled = false; }, 2000);
+    }
+  } catch(e) {
+    btn.textContent = 'Error';
+    setTimeout(function() { btn.textContent = 'Play preview'; btn.disabled = false; }, 2000);
+  }
 }
 
 // ===== CUSTOMERS =====
