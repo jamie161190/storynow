@@ -19,7 +19,7 @@ export function sanitiseStoryData(d) {
   const s = { ...d };
   const textFields = ['childName', 'friendName', 'sidekickName', 'petName', 'petType', 'favTeddy',
     'villainName', 'familyMembers', 'teacherName', 'interest', 'themeDetail', 'setting',
-    'extraDetails', 'personalMessage', 'giftFrom', 'giftMessage', 'proudOf', 'subject',
+    'extraDetails', 'personalMessage', 'giftFrom', 'giftMessage', 'subject',
     'learningGoal', 'customTheme', 'customWhere'];
   for (const f of textFields) {
     if (s[f]) s[f] = sanitiseInput(s[f]);
@@ -215,8 +215,6 @@ This is critical. The parent has told you exactly what their child loves within 
 - Name: ${d.childName} (${d.gender || 'child'})
 - Age: ${d.age}
 - ${pronounLine}
-${d.proudOf ? `- Occasion: ${d.proudOf}
-THIS IS IMPORTANT. The parent told you about this occasion because it matters to them. Weave it into the story as a source of pride, courage, or celebration. If it is a birthday, the adventure should feel like a birthday gift. If the child learned something new, that achievement should give them confidence at a key moment. If it is a milestone, the story should honour it. Do not just mention it once. Let it resonate.` : ''}
 
 PEOPLE IN THE STORY:
 - Best friend: ${d.friendName} (must have at least 3 meaningful moments: dialogue, an action, a connection)
@@ -329,9 +327,6 @@ BAD: "${allNames.join(', ')} all looked up at the sky."
 GOOD: "${allNames[0]} heard it first. A low rumble from somewhere behind the wall ... ${allNames[1]} was already running. ${allNames[1]} always was ... ${allNames.length > 2 ? allNames[2] + ' tugged ' + (children[0].gender === 'girl' ? 'her' : children[0].gender === 'boy' ? 'his' : 'their') + ' sleeve. "I want to see."' : ''}"
 
 Throughout the story, use individual names in their own sentences. Two names together is fine when natural ("${allNames[1]} grabbed ${allNames[0]}'s hand"). All names together should be RARE — only for the sign-off or a genuine group moment near the climax.
-
-${d.proudOf ? `OCCASION: ${d.proudOf}
-The parent told you about this occasion because it matters to them. Weave it into the story as a source of pride, courage, or celebration for the whole group.` : ''}
 
 PEOPLE IN THE STORY:
 ${d.friendName ? `- Shared friend: ${d.friendName} (a friend they all know — give them at least 2 meaningful moments)` : '- No additional friend specified — the children are each other\'s companions'}
