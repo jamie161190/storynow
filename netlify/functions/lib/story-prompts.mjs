@@ -167,8 +167,20 @@ The very last line of EVERY story must include the child's name and the phrase "
 
 export function getAgeBand(age) {
   const a = parseInt(age);
-  if (a <= 4) return `This child is very young (age ${a}). Use very simple vocabulary, short sentences, gentle repetition, sound effects, and keep everything safe, warm, and familiar. Think CBeebies bedtime hour. Sentences should rarely exceed 12 words. Use lots of "And then..." and repeated patterns. Name things the child knows: colours, animals, family, food, bath time, bedtime. For age 2 to 3, keep the TOTAL word count closer to 1200 words (shorter attention span). The story should feel like being read to by a loving parent.
-CRITICAL FOR THIS AGE: Every single paragraph needs at least one of: a sound effect (Whoosh! Splash! Clip-clop!), a repeated pattern ("And they looked, and they looked, and they looked"), or a counting/naming rhythm ("One star. Two stars. Three stars."). This is NOT optional. Without these elements, the story will sound like a simplified story for older children, and it will not hold a ${a} year old's attention. Write as if you are performing the story, not just reading it.`;
+  if (a <= 2) return `This child is a baby/toddler (age ${a}). This story is read TO them by a parent. Write it as a warm, rhythmic, sensory experience. NOT a narrative with plot or characters doing things.
+RULES FOR THIS AGE:
+- Sentences must be 5 to 8 words maximum. Never longer.
+- Use gentle repetition as the structure: "The stars blinked. Blink, blink, blink." NOT complex patterns or chase scenes.
+- Sound effects should be soft and gentle (not every line): a purr, a gentle splash, a whisper. NOT loud noises, roars, or crashes.
+- ABSOLUTELY NO villains, danger, suspense, chase scenes, stealing, hiding, or anything that could upset a baby.
+- ABSOLUTELY NO dialogue FROM the child. A 1 year old cannot speak in sentences.
+- Family members can speak TO the child warmly and simply: "I love you" or "Look at the stars."
+- The story should feel like a lullaby in prose. Warm, safe, sleepy, loving.
+- Name their comfort item, their pet, their family. That is enough.
+- Keep the total word count shorter. This child has a very short attention span.`;
+  if (a <= 4) return `This child is very young (age ${a}). Use very simple vocabulary, short sentences, gentle repetition, and occasional sound effects. Keep everything safe, warm, and familiar. Think CBeebies bedtime hour. Sentences should rarely exceed 12 words. Use "And then..." patterns and simple repetition. Name things the child knows: colours, animals, family, food, bath time, bedtime. For age 2 to 3, keep the TOTAL word count closer to 1200 words (shorter attention span). The story should feel like being read to by a loving parent.
+ABSOLUTELY NO villains, danger, scary moments, or suspense for this age. Even "cheeky" villains are too much. Everything must be gentle and safe.
+Sound effects and repeated patterns are good but do not overdo them. One sound effect every 3 to 4 sentences is enough. Do not put a sound effect in every single sentence or it becomes exhausting to listen to. Let some sentences just be warm and descriptive.`;
   if (a <= 7) return `This child is ${a} years old. Use clear story structure with a beginning, middle, and end. Keep language accessible but not babyish. Dialogue and action keep them engaged. The world is kind and the child is brave. Use vocabulary that stretches them slightly (one or two words they might not know but can figure out from context). The friend should talk like a real kid their age. Include at least one moment that makes the child giggle or gasp.`;
   if (a <= 10) return `This child is ${a} years old. Write with real narrative tension, humour, and clever problem solving. Richer vocabulary is welcome. The friend should have their own personality and opinions. The child is the hero because they are smart, not lucky. Include wordplay, wit, and at least one genuinely funny moment. The characters can disagree, make mistakes, and learn. The story should feel like the best book they have ever read, not like something written for a younger kid.`;
   return `This child is ${a} years old. Write at a young adult level. Complex emotions, genuine depth, themes of identity and belonging. Respect their intelligence completely. The friendship should feel real and layered, with moments of tension and reconciliation. Do not shy away from ambiguity or nuance. The humour should be smart, not silly. The stakes should feel real. The ending can be hopeful without being neat. Write as if you are writing for someone who reads real novels.
@@ -235,9 +247,10 @@ ${d.petType ? `IMPORTANT: You know what ${d.petType}s are really like. Use that 
 This item should appear in the story. Give it a role, a moment, a reason to matter. CRITICAL: Use ONLY the description the parent gave. If they said "yellow blanket," it is yellow. If they said "small white bunny," it is small and white. NEVER invent colours, sizes, or details the parent did not mention. If no colour or description was given, describe it without visual details (e.g. "the blanket" not "the soft blue blanket").`;
   }
 
-  if (d.hasVillain && d.villainName) {
+  const childAge = parseInt(d.age) || 5;
+  if (d.hasVillain && d.villainName && childAge >= 3) {
     block += `\n\nVILLAIN: ${d.villainName}
-This is the story's cheeky antagonist, chosen by the parent. They cause trouble, create obstacles, and make the adventure exciting. But they are NOT truly evil or scary. Think mischievous, silly, or bumbling rather than threatening. The villain should:
+This is the story's cheeky antagonist, chosen by the parent. They cause trouble, create obstacles, and make the adventure exciting. But they are NOT truly evil or scary. Think mischievous, silly, or bumbling rather than threatening. The villain should:`;
 - Appear at least 3 times throughout the story, escalating each time
 - Have a funny catchphrase or signature move
 - Underestimate ${d.childName} every single time
@@ -344,8 +357,8 @@ ${d.petType ? `Make ${d.petName} behave like a real ${d.petType} would. The chil
 This should appear in the story. Use ONLY the description the parent gave. NEVER invent colours, sizes, or details they did not mention. If multiple children are in the story and different items are described for each child, match each item to the correct child based on the names mentioned.`;
   }
 
-  if (d.hasVillain && d.villainName) {
-    const youngestAge = Math.min(...children.map(c => parseInt(c.age)));
+  const youngestAge = Math.min(...children.map(c => parseInt(c.age) || 5));
+  if (d.hasVillain && d.villainName && youngestAge >= 3) {
     block += `\n\nVILLAIN: ${d.villainName}
 The cheeky antagonist for the whole group. Causes trouble, creates obstacles, makes the adventure exciting. NOT truly evil or scary.
 - Appears at least 3 times, escalating each time
