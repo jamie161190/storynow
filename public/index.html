@@ -250,6 +250,28 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .tagline .highlight{color:var(--purple);position:relative}
 .hero-sub{font-size:0.92rem;color:var(--text-soft);line-height:1.65;max-width:360px;margin:0 auto 22px}
 
+/* Hero banner overlay */
+.hero-img{width:100%;display:block;object-fit:cover;object-position:center center;min-height:440px}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0%,rgba(15,10,30,0.25) 35%,rgba(15,10,30,0.7) 100%);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;text-align:center;padding:0 1.5rem 2rem}
+.hero-headline{font-family:'Playfair Display',Georgia,serif;font-size:1.85rem;font-weight:800;color:#fff;line-height:1.15;margin:0 0 0.6rem 0;text-shadow:0 2px 12px rgba(0,0,0,0.7),0 1px 3px rgba(0,0,0,0.9)}
+.hero-headline em{color:#e8860c;font-style:normal}
+.hero-sub-1{font-size:0.9rem;color:#eee;margin:0 0 0.2rem 0;text-shadow:0 1px 8px rgba(0,0,0,0.7),0 1px 2px rgba(0,0,0,0.9)}
+.hero-sub-1 span{color:#e8860c;font-weight:600}
+.hero-sub-2{font-size:0.8rem;color:#ccc;margin:0 0 1rem 0;text-shadow:0 1px 8px rgba(0,0,0,0.7),0 1px 2px rgba(0,0,0,0.9)}
+.hero-trust-row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.hero-trust-item{display:flex;align-items:center;gap:0.4rem;font-size:0.7rem;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.7)}
+.hero-trust-icon{width:28px;height:28px;border-radius:50%;background:rgba(232,134,12,0.2);border:1.5px solid #e8860c;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0}
+
+@media(min-width:600px){
+  .hero-img{min-height:480px;object-position:right center}
+  .hero-overlay{background:linear-gradient(to right,rgba(15,10,30,0.85) 0%,rgba(15,10,30,0.6) 35%,rgba(15,10,30,0.1) 55%,transparent 100%);justify-content:center;align-items:flex-start;text-align:left;padding:2.5rem 4rem}
+  .hero-headline{font-size:2.8rem;margin:0 0 0.75rem 0}
+  .hero-sub-1{font-size:1.05rem}
+  .hero-sub-2{font-size:0.9rem;margin:0 0 1.25rem 0}
+  .hero-trust-row{justify-content:flex-start}
+  .hero-trust-item{font-size:0.78rem}
+}
+
 .cta-group{display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:340px;margin:0.5rem auto 0}
 .btn{padding:1rem 2rem;border:none;border-radius:var(--radius);font-family:'Quicksand',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.25s ease;text-align:center;position:relative;overflow:hidden}
 .btn-primary{background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,#A872C8));color:#fff;box-shadow:0 4px 20px var(--cat-glow,rgba(124,92,252,0.3))}
@@ -738,12 +760,27 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- HERO -->
   <div id="sectionHero" style="width:100%;max-width:440px;text-align:center">
-    <div class="trust-bar">
-      <span class="trust-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-      <span>Loved by families across the world</span>
-    </div>
-    <div style="width:100vw;margin-left:calc(-50vw + 50%);margin-bottom:1.5rem">
-      <img src="/images/hero-banner.jpg" alt="Hear Their Name In Their Own Story" style="width:100%;display:block">
+    <div class="hero-banner-wrap" style="width:100vw;margin-left:calc(-50vw + 50%);margin-bottom:1.5rem;position:relative;overflow:hidden">
+      <img src="/images/hero-banner.jpg" alt="" class="hero-img">
+      <div class="hero-overlay">
+        <h1 class="hero-headline">Hear Their Name<br>In Their Own<br><em>Story</em></h1>
+        <p class="hero-sub-1">Their name. Their world.<br><span>Spoken back to them.</span></p>
+        <p class="hero-sub-2">Personalised audio stories,<br>made just for the ones you love.</p>
+        <div class="hero-trust-row">
+          <span class="hero-trust-item">
+            <span class="hero-trust-icon">&#127911;</span>
+            Free 15-minute<br>stories
+          </span>
+          <span class="hero-trust-item">
+            <span class="hero-trust-icon">&#10084;&#65039;</span>
+            Theirs<br>forever
+          </span>
+          <span class="hero-trust-item">
+            <span class="hero-trust-icon">&#128104;&#8205;&#128102;</span>
+            Made by a dad<br>and his son
+          </span>
+        </div>
+      </div>
     </div>
 
     <!-- NAME CAPTURE CARD -->
