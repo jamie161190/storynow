@@ -24,8 +24,8 @@ export default async (req) => {
         price_data: {
           currency: 'gbp',
           product_data: {
-            name: 'Say thank you',
-            description: 'Supporting Hear Their Name'
+            name: 'Support Hear Their Name',
+            description: 'Helping us keep making free stories for families'
           },
           unit_amount: Math.round(amount * 100)
         },

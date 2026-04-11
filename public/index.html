@@ -3756,7 +3756,8 @@ async function submitStoryRequest() {
     var data = await res.json();
 
     // Track event
-    trackEvent('StoryRequested', { content_name: storyData.category, child_name: storyData.childName });
+    trackEvent('Lead', { content_name: storyData.category, child_name: storyData.childName });
+    trackEvent('CompleteRegistration', { content_name: storyData.category });
 
     // Show confirmation
     showRequestConfirmation();
