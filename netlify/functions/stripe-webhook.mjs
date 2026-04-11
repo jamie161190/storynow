@@ -1,6 +1,6 @@
 // Stripe webhook handler for:
-// 1. Server-side conversion tracking (Meta CAPI + TikTok Events API) on successful purchase
-// 2. Abandoned cart recovery emails on expired checkout sessions
+// 1. Server-side conversion tracking (Meta CAPI + TikTok Events API)
+// 2. Saving donations to database
 import Stripe from 'stripe';
 import { createHash } from 'crypto';
 
@@ -178,45 +178,6 @@ export default async (req) => {
       }
     }
 
-    // ── Referral conversion tracking ──
-    const refCode = metadata.ref_code;
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-    if (refCode && supabaseUrl && supabaseKey) {
-      try {
-        const refLookup = await fetch(
-          `${supabaseUrl}/rest/v1/referrals?ref_code=eq.${encodeURIComponent(refCode)}&select=id,conversions,revenue,referred_emails`,
-          { headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey } }
-        );
-        if (refLookup.ok) {
-          const refs = await refLookup.json();
-          if (refs.length > 0) {
-            const r = refs[0];
-            const updatedEmails = [...(r.referred_emails || [])];
-            if (email && !updatedEmails.includes(email)) updatedEmails.push(email);
-            await fetch(
-              `${supabaseUrl}/rest/v1/referrals?id=eq.${r.id}`,
-              {
-                method: 'PATCH',
-                headers: {
-                  'Authorization': `Bearer ${supabaseKey}`,
-                  'apikey': supabaseKey,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  conversions: (r.conversions || 0) + 1,
-                  revenue: (r.revenue || 0) + (amountTotal / 100),
-                  referred_emails: updatedEmails
-                })
-              }
-            );
-            console.log(`Referral conversion recorded for code: ${refCode}`);
-          }
-        }
-      } catch (refErr) {
-        console.error('Referral tracking error:', refErr.message);
-      }
-    }
   }
 
   // Always return 200 to Stripe so it doesn't retry
