@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Story | Hear Their Name</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Nunito', sans-serif; background: #FEFBF6; color: #2D2844; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+.story-page { width: 100%; max-width: 480px; padding: 2rem 1.25rem 3rem; }
+
+/* Loading state */
+.loading { text-align: center; padding: 4rem 1rem; }
+.loading p { color: #999; font-size: 0.9rem; }
+
+/* Error state */
+.error { text-align: center; padding: 4rem 1rem; }
+.error h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+.error p { color: #999; font-size: 0.9rem; }
+
+/* Player section */
+.player-section { text-align: center; padding: 3rem 0 2rem; }
+.child-name { font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 800; color: #2D2844; line-height: 1.2; margin: 0 0 0.3rem; }
+.story-label { font-size: 0.82rem; color: #999; font-weight: 600; margin: 0 0 2rem; }
+
+.play-btn { width: 80px; height: 80px; border-radius: 50%; border: none; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 4px 20px rgba(107, 47, 147, 0.3); transition: transform 0.2s, box-shadow 0.2s; }
+.play-btn:hover { transform: scale(1.05); box-shadow: 0 6px 28px rgba(107, 47, 147, 0.4); }
+.play-btn svg { width: 28px; height: 28px; fill: white; margin-left: 3px; }
+.play-btn.playing svg { margin-left: 0; }
+
+.progress-wrap { width: 100%; max-width: 320px; margin: 0 auto; }
+.progress-bar { width: 100%; height: 4px; background: #E8E0F0; border-radius: 2px; overflow: hidden; cursor: pointer; }
+.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #6B2F93, #A872C8); border-radius: 2px; transition: width 0.3s linear; }
+.time-display { display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 0.72rem; color: #999; font-weight: 600; }
+
+/* Divider */
+.section-divider { width: 100%; height: 1px; background: #F0ECF5; margin: 2.5rem 0; }
+
+/* Thank you section */
+.thankyou-section { text-align: center; }
+.thankyou-section h3 { font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900; color: #2D2844; margin: 0 0 0.6rem; }
+.thankyou-section p { font-size: 0.85rem; color: #888; line-height: 1.7; margin: 0 0 1.25rem; }
+
+.amount-btns { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+.amount-btn { padding: 0.6rem 1.25rem; border-radius: 50px; border: 2px solid #E8E0F0; background: #fff; font-size: 0.9rem; font-weight: 700; color: #2D2844; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+.amount-btn:hover, .amount-btn.selected { border-color: #6B2F93; background: #F0E5F7; color: #6B2F93; }
+.amount-btn-custom { padding: 0.6rem 1rem; border-radius: 50px; border: 2px solid #E8E0F0; background: #fff; font-size: 0.9rem; font-weight: 700; color: #2D2844; width: 80px; text-align: center; font-family: 'Nunito', sans-serif; }
+
+.message-input { width: 100%; padding: 0.6rem 0.8rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 0.85rem; font-family: 'Nunito', sans-serif; resize: none; height: 60px; margin-bottom: 1rem; }
+
+.donate-btn { width: 100%; padding: 0.85rem; border: none; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+.donate-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(107, 47, 147, 0.3); }
+
+/* Community wall */
+.community-section { margin-top: 2rem; }
+.community-section h3 { font-size: 0.9rem; font-weight: 900; color: #2D2844; margin: 0 0 0.75rem; text-align: center; }
+.community-stat { text-align: center; font-size: 0.78rem; color: #999; margin: 0 0 1rem; }
+.community-wall { display: flex; flex-direction: column; gap: 0.5rem; }
+.community-card { background: #fff; border: 1.5px solid #F0ECF5; border-radius: 12px; padding: 0.75rem 1rem; }
+.community-card .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+.community-card .cc-name { font-size: 0.78rem; font-weight: 700; color: #2D2844; }
+.community-card .cc-amount { font-size: 0.78rem; font-weight: 800; color: #6B2F93; }
+.community-card .cc-message { font-size: 0.8rem; color: #666; line-height: 1.5; font-style: italic; }
+
+/* Share & CTA */
+.share-section { margin-top: 2rem; text-align: center; }
+.share-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; border-radius: 50px; border: 2px solid #E8E0F0; background: #fff; font-size: 0.85rem; font-weight: 700; color: #2D2844; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+.share-btn:hover { border-color: #6B2F93; color: #6B2F93; }
+
+.cta-section { margin-top: 2.5rem; text-align: center; }
+.cta-section p { font-size: 0.85rem; color: #888; margin: 0 0 0.75rem; }
+.cta-btn { display: inline-block; padding: 0.85rem 2rem; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; text-decoration: none; font-size: 0.95rem; font-weight: 700; font-family: 'Nunito', sans-serif; }
+
+.footer { margin-top: 3rem; text-align: center; font-size: 0.7rem; color: #ccc; }
+</style>
+</head>
+<body>
+
+<div class="story-page" id="storyPage">
+  <!-- Loading -->
+  <div class="loading" id="loadingState">
+    <p>Loading story...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error" id="errorState" style="display:none">
+    <h2>Story not found</h2>
+    <p>This link may have expired or the story hasn't been delivered yet.</p>
+    <p style="margin-top:1rem"><a href="https://heartheirname.com" style="color:#6B2F93;font-weight:700;text-decoration:none">Go to Hear Their Name</a></p>
+  </div>
+
+  <!-- Story content (hidden until loaded) -->
+  <div id="storyContent" style="display:none">
+
+    <!-- Player -->
+    <div class="player-section">
+      <h1 class="child-name" id="childNameDisplay"></h1>
+      <p class="story-label">A Hear Their Name story</p>
+
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" onclick="seekAudio(event)">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="time-display">
+          <span id="currentTime">0:00</span>
+          <span id="totalTime">0:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Say thank you -->
+    <div class="thankyou-section">
+      <h3>If this meant something to your family</h3>
+      <p>Every story is free. If you'd like to help us keep making them, you can say thank you.</p>
+
+      <div class="amount-btns">
+        <button class="amount-btn" onclick="selectAmount(5, this)">£5</button>
+        <button class="amount-btn selected" onclick="selectAmount(10, this)">£10</button>
+        <button class="amount-btn" onclick="selectAmount(15, this)">£15</button>
+        <input type="number" class="amount-btn-custom" placeholder="Other" id="customAmount" onfocus="clearAmountSelection()" oninput="clearAmountSelection()">
+      </div>
+
+      <textarea class="message-input" id="donationMessage" placeholder="Leave a message for other families (optional)"></textarea>
+
+      <button class="donate-btn" id="donateBtn" onclick="submitDonation()">Say thank you</button>
+    </div>
+
+    <!-- Community wall -->
+    <div class="community-section">
+      <h3>Thank yous from other families</h3>
+      <p class="community-stat" id="communityStat"></p>
+      <div class="community-wall" id="communityWall">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- Share -->
+    <div class="share-section">
+      <button class="share-btn" onclick="shareStory()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Share this story
+      </button>
+    </div>
+
+    <!-- Make your own -->
+    <div class="cta-section">
+      <p>Know a child who'd love their own story?</p>
+      <a href="https://heartheirname.com" class="cta-btn">Make a free story</a>
+    </div>
+
+    <div class="footer">
+      <p>Hear Their Name. Made by a dad and his son.</p>
+    </div>
+  </div>
+</div>
+
+<audio id="storyAudio" preload="auto"></audio>
+<audio id="bgMusicAudio" loop preload="auto"></audio>
+
+<script>
+// Get story ID from URL path
+const pathParts = window.location.pathname.split('/');
+const storyId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+
+let storyData = null;
+let selectedDonationAmount = 10;
+
+const musicTracks = {
+  bedtime: '/music/bedtime-ambient.mp3?v=5',
+  journey: '/music/adventure-ambient.mp3?v=7',
+  learning: '/music/bedtime-ambient.mp3?v=5'
+};
+
+// Load the story
+async function loadStory() {
+  try {
+    const res = await fetch('/api/shared-story?id=' + encodeURIComponent(storyId));
+    const data = await res.json();
+
+    if (!data.success || !data.story || !data.story.audioUrl) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+      return;
+    }
+
+    storyData = data.story;
+    document.title = storyData.childName + "'s Story | Hear Their Name";
+
+    // Set child name
+    document.getElementById('childNameDisplay').textContent = storyData.childName + "'s Story";
+
+    // Set audio source
+    const audio = document.getElementById('storyAudio');
+    audio.src = storyData.audioUrl;
+
+    // Set background music
+    const bgMusic = document.getElementById('bgMusicAudio');
+    bgMusic.src = musicTracks[storyData.category] || musicTracks.bedtime;
+    bgMusic.volume = 0.25;
+
+    // Show content
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('storyContent').style.display = 'block';
+
+    // Load donations
+    loadDonations();
+
+  } catch (err) {
+    console.error('Failed to load story:', err);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+  }
+}
+
+// Audio player
+function togglePlay() {
+  const audio = document.getElementById('storyAudio');
+  const btn = document.getElementById('playBtn');
+  const bgMusic = document.getElementById('bgMusicAudio');
+
+  if (audio.paused) {
+    audio.play();
+    bgMusic.play().catch(() => {});
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/></svg>';
+    btn.classList.add('playing');
+  } else {
+    audio.pause();
+    bgMusic.pause();
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    btn.classList.remove('playing');
+  }
+}
+
+// Progress bar
+const audio = document.getElementById('storyAudio');
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+});
+
+audio.addEventListener('loadedmetadata', () => {
+  document.getElementById('totalTime').textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener('ended', () => {
+  const btn = document.getElementById('playBtn');
+  const bgMusic = document.getElementById('bgMusicAudio');
+  bgMusic.pause();
+  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  btn.classList.remove('playing');
+});
+
+function seekAudio(e) {
+  const bar = document.getElementById('progressBar');
+  const rect = bar.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  audio.currentTime = pct * audio.duration;
+}
+
+function formatTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+// Donation
+function selectAmount(amount, btn) {
+  selectedDonationAmount = amount;
+  document.getElementById('customAmount').value = '';
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function clearAmountSelection() {
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+  const custom = document.getElementById('customAmount').value;
+  if (custom) selectedDonationAmount = parseFloat(custom);
+}
+
+async function submitDonation() {
+  const custom = document.getElementById('customAmount').value;
+  const amount = custom ? parseFloat(custom) : selectedDonationAmount;
+  if (!amount || amount < 1) { alert('Please select an amount'); return; }
+
+  const message = document.getElementById('donationMessage').value.trim();
+  const btn = document.getElementById('donateBtn');
+
+  btn.textContent = 'Processing...';
+  btn.style.opacity = '0.6';
+
+  // TODO: Wire up Stripe payment for donation
+  // For now, save the donation intent
+  try {
+    alert('Donation system coming soon. Thank you for wanting to support us!');
+    btn.textContent = 'Say thank you';
+    btn.style.opacity = '1';
+  } catch (err) {
+    btn.textContent = 'Say thank you';
+    btn.style.opacity = '1';
+  }
+}
+
+// Load donation wall
+async function loadDonations() {
+  // TODO: Fetch from /api/donations endpoint
+  // For now, show placeholder community data
+  const placeholders = [
+    { name: "Emma's mum", amount: 10, message: "She fell asleep smiling. Thank you." },
+    { name: "Grandad Pete", amount: 15, message: "Made both my grandchildren's day." },
+    { name: "The Patels", amount: 5, message: "Bedtime has never been this easy." },
+    { name: "Sarah", amount: 10, message: "My daughter asked to hear it three times." },
+    { name: "Uncle Mark", amount: 20, message: "Better than any gift I could have wrapped." }
+  ];
+
+  document.getElementById('communityStat').textContent = 'This week, 20 families helped us continue making stories';
+
+  const wall = document.getElementById('communityWall');
+  wall.innerHTML = placeholders.map(d => `
+    <div class="community-card">
+      <div class="cc-header">
+        <span class="cc-name">${d.name}</span>
+        <span class="cc-amount">£${d.amount}</span>
+      </div>
+      ${d.message ? '<p class="cc-message">"' + d.message + '"</p>' : ''}
+    </div>
+  `).join('');
+}
+
+// Share
+function shareStory() {
+  const url = window.location.href;
+  const text = storyData ? 'Listen to ' + storyData.childName + "'s personalised story" : 'Listen to this personalised story';
+
+  if (navigator.share) {
+    navigator.share({ title: text, url: url }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.querySelector('.share-btn');
+      btn.textContent = 'Link copied!';
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share this story';
+      }, 2000);
+    });
+  }
+}
+
+// Init
+loadStory();
+</script>
+</body>
+</html>

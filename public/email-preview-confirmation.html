@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirmation Email Preview</title>
+<style>
+body { margin: 0; padding: 2rem; background: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.inbox { max-width: 600px; margin: 0 auto; }
+.email-header { background: #fff; border: 1px solid #e0e0e0; border-bottom: none; border-radius: 8px 8px 0 0; padding: 1rem 1.25rem; }
+.from { font-size: 0.85rem; color: #333; font-weight: 600; }
+.from span { font-weight: 400; color: #888; }
+.subject { font-size: 1rem; font-weight: 600; color: #111; margin-top: 0.3rem; }
+.email-body { background: #fff; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px; padding: 1.75rem 1.5rem 2rem; }
+.email-body p { font-size: 0.95rem; color: #333; line-height: 1.75; margin: 0 0 1rem; }
+.email-body p:last-child { margin-bottom: 0; }
+.sign-off { margin-top: 1.5rem !important; margin-bottom: 0.15rem !important; }
+.name-sign { font-weight: 600; margin-bottom: 0.1rem !important; }
+.brand { font-size: 0.82rem !important; color: #999 !important; margin-bottom: 1.25rem !important; }
+.summary { font-size: 0.82rem !important; color: #aaa !important; border-top: 1px solid #eee; padding-top: 1rem; margin-top: 1.5rem !important; }
+.label { background: #f5f5f5; display: inline-block; padding: 0.1rem 0.5rem; border-radius: 4px; margin-top: 1rem; font-size: 0.7rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="inbox">
+  <span class="label">Single child</span>
+
+  <div class="email-header">
+    <div class="from">Jamie and Chase from Hear Their Name <span>&lt;jamie@heartheirname.com&gt;</span></div>
+    <div class="subject">We're creating Chase's story</div>
+  </div>
+
+  <div class="email-body">
+    <p>Hi Sarah,</p>
+
+    <p>Thank you for requesting a story for Chase.</p>
+
+    <p>We'll put it together carefully using everything you shared, and send it to you once it's ready. That's usually within a few days.</p>
+
+    <p>If anything changes or you'd like to add something, just reply to this email.</p>
+
+    <p class="sign-off"></p>
+    <p class="name-sign">Jamie and Chase</p>
+    <p class="brand">Hear Their Name</p>
+
+    <p class="summary">Story for Chase &middot; Bedtime &middot; Narrated by Callum</p>
+  </div>
+</div>
+
+<div class="inbox" style="margin-top:3rem">
+  <span class="label">Multiple children</span>
+
+  <div class="email-header">
+    <div class="from">Jamie and Chase from Hear Their Name <span>&lt;jamie@heartheirname.com&gt;</span></div>
+    <div class="subject">We're creating Isla and Oliver's story</div>
+  </div>
+
+  <div class="email-body">
+    <p>Hi Rachel,</p>
+
+    <p>Thank you for requesting a story for Isla and Oliver.</p>
+
+    <p>We'll put it together carefully using everything you shared, and send it to you once it's ready. That's usually within a few days.</p>
+
+    <p>If anything changes or you'd like to add something, just reply to this email.</p>
+
+    <p class="sign-off"></p>
+    <p class="name-sign">Jamie and Chase</p>
+    <p class="brand">Hear Their Name</p>
+
+    <p class="summary">Story for Isla and Oliver &middot; Adventure &middot; Narrated by Grace</p>
+  </div>
+</div>
+
+</body>
+</html>

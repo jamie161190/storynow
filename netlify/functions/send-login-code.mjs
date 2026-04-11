@@ -82,7 +82,7 @@ export default async (req) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Hear Their Name <jamie@heartheirname.com>',
+        from: 'Jamie and Chase from Hear Their Name <jamie@heartheirname.com>',
         to: [email],
         subject: 'Your Hear Their Name login code',
         html: `

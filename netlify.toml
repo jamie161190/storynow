@@ -28,8 +28,7 @@
 # [functions."retry-worker"]
 #   schedule = "*/5 * * * *"
 
-[functions."abandoned-preview-worker"]
-  schedule = "*/30 * * * *"
+# Abandoned preview worker removed (free model, no previews)
 
 
 [[edge_functions]]
@@ -39,6 +38,11 @@
 [[edge_functions]]
   path = "/"
   function = "og-shared"
+
+[[redirects]]
+  from = "/story/*"
+  to = "/story.html"
+  status = 200
 
 [[redirects]]
   from = "/api/*"

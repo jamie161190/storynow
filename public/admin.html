@@ -88,9 +88,7 @@ audio { width: 100%; margin-top: 0.5rem; }
   <div class="tabs">
     <div class="tab active" onclick="switchTab('queue',this)">Queue</div>
     <div class="tab" onclick="switchTab('delivered',this)">Delivered</div>
-    <div class="tab" onclick="switchTab('previews',this)">Previews</div>
-    <div class="tab" onclick="switchTab('customers',this)">Customers</div>
-    <div class="tab" onclick="switchTab('funnel',this)">Funnel</div>
+    <div class="tab" onclick="switchTab('rejected',this)">Bad stories</div>
     <div class="tab" onclick="switchTab('stats',this)">Stats</div>
   </div>
 
@@ -188,9 +186,7 @@ function switchTab(tab, el) {
   document.getElementById('content').innerHTML = '<div class="loading">Loading...</div>';
   if (tab === 'queue') loadQueue('pending');
   else if (tab === 'delivered') loadQueue('delivered');
-  else if (tab === 'previews') loadPreviews();
-  else if (tab === 'customers') loadCustomers();
-  else if (tab === 'funnel') loadFunnel();
+  else if (tab === 'rejected') loadRejected();
   else if (tab === 'stats') loadStatsTab();
 }
 
@@ -201,9 +197,11 @@ async function loadQueue(status) {
   else renderDelivered(data.stories || []);
 }
 
+const VOICE_NAMES = { 'N2lVS1w4EtoT3dr4eOWO':'Callum', 'oWAxZDx7w5VEj9dCyTzz':'Grace', 'onwK4e9ZLuTAKqWW03F9':'Daniel', 'ThT5KcBeYPX3keUQqHPh':'Dorothy', 'g5CIjZEefAph4nQFvHAz':'Ethan', 'ZQe5CZNOzWyzPSCn5a3c':'James', 'cjVigY5qzO86Huf0OWal':'Eric' };
+
 function renderQueue(stories) {
   if (!stories.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">No pending orders. All caught up!</div>';
+    document.getElementById('content').innerHTML = '<div class="empty">No pending requests. All caught up!</div>';
     return;
   }
   let html = '';
@@ -212,47 +210,97 @@ function renderQueue(stories) {
     const isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
     const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
     const hasFeedback = s.feedback && s.feedback.trim();
+    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || 'Unknown';
+    const requesterName = sd.requesterName || '';
 
     html += '<div class="card">';
+
+    // Header: child name + status + time
     html += '<div class="card-header">';
-    html += '<span class="card-title">' + esc(s.child_name || 'Unknown') + '</span>';
+    html += '<span class="card-title">' + esc(s.child_name || 'Unknown') + ' <span style="font-weight:500;font-size:0.78rem;color:#999">' + catLabel + '</span></span>';
     html += '<span class="card-meta">' + timeAgo(s.created_at) + '</span>';
     html += '</div>';
 
-    html += '<div class="card-detail">' + catLabel;
-    if (isMulti) html += ' <span class="badge badge-blue">' + sd.children.length + ' children</span>';
-    if (s.is_gift) html += ' <span class="badge badge-purple">Gift</span>';
-    if (s.status === 'generating') html += ' <span class="badge badge-orange">Generating...</span>';
-    if (s.status === 'ready') html += ' <span class="badge badge-green">Audio ready</span>';
+    // Status badges
+    html += '<div style="margin-bottom:0.5rem">';
+    if (isMulti) html += '<span class="badge badge-blue">' + sd.children.length + ' children</span> ';
+    if (s.status === 'generating') html += '<span class="badge badge-orange">Generating...</span> ';
+    if (s.status === 'ready') html += '<span class="badge badge-green">Audio ready</span> ';
+    if (!s.story_text) html += '<span class="badge badge-orange">Needs text</span> ';
     html += '</div>';
 
-    html += '<div class="card-detail">Email: ' + esc(s.email) + '</div>';
-    if (s.voice_id) html += '<div class="card-detail">Voice: ' + esc(s.voice_id) + '</div>';
-    html += '<div class="card-detail">Music: ' + (sd.wantsMusic === false ? 'No' : 'Yes') + '</div>';
+    // Customer info
+    html += '<div style="background:#F8F7FA;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.6">';
+    if (requesterName) html += '<strong>From:</strong> ' + esc(requesterName) + '<br>';
+    html += '<strong>Email:</strong> ' + esc(s.email) + '<br>';
+    html += '<strong>Narrator:</strong> ' + esc(voiceName);
+    html += '</div>';
 
+    // What they told us (the input)
+    html += '<details style="margin-bottom:0.75rem">';
+    html += '<summary style="font-size:0.78rem;font-weight:700;color:#6B2F93;cursor:pointer;padding:0.3rem 0">What they shared with us</summary>';
+    html += '<div style="background:#F8F5FF;border-radius:10px;padding:0.75rem;margin-top:0.4rem;font-size:0.78rem;line-height:1.7">';
+
+    if (isMulti && sd.children) {
+      for (const c of sd.children) {
+        html += '<strong>' + esc(c.name) + '</strong> (' + esc(c.gender) + ', age ' + esc(c.age) + ')';
+        if (c.about) html += ' — ' + esc(c.about);
+        html += '<br>';
+      }
+    } else {
+      if (sd.childName) html += '<strong>Name:</strong> ' + esc(sd.childName) + '<br>';
+      if (sd.age) html += '<strong>Age:</strong> ' + esc(sd.age) + '<br>';
+      if (sd.gender) html += '<strong>Gender:</strong> ' + esc(sd.gender) + '<br>';
+    }
+    if (sd.friendName) html += '<strong>Best friend:</strong> ' + esc(sd.friendName) + '<br>';
+    if (sd.sidekickName) html += '<strong>Sidekick:</strong> ' + esc(sd.sidekickName) + '<br>';
+    if (sd.familyMembers) html += '<strong>Family:</strong> ' + esc(sd.familyMembers) + '<br>';
+    if (sd.hasPet && sd.petName) html += '<strong>Pet:</strong> ' + esc(sd.petName) + (sd.petType ? ' (' + esc(sd.petType) + ')' : '') + '<br>';
+    if (sd.hasVillain && sd.villainName) html += '<strong>Villain:</strong> ' + esc(sd.villainName) + '<br>';
+    if (sd.favTeddy) html += '<strong>Special item:</strong> ' + esc(sd.favTeddy) + '<br>';
+    if (sd.themes && sd.themes.length) html += '<strong>Interests:</strong> ' + esc(sd.themes.join(', ')) + (sd.themeDetail ? ' (' + esc(sd.themeDetail) + ')' : '') + '<br>';
+    if (sd.setting) html += '<strong>Setting:</strong> ' + esc(sd.setting) + '<br>';
+    if (sd.siblingDynamics) html += '<strong>Sibling dynamic:</strong> ' + esc(sd.siblingDynamics) + '<br>';
+    if (sd.extraDetails) html += '<strong>Extra notes:</strong> ' + esc(sd.extraDetails) + '<br>';
+    if (sd.subject) html += '<strong>Subject:</strong> ' + esc(sd.subject) + '<br>';
+    if (sd.learningGoal) html += '<strong>Learning goal:</strong> ' + esc(sd.learningGoal) + '<br>';
+
+    html += '</div></details>';
+
+    // Customer feedback (if rewrite request)
     if (hasFeedback) {
-      html += '<div style="background:#FFF8F0;border-radius:8px;padding:0.6rem 0.8rem;margin:0.5rem 0;border-left:3px solid #F1753B">';
+      html += '<div style="background:#FFF8F0;border-radius:8px;padding:0.6rem 0.8rem;margin:0 0 0.75rem;border-left:3px solid #F1753B">';
       html += '<p style="font-size:0.72rem;font-weight:700;color:#E65100;margin:0 0 0.2rem">Customer feedback</p>';
       html += '<p style="font-size:0.82rem;color:#2D2844;margin:0;line-height:1.5">' + esc(s.feedback) + '</p>';
       html += '</div>';
     }
 
-    if (s.is_gift && s.gift_delivery_preference) {
-      html += '<div class="card-detail">Gift delivery: ' + (s.gift_delivery_preference === 'auto' ? 'Auto-send to ' + esc(s.gift_email || '?') : 'Buyer will send manually') + '</div>';
+
+    // Story text (if generated)
+    if (s.story_text) {
+      html += '<details style="margin:0.75rem 0">';
+      html += '<summary style="font-size:0.78rem;font-weight:700;color:#6B2F93;cursor:pointer;padding:0.3rem 0">Read the story</summary>';
+      html += '<div class="story-text-preview">' + esc(s.story_text) + '</div>';
+      html += '</details>';
     }
 
+    // Audio player
     if (s.audio_url) {
-      html += '<audio controls preload="none" src="' + esc(s.audio_url) + '"></audio>';
+      html += '<audio controls preload="none" src="' + esc(s.audio_url) + '" style="width:100%;margin:0.5rem 0"></audio>';
     }
 
+    // Actions
     html += '<div class="card-actions">';
-    html += '<button class="btn btn-outline" onclick="viewStory(\'' + esc(s.id) + '\')">Read story</button>';
-    if (!s.audio_url || s.status !== 'ready') {
+    if (!s.story_text) {
+      html += '<button class="btn btn-purple" onclick="generateStoryText(\'' + esc(s.id) + '\',this)">Generate story</button>';
+    } else if (!s.audio_url || s.status !== 'ready') {
       html += '<button class="btn btn-purple" onclick="generateTTS(\'' + esc(s.id) + '\',this)">Generate audio</button>';
     }
-    html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate</button>';
+    if (s.story_text) {
+      html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate</button>';
+    }
     if (s.audio_url) {
-      html += '<button class="btn btn-green" onclick="sendStory(\'' + esc(s.id) + '\',this)">Send</button>';
+      html += '<button class="btn btn-green" onclick="sendStory(\'' + esc(s.id) + '\',this)">Send to customer</button>';
     }
     html += '</div></div>';
   }
@@ -285,6 +333,21 @@ async function viewStory(id) {
   document.getElementById('storyModalTitle').textContent = (s.child_name || 'Story') + ' text';
   document.getElementById('storyModalText').textContent = s.story_text || 'No story text available';
   document.getElementById('storyModal').classList.add('active');
+}
+
+async function generateStoryText(id, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Writing story...';
+  const data = await queueApi('generate-text', {}, { storyId: id });
+  if (data.success) {
+    btn.textContent = 'Done! ' + (data.wordCount || '') + ' words';
+    btn.className = 'btn btn-green';
+    setTimeout(() => loadQueue('pending'), 1500);
+  } else {
+    btn.textContent = 'Failed';
+    btn.disabled = false;
+    alert('Story generation failed: ' + (data.error || 'Unknown error'));
+  }
 }
 
 async function generateTTS(id, btn) {
@@ -350,228 +413,52 @@ async function sendStory(id, btn) {
 
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-// ===== PREVIEWS =====
-let _previewAttempts = [];
-async function loadPreviews() {
-  const data = await adminApi('attempts');
-  const attempts = data.attempts || [];
-  _previewAttempts = attempts;
-  if (!attempts.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">No previews generated yet</div>';
+// ===== BAD STORIES =====
+async function loadRejected() {
+  // Fetch stories that have rejected_versions
+  const data = await queueApi('list', { status: 'pending' });
+  const deliveredData = await queueApi('list', { status: 'delivered' });
+  const allStories = [...(data.stories || []), ...(deliveredData.stories || [])];
+  const withRejected = allStories.filter(s => s.rejected_versions && s.rejected_versions.length > 0);
+
+  if (!withRejected.length) {
+    document.getElementById('content').innerHTML = '<div class="empty">No rejected stories yet. When you regenerate a story, the old version gets saved here.</div>';
     return;
   }
 
-  // Check which emails have purchased
-  const customerData = await adminApi('customers');
-  const purchasedEmails = new Set((customerData.customers || []).map(c => c.email));
-
-  let html = '<div class="filter-row">';
-  html += '<button class="filter-pill active" onclick="filterPreviews(\'all\',this)">All</button>';
-  html += '<button class="filter-pill" onclick="filterPreviews(\'converted\',this)">Converted</button>';
-  html += '<button class="filter-pill" onclick="filterPreviews(\'not_converted\',this)">Did not convert</button>';
-  html += '</div>';
-  html += '<div id="previewsList">';
-
-  for (const a of attempts) {
-    const sd = a.story_data || {};
-    const converted = a.email && purchasedEmails.has(a.email);
-    const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[sd.category || a.category] || 'Story';
-    const date = new Date(a.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
-    const isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
-
-    html += '<div class="card preview-card" data-converted="' + (converted ? 'yes' : 'no') + '">';
-    html += '<div class="card-header">';
-    html += '<span class="card-title">' + esc(a.child_name || sd.childName || 'Unknown') + '</span>';
-    html += converted ? '<span class="badge badge-green">Converted</span>' : '<span class="badge badge-red">Did not convert</span>';
-    html += '</div>';
-    html += '<div class="card-detail">' + catLabel;
-    if (isMulti) html += ' <span class="badge badge-blue">' + sd.children.length + ' children</span>';
-    html += ' &middot; ' + date + '</div>';
-    if (a.email) html += '<div class="card-detail">Email: ' + esc(a.email) + '</div>';
-    if (sd.themes && sd.themes.length) html += '<div class="card-detail">Themes: ' + esc(sd.themes.join(', ')) + '</div>';
-
-    html += '<div class="card-actions">';
-    html += '<button class="btn btn-outline" data-idx="' + attempts.indexOf(a) + '" onclick="viewPreviewDetails(_previewAttempts[this.dataset.idx])">View details</button>';
-    if (a.job_id) {
-      html += '<button class="btn btn-purple" onclick="playPreviewAudio(\'' + esc(a.job_id) + '\',this)">Play preview</button>';
-    }
-    html += '</div>';
-
-    html += '</div>';
-  }
-  html += '</div>';
-  document.getElementById('content').innerHTML = html;
-}
-
-function filterPreviews(filter, btn) {
-  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.preview-card').forEach(card => {
-    if (filter === 'all') card.style.display = 'block';
-    else if (filter === 'converted') card.style.display = card.dataset.converted === 'yes' ? 'block' : 'none';
-    else card.style.display = card.dataset.converted === 'no' ? 'block' : 'none';
-  });
-}
-
-function viewPreviewDetails(attempt) {
-  const sd = attempt.story_data || {};
   let html = '';
+  for (const s of withRejected) {
+    const sd = s.story_data || {};
+    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || 'Unknown';
 
-  // Children
-  if (sd.children && sd.children.length) {
-    sd.children.forEach(function(c, i) {
-      html += '<div class="detail-row"><strong>Child ' + (i+1) + ':</strong> ' + esc(c.name) + ' (' + esc(c.gender || '') + ', age ' + esc(c.age || '') + ')</div>';
-      if (c.about) html += '<div class="detail-row" style="margin-left:1rem;color:#666">About: ' + esc(c.about) + '</div>';
-    });
-  } else {
-    html += '<div class="detail-row"><strong>Child:</strong> ' + esc(sd.childName || attempt.child_name || '') + ' (' + esc(sd.gender || '') + ', age ' + esc(sd.age || '') + ')</div>';
-  }
+    for (let i = 0; i < s.rejected_versions.length; i++) {
+      const rv = s.rejected_versions[i];
+      const date = new Date(rv.rejected_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
 
-  if (sd.friendName) html += '<div class="detail-row"><strong>Friend:</strong> ' + esc(sd.friendName) + '</div>';
-  if (sd.sidekickName) html += '<div class="detail-row"><strong>Sidekick:</strong> ' + esc(sd.sidekickName) + '</div>';
-  if (sd.familyMembers) html += '<div class="detail-row"><strong>Family:</strong> ' + esc(sd.familyMembers) + '</div>';
-  if (sd.hasPet && sd.petName) html += '<div class="detail-row"><strong>Pet:</strong> ' + esc(sd.petName) + (sd.petType ? ' (' + esc(sd.petType) + ')' : '') + '</div>';
-  if (sd.hasVillain && sd.villainName) html += '<div class="detail-row"><strong>Villain:</strong> ' + esc(sd.villainName) + '</div>';
-  if (sd.favTeddy) html += '<div class="detail-row"><strong>Comfort item:</strong> ' + esc(sd.favTeddy) + '</div>';
-  if (sd.themes && sd.themes.length) html += '<div class="detail-row"><strong>Themes:</strong> ' + esc(sd.themes.join(', ')) + '</div>';
-  if (sd.themeDetail) html += '<div class="detail-row"><strong>Theme detail:</strong> ' + esc(sd.themeDetail) + '</div>';
-  if (sd.setting) html += '<div class="detail-row"><strong>Setting:</strong> ' + esc(sd.setting) + '</div>';
-  if (sd.extraDetails) html += '<div class="detail-row"><strong>Extra details:</strong> ' + esc(sd.extraDetails) + '</div>';
-  if (sd.siblingDynamics) html += '<div class="detail-row"><strong>Sibling dynamics:</strong> ' + esc(sd.siblingDynamics) + '</div>';
+      html += '<div class="card">';
+      html += '<div class="card-header">';
+      html += '<span class="card-title">' + esc(s.child_name || 'Unknown') + ' <span style="font-weight:500;font-size:0.78rem;color:#FF6B9D">Rejected #' + (i + 1) + '</span></span>';
+      html += '<span class="card-meta">' + date + '</span>';
+      html += '</div>';
 
-  // Gift info
-  if (sd.isGift) {
-    html += '<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #E8E0F0">';
-    html += '<div class="detail-row"><strong>Gift from:</strong> ' + esc(sd.giftFrom || '') + (sd.giftInStory ? ' (in story)' : '') + '</div>';
-    if (sd.giftMessage) html += '<div class="detail-row"><strong>Gift message:</strong> ' + esc(sd.giftMessage) + '</div>';
-    if (sd.giftEmail) html += '<div class="detail-row"><strong>Send to:</strong> ' + esc(sd.giftEmail) + '</div>';
-    html += '</div>';
-  }
+      html += '<div style="font-size:0.78rem;color:#666;margin-bottom:0.5rem">';
+      html += esc(s.email) + ' &middot; ' + esc(voiceName);
+      html += '</div>';
 
-  if (sd.personalMessage) html += '<div class="detail-row"><strong>Personal message:</strong> ' + esc(sd.personalMessage) + '</div>';
-  html += '<div class="detail-row"><strong>Music:</strong> ' + (sd.wantsMusic === false ? 'No' : 'Yes') + '</div>';
+      if (rv.notes) {
+        html += '<div style="background:#FFF8F0;border-radius:8px;padding:0.5rem 0.7rem;margin-bottom:0.5rem;border-left:3px solid #F1753B">';
+        html += '<p style="font-size:0.72rem;font-weight:700;color:#E65100;margin:0 0 0.2rem">Why it was rejected</p>';
+        html += '<p style="font-size:0.78rem;color:#2D2844;margin:0;line-height:1.5">' + esc(rv.notes) + '</p>';
+        html += '</div>';
+      }
 
-  // Preview text
-  if (attempt.preview_story) {
-    html += '<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #E8E0F0">';
-    html += '<strong style="font-size:0.82rem">Preview text:</strong>';
-    html += '<div class="story-text-preview" style="margin-top:0.5rem">' + esc(attempt.preview_story) + '</div>';
-    html += '</div>';
-  }
+      html += '<details>';
+      html += '<summary style="font-size:0.78rem;font-weight:700;color:#6B2F93;cursor:pointer;padding:0.3rem 0">Read rejected story</summary>';
+      html += '<div class="story-text-preview">' + esc(rv.text) + '</div>';
+      html += '</details>';
 
-  document.getElementById('storyModalTitle').textContent = esc(attempt.child_name || sd.childName || 'Preview') + ' details';
-  document.getElementById('storyModalText').innerHTML = html;
-  document.getElementById('storyModal').classList.add('active');
-}
-
-async function playPreviewAudio(jobId, btn) {
-  btn.disabled = true;
-  btn.textContent = 'Loading...';
-  try {
-    const res = await fetch('https://heartheirname.com/api/check-preview?jobId=' + encodeURIComponent(jobId));
-    const data = await res.json();
-    if (data.ready && data.previewAudio) {
-      const audio = new Audio('data:audio/mpeg;base64,' + data.previewAudio);
-      audio.play();
-      btn.textContent = 'Playing...';
-      audio.onended = function() { btn.textContent = 'Play preview'; btn.disabled = false; };
-    } else {
-      btn.textContent = 'No audio';
-      setTimeout(function() { btn.textContent = 'Play preview'; btn.disabled = false; }, 2000);
-    }
-  } catch(e) {
-    btn.textContent = 'Error';
-    setTimeout(function() { btn.textContent = 'Play preview'; btn.disabled = false; }, 2000);
-  }
-}
-
-// ===== CUSTOMERS =====
-async function loadCustomers() {
-  const data = await adminApi('customers');
-  const customers = data.customers || [];
-  if (!customers.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">No customers yet</div>';
-    return;
-  }
-  let html = '';
-  for (const c of customers) {
-    html += '<div class="card">';
-    html += '<div class="card-header"><span class="card-title">' + esc(c.email) + '</span><span class="badge badge-purple">' + c.storyCount + ' stories</span></div>';
-    for (const s of (c.stories || [])) {
-      const date = new Date(s.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-      const cat = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
-      html += '<div class="card-detail">' + esc(s.child_name) + ' &middot; ' + cat + ' &middot; ' + date;
-      if (s.status) html += ' <span class="badge badge-' + (s.status === 'delivered' ? 'green' : s.status === 'pending' ? 'orange' : 'purple') + '">' + esc(s.status) + '</span>';
       html += '</div>';
     }
-    html += '</div>';
-  }
-  document.getElementById('content').innerHTML = html;
-}
-
-// ===== FUNNEL =====
-let funnelDays = 7;
-async function loadFunnel(days) {
-  if (days) funnelDays = days;
-  // Funnel data comes from page_views with screen_name starting with 'funnel_'
-  const data = await adminApi('metrics', { days: funnelDays });
-  const funnelRaw = data.funnel || {};
-
-  // Convert to ordered steps
-  const stepOrder = [
-    { key: 'funnel_category', label: 'Category' },
-    { key: 'funnel_gift', label: 'Gift question' },
-    { key: 'funnel_details', label: 'Children details' },
-    { key: 'funnel_people', label: 'People & pets' },
-    { key: 'funnel_themesetting', label: 'Theme & setting' },
-    { key: 'funnel_extras', label: 'Extras' },
-    { key: 'funnel_voice', label: 'Voice selection' },
-    { key: 'funnel_review', label: 'Review' },
-    { key: 'funnel_preview', label: 'Preview' },
-    { key: 'hero_start_name', label: 'Hero (with name)' },
-    { key: 'hero_start_noname', label: 'Hero (no name)' },
-    { key: 'landing', label: 'Landing page' }
-  ];
-
-  // Build steps from raw data, include any screen_name that has data
-  const steps = [];
-  // First add landing and hero
-  if (funnelRaw['landing']) steps.push({ label: 'Landing page', count: funnelRaw['landing'] });
-  if (funnelRaw['hero_start_name'] || funnelRaw['hero_start_noname']) {
-    steps.push({ label: 'Started story', count: (funnelRaw['hero_start_name'] || 0) + (funnelRaw['hero_start_noname'] || 0) });
-  }
-  // Then funnel steps
-  for (const s of stepOrder) {
-    if (s.key.startsWith('funnel_') && funnelRaw[s.key]) {
-      steps.push({ label: s.label, count: funnelRaw[s.key] });
-    }
-  }
-
-  if (!steps.length) {
-    document.getElementById('content').innerHTML = '<div class="empty">No funnel data yet. Steps are tracked as visitors move through the builder.</div>';
-    return;
-  }
-
-  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">';
-  html += '<h2 style="font-size:1rem;color:#6B2F93;margin:0">Funnel</h2>';
-  html += '<div style="display:flex;gap:0.3rem">';
-  html += '<button class="filter-pill' + (funnelDays === 1 ? ' active' : '') + '" onclick="loadFunnel(1)">Today</button>';
-  html += '<button class="filter-pill' + (funnelDays === 7 ? ' active' : '') + '" onclick="loadFunnel(7)">7 days</button>';
-  html += '<button class="filter-pill' + (funnelDays === 30 ? ' active' : '') + '" onclick="loadFunnel(30)">30 days</button>';
-  html += '</div></div>';
-  const maxCount = Math.max(...steps.map(s => s.count), 1);
-  for (let i = 0; i < steps.length; i++) {
-    const s = steps[i];
-    const pct = Math.round((s.count / maxCount) * 100);
-    const dropPct = i > 0 ? Math.round((1 - s.count / steps[i-1].count) * 100) : 0;
-    html += '<div style="margin-bottom:0.75rem">';
-    html += '<div style="display:flex;justify-content:space-between;font-size:0.82rem;font-weight:700;margin-bottom:0.25rem">';
-    html += '<span>' + esc(s.label || s.screen_name) + '</span>';
-    html += '<span>' + s.count;
-    if (i > 0 && dropPct > 0) html += ' <span style="color:#FF6B9D;font-size:0.72rem">(-' + dropPct + '%)</span>';
-    html += '</span></div>';
-    html += '<div style="height:8px;background:#F0ECF5;border-radius:4px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#6B2F93,#F1753B);border-radius:4px"></div></div>';
-    html += '</div>';
   }
   document.getElementById('content').innerHTML = html;
 }
@@ -582,8 +469,7 @@ async function loadStats() {
     const data = await adminApi('metrics', { days: 30 });
     const s = data.simplified || {};
     document.getElementById('statsLine').textContent =
-      (s.totalStories || 0) + ' stories delivered, ' +
-      (s.totalCustomers || 0) + ' customers';
+      (s.totalStories || 0) + ' stories delivered';
   } catch(e) {
     document.getElementById('statsLine').textContent = 'Admin ready';
   }
@@ -596,9 +482,7 @@ async function loadStatsTab() {
     const data = await adminApi('metrics', { days: 30 });
     const s = data.simplified || {};
     html += statCard(s.totalStories || 0, 'Stories delivered');
-    html += statCard(s.totalCustomers || 0, 'Customers');
-    html += statCard(s.revenue ? '£' + s.revenue : '£0', 'Revenue (30d)');
-    html += statCard(s.conversionRate ? s.conversionRate + '%' : '0%', 'Conversion rate');
+    html += statCard(s.totalRequests || s.totalCustomers || 0, 'Requests');
   } catch(e) {
     html += '<div class="empty">Could not load stats</div>';
   }
@@ -609,7 +493,7 @@ async function loadStatsTab() {
   try {
     const q = await queueApi('list', { status: 'pending' });
     const pending = (q.stories || []).length;
-    html += '<div class="card"><div class="card-header"><span class="card-title">Pending orders</span><span class="badge badge-orange">' + pending + '</span></div></div>';
+    html += '<div class="card"><div class="card-header"><span class="card-title">Pending requests</span><span class="badge badge-orange">' + pending + '</span></div></div>';
   } catch(e) {}
 
   document.getElementById('content').innerHTML = html;

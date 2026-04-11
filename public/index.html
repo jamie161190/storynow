@@ -450,7 +450,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* ===== VOICE CARDS ===== */
 .voice-cards{display:flex;flex-direction:column;gap:0.75rem;width:100%}
-.voice-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:1.15rem 1.25rem;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow)}
+.voice-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius);padding:0.85rem 1rem;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:0.85rem;box-shadow:var(--shadow)}
 .voice-card:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
 .voice-card.selected{border-color:var(--cat-accent,var(--purple));background:var(--cat-accent-light,var(--purple-light))}
 .voice-emoji{font-size:1.6rem;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--yellow-light);border-radius:12px}
@@ -1500,85 +1500,72 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <button class="back-btn" onclick="goTo(needsExtrasScreen()?'screenExtras':'screenThemeSetting')">&#8592; Back</button>
   <div class="progress-steps"><div class="progress-steps-bar" id="progressVoice"></div><p class="progress-step-label">Last step!</p></div>
   <h2 class="section-title">Choose a storyteller</h2>
-  <p class="section-sub" id="voiceSubtext">Pick the voice that feels right.</p>
-
-  <!-- VOICE FILTERS -->
-  <div class="voice-filters">
-    <div class="filter-row">
-      <div class="filter-group">
-        <label class="filter-label">Gender</label>
-        <div class="filter-pills" id="filterGender">
-          <button class="filter-pill active" data-val="all" onclick="setFilter('gender','all',this)">All</button>
-          <button class="filter-pill" data-val="female" onclick="setFilter('gender','female',this)">Female</button>
-          <button class="filter-pill" data-val="male" onclick="setFilter('gender','male',this)">Male</button>
-        </div>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Accent</label>
-        <div class="filter-pills" id="filterAccent">
-          <button class="filter-pill active" data-val="all" onclick="setFilter('accent','all',this)">All</button>
-          <button class="filter-pill" data-val="british" onclick="setFilter('accent','british',this)">British</button>
-          <button class="filter-pill" data-val="american" onclick="setFilter('accent','american',this)">American</button>
-          <button class="filter-pill" data-val="australian" onclick="setFilter('accent','australian',this)">Australian</button>
-          <button class="filter-pill" data-val="irish" onclick="setFilter('accent','irish',this)">Irish</button>
-        </div>
-      </div>
-      <div class="filter-group">
-        <label class="filter-label">Age</label>
-        <div class="filter-pills" id="filterAge">
-          <button class="filter-pill active" data-val="all" onclick="setFilter('age','all',this)">All</button>
-          <button class="filter-pill" data-val="young" onclick="setFilter('age','young',this)">Young</button>
-          <button class="filter-pill" data-val="middle" onclick="setFilter('age','middle',this)">Middle aged</button>
-          <button class="filter-pill" data-val="senior" onclick="setFilter('age','senior',this)">Older</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <p class="section-sub" id="voiceSubtext">Pick the voice that feels right. Tap the play button to hear a preview.</p>
 
   <div class="voice-cards" id="voiceCards"></div>
-  <div id="voiceShowMore" style="text-align:center;margin-top:0.5rem">
-    <button onclick="showAllVoices()" style="background:none;border:2px solid var(--border);border-radius:var(--radius-full);padding:0.5rem 1.5rem;font-size:0.82rem;font-weight:700;color:var(--purple);cursor:pointer;font-family:'Nunito',sans-serif">Show all voices</button>
-  </div>
-  <p class="voice-empty" id="voiceEmpty" style="display:none">No voices match those filters. Try changing one.</p>
+  <div id="voiceShowMore" style="display:none"></div>
+  <p class="voice-empty" id="voiceEmpty" style="display:none">No voices available.</p>
   <audio id="voicePreviewAudio" preload="none"></audio>
-  <button class="btn btn-primary" style="width:100%;margin-top:1.5rem" onclick="showReview()">Create my preview</button>
+
+  <div class="form-group" style="margin-top:1.5rem">
+    <label style="font-weight:700">Anything else we should know? (optional)</label>
+    <textarea id="extraDetailsVoice" placeholder="e.g. scared of thunder but pretends not to be, calls spaghetti pasketti, always wears odd socks, copies everything big sister does" style="height:70px;resize:vertical"></textarea>
+    <p class="form-hint">Personality quirks, funny habits, fears, things that make them laugh. The details no form can capture. These are gold.</p>
+  </div>
+
+  <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="showReview()">Nearly there, let's check everything</button>
 </div>
 
 <!-- REVIEW ANSWERS -->
 <div class="screen" id="screenReview">
   <button class="back-btn" onclick="goTo('screenVoice')">&#8592; Back</button>
-  <h2 class="section-title">Check your details</h2>
-  <p class="section-sub">Make sure everything looks right. Tap &#9998; to edit anything.</p>
+
+  <!-- SECTION A: Review -->
+  <h2 class="section-title">Review their story</h2>
+  <p class="section-sub">If anything doesn't look right, you can go back and change it, or leave a note below.</p>
   <div id="reviewContent" style="width:100%;max-width:440px"></div>
 
-  <!-- Background music option -->
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.85rem 1rem;margin-top:1rem;max-width:440px;width:100%">
-    <div class="toggle-row" style="margin-bottom:0">
-      <button class="toggle on" id="musicOptionToggle" onclick="toggleMusicOption()"></button>
-      <span class="toggle-label" style="font-weight:600">Background music</span>
+  <!-- Jamie & Chase working photo -->
+  <div style="width:100%;max-width:440px;margin-top:2.25rem;margin-bottom:1.25rem">
+    <img src="/images/jamie-chase-working.jpg" alt="" style="width:100%;display:block;border-radius:var(--radius);object-fit:cover;object-position:center 30%;max-height:320px">
+  </div>
+
+  <!-- SECTION B: One small thing -->
+  <div style="width:100%;max-width:440px;background:#FAFAF5;border:1.5px solid var(--border);border-radius:14px;padding:1.25rem">
+    <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;color:var(--text);margin:0 0 0.6rem">One small thing</p>
+    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.7;margin:0 0 0.75rem">These stories aren't made instantly, and they're never reused. We take the time to put each one together properly using what you've shared, so we only create them for people who'll genuinely enjoy hearing them.</p>
+    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.7;margin:0 0 0.75rem">Please tick below if that feels right for who you're creating this for.</p>
+    <label style="display:flex;align-items:flex-start;gap:0.6rem;cursor:pointer;font-size:0.82rem;color:var(--text);line-height:1.5;font-weight:600">
+      <input type="checkbox" id="requestConfirmCheck" onchange="validateRequestForm()" style="margin-top:0.2rem;width:18px;height:18px;flex-shrink:0;accent-color:var(--purple)">
+      I'm requesting this because I believe they would genuinely enjoy hearing their story come to life
+    </label>
+  </div>
+
+  <!-- SECTION C: What happens next -->
+  <div style="width:100%;max-width:440px;margin-top:2rem">
+    <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;color:var(--text);margin:0 0 0.4rem">What happens next</p>
+    <p style="font-size:0.82rem;color:var(--text-soft);line-height:1.7;margin:0">We'll create the story using everything you've shared here. Once it's ready, we'll send it to your email usually within 72 hours.</p>
+    <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.6;margin:0.4rem 0 0">Sometimes it can take a little longer but it's always worth the wait.</p>
+  </div>
+
+  <!-- SECTION D: Email -->
+  <div style="width:100%;max-width:440px;margin-top:1.5rem">
+    <p style="font-size:0.85rem;color:var(--text-soft);margin:0 0 0.75rem">Now we just need somewhere to send it...</p>
+    <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:0.95rem;color:var(--text);margin:0 0 1rem">Where should we send their story when it's ready?</p>
+    <div class="form-group" style="margin-bottom:0.6rem">
+      <input type="text" id="requestName" placeholder="Your name" oninput="validateRequestForm()" style="width:100%;padding:0.7rem 0.9rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
     </div>
-    <p class="form-hint" id="musicOptionHint" style="margin-top:0.3rem">Soft ambient music will play underneath the narration, matching the mood of the story.</p>
-  </div>
-
-  <!-- Extra details (added at the end so parent knows what's already captured) -->
-  <div class="form-group" style="margin-top:1.25rem">
-    <label style="font-weight:700">Anything else I should know? (optional)</label>
-    <textarea id="extraDetailsReview" placeholder="e.g. scared of thunder but pretends not to be, calls spaghetti pasketti, always wears odd socks, copies everything big sister does" style="height:70px;resize:vertical"></textarea>
-    <p class="form-hint">Personality quirks, funny habits, fears, things that make them laugh. The details no form can capture. These are gold.</p>
-  </div>
-
-  <!-- Voice message (non-gift only, gift users record on the gift screen) -->
-  <div id="reviewVoiceRecord" style="margin-top:1.25rem;display:none">
-    <label style="display:block;font-size:0.88rem;font-weight:700;color:var(--text);margin-bottom:0.4rem">Record a voice message (optional)</label>
-    <p class="form-hint" style="margin-bottom:0.6rem">Record a personal message in your own voice. It will play before the story begins.</p>
-    <div id="reviewVoiceIdle">
-      <button onclick="startVoiceRecord()" style="display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1.25rem;border:2px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;font-family:'Nunito',sans-serif;font-size:0.88rem;font-weight:700;color:var(--purple);width:100%;justify-content:center">
-        <span style="width:12px;height:12px;background:#FF4444;border-radius:50%;flex-shrink:0"></span> Tap to record
-      </button>
+    <div class="form-group" style="margin-bottom:0.6rem">
+      <input type="email" id="requestEmail" placeholder="Your email address" oninput="validateRequestForm()" style="width:100%;padding:0.7rem 0.9rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
     </div>
+    <div class="form-group">
+      <input type="email" id="requestEmailConfirm" placeholder="Confirm your email address" oninput="validateRequestForm()" style="width:100%;padding:0.7rem 0.9rem;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'Nunito',sans-serif;background:var(--card)">
+    </div>
+    <p id="requestEmailError" style="color:#FF6B9D;font-size:0.78rem;margin:0.25rem 0 0;display:none"></p>
   </div>
 
-  <button class="btn btn-primary" style="width:100%;margin-top:1.2rem" onclick="generatePreview()">Looks good, create my preview!</button>
+  <!-- SECTION E: Submit -->
+  <button class="btn btn-primary" id="requestSubmitBtn" style="width:100%;margin-top:1.5rem;opacity:0.5;pointer-events:none" onclick="submitStoryRequest()">Request their story</button>
 </div>
 
 <!-- LOADING -->
@@ -2280,33 +2267,13 @@ let currentPlayingCategory = '';
 // Each voice tagged with gender, accent, age, and recommended story types
 // preview_url will be populated from ElevenLabs API on first load
 const ALL_VOICES = [
-  // FEMALE VOICES
-  { id:'EXAVITQu4vr4xnSDxMaL', name:'Sarah', desc:'Warm, gentle, and nurturing', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['bedtime'] },
-  { id:'XB0fDUnXU5powFXDhCwa', name:'Charlotte', desc:'Soft and kind, like a favourite aunt', gender:'female', accent:'british', age:'middle', emoji:'\u{1F469}' , best:['bedtime'] },
-  { id:'ThT5KcBeYPX3keUQqHPh', name:'Dorothy', desc:'Encouraging and patient', gender:'female', accent:'british', age:'senior', emoji:'\u{1F475}', best:['learning','bedtime'] },
-  { id:'oWAxZDx7w5VEj9dCyTzz', name:'Grace', desc:'Clear and reassuring', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['learning','journey'] },
-  { id:'jBpfuIE2acCO8z3wKNLl', name:'Gigi', desc:'Animated and playful', gender:'female', accent:'american', age:'young', emoji:'\u{1F467}', best:['journey','learning'] },
-  { id:'z9fAnlkpzviPz146aGWa', name:'Glinda', desc:'Bright and magical', gender:'female', accent:'american', age:'middle', emoji:'\u{2728}', best:['bedtime','journey'] },
-  { id:'piTKgcLEGmPE4e6mEKli', name:'Nicole', desc:'Warm and expressive storyteller', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey'] },
-  { id:'FGY2WhTYpPnrIDTdsKH5', name:'Laura', desc:'Gentle with a soft Irish lilt', gender:'female', accent:'irish', age:'young', emoji:'\u{2618}\u{FE0F}', best:['bedtime'] },
-  { id:'pFZP5JQG7iQjIQuC4Bku', name:'Lily', desc:'Sweet and soothing', gender:'female', accent:'british', age:'young', emoji:'\u{1F338}', best:['bedtime','learning'] },
-  { id:'XrExE9yKIg1WjnnlVkGX', name:'Matilda', desc:'Warm and friendly, great for adventures', gender:'female', accent:'american', age:'young', emoji:'\u{1F31F}', best:['journey','learning'] },
-  { id:'cgSgspJ2msm6clMCkdW9', name:'Jessica', desc:'Smooth and confident', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['journey'] },
-  { id:'Xb7hH8MSUJpSbSDYk0k2', name:'Alice', desc:'Confident with a warm Australian tone', gender:'female', accent:'australian', age:'middle', emoji:'\u{1F998}', best:['journey','learning'] },
-
-  // MALE VOICES
-  { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm, deep, and soothing', gender:'male', accent:'british', age:'middle', emoji:'\u{1F468}', best:['bedtime'] },
-  { id:'IKne3meq5aSn9XLyUdCD', name:'Charlie', desc:'Gentle and warm', gender:'male', accent:'australian', age:'middle', emoji:'\u{1F9D4}', best:['bedtime'] },
-  { id:'TxGEqnHWrfWFTfGW9XjX', name:'Josh', desc:'Energetic and adventurous', gender:'male', accent:'american', age:'young', emoji:'\u{1F9D7}', best:['journey','learning'] },
-  { id:'ErXwobaYiN019PkySvjV', name:'Antoni', desc:'Bold and expressive', gender:'male', accent:'american', age:'young', emoji:'\u{1F9B8}', best:['journey'] },
-  { id:'VR6AewLTigWG4xSOukaG', name:'Arnold', desc:'Strong and commanding', gender:'male', accent:'american', age:'middle', emoji:'\u{1F4AA}', best:['journey','learning'] },
-  { id:'pNInz6obpgDQGcFmaJgB', name:'Adam', desc:'Deep and dramatic', gender:'male', accent:'american', age:'middle', emoji:'\u{1F3AD}', best:['journey','bedtime'] },
-  { id:'g5CIjZEefAph4nQFvHAz', name:'Ethan', desc:'Fun and enthusiastic', gender:'male', accent:'american', age:'young', emoji:'\u{1F52C}', best:['learning','journey'] },
-  { id:'ZQe5CZNOzWyzPSCn5a3c', name:'James', desc:'Wise and distinguished', gender:'male', accent:'australian', age:'senior', emoji:'\u{1F393}', best:['learning','bedtime'] },
   { id:'N2lVS1w4EtoT3dr4eOWO', name:'Callum', desc:'Warm, friendly, Scottish charm', gender:'male', accent:'british', age:'young', emoji:'\u{1F3F4}', best:['journey','bedtime'] },
-  { id:'bIHbv24MWmeRgasZH58o', name:'Will', desc:'Friendly and conversational', gender:'male', accent:'american', age:'young', emoji:'\u{1F468}', best:['learning'] },
+  { id:'oWAxZDx7w5VEj9dCyTzz', name:'Grace', desc:'Clear and reassuring', gender:'female', accent:'american', age:'young', emoji:'\u{1F469}', best:['bedtime','journey'] },
+  { id:'onwK4e9ZLuTAKqWW03F9', name:'Daniel', desc:'Calm, deep, and soothing', gender:'male', accent:'british', age:'middle', emoji:'\u{1F468}', best:['bedtime'] },
+  { id:'ThT5KcBeYPX3keUQqHPh', name:'Dorothy', desc:'Warm and encouraging', gender:'female', accent:'british', age:'senior', emoji:'\u{1F475}', best:['bedtime'] },
+  { id:'g5CIjZEefAph4nQFvHAz', name:'Ethan', desc:'Fun and enthusiastic', gender:'male', accent:'american', age:'young', emoji:'\u{1F52C}', best:['journey'] },
+  { id:'ZQe5CZNOzWyzPSCn5a3c', name:'James', desc:'Wise and distinguished', gender:'male', accent:'australian', age:'senior', emoji:'\u{1F393}', best:['bedtime'] },
   { id:'cjVigY5qzO86Huf0OWal', name:'Eric', desc:'Friendly with a natural Irish warmth', gender:'male', accent:'irish', age:'middle', emoji:'\u{2618}\u{FE0F}', best:['bedtime','journey'] },
-  { id:'TX3LPaxmHKxFdv7VOQHJ', name:'Liam', desc:'Articulate and engaging', gender:'male', accent:'american', age:'young', emoji:'\u{1F468}', best:['learning','journey'] },
 ];
 
 // Filters state
@@ -3461,20 +3428,11 @@ function renderFilteredVoices() {
 
   document.getElementById('voiceEmpty').style.display = voices.length === 0 ? 'block' : 'none';
 
-  // Show top 4 initially, or all if filters are active or user clicked "show all"
-  const filtersActive = voiceFilters.gender !== 'all' || voiceFilters.accent !== 'all' || voiceFilters.age !== 'all';
-  const limit = (showingAllVoices || filtersActive) ? voices.length : 4;
-  const displayVoices = voices.slice(0, limit);
+  const displayVoices = voices;
 
-  // Show/hide the "show more" button
+  // Show/hide the "show more" button (hidden, all voices shown)
   const showMoreBtn = document.getElementById('voiceShowMore');
-  if (showMoreBtn) {
-    const remaining = voices.length - limit;
-    showMoreBtn.style.display = remaining > 0 ? 'block' : 'none';
-    if (remaining > 0) {
-      showMoreBtn.querySelector('button').textContent = `Show all ${voices.length} voices`;
-    }
-  }
+  if (showMoreBtn) showMoreBtn.style.display = 'none';
 
   // Check if currently selected voice is still in filtered results
   const selectedStillVisible = voices.some(v => v.id === selectedVoiceId);
@@ -3493,12 +3451,8 @@ function renderFilteredVoices() {
     card.innerHTML = `
       <div class="voice-emoji">${v.emoji}</div>
       <div class="voice-info">
-        <h4>${v.name}${isRecommended ? ' <span style="font-size:0.65rem;color:white;font-weight:700;background:var(--green);padding:0.15rem 0.45rem;border-radius:20px;vertical-align:middle;margin-left:0.25rem">Top pick</span>' : ''}</h4>
+        <h4 style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap">${v.name} <span class="voice-tag" style="margin:0">${accentLabel}</span>${v.id === 'N2lVS1w4EtoT3dr4eOWO' ? '<span style="font-size:0.65rem;color:white;font-weight:700;background:var(--green);padding:0.15rem 0.45rem;border-radius:20px">Most popular</span>' : ''}</h4>
         <p>${v.desc}</p>
-        <div class="voice-tags">
-          <span class="voice-tag">${accentLabel}</span>
-          <span class="voice-tag">${ageLabels[v.age] || v.age}</span>
-        </div>
       </div>
       <button class="voice-preview-btn" title="Preview voice" onclick="event.stopPropagation();previewVoice('${v.id}',this)">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -3586,7 +3540,7 @@ async function previewVoice(voiceId, btn) {
 }
 
 function showVoices() {
-  const subtexts = { bedtime:'Who tucks them in tonight?', journey:'Who leads the adventure?', learning:'Who teaches the lesson?' };
+  const subtexts = { bedtime:'Who should tell their story?', journey:'Who should tell their story?', learning:'Who should tell their story?' };
   document.getElementById('voiceSubtext').textContent = subtexts[storyData.category] || 'Pick the voice that feels right.';
 
   // Reset filters
@@ -3627,7 +3581,10 @@ function showVoices() {
 }
 
 function showReview() {
-  if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
+  if (!selectedVoiceId) selectedVoiceId = 'N2lVS1w4EtoT3dr4eOWO';
+  // Capture extra details from voice screen
+  var extraVoice = document.getElementById('extraDetailsVoice');
+  if (extraVoice && extraVoice.value.trim()) storyData.extraDetails = extraVoice.value.trim();
   const d = storyData;
   const catEmoji = { bedtime:'&#127769;', journey:'&#127757;', learning:'&#128218;' };
   const catLabel = { bedtime:'Bedtime Story', journey:'Adventure Story', learning:'Learning Story' };
@@ -3722,10 +3679,100 @@ function showReview() {
   }
 
   document.getElementById('reviewContent').innerHTML = html;
-  // Show voice record for non-gift users (gift users already have it on gift screen)
-  var rvr = document.getElementById('reviewVoiceRecord');
-  if (rvr) rvr.style.display = isGiftMode ? 'none' : 'block';
+  // Reset form state
+  var chk = document.getElementById('requestConfirmCheck');
+  if (chk) chk.checked = false;
+  var emailField = document.getElementById('requestEmail');
+  if (emailField) emailField.value = '';
+  var emailConfirm = document.getElementById('requestEmailConfirm');
+  if (emailConfirm) emailConfirm.value = '';
+  validateRequestForm();
   goTo('screenReview');
+}
+
+function validateRequestForm() {
+  var btn = document.getElementById('requestSubmitBtn');
+  var chk = document.getElementById('requestConfirmCheck');
+  var name = (document.getElementById('requestName') || {}).value || '';
+  var email = (document.getElementById('requestEmail') || {}).value || '';
+  var emailConfirm = (document.getElementById('requestEmailConfirm') || {}).value || '';
+  var errEl = document.getElementById('requestEmailError');
+
+  var checked = chk && chk.checked;
+  var nameValid = name.trim().length >= 2;
+  var emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  var emailsMatch = email && email === emailConfirm;
+
+  // Show email mismatch error only if both fields have content
+  if (errEl) {
+    if (emailConfirm && !emailsMatch) {
+      errEl.textContent = 'Email addresses don\'t match';
+      errEl.style.display = 'block';
+    } else {
+      errEl.style.display = 'none';
+    }
+  }
+
+  var valid = checked && nameValid && emailValid && emailsMatch;
+  if (btn) {
+    btn.style.opacity = valid ? '1' : '0.5';
+    btn.style.pointerEvents = valid ? 'auto' : 'none';
+  }
+}
+
+async function submitStoryRequest() {
+  var btn = document.getElementById('requestSubmitBtn');
+  var requesterName = document.getElementById('requestName').value.trim();
+  var email = document.getElementById('requestEmail').value.trim();
+  var notes = (document.getElementById('extraDetailsReview') || {}).value || '';
+
+  // Add notes and requester info to storyData
+  if (notes) storyData.extraDetails = notes;
+  storyData.requesterName = requesterName;
+  storyData.email = email;
+  storyData.wantsMusic = true;
+
+  // Disable button
+  btn.textContent = 'Sending...';
+  btn.style.opacity = '0.5';
+  btn.style.pointerEvents = 'none';
+
+  try {
+    var res = await fetch('/api/request-story', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ storyData: storyData, voiceId: selectedVoiceId, email: email })
+    });
+
+    if (!res.ok) throw new Error('Request failed');
+    var data = await res.json();
+
+    // Track event
+    trackEvent('StoryRequested', { content_name: storyData.category, child_name: storyData.childName });
+
+    // Show confirmation
+    showRequestConfirmation();
+  } catch (err) {
+    btn.textContent = 'Request their story';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    alert('Something went wrong. Please try again.');
+  }
+}
+
+function showRequestConfirmation() {
+  var childName = escHtml(storyData.childName || 'your child');
+  var container = document.getElementById('screenPreview');
+  container.innerHTML = `
+    <div style="text-align:center;padding:3rem 1.25rem;max-width:440px;margin:0 auto">
+      <h2 style="font-family:'Playfair Display',Georgia,serif;font-size:1.5rem;font-weight:800;color:var(--text);line-height:1.3;margin:0 0 1.25rem">${childName}'s story is on its way.</h2>
+      <p style="font-size:0.88rem;color:var(--text-soft);line-height:1.7;margin:0 0 2rem">We'll send it to ${escHtml(storyData.email || '')} once it's ready.</p>
+      <p style="font-size:0.88rem;color:var(--text);line-height:1.7;margin:0 0 0.75rem;font-weight:600">Thank you for sharing something so personal with us.</p>
+      <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.7;margin:0">We hope it becomes something they ask to hear again and again.</p>
+      <p style="font-size:0.72rem;color:var(--text-muted);margin-top:3rem">jamie@heartheirname.com</p>
+    </div>
+  `;
+  goTo('screenPreview');
 }
 
 async function pollForPreview(jobId) {
@@ -3792,7 +3839,7 @@ let _previewStartTime = 0;
 const MIN_PREVIEW_WAIT_MS = 120000; // 2 minutes minimum before showing ready button
 
 async function generatePreview() {
-  if (!selectedVoiceId) selectedVoiceId = 'EXAVITQu4vr4xnSDxMaL';
+  if (!selectedVoiceId) selectedVoiceId = 'N2lVS1w4EtoT3dr4eOWO';
   applyCategoryTheme(storyData.category);
 
   // Show the game phase on screenPreview
@@ -4438,7 +4485,7 @@ async function handleStripeReturn() {
   const { storyData: savedData, previewStoryText: savedPreview, selectedVoiceId: savedVoice, jobId: savedJobId } = parsed;
   Object.assign(storyData, savedData);
   previewStoryText = savedPreview || '';
-  selectedVoiceId = savedVoice || 'EXAVITQu4vr4xnSDxMaL';
+  selectedVoiceId = savedVoice || 'N2lVS1w4EtoT3dr4eOWO';
   if (savedJobId) window._currentJobId = savedJobId;
 
   // Verify payment
