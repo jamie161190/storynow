@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hear Their Name — A story that knows their name</title>
-<meta name="description" content="Personalised audio stories for children. Their name, their best friend, their world — spoken aloud in a story made just for them. Hear it free before you pay.">
+<title>Hear Their Name | A story that knows their name</title>
+<meta name="description" content="Personalised audio stories for children. Their name, their best friend, their world. Spoken aloud in a story made just for them. Completely free.">
 <link rel="canonical" href="https://heartheirname.com/">
 <meta name="facebook-domain-verification" content="oivve384m8vpae0lxrhv42w3hw6i3m" />
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -15,8 +15,8 @@
 <!-- Open Graph (Facebook, WhatsApp, LinkedIn) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://heartheirname.com/">
-<meta property="og:title" content="Hear Their Name — A story that knows their name">
-<meta property="og:description" content="Personalised audio stories for children. Their name, their best friend, their world — spoken aloud in a story made just for them. Hear it free before you pay.">
+<meta property="og:title" content="Hear Their Name | A story that knows their name">
+<meta property="og:description" content="Personalised audio stories for children. Their name, their best friend, their world. Spoken aloud in a story made just for them. Completely free.">
 <meta property="og:image" content="https://heartheirname.com/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -25,7 +25,7 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hear Their Name — A story that knows their name">
+<meta name="twitter:title" content="Hear Their Name | A story that knows their name">
 <meta name="twitter:description" content="Create a personalised audio story for the children you love. Their names, their friends, their world, woven into every scene. Free preview, then just £19.99.">
 <meta name="twitter:image" content="https://heartheirname.com/og-image.png">
 
@@ -799,25 +799,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         <button class="type-pill" id="heroPillAdventure" onclick="setPill(this,'adventure')">&#9876;&#65039; Adventure</button>
       </div>
       <button class="hero-btn" id="heroBtn" onclick="heroStartStory()">Start their story</button>
-      <p class="hero-price">Free preview first &nbsp;&middot;&nbsp; <span class="price-display" style="color:var(--purple);font-weight:800">&pound;19.99</span> for the full story &nbsp;&middot;&nbsp; Theirs forever</p>
+      <p class="hero-price">Completely free. Delivered within 72 hours.<br><span style="font-size:0.68rem;color:var(--text-muted)">Please only request one if it truly feels special to you.</span></p>
     </div>
   </div>
 
   <!-- STORY CINEMA -->
   <div class="section-divider">
     <h2>Real stories. Real children.</h2>
-    <p>Three completely different stories. Every word written from scratch using only the details you share. Read them. Hear them. Or both.</p>
+    <p>Every story is written from scratch using the details you share.<br>Their name, their world, their people. All woven into something they'll recognise.<br><br>Something that feels like it was made just for them... because it was.</p>
   </div>
 
   <div class="story-cinema" id="sectionCinema">
-    <!-- Tabs -->
-    <p class="story-tabs-label">Tap a story to read or listen &#8595;</p>
-    <div class="story-tabs">
-      <button class="story-tab active" onclick="switchTab('bedtime',this)">&#127769; Bedtime</button>
-      <button class="story-tab" onclick="switchTab('adventure',this)">&#9876;&#65039; Adventure</button>
-      <button class="story-tab" onclick="switchTab('siblings',this)">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102; Siblings</button>
-    </div>
-
     <!-- BEDTIME -->
     <div class="story-section active" id="tab-bedtime">
       <div class="recipe-card">
@@ -840,54 +832,18 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
           <div class="recipe-chip"><div class="chip-check" style="background:#9B59B6">&#10003;</div><span class="chip-label">Their thing</span>&nbsp;<span class="chip-val">wears wellies even in sunshine</span></div>
           <div class="recipe-chip"><div class="chip-check">&#10003;</div><span class="chip-label">Narrator voice</span>&nbsp;<span class="chip-val">Charlotte</span></div>
         </div>
-      </div>
-      <div class="recipe-arrow">&#8595; this became...</div>
-      <div class="story-reader">
-        <div class="reader-header">
-          <button class="reader-play-btn" onclick="playDemoStory('bedtime',this)">
+        <div style="text-align:center;padding:0.75rem 0 0.25rem;border-top:1.5px solid var(--border);margin-top:0.75rem">
+          <p style="font-size:0.78rem;color:var(--purple-soft);font-weight:700;letter-spacing:0.05em;text-transform:uppercase;margin:0 0 0.6rem">&#8595; this became...</p>
+          <button class="reader-play-btn" onclick="playDemoStory('bedtime',this)" style="margin:0 auto">
             <div class="play-icon"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
-            &#9654; Play this story
+            &#9654; Hear how it sounds
           </button>
-          <div class="reader-meta"></div>
-        </div>
-        <div class="story-text" id="story-bedtime">
-          <p>Somewhere between the last yawn and the softest dream, there lived a little girl named <span class="cn">Poppy</span>,and tonight, <span class="cn">Poppy</span> was still wearing her wellies.</p>
-          <p><span class="cf">Mummy</span> had tucked her in with a kiss, <span class="cf">Daddy</span> had turned off the light, and <span class="cf">Bunny</span> was snuggled tight under her chin,but <span class="cn">Poppy</span>'s bright yellow wellies were still on her feet. Just in case, she always said. You never know when you might need them.</p>
-          <p>And tonight,tonight, she was very glad she had kept them on.</p>
-          <p>Because the moment <span class="cn">Poppy</span> closed her eyes, something magical began to happen. A shimmer appeared at her window. Then another. And another,until the whole room glittered like the inside of a snow globe filled with starlight.</p>
-          <p><span class="cn">Poppy</span> sat up. <span class="cf">Bunny</span> tucked under one arm. And there, outside her window, floated the most beautiful unicorn she had ever seen. Its mane was the colour of moonlight, and every step it took left a trail of glitter drifting slowly down into the night sky.</p>
-          <p>"<span class="cn">Poppy</span>," the unicorn said softly, "I have been looking for you."</p>
-          <p>The unicorn's name was <span class="cf">Orla</span>, and she had come with a very important mission. Somewhere far above, between the stars, a whole trail of glitter had gone missing from the Milky Way, and only someone brave enough to wear wellies in the sunshine could help find it.</p>
-          <p><span class="cn">Poppy</span> did not even hesitate. She climbed onto <span class="cf">Orla</span>'s back, <span class="cf">Bunny</span> gripped tight, and they rose up,up,up,into the velvet dark of the night sky.</p>
-          <p>"<span class="cf">Mia</span> is going to absolutely not believe this," <span class="cn">Poppy</span> whispered to <span class="cf">Bunny</span>.</p>
-          <p>Up in the sky, the stars were close enough to touch. <span class="cn">Poppy</span> reached out and brushed one with her fingertips, and it chimed like a tiny bell. <span class="cf">Orla</span> laughed, a warm sound like wind chimes, and galloped faster along the invisible road between the constellations.</p>
-          <p>They found the missing glitter trail just past the Great Bear,a river of sparkle that had come loose and was drifting gently toward the edge of the sky. <span class="cn">Poppy</span> leaned out carefully and, one handful at a time, guided the glitter back where it belonged.</p>
-          <p>It was the most beautiful thing she had ever done.</p>
-          <p>When the last sparkle was back in place, the whole sky seemed to glow a little brighter. And then, from somewhere very far below, the tiniest sound floated up. A meow. Long and gentle and very familiar.</p>
-          <p><span class="cn">Poppy</span> looked down. "<span class="cf">Daisy</span>," she breathed.</p>
-          <p>Her little cat was sitting on the windowsill below, watching the whole sky light up, her tail curled neat around her paws. And <span class="cn">Poppy</span> felt a warm pull in her chest,the pull of home, of <span class="cf">Bunny</span>, of <span class="cf">Mummy</span> and <span class="cf">Daddy</span> sleeping just down the hall.</p>
-          <p>"Time to go back," said <span class="cf">Orla</span> quietly. "But <span class="cn">Poppy</span>,the sky will always remember what you did tonight."</p>
-          <p><span class="cf">Orla</span> swooped low and let <span class="cn">Poppy</span> slip back through her window, landing soft as a feather on her pillow. <span class="cf">Daisy</span> leapt up onto the bed and curled herself into a perfect circle at <span class="cn">Poppy</span>'s feet, right beside the yellow wellies.</p>
-          <p><span class="cn">Poppy</span> lay back down and pulled <span class="cf">Bunny</span> close. The ceiling above her was still scattered with tiny drifting sparks of glitter, swirling slowly in the dark like the Milky Way come indoors. She watched them until they began to blur.</p>
-          <p>She left her wellies on. Just in case.</p>
-          <p>And somewhere above the clouds, a trail of glitter stretched from one end of the night to the other,because <span class="cn">Poppy</span> had put it there.</p>
-          <p>Goodnight, <span class="cn">Poppy</span>. Goodnight, <span class="cf">Bunny</span>. Goodnight, little cat.</p>
-          <p>This story was made just for <span class="cn">Poppy</span>.</p>
-        </div>
-        <div class="reader-fade"></div>
-        <div class="reader-footer">
-          <div class="reader-footer-text">
-            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Never made twice</span>
-            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#127911; 15 mins of magic</span>
-            <span class="benefit-tag" style="background:#FFF8E7;color:#B8860B">&#128156; Theirs to keep forever</span>
-          </div>
-          <button class="read-more-btn" onclick="expandStory(this)">Read full story &#8595;</button>
         </div>
       </div>
     </div>
 
-    <!-- ADVENTURE -->
-    <div class="story-section" id="tab-adventure">
+    <!-- ADVENTURE (hidden) -->
+    <div class="story-section" id="tab-adventure" style="display:none!important">
       <div class="recipe-card">
         <div class="recipe-header">
           <div class="recipe-icon" style="background:#FFF0E8">&#9876;&#65039;</div>
@@ -914,7 +870,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         <div class="reader-header">
           <button class="reader-play-btn" style="background:var(--orange-light);color:#D4601E;border-color:var(--border)" onclick="playDemoStory('adventure',this)">
             <div class="play-icon" style="background:var(--orange)"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
-            &#9654; Play this story
+            &#9654; Hear how it sounds
           </button>
           <div class="reader-meta"></div>
         </div>
@@ -949,17 +905,17 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         <div class="reader-fade"></div>
         <div class="reader-footer">
           <div class="reader-footer-text">
-            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Never made twice</span>
-            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#127911; 15 mins of magic</span>
-            <span class="benefit-tag" style="background:#FFF8E7;color:#B8860B">&#128156; Theirs to keep forever</span>
+            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Made just for them</span>
+            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#127911; Around 15 minutes long</span>
+            <span class="benefit-tag" style="background:#FFF8E7;color:#B8860B">&#128230; Delivered within 72 hours</span>
           </div>
-          <button class="read-more-btn" style="background:var(--orange-light);color:var(--orange)" onclick="expandStory(this)">Read full story &#8595;</button>
+          <button class="read-more-btn" style="background:var(--orange-light);color:var(--orange)" onclick="expandStory(this)">Create a story like this &#8595;</button>
         </div>
       </div>
     </div>
 
-    <!-- GIFT -->
-    <div class="story-section" id="tab-siblings">
+    <!-- SIBLINGS (hidden) -->
+    <div class="story-section" id="tab-siblings" style="display:none!important">
       <div class="recipe-card">
         <div class="recipe-header">
           <div class="recipe-icon" style="background:#E8F0FE">&#128104;&#8205;&#128105;&#8205;&#128103;&#8205;&#128102;</div>
@@ -986,7 +942,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         <div class="reader-header">
           <button class="reader-play-btn" style="background:#E8F0FE;color:#1565C0;border-color:#C5CAE9" onclick="playDemoStory('siblings',this)">
             <div class="play-icon" style="background:#5C6BC0"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
-            &#9654; Play this story
+            &#9654; Hear how it sounds
           </button>
           <div class="reader-meta"><span style="color:#5C6BC0;font-weight:800">2 children</span> in one story</div>
         </div>
@@ -1071,11 +1027,11 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
         <div class="reader-fade"></div>
         <div class="reader-footer">
           <div class="reader-footer-text">
-            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Never made twice</span>
-            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#127911; 15 mins of magic</span>
-            <span class="benefit-tag" style="background:#FFF8E7;color:#B8860B">&#128156; Theirs to keep forever</span>
+            <span class="benefit-tag" style="background:var(--purple-light);color:var(--purple)">&#10024; Made just for them</span>
+            <span class="benefit-tag" style="background:var(--orange-light);color:#D4601E">&#127911; Around 15 minutes long</span>
+            <span class="benefit-tag" style="background:#FFF8E7;color:#B8860B">&#128230; Delivered within 72 hours</span>
           </div>
-          <button class="read-more-btn" style="background:#E8F0FE;color:#1565C0" onclick="expandStory(this)">Read full story &#8595;</button>
+          <button class="read-more-btn" style="background:#E8F0FE;color:#1565C0" onclick="expandStory(this)">Create a story like this &#8595;</button>
         </div>
       </div>
     </div>
@@ -1083,9 +1039,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- STATS -->
   <div class="stats-grid" style="margin-top:20px">
-    <div class="stat-card"><span class="stat-num purple">&#127911;</span><span class="stat-label">Every story personally reviewed</span></div>
-    <div class="stat-card"><span class="stat-num orange">15<small style="font-size:0.8rem">min</small></span><span class="stat-label">of magic, delivered within 24h</span></div>
-    <div class="stat-card"><span class="stat-num green">Free</span><span class="stat-label">preview before you pay a penny</span></div>
+    <div class="stat-card"><span class="stat-num purple">&#9997;&#65039;</span><span class="stat-label">Written with care<br><small style="font-size:0.7rem;color:var(--text-muted);font-weight:500">Every story is crafted individually</small></span></div>
+    <div class="stat-card"><span class="stat-num orange">72<small style="font-size:0.8rem">hrs</small></span><span class="stat-label">Delivered within 72 hours<br><small style="font-size:0.7rem;color:var(--text-muted);font-weight:500">We take the time to get it right</small></span></div>
+    <div class="stat-card"><span class="stat-num green">Free</span><span class="stat-label">Completely free<br><small style="font-size:0.7rem;color:var(--text-muted);font-weight:500">No payment required, ever</small></span></div>
   </div>
 
   <!-- STORY COUNTER (hidden until count loads) -->
@@ -1097,33 +1053,18 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 
   <!-- FOUNDER CARD -->
   <div style="background:var(--card);border:2px solid var(--purple-light);border-radius:var(--radius);overflow:hidden;margin-top:1.5rem;width:100%;box-shadow:var(--shadow)">
-    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;height:400px;object-fit:cover;object-position:center 18%;display:block">
-    <div style="padding:12px 14px">
-      <p style="margin:0 0 5px;font-size:0.75rem;font-weight:800;color:var(--purple);font-family:'Nunito',sans-serif">Jamie &middot; Chase's dad &middot; Founder of Hear Their Name</p>
-      <p style="color:var(--text);font-size:0.84rem;line-height:1.65;margin:0;font-weight:500">"My son Chase asked me why he wasn't in any of his stories. He wanted to hear his name spoken out loud in a story made just for him. So I built something where he could. Now every child can."</p>
+    <p style="font-family:'Playfair Display',Georgia,serif;font-size:1.1rem;font-weight:700;color:var(--text);text-align:center;margin:0;padding:1rem 1rem 0.5rem;font-style:italic">I made this for my son.</p>
+    <img src="/jamie-chase.jpg" alt="Jamie and Chase" style="width:100%;display:block">
+    <div style="padding:14px 16px">
+      <p style="color:var(--text);font-size:0.88rem;line-height:1.75;margin:0;font-weight:500">The first time he heard his own name inside a story, I saw something I'd never seen before. That quiet moment where it suddenly felt real to him.<br><br>That's why this exists. And now, we make them for other families too.</p>
     </div>
   </div>
 
   <!-- SECOND CTA -->
   <div style="width:100%;text-align:center;margin-top:20px" id="sectionCta2">
-    <button class="hero-btn" id="cta2Btn" onclick="goTo('screenCategory')" style="margin-bottom:8px">Make their story now.</button>
-    <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin-bottom:5px">Free preview first. Only pay if you love it.</p>
-    <p style="font-size:0.72rem;color:var(--green);font-weight:700;margin-bottom:5px">&#128154; Not magical enough? I'll rewrite it for free.</p>
-    <p style="font-size:0.65rem;color:var(--text-muted);font-weight:600">&#128274; One payment. No subscription. Theirs forever.</p>
-  </div>
-
-  <!-- GIFT SECTION -->
-  <div style="width:100%;max-width:440px;margin-top:2rem;background:linear-gradient(135deg,#F8F5FF,#FFF0F5);border:2px solid var(--purple-light);border-radius:16px;padding:1.5rem;text-align:center">
-    <p style="font-size:1.5rem;margin:0 0 0.5rem">&#127873;</p>
-    <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;color:var(--text);margin:0 0 0.5rem">The gift they will never forget</p>
-    <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.6;margin:0 0 0.75rem">Every story can be given as a gift. Birthdays, Christmas, Eid, christenings, or just because you love them. You choose when and how to deliver it.</p>
-    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;justify-content:center;margin-bottom:0.75rem">
-      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#127873; Grandparents</span>
-      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#128149; Aunties &amp; Uncles</span>
-      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#127775; Godparents</span>
-      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#128106; Family friends</span>
-    </div>
-    <p style="font-size:0.75rem;color:var(--text-muted);margin:0;line-height:1.5">After the preview, you can make it a gift, record your message, and choose how to send it.</p>
+    <button class="hero-btn" id="cta2Btn" onclick="goTo('screenCategory')" style="margin-bottom:8px">Start their story</button>
+    <p style="font-size:0.72rem;color:var(--text-muted);font-weight:600;margin-bottom:5px">Completely free. Made with care.</p>
+    <p style="font-size:0.68rem;color:var(--text-muted);font-weight:600">Only request one if it truly matters to you.</p>
   </div>
 
   <!-- HOW IT WORKS -->
@@ -1133,32 +1074,52 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:0.85rem;text-align:center">
         <p style="font-size:1.2rem;margin:0 0 0.3rem">&#9997;&#65039;</p>
         <p style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">Tell me about them</p>
-        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Names, ages, interests, friends, pets.</p>
-      </div>
-      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:0.85rem;text-align:center">
-        <p style="font-size:1.2rem;margin:0 0 0.3rem">&#127911;</p>
-        <p style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">Hear the preview</p>
-        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Free. Hear their name in the story.</p>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Names, family, little details that matter</p>
       </div>
       <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:0.85rem;text-align:center">
         <p style="font-size:1.2rem;margin:0 0 0.3rem">&#10024;</p>
-        <p style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">I craft the full story</p>
-        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Personally reviewed. Your feedback worked in.</p>
+        <p style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">We create their story</p>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Written from scratch, not rushed</p>
       </div>
       <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:0.85rem;text-align:center">
-        <p style="font-size:1.2rem;margin:0 0 0.3rem">&#128140;</p>
+        <p style="font-size:1.2rem;margin:0 0 0.3rem">&#128230;</p>
         <p style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">Delivered to you</p>
-        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Within 24 hours. Theirs forever.</p>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Within 72 hours, ready to listen</p>
+      </div>
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:0.85rem;text-align:center">
+        <p style="font-size:1.2rem;margin:0 0 0.3rem">&#128156;</p>
+        <p style="font-family:'Nunito',sans-serif;font-size:0.82rem;font-weight:800;color:var(--text);margin:0 0 0.15rem">Yours forever</p>
+        <p style="font-size:0.72rem;color:var(--text-muted);margin:0;line-height:1.4">Something they can keep and replay</p>
       </div>
     </div>
+  </div>
+
+  <!-- BEFORE YOU REQUEST -->
+  <div style="width:100%;max-width:440px;margin-top:2rem;background:var(--card);border:2px solid var(--border);border-radius:16px;padding:1.5rem;text-align:center">
+    <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:var(--text);margin:0 0 0.75rem">Before you request a story...</p>
+    <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.75;margin:0">We want these stories to be truly special for families. If this feels like something that would genuinely mean something to your child, we'd love to make one for you.<br><br>But if it's just something to try because it's free, that's completely okay. This might not be for you. Each story takes time and heart to create.</p>
+  </div>
+
+  <!-- GIFT SECTION -->
+  <div style="width:100%;max-width:440px;margin-top:2rem;background:linear-gradient(135deg,#F8F5FF,#FFF0F5);border:2px solid var(--purple-light);border-radius:16px;padding:1.5rem;text-align:center">
+    <p style="font-size:1.5rem;margin:0 0 0.5rem">&#127873;</p>
+    <p style="font-family:'Nunito',sans-serif;font-weight:900;font-size:1.15rem;color:var(--text);margin:0 0 0.5rem">The gift they will never forget</p>
+    <p style="font-size:0.85rem;color:var(--text-soft);line-height:1.6;margin:0 0 0.75rem">Not just something they listen to once.<br><br>Something they come back to.<br><br>A story where they are the main character, alongside the people they love.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:0.4rem;justify-content:center;margin-bottom:0.75rem">
+      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#127873; Grandparents</span>
+      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#128149; Aunties &amp; Uncles</span>
+      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#127775; Godparents</span>
+      <span style="font-size:0.72rem;font-weight:700;background:#fff;color:var(--purple);padding:0.3rem 0.7rem;border-radius:20px;border:1.5px solid var(--purple-light)">&#128106; Family friends</span>
+    </div>
+    <p style="font-size:0.75rem;color:var(--text-muted);margin:0;line-height:1.5">Birthdays, Christmas, Eid, christenings, or just because you love them.</p>
   </div>
 
   <!-- FAQ -->
   <div class="faq-section" id="sectionFaq" style="margin-top:20px">
     <p style="font-family:'Nunito',sans-serif;font-size:0.92rem;font-weight:800;color:var(--text);margin-bottom:10px;text-align:center">Common questions</p>
     <details>
-      <summary>Can I hear it before I pay?</summary>
-      <p>Yes. You get a free 2-minute preview before you spend anything. Hear their names in the story, give feedback, then decide.</p>
+      <summary>Is it really free?</summary>
+      <p>Yes. Every story is completely free. If you love it, you'll have the option to support us. But there's never any obligation.</p>
     </details>
     <details>
       <summary>How long is the full story?</summary>
@@ -1166,23 +1127,19 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     </details>
     <details>
       <summary>How long does delivery take?</summary>
-      <p>Within 24 hours. Every story is personally reviewed before it reaches you. I will email you the moment it is ready.</p>
+      <p>We do our very best to have your story ready within 72 hours. Occasionally it may take a little longer, and we're sorry if it does. But every story is written individually, and we'd rather take the time to get it right than rush it out.</p>
     </details>
     <details>
-      <summary>What if I am not happy with it?</summary>
-      <p>I will rewrite it. No questions asked. You can also give feedback before the full story is written, and I will adjust it based on what you tell me.</p>
-    </details>
-    <details>
-      <summary>How many children can be in one story?</summary>
-      <p>Up to 5. One child, two siblings, three cousins, a whole friend group. Everyone gets their own moments, their own personality, their own name spoken throughout. Same price whether it is one hero or five.</p>
+      <summary>Why do you do this for free?</summary>
+      <p>Because we started this for one child, and realised how special it felt. Now we want other families to experience that too.</p>
     </details>
     <details>
       <summary>Can I give this as a gift?</summary>
-      <p>It is one of the best gifts you can give. Birthdays, Christmas, Eid, christenings, or just because you love them. You can record a personal message in your own voice and it plays before the story begins. You choose when and how to send it to them.</p>
+      <p>Absolutely. Grandparents, aunties, uncles, godparents. Request a story for any child you love. When it's ready, share the link or forward the email. It's free for them too.</p>
     </details>
     <details>
       <summary>What ages does it work for?</summary>
-      <p>All ages. The story adapts to how old the children are. A gentle, warm bedtime story for toddlers. A clever, witty adventure for older ones. Every story is written specifically for the children in it.</p>
+      <p>All ages. We write each story with the child's age in mind. A warm, gentle bedtime story for a 3-year-old sounds very different from a witty adventure for a 9-year-old. That's because every story is written individually.</p>
     </details>
     <details>
       <summary>Can they listen more than once?</summary>
@@ -1210,7 +1167,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <!-- FOOTER -->
   <div id="sectionFooter" style="width:100%;max-width:440px;margin-top:2rem;padding-top:1.25rem;border-top:2px solid var(--border);text-align:center">
     <a onclick="goTo('screenLogin')" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:var(--purple);font-weight:700;cursor:pointer;padding:0.5rem 1.2rem;border:2px solid var(--purple-light);border-radius:var(--radius-full);background:var(--purple-light);margin-bottom:0.75rem">&#128100; Log in to My Stories</a>
-    <p style="font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin:0">Already bought a story? Log in with the email you used at checkout.</p>
+    <p style="font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin:0">Already have a story? Log in with the email you used.</p>
     <p style="font-size:0.65rem;color:var(--text-muted);margin-top:1rem">&copy; 2026 Hear Their Name. All rights reserved.</p>
     <p style="font-size:0.62rem;color:var(--text-muted);margin-top:0.3rem"><a href="/privacy.html" style="color:var(--text-muted);text-decoration:underline">Privacy Policy</a> &middot; <a href="/terms.html" style="color:var(--text-muted);text-decoration:underline">Terms of Service</a></p>
   </div>
@@ -1221,7 +1178,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   <div class="sticky-bar-inner" style="justify-content:center">
     <button class="sticky-bar-btn" onclick="document.getElementById('heroChildName').scrollIntoView({behavior:'smooth',block:'center'});setTimeout(function(){document.getElementById('heroChildName').focus()},500)" style="width:100%;max-width:340px;text-align:center">
       <strong>Start their story</strong>
-      <span>Free preview &nbsp;&middot;&nbsp; &pound;19.99 for the full story</span>
+      <span>Completely free &nbsp;&middot;&nbsp; Made with care</span>
     </button>
   </div>
 </div>
@@ -1884,7 +1841,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <!-- Post purchase actions -->
     <div class="post-actions">
       <button class="btn btn-primary" style="width:100%" onclick="downloadStory()">&#127911; Download MP3</button>
-      <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin:-0.25rem 0 0">The download is narration only — background music plays in the app.</p>
+      <p style="font-size:0.68rem;color:var(--text-muted);text-align:center;margin:-0.25rem 0 0">The download is narration only. Background music plays in the app.</p>
       <div class="post-actions-row">
         <button class="btn btn-gift" onclick="shareFromFullScreen()">Share with family</button>
         <button class="btn btn-gift" style="background:transparent;border:2px solid var(--border);color:var(--text)" onclick="showQrCode()">QR Code</button>
@@ -2246,7 +2203,7 @@ function resetDemoBtn(tab) {
   if (!reader) return;
   var btn = reader.querySelector('.reader-play-btn');
   if (!btn) return;
-  btn.innerHTML = '<div class="play-icon" style="' + getPlayIconStyle(tab) + '"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div> &#9654; Play this story';
+  btn.innerHTML = '<div class="play-icon" style="' + getPlayIconStyle(tab) + '"><svg viewBox="0 0 24 24" width="10" height="10" fill="white"><path d="M8 5v14l11-7z"/></svg></div> &#9654; Hear how it sounds';
 }
 
 function stopAllDemoAudio() {
