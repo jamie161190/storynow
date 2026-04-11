@@ -6,176 +6,186 @@
 <title>Your Story | Hear Their Name</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Nunito', sans-serif; background: #FEFBF6; color: #2D2844; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
 
-.story-page { width: 100%; max-width: 480px; padding: 2rem 1.25rem 3rem; }
+.story-page { width: 100%; max-width: 100%; padding: 0 0 0; }
+.section { width: 100%; padding: 0 1.25rem; }
+.section-inner { max-width: 480px; margin: 0 auto; }
+.section-alt { background: #F8F6F2; }
+.section-warm { background: #F5F0FB; }
 
-/* Loading state */
-.loading { text-align: center; padding: 4rem 1rem; }
-.loading p { color: #999; font-size: 0.9rem; }
+.loading { text-align: center; padding: 6rem 1rem; }
+.loading p { color: #bbb; font-size: 0.88rem; }
 
-/* Error state */
-.error { text-align: center; padding: 4rem 1rem; }
-.error h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
-.error p { color: #999; font-size: 0.9rem; }
+.error { text-align: center; padding: 6rem 1rem; }
+.error h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.3rem; margin-bottom: 0.5rem; }
+.error p { color: #999; font-size: 0.85rem; line-height: 1.7; }
+.error a { color: #6B2F93; font-weight: 700; text-decoration: none; }
 
-/* Player section */
-.player-section { text-align: center; padding: 3rem 0 2rem; }
-.child-name { font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 800; color: #2D2844; line-height: 1.2; margin: 0 0 0.3rem; }
-.story-label { font-size: 0.82rem; color: #999; font-weight: 600; margin: 0 0 2rem; }
+/* Player */
+.player-section { text-align: center; padding: 3rem 0 0; }
+.child-name { font-family: 'Playfair Display', Georgia, serif; font-size: 1.9rem; font-weight: 800; color: #2D2844; line-height: 1.2; margin: 0 0 0.25rem; }
+.story-label { font-size: 0.78rem; color: #bbb; font-weight: 600; letter-spacing: 0.03em; margin: 0 0 2rem; }
 
-.play-btn { width: 80px; height: 80px; border-radius: 50%; border: none; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 4px 20px rgba(107, 47, 147, 0.3); transition: transform 0.2s, box-shadow 0.2s; }
-.play-btn:hover { transform: scale(1.05); box-shadow: 0 6px 28px rgba(107, 47, 147, 0.4); }
-.play-btn svg { width: 28px; height: 28px; fill: white; margin-left: 3px; }
+.play-btn { width: 84px; height: 84px; border-radius: 50%; border: none; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; box-shadow: 0 6px 24px rgba(107, 47, 147, 0.25); transition: transform 0.2s, box-shadow 0.2s; }
+.play-btn:hover { transform: scale(1.05); box-shadow: 0 8px 32px rgba(107, 47, 147, 0.35); }
+.play-btn svg { width: 30px; height: 30px; fill: white; margin-left: 3px; }
 .play-btn.playing svg { margin-left: 0; }
 
-.progress-wrap { width: 100%; max-width: 320px; margin: 0 auto; }
+.progress-wrap { width: 100%; max-width: 300px; margin: 0 auto; }
 .progress-bar { width: 100%; height: 4px; background: #E8E0F0; border-radius: 2px; overflow: hidden; cursor: pointer; }
 .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #6B2F93, #A872C8); border-radius: 2px; transition: width 0.3s linear; }
-.time-display { display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 0.72rem; color: #999; font-weight: 600; }
+.time-display { display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 0.7rem; color: #bbb; font-weight: 600; }
 
 /* Divider */
-.section-divider { width: 100%; height: 1px; background: #F0ECF5; margin: 2.5rem 0; }
+.divider { width: 40px; height: 1.5px; background: #E8E0F0; margin: 1.75rem auto; }
 
-/* Thank you section */
-.thankyou-section { text-align: center; }
-.thankyou-section h3 { font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900; color: #2D2844; margin: 0 0 0.6rem; }
-.thankyou-section p { font-size: 0.85rem; color: #888; line-height: 1.7; margin: 0 0 1.25rem; }
+/* Text sections */
+.quiet-line { font-family: 'Playfair Display', Georgia, serif; font-size: 1rem; font-style: italic; color: #2D2844; text-align: center; line-height: 1.6; }
+.made-line { font-size: 0.88rem; color: #999; text-align: center; line-height: 1.6; }
 
-.amount-btns { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
-.amount-btn { padding: 0.6rem 1.25rem; border-radius: 50px; border: 2px solid #E8E0F0; background: #fff; font-size: 0.9rem; font-weight: 700; color: #2D2844; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
-.amount-btn:hover, .amount-btn.selected { border-color: #6B2F93; background: #F0E5F7; color: #6B2F93; }
-.amount-btn-custom { padding: 0.6rem 1rem; border-radius: 50px; border: 2px solid #E8E0F0; background: #fff; font-size: 0.9rem; font-weight: 700; color: #2D2844; width: 80px; text-align: center; font-family: 'Nunito', sans-serif; }
+/* Thank you */
+.thankyou-copy { font-size: 0.85rem; color: #999; text-align: center; line-height: 1.8; margin: 0 0 1rem; }
 
-.message-input { width: 100%; padding: 0.6rem 0.8rem; border: 2px solid #E8E0F0; border-radius: 10px; font-size: 0.85rem; font-family: 'Nunito', sans-serif; resize: none; height: 60px; margin-bottom: 1rem; }
+.amount-row { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
+.amt { padding: 0.55rem 1.15rem; border-radius: 50px; border: 1.5px solid #E8E0F0; background: #fff; font-size: 0.88rem; font-weight: 700; color: #2D2844; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
+.amt:hover, .amt.on { border-color: #6B2F93; background: #F8F5FF; color: #6B2F93; }
+.amt-custom { padding: 0.55rem 0.8rem; border-radius: 50px; border: 1.5px solid #E8E0F0; background: #fff; font-size: 0.88rem; font-weight: 700; color: #2D2844; width: 72px; text-align: center; font-family: 'Nunito', sans-serif; }
+.amt-custom:focus { border-color: #6B2F93; outline: none; }
 
-.donate-btn { width: 100%; padding: 0.85rem; border: none; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
-.donate-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(107, 47, 147, 0.3); }
+.msg-label { font-size: 0.82rem; color: #aaa; text-align: center; margin: 0 0 0.6rem; }
+.msg-box { width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #E8E0F0; border-radius: 10px; font-size: 0.82rem; font-family: 'Nunito', sans-serif; resize: none; height: 56px; color: #2D2844; }
+.msg-box:focus { border-color: #6B2F93; outline: none; }
 
-/* Community wall */
-.community-section { margin-top: 2rem; }
-.community-section h3 { font-size: 0.9rem; font-weight: 900; color: #2D2844; margin: 0 0 0.75rem; text-align: center; }
-.community-stat { text-align: center; font-size: 0.78rem; color: #999; margin: 0 0 1rem; }
-.community-wall { display: flex; flex-direction: column; gap: 0.5rem; }
-.community-card { background: #fff; border: 1.5px solid #F0ECF5; border-radius: 12px; padding: 0.75rem 1rem; }
-.community-card .cc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
-.community-card .cc-name { font-size: 0.78rem; font-weight: 700; color: #2D2844; }
-.community-card .cc-amount { font-size: 0.78rem; font-weight: 800; color: #6B2F93; }
-.community-card .cc-message { font-size: 0.8rem; color: #666; line-height: 1.5; font-style: italic; }
+.ty-btn { width: 100%; padding: 0.8rem; border: none; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; margin-top: 1rem; }
 
-/* Share & CTA */
-.share-section { margin-top: 2rem; text-align: center; }
-.share-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1.5rem; border-radius: 50px; border: 2px solid #E8E0F0; background: #fff; font-size: 0.85rem; font-weight: 700; color: #2D2844; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
-.share-btn:hover { border-color: #6B2F93; color: #6B2F93; }
+/* Families */
+.families-intro { font-size: 0.82rem; color: #999; text-align: center; line-height: 1.7; margin: 0 0 1rem; }
+.families-title { font-size: 0.85rem; font-weight: 800; color: #2D2844; text-align: center; margin: 0 0 0.75rem; }
 
-.cta-section { margin-top: 2.5rem; text-align: center; }
-.cta-section p { font-size: 0.85rem; color: #888; margin: 0 0 0.75rem; }
-.cta-btn { display: inline-block; padding: 0.85rem 2rem; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; text-decoration: none; font-size: 0.95rem; font-weight: 700; font-family: 'Nunito', sans-serif; }
+.fam { padding: 0.85rem 0; border-bottom: 1px solid #F0ECF5; text-align: center; }
+.fam:last-child { border-bottom: none; }
+.fam-quote { font-size: 0.85rem; color: #666; line-height: 1.6; font-style: italic; margin: 0 0 0.25rem; }
+.fam-name { font-size: 0.75rem; font-weight: 700; color: #bbb; }
 
-.footer { margin-top: 3rem; text-align: center; font-size: 0.7rem; color: #ccc; }
+/* CTA */
+.cta-section { text-align: center; }
+.cta-section p { font-size: 0.85rem; color: #999; line-height: 1.7; margin: 0 0 0.6rem; }
+.cta-link { display: inline-block; padding: 0.75rem 2rem; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; text-decoration: none; font-size: 0.92rem; font-weight: 700; font-family: 'Nunito', sans-serif; }
+
+.footer { margin-top: 3rem; text-align: center; font-size: 0.7rem; color: #ccc; line-height: 1.7; }
 </style>
 </head>
 <body>
 
-<div class="story-page" id="storyPage">
-  <!-- Loading -->
-  <div class="loading" id="loadingState">
-    <p>Loading story...</p>
-  </div>
+<div class="story-page">
+  <div class="loading" id="loadingState"><p>Loading...</p></div>
 
-  <!-- Error -->
   <div class="error" id="errorState" style="display:none">
-    <h2>Story not found</h2>
-    <p>This link may have expired or the story hasn't been delivered yet.</p>
-    <p style="margin-top:1rem"><a href="https://heartheirname.com" style="color:#6B2F93;font-weight:700;text-decoration:none">Go to Hear Their Name</a></p>
+    <h2>This story isn't ready yet</h2>
+    <p>It might still be being created, or this link may not be right.<br><br><a href="https://heartheirname.com">Go to Hear Their Name</a></p>
   </div>
 
-  <!-- Story content (hidden until loaded) -->
   <div id="storyContent" style="display:none">
 
     <!-- Player -->
-    <div class="player-section">
-      <h1 class="child-name" id="childNameDisplay"></h1>
-      <p class="story-label">A Hear Their Name story</p>
-
-      <button class="play-btn" id="playBtn" onclick="togglePlay()">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </button>
-
-      <div class="progress-wrap">
-        <div class="progress-bar" id="progressBar" onclick="seekAudio(event)">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <div class="time-display">
-          <span id="currentTime">0:00</span>
-          <span id="totalTime">0:00</span>
+    <div class="section" style="padding-bottom:2.5rem">
+      <div class="section-inner">
+        <div class="player-section">
+          <h1 class="child-name" id="childNameDisplay"></h1>
+          <p class="story-label">A Hear Their Name story</p>
+          <button class="play-btn" id="playBtn" onclick="togglePlay()">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <div class="progress-wrap">
+            <div class="progress-bar" id="progressBar" onclick="seekAudio(event)">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="time-display">
+              <span id="currentTime">0:00</span>
+              <span id="totalTime">0:00</span>
+            </div>
+          </div>
+          <button id="musicToggle" onclick="toggleMusic()" style="margin-top:1rem;background:none;border:1.5px solid #E8E0F0;border-radius:50px;padding:0.35rem 0.9rem;font-size:0.72rem;font-weight:700;color:#999;cursor:pointer;font-family:'Nunito',sans-serif">&#9835; Music on</button>
         </div>
       </div>
     </div>
 
-    <div class="section-divider"></div>
+    <!-- Quiet moment -->
+    <div class="section section-alt" style="padding:2rem 1.25rem">
+      <div class="section-inner" style="text-align:center">
+        <p class="made-line" id="madeLine"></p>
+      </div>
+    </div>
 
     <!-- Say thank you -->
-    <div class="thankyou-section">
-      <h3>If this meant something to your family</h3>
-      <p>Every story is free. If you'd like to help us keep making them, you can say thank you.</p>
+    <div class="section" style="padding:2.5rem 1.25rem 2rem">
+      <div class="section-inner">
+        <p style="font-size:0.85rem;color:#999;text-align:center;line-height:1.7;margin:0 0 0.5rem">Every story is free. If you'd like to support what we do, you can here.</p>
+        <p style="font-size:0.75rem;color:#bbb;text-align:center;margin:0 0 1.25rem">12 families supported us this week</p>
 
-      <div class="amount-btns">
-        <button class="amount-btn" onclick="selectAmount(5, this)">£5</button>
-        <button class="amount-btn selected" onclick="selectAmount(10, this)">£10</button>
-        <button class="amount-btn" onclick="selectAmount(15, this)">£15</button>
-        <input type="number" class="amount-btn-custom" placeholder="Other" id="customAmount" onfocus="clearAmountSelection()" oninput="clearAmountSelection()">
-      </div>
+        <div style="max-width:200px;margin:0 auto 1.25rem">
+          <div style="display:flex;align-items:center;border:1.5px solid #E8E0F0;border-radius:50px;padding:0.55rem 1rem;background:#fff">
+            <span style="font-size:0.92rem;font-weight:700;color:#999;margin-right:0.4rem">£</span>
+            <input type="number" id="thankAmount" placeholder="Amount" style="border:none;outline:none;font-size:0.95rem;font-weight:700;color:#2D2844;font-family:'Nunito',sans-serif;width:100%;background:transparent">
+          </div>
+        </div>
 
-      <textarea class="message-input" id="donationMessage" placeholder="Leave a message for other families (optional)"></textarea>
-
-      <button class="donate-btn" id="donateBtn" onclick="submitDonation()">Say thank you</button>
-    </div>
-
-    <!-- Community wall -->
-    <div class="community-section">
-      <h3>Thank yous from other families</h3>
-      <p class="community-stat" id="communityStat"></p>
-      <div class="community-wall" id="communityWall">
-        <!-- Populated by JS -->
+        <button class="ty-btn" id="tyBtn" onclick="sayThankYou()">Support us</button>
       </div>
     </div>
 
-    <div class="section-divider"></div>
-
-    <!-- Share -->
-    <div class="share-section">
-      <button class="share-btn" onclick="shareStory()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-        Share this story
-      </button>
+    <!-- CTA -->
+    <div class="section section-alt" style="padding:2.5rem 1.25rem">
+      <div class="section-inner">
+        <div class="cta-section">
+          <p>Know someone who'd love their own?</p>
+          <a href="https://heartheirname.com" class="cta-link">Make a free story</a>
+        </div>
+      </div>
     </div>
 
-    <!-- Make your own -->
-    <div class="cta-section">
-      <p>Know a child who'd love their own story?</p>
-      <a href="https://heartheirname.com" class="cta-btn">Make a free story</a>
-    </div>
-
-    <div class="footer">
-      <p>Hear Their Name. Made by a dad and his son.</p>
+    <!-- Footer -->
+    <div class="section" style="padding:2rem 1.25rem 3rem">
+      <div class="section-inner">
+        <div class="footer">
+          <p>Made by a dad and his son.<br>jamie@heartheirname.com</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <audio id="storyAudio" preload="auto"></audio>
-<audio id="bgMusicAudio" loop preload="auto"></audio>
+<audio id="bgMusicAudio" loop preload="auto" volume="0"></audio>
 
 <script>
-// Get story ID from URL path
 const pathParts = window.location.pathname.split('/');
 const storyId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
-
 let storyData = null;
-let selectedDonationAmount = 10;
+let bgAudio = null;
+let musicEnabled = true;
+
+function toggleMusic() {
+  musicEnabled = !musicEnabled;
+  const btn = document.getElementById('musicToggle');
+  if (musicEnabled) {
+    btn.innerHTML = '&#9835; Music on';
+    btn.style.color = '#999';
+    var bg = document.getElementById('bgMusicAudio');
+    if (!document.getElementById('storyAudio').paused) {
+      bg.play().catch(function() {});
+      bg.volume = 0.4;
+    }
+  } else {
+    btn.innerHTML = '&#9835; Music off';
+    btn.style.color = '#ccc';
+    var bg2 = document.getElementById('bgMusicAudio'); bg2.pause(); bg2.volume = 0;
+  }
+}
 
 const musicTracks = {
   bedtime: '/music/bedtime-ambient.mp3?v=5',
@@ -183,184 +193,149 @@ const musicTracks = {
   learning: '/music/bedtime-ambient.mp3?v=5'
 };
 
-// Load the story
 async function loadStory() {
   try {
     const res = await fetch('/api/shared-story?id=' + encodeURIComponent(storyId));
     const data = await res.json();
-
     if (!data.success || !data.story || !data.story.audioUrl) {
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('errorState').style.display = 'block';
       return;
     }
-
     storyData = data.story;
     document.title = storyData.childName + "'s Story | Hear Their Name";
-
-    // Set child name
     document.getElementById('childNameDisplay').textContent = storyData.childName + "'s Story";
-
-    // Set audio source
-    const audio = document.getElementById('storyAudio');
-    audio.src = storyData.audioUrl;
-
-    // Set background music
-    const bgMusic = document.getElementById('bgMusicAudio');
-    bgMusic.src = musicTracks[storyData.category] || musicTracks.bedtime;
-    bgMusic.volume = 0.25;
-
-    // Show content
+    document.getElementById('madeLine').textContent = 'This story was made for ' + storyData.childName + '.';
+    document.getElementById('storyAudio').src = storyData.audioUrl;
+    var bgEl = document.getElementById('bgMusicAudio');
+    bgEl.src = musicTracks[storyData.category] || musicTracks.bedtime;
+    bgEl.volume = 0;
+    bgEl.load();
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('storyContent').style.display = 'block';
-
-    // Load donations
-    loadDonations();
-
   } catch (err) {
-    console.error('Failed to load story:', err);
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('errorState').style.display = 'block';
   }
 }
 
-// Audio player
 function togglePlay() {
   const audio = document.getElementById('storyAudio');
   const btn = document.getElementById('playBtn');
-  const bgMusic = document.getElementById('bgMusicAudio');
-
   if (audio.paused) {
+    var bg = document.getElementById('bgMusicAudio');
+    // Must play BOTH audio elements inside the same user click handler
+    // Play music first (at volume 0) to unlock it, then fade in
+    bg.volume = 0;
+    bg.play().catch(function() {});
     audio.play();
-    bgMusic.play().catch(() => {});
+    if (musicEnabled) {
+      var vol = 0;
+      var fadeIn = setInterval(function() {
+        vol = Math.min(vol + 0.02, 0.4);
+        bg.volume = vol;
+        if (vol >= 0.4) clearInterval(fadeIn);
+      }, 100);
+    } else {
+      bg.pause();
+    }
     btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/></svg>';
     btn.classList.add('playing');
   } else {
     audio.pause();
-    bgMusic.pause();
+    document.getElementById('bgMusicAudio').pause();
     btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
     btn.classList.remove('playing');
   }
 }
 
-// Progress bar
 const audio = document.getElementById('storyAudio');
 audio.addEventListener('timeupdate', () => {
   if (!audio.duration) return;
-  const pct = (audio.currentTime / audio.duration) * 100;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('currentTime').textContent = formatTime(audio.currentTime);
+  document.getElementById('progressFill').style.width = (audio.currentTime / audio.duration * 100) + '%';
+  document.getElementById('currentTime').textContent = fmt(audio.currentTime);
 });
-
 audio.addEventListener('loadedmetadata', () => {
-  document.getElementById('totalTime').textContent = formatTime(audio.duration);
+  document.getElementById('totalTime').textContent = fmt(audio.duration);
 });
-
-audio.addEventListener('ended', () => {
-  const btn = document.getElementById('playBtn');
-  const bgMusic = document.getElementById('bgMusicAudio');
-  bgMusic.pause();
-  btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  btn.classList.remove('playing');
+audio.addEventListener('ended', function() {
+  var bg = document.getElementById('bgMusicAudio');
+  if (bg && !bg.paused) {
+    var vol = bg.volume;
+    var fadeOut = setInterval(function() {
+      vol = Math.max(vol - 0.02, 0);
+      bg.volume = vol;
+      if (vol <= 0) { clearInterval(fadeOut); bg.pause(); }
+    }, 100);
+  }
+  document.getElementById('playBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+  document.getElementById('playBtn').classList.remove('playing');
 });
 
 function seekAudio(e) {
   const bar = document.getElementById('progressBar');
   const rect = bar.getBoundingClientRect();
-  const pct = (e.clientX - rect.left) / rect.width;
-  audio.currentTime = pct * audio.duration;
+  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
 }
 
-function formatTime(s) {
+function fmt(s) {
   if (!s || isNaN(s)) return '0:00';
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return m + ':' + (sec < 10 ? '0' : '') + sec;
+  return Math.floor(s / 60) + ':' + (Math.floor(s % 60) < 10 ? '0' : '') + Math.floor(s % 60);
 }
 
-// Donation
-function selectAmount(amount, btn) {
-  selectedDonationAmount = amount;
-  document.getElementById('customAmount').value = '';
-  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-}
+async function sayThankYou() {
+  var amountEl = document.getElementById('thankAmount');
+  var amount = parseFloat(amountEl.value);
+  if (!amount || amount < 1) { amountEl.focus(); return; }
 
-function clearAmountSelection() {
-  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
-  const custom = document.getElementById('customAmount').value;
-  if (custom) selectedDonationAmount = parseFloat(custom);
-}
-
-async function submitDonation() {
-  const custom = document.getElementById('customAmount').value;
-  const amount = custom ? parseFloat(custom) : selectedDonationAmount;
-  if (!amount || amount < 1) { alert('Please select an amount'); return; }
-
-  const message = document.getElementById('donationMessage').value.trim();
-  const btn = document.getElementById('donateBtn');
-
+  var btn = document.getElementById('tyBtn');
   btn.textContent = 'Processing...';
   btn.style.opacity = '0.6';
+  btn.style.pointerEvents = 'none';
 
-  // TODO: Wire up Stripe payment for donation
-  // For now, save the donation intent
+  var message = (document.getElementById('thankMsg').value || '').trim();
+  var nameEl = document.getElementById('thankName');
+  var isAnon = document.getElementById('thankAnon').checked;
+  var displayName = isAnon ? 'Anonymous' : (nameEl.value || '').trim();
+
   try {
-    alert('Donation system coming soon. Thank you for wanting to support us!');
-    btn.textContent = 'Say thank you';
-    btn.style.opacity = '1';
+    var res = await fetch('/api/create-donation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: amount, storyId: storyId, message: message, displayName: displayName })
+    });
+    var data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      throw new Error(data.error || 'Failed');
+    }
   } catch (err) {
     btn.textContent = 'Say thank you';
     btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+    alert('Something went wrong. Please try again.');
   }
 }
 
-// Load donation wall
-async function loadDonations() {
-  // TODO: Fetch from /api/donations endpoint
-  // For now, show placeholder community data
-  const placeholders = [
-    { name: "Emma's mum", amount: 10, message: "She fell asleep smiling. Thank you." },
-    { name: "Grandad Pete", amount: 15, message: "Made both my grandchildren's day." },
-    { name: "The Patels", amount: 5, message: "Bedtime has never been this easy." },
-    { name: "Sarah", amount: 10, message: "My daughter asked to hear it three times." },
-    { name: "Uncle Mark", amount: 20, message: "Better than any gift I could have wrapped." }
-  ];
-
-  document.getElementById('communityStat').textContent = 'This week, 20 families helped us continue making stories';
-
-  const wall = document.getElementById('communityWall');
-  wall.innerHTML = placeholders.map(d => `
-    <div class="community-card">
-      <div class="cc-header">
-        <span class="cc-name">${d.name}</span>
-        <span class="cc-amount">£${d.amount}</span>
-      </div>
-      ${d.message ? '<p class="cc-message">"' + d.message + '"</p>' : ''}
-    </div>
-  `).join('');
-}
-
-// Share
-function shareStory() {
-  const url = window.location.href;
-  const text = storyData ? 'Listen to ' + storyData.childName + "'s personalised story" : 'Listen to this personalised story';
-
-  if (navigator.share) {
-    navigator.share({ title: text, url: url }).catch(() => {});
-  } else {
-    navigator.clipboard.writeText(url).then(() => {
-      const btn = document.querySelector('.share-btn');
-      btn.textContent = 'Link copied!';
-      setTimeout(() => {
-        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share this story';
-      }, 2000);
-    });
-  }
-}
-
-// Init
 loadStory();
+
+// Check if returning from successful thank-you payment
+if (window.location.search.includes('thankyou=1')) {
+  window.history.replaceState({}, '', window.location.pathname);
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      var ty = document.querySelector('.thankyou-copy');
+      if (ty) {
+        ty.innerHTML = '<strong style="color:#2D2844">Thank you. That really means a lot to us.</strong>';
+        var btn = document.getElementById('tyBtn');
+        if (btn) btn.style.display = 'none';
+        var amtField = document.querySelector('.amt-custom') || document.getElementById('thankAmount');
+        if (amtField) amtField.parentElement.style.display = 'none';
+      }
+    }, 500);
+  });
+}
 </script>
 </body>
 </html>

@@ -443,12 +443,20 @@ export default async (req) => {
     const sd = story.story_data || {};
     const isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
     const safeChild = esc(story.child_name || 'your child');
-    const categoryLabel = story.category === 'learning' ? 'Learning Adventure' : story.category === 'journey' ? 'Adventure Story' : 'Bedtime Story';
-    const listenUrl = `https://heartheirname.com?listen=${encodeURIComponent(storyId)}&utm_source=email&utm_medium=delivery&utm_campaign=story_delivery`;
+    const requesterName = esc(sd.requesterName || '');
+    const listenUrl = `https://heartheirname.com/story/${encodeURIComponent(storyId)}`;
 
-    // Send delivery email
-    const subject = isMulti ? 'Their story is ready!' : `${safeChild}'s story is ready!`;
-    const emailHtml = deliveryEmail(safeChild, categoryLabel, listenUrl, story.email, isMulti, storyId);
+    const subject = isMulti ? "Their story is ready" : `${story.child_name}'s story is ready`;
+    const greeting = requesterName ? `Hi ${requesterName},` : 'Hi,';
+
+    const emailHtml = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:500px;margin:0 auto;padding:20px;color:#333">
+<p style="margin:0 0 16px;line-height:1.75">${greeting}</p>
+<p style="margin:0 0 16px;line-height:1.75">${isMulti ? "Their story is ready for you." : safeChild + "'s story is ready for you."}</p>
+<p style="text-align:center;margin:24px 0"><a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 32px;border-radius:50px;font-size:1rem;font-weight:700">${isMulti ? "Listen to their story" : "Listen to " + safeChild + "'s story"}</a></p>
+<p style="margin:0 0 16px;line-height:1.75">${isMulti ? "We hope it becomes something they ask to hear again and again." : "We hope it becomes something " + safeChild.split("'")[0] + " asks to hear again and again."}</p>
+<p style="margin:24px 0 2px;line-height:1.75;font-weight:600">Jamie and Chase</p>
+<p style="margin:0;font-size:13px;color:#999">Hear Their Name</p>
+</div>`;
 
     try {
       const emailRes = await fetch('https://api.resend.com/emails', {
@@ -467,31 +475,10 @@ export default async (req) => {
         return json({ error: 'Email failed' }, 500);
       }
 
-      // Auto-send gift email if preference is 'auto'
-      if (story.is_gift && story.gift_delivery_preference === 'auto' && story.gift_email) {
-        const giftSubject = isMulti
-          ? `${esc(sd.giftFrom || 'Someone special')} made something magical`
-          : `${esc(sd.giftFrom || 'Someone special')} made something special for ${safeChild}`;
-        // Use existing send-email gift template via internal call
-        await fetch('https://heartheirname.com/api/send-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'gift',
-            to: story.gift_email,
-            childName: story.child_name,
-            giftFrom: sd.giftFrom || 'Someone special',
-            giftMessage: sd.giftMessage || null,
-            storyId,
-            isMultiChild: isMulti
-          })
-        }).catch(e => console.error('[ADMIN-QUEUE] Gift email error:', e.message));
-      }
-
-      // Update status to delivered
+      // Update status to delivered with timestamp
       await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
         method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ status: 'delivered' })
+        body: JSON.stringify({ status: 'delivered', delivered_at: new Date().toISOString() })
       });
 
       console.log(`[ADMIN-QUEUE] Story ${storyId} delivered to ${story.email}`);
@@ -532,54 +519,5 @@ export default async (req) => {
 
   return json({ error: 'Unknown action: ' + action }, 400);
 };
-
-function deliveryEmail(childName, categoryLabel, listenUrl, customerEmail, isMulti, storyId) {
-  const waShareUrl = `https://heartheirname.com?listen=${encodeURIComponent(storyId)}&utm_source=share&utm_medium=whatsapp&utm_campaign=delivery_share`;
-  const waText = isMulti
-    ? encodeURIComponent(`Listen to a story made for ${childName}!\n\n${waShareUrl}\n\nMade with heartheirname.com`)
-    : encodeURIComponent(`Listen to ${childName}'s personalised audio story!\n\n${waShareUrl}\n\nMade with heartheirname.com`);
-
-  return `<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background:#FEFBF6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <div style="max-width:520px;margin:0 auto;padding:40px 24px;">
-    <div style="text-align:center;margin-bottom:32px;">
-      <img src="https://heartheirname.com/logo-email.png" alt="Hear Their Name" style="height:56px;width:auto;margin:0;" />
-    </div>
-    <div style="background:#ffffff;border-radius:16px;padding:32px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-      <p style="font-size:24px;text-align:center;margin:0 0 8px;">🎧</p>
-      <h2 style="color:#2D2844;font-size:20px;text-align:center;margin:0 0 16px;">${isMulti ? 'Their story is ready!' : childName + "'s story is ready!"}</h2>
-      <p style="color:#666;font-size:15px;line-height:1.6;margin:0 0 20px;">
-        ${isMulti
-          ? `A personalised ${categoryLabel.toLowerCase()} starring ${childName} has been crafted and is ready to enjoy.`
-          : `${childName}'s personalised ${categoryLabel.toLowerCase()} has been crafted and is ready to enjoy.`}
-      </p>
-      <div style="text-align:center;margin:0 0 24px;">
-        <a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 36px;border-radius:50px;font-size:16px;font-weight:700;">${isMulti ? 'Listen to their story' : 'Listen to ' + childName + "'s story"}</a>
-      </div>
-      <div style="background:#FFF0E5;border-radius:12px;padding:16px;margin:0 0 20px;text-align:center;">
-        <p style="margin:0 0 8px;font-size:15px;color:#2D2844;font-weight:700;">Share with the whole family</p>
-        <p style="margin:0 0 12px;font-size:13px;color:#666;line-height:1.5;">Grandparents, aunties, uncles. Let everyone hear ${isMulti ? 'their story' : childName + "'s story"}. No extra cost.</p>
-        <a href="https://wa.me/?text=${waText}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;">Share on WhatsApp</a>
-      </div>
-      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 16px;">
-        You can replay the story any time. Just visit heartheirname.com, tap <strong>My Stories</strong>, and log in with this email:
-      </p>
-      <div style="background:#F8F5FF;border-radius:10px;padding:12px;text-align:center;margin:0 0 20px;">
-        <p style="margin:0;font-size:16px;font-weight:700;color:#6B2F93;">${esc(customerEmail)}</p>
-      </div>
-      <p style="color:#666;font-size:14px;line-height:1.6;margin:0 0 24px;">
-        ${isMulti ? 'I hope they love every second of it.' : 'I hope ' + childName + ' loves every second of it.'}
-      </p>
-      <p style="color:#999;font-size:13px;text-align:center;line-height:1.5;margin:0;">
-        Not quite right? Reply to this email and I will adjust it for free.
-      </p>
-    </div>
-    <p style="text-align:center;color:#bbb;font-size:12px;margin-top:24px;">Hear Their Name. Audio stories that know them by name.</p>
-  </div>
-</body>
-</html>`;
-}
 
 export const config = { path: '/api/admin-queue' };

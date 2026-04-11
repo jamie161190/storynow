@@ -24,11 +24,15 @@
 [functions."stripe-webhook"]
   external_node_modules = ["stripe"]
 
+[functions."create-donation"]
+  external_node_modules = ["stripe"]
+
 # Retry worker disabled — moving to queued delivery system
 # [functions."retry-worker"]
 #   schedule = "*/5 * * * *"
 
-# Abandoned preview worker removed (free model, no previews)
+[functions."followup-worker"]
+  schedule = "*/30 * * * *"
 
 
 [[edge_functions]]

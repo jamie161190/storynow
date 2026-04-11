@@ -153,6 +153,31 @@ export default async (req) => {
 
     console.log(`Server-side conversion tracking complete for session ${sessionId}`);
 
+    // ── Donation: save to donations table ──
+    if (metadata.type === 'donation' && metadata.story_id) {
+      const supabaseUrl2 = process.env.SUPABASE_URL;
+      const supabaseKey2 = process.env.SUPABASE_SECRET_KEY;
+      if (supabaseUrl2 && supabaseKey2) {
+        try {
+          await fetch(`${supabaseUrl2}/rest/v1/donations`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${supabaseKey2}`, 'apikey': supabaseKey2, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              story_id: metadata.story_id,
+              email: email || null,
+              amount: amountTotal / 100,
+              currency: currency,
+              message: metadata.message || null,
+              display_name: metadata.display_name || null
+            })
+          });
+          console.log(`Donation saved: £${(amountTotal/100).toFixed(2)} for story ${metadata.story_id}`);
+        } catch (donErr) {
+          console.error('Donation save error:', donErr.message);
+        }
+      }
+    }
+
     // ── Referral conversion tracking ──
     const refCode = metadata.ref_code;
     const supabaseUrl = process.env.SUPABASE_URL;
