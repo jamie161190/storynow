@@ -224,9 +224,17 @@ async function loadStory() {
       return;
     }
     storyData = data.story;
-    document.title = storyData.childName + "'s Story | Hear Their Name";
-    document.getElementById('childNameDisplay').textContent = storyData.childName + "'s Story";
-    document.getElementById('madeLine').textContent = 'This story was made for ' + storyData.childName + '.';
+    // Format names with "and" before the last name
+    function formatNames(name) {
+      var parts = name.split(/,\s*/);
+      if (parts.length <= 1) return name;
+      if (parts.length === 2) return parts[0] + ' and ' + parts[1];
+      return parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1];
+    }
+    var displayName = formatNames(storyData.childName);
+    document.title = displayName + "'s Story | Hear Their Name";
+    document.getElementById('childNameDisplay').textContent = displayName + "'s Story";
+    document.getElementById('madeLine').textContent = 'This story was made for ' + displayName + '.';
     document.getElementById('storyAudio').src = storyData.audioUrl;
     var bgEl = document.getElementById('bgMusicAudio');
     bgEl.src = musicTracks[storyData.category] || musicTracks.bedtime;
