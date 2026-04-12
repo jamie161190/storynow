@@ -280,7 +280,10 @@ function renderQueue(stories) {
     if (s.story_text) {
       html += '<details style="margin:0.75rem 0">';
       html += '<summary style="font-size:0.78rem;font-weight:700;color:#6B2F93;cursor:pointer;padding:0.3rem 0">Read the story</summary>';
-      html += '<div class="story-text-preview">' + esc(s.story_text) + '</div>';
+      html += '<div class="story-text-preview" id="storyText_' + esc(s.id) + '">' + esc(s.story_text) + '</div>';
+      html += '<div style="margin-top:0.5rem;display:flex;gap:0.4rem">';
+      html += '<button class="btn btn-outline" onclick="editStoryText(\'' + esc(s.id) + '\')">Edit text</button>';
+      html += '</div>';
       html += '</details>';
     }
 
@@ -333,6 +336,36 @@ async function viewStory(id) {
   document.getElementById('storyModalTitle').textContent = (s.child_name || 'Story') + ' text';
   document.getElementById('storyModalText').textContent = s.story_text || 'No story text available';
   document.getElementById('storyModal').classList.add('active');
+}
+
+function editStoryText(id) {
+  var el = document.getElementById('storyText_' + id);
+  if (!el) return;
+  var currentText = el.textContent;
+  el.innerHTML = '<textarea id="storyEdit_' + id + '" style="width:100%;min-height:300px;padding:0.75rem;border:2px solid #6B2F93;border-radius:10px;font-size:0.82rem;line-height:1.7;font-family:inherit;resize:vertical">' + esc(currentText) + '</textarea>' +
+    '<div style="display:flex;gap:0.4rem;margin-top:0.5rem">' +
+    '<button class="btn btn-purple" onclick="saveStoryText(\'' + id + '\')">Save changes</button>' +
+    '<button class="btn btn-outline" onclick="loadQueue(\'pending\')">Cancel</button>' +
+    '</div>';
+}
+
+async function saveStoryText(id) {
+  var textarea = document.getElementById('storyEdit_' + id);
+  if (!textarea) return;
+  var newText = textarea.value.trim();
+  if (!newText) { alert('Story text cannot be empty'); return; }
+
+  try {
+    var data = await queueApi('update-text', {}, { storyId: id, storyText: newText });
+    if (data.success) {
+      alert('Story text saved');
+      loadQueue('pending');
+    } else {
+      alert('Failed to save: ' + (data.error || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Failed to save');
+  }
 }
 
 async function generateStoryText(id, btn) {

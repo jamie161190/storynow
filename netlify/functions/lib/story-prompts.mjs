@@ -681,15 +681,12 @@ export function buildCompleteStoryPrompt(storyData) {
 
   return fullPrompt + `
 
-OPENING QUALITY (CRITICAL):
-The first ~250 words of this story will be played as a 2-minute audio preview to the parent BEFORE they purchase. This opening must be so good that they cannot say no. Every word in the first 250 words is a sales pitch wrapped in story. After that, the story continues to its full arc.
+Write the COMPLETE story from beginning to end. Approximately ${wordCount} words. This is the full, finished story that will be read aloud in one sitting.
 
-${openingFormula}
+Let the story breathe naturally from the start. There is no preview or sample. The listener will hear the whole thing in one go, so the pacing should be even throughout. Begin gently, build through the middle, and resolve warmly.
 
-After the opening, continue into the full story arc. Build through rising action to a satisfying climax and resolution.
-
-Write the COMPLETE story from beginning to end. Approximately ${wordCount} words. This is the full, finished story that will be read aloud in one sitting. Include natural pauses ( ... ) throughout for the narrator to breathe.
-${isMulti ? '\nRemember: introduce each child INDIVIDUALLY in the opening. Never list them together. The parent needs to hear each name spoken separately within the first 2 minutes.' : ''}`;
+Include natural pauses ( ... ) throughout for the narrator to breathe.
+${isMulti ? '\nIntroduce each child individually in the opening. Never list them together. Let each name land on its own.' : ''}`;
 }
 
 // Build a complete story prompt with feedback adjustments (for admin regeneration)

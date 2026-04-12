@@ -138,6 +138,22 @@ export default async (req) => {
   }
 
   // ── GENERATE-TEXT: Generate story text only (no audio) ──
+  // ── UPDATE-TEXT: Save edited story text ──
+  if (action === 'update-text' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId, storyText } = body;
+    if (!storyId || !storyText) return json({ error: 'Missing storyId or storyText' }, 400);
+
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ story_text: storyText })
+    });
+
+    console.log(`[ADMIN-QUEUE] Story text updated for ${storyId}`);
+    return json({ success: true });
+  }
+
+  // ── GENERATE-TEXT: Generate story text only (no audio) ──
   if (action === 'generate-text' && req.method === 'POST') {
     const body = await req.json();
     const { storyId } = body;
