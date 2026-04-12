@@ -126,20 +126,13 @@ export default async (req) => {
       }
     }
 
-    // Auto-generate story text in background (fire-and-forget)
+    // Auto-generate story text via background function (fire-and-forget)
     if (orderId) {
-      const adminSecret = process.env.ADMIN_SECRET;
-      if (adminSecret) {
-        fetch('https://heartheirname.com/api/admin-queue?action=generate-text', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-admin-secret': adminSecret },
-          body: JSON.stringify({ storyId: orderId })
-        }).then(r => r.json()).then(d => {
-          console.log('Auto-generated story text for', orderId, d.success ? d.wordCount + ' words' : 'failed');
-        }).catch(e => {
-          console.error('Auto-generate text failed:', e.message);
-        });
-      }
+      fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId: orderId })
+      }).catch(e => console.error('Auto-generate trigger failed:', e.message));
     }
 
     return new Response(JSON.stringify({ success: true, orderId, status: 'pending' }), {
