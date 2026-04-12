@@ -126,6 +126,22 @@ export default async (req) => {
       }
     }
 
+    // Auto-generate story text in background (fire-and-forget)
+    if (orderId) {
+      const adminSecret = process.env.ADMIN_SECRET;
+      if (adminSecret) {
+        fetch('https://heartheirname.com/api/admin-queue?action=generate-text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-admin-secret': adminSecret },
+          body: JSON.stringify({ storyId: orderId })
+        }).then(r => r.json()).then(d => {
+          console.log('Auto-generated story text for', orderId, d.success ? d.wordCount + ' words' : 'failed');
+        }).catch(e => {
+          console.error('Auto-generate text failed:', e.message);
+        });
+      }
+    }
+
     return new Response(JSON.stringify({ success: true, orderId, status: 'pending' }), {
       status: 200, headers: { 'Content-Type': 'application/json' }
     });
