@@ -1,22 +1,22 @@
 // Background function: generates story text via Claude.
 // Called fire-and-forget from request-story.mjs on submission.
-// Background functions can run up to 15 minutes on Netlify.
+// Uses Lambda handler format (required for background functions).
 
 import { SYSTEM_PROMPT, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
 
-export default async (req) => {
+export const handler = async (event) => {
   try {
-    const { storyId } = await req.json();
+    const { storyId } = JSON.parse(event.body || '{}');
     if (!storyId) {
       console.error('[STORY-TEXT-BG] Missing storyId');
-      return;
+      return { statusCode: 400 };
     }
 
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SECRET_KEY;
     if (!supabaseUrl || !supabaseKey) {
       console.error('[STORY-TEXT-BG] Missing env vars');
-      return;
+      return { statusCode: 500 };
     }
 
     const headers = { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey };
@@ -27,15 +27,14 @@ export default async (req) => {
       `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=*&limit=1`,
       { headers }
     );
-    if (!storyRes.ok) { console.error('[STORY-TEXT-BG] Failed to fetch story'); return; }
+    if (!storyRes.ok) { console.error('[STORY-TEXT-BG] Failed to fetch story'); return { statusCode: 500 }; }
     const stories = await storyRes.json();
-    if (!stories.length) { console.error('[STORY-TEXT-BG] Story not found:', storyId); return; }
+    if (!stories.length) { console.error('[STORY-TEXT-BG] Story not found:', storyId); return { statusCode: 404 }; }
     const story = stories[0];
 
-    // Skip if text already exists
     if (story.story_text) {
       console.log('[STORY-TEXT-BG] Story already has text, skipping:', storyId);
-      return;
+      return { statusCode: 200 };
     }
 
     const sd = story.story_data || {};
@@ -56,22 +55,21 @@ export default async (req) => {
     });
 
     if (!genRes.ok) {
-      console.error('[STORY-TEXT-BG] Claude API error:', genRes.status);
-      return;
+      const errText = await genRes.text();
+      console.error('[STORY-TEXT-BG] Claude API error:', genRes.status, errText.slice(0, 200));
+      return { statusCode: 500 };
     }
 
     const genResult = await genRes.json();
     let storyText = '';
     for (const block of genResult.content) { if (block.type === 'text') storyText += block.text; }
 
-    // Add message intro and outro
     let messageIntro = '';
     if (sd.personalMessage) {
       messageIntro = 'Before we begin, there is a special message for ' + sd.childName + '. ... ' + sd.personalMessage + ' ... And now, on with the story. ... ';
     }
     const fullText = messageIntro + storyText + ' ... ... A Hear Their Name original ... made with love.';
 
-    // Save to database
     await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
       method: 'PATCH', headers: headersJson,
       body: JSON.stringify({ story_text: fullText })
@@ -79,10 +77,10 @@ export default async (req) => {
 
     const wordCount = fullText.split(/\s+/).length;
     console.log(`[STORY-TEXT-BG] Complete: ${wordCount} words for ${sd.childName} (${storyId})`);
+    return { statusCode: 200 };
 
   } catch (err) {
     console.error('[STORY-TEXT-BG] Error:', err.message);
+    return { statusCode: 500 };
   }
 };
-
-export const config = { path: '/.netlify/functions/story-text-background' };
