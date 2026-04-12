@@ -115,8 +115,9 @@ export default async (req) => {
   if (action === 'list') {
     const status = url.searchParams.get('status') || 'pending';
     const limit = parseInt(url.searchParams.get('limit')) || 50;
+    const statusFilter = status === 'pending' ? 'status=in.(pending,generating,ready)' : `status=eq.${encodeURIComponent(status)}`;
     const res = await fetch(
-      `${supabaseUrl}/rest/v1/stories?status=eq.${encodeURIComponent(status)}&select=id,email,child_name,category,voice_id,story_text,story_data,feedback,gift_delivery_preference,is_gift,gift_email,gift_from,created_at&order=created_at.desc&limit=${limit}`,
+      `${supabaseUrl}/rest/v1/stories?${statusFilter}&select=id,email,child_name,category,voice_id,story_text,audio_url,story_data,status,feedback,rejected_versions,gift_delivery_preference,is_gift,gift_email,gift_from,created_at&order=created_at.desc&limit=${limit}`,
       { headers }
     );
     if (!res.ok) return json({ error: 'Failed to query stories' }, 500);
