@@ -48,7 +48,6 @@ export const handler = async (event) => {
         model: 'claude-sonnet-4-6',
         max_tokens: 16000,
         temperature: 1,
-        thinking: { type: 'adaptive' },
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: fullPrompt }]
       })
@@ -63,6 +62,11 @@ export const handler = async (event) => {
     const genResult = await genRes.json();
     let storyText = '';
     for (const block of genResult.content) { if (block.type === 'text') storyText += block.text; }
+
+    if (!storyText || storyText.split(/\s+/).length < 100) {
+      console.error('[STORY-TEXT-BG] Claude returned insufficient text:', storyText ? storyText.length + ' chars' : 'empty');
+      return { statusCode: 500 };
+    }
 
     let messageIntro = '';
     if (sd.personalMessage) {
