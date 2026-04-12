@@ -452,27 +452,46 @@ async function saveStoryText(id) {
 async function generateStoryText(id, btn) {
   btn.disabled = true;
   btn.textContent = 'Writing story...';
-  const data = await queueApi('generate-text', {}, { storyId: id });
-  if (data.success) {
-    btn.textContent = 'Done! ' + (data.wordCount || '') + ' words';
-    btn.className = 'btn btn-green';
-    setTimeout(() => loadQueue('pending'), 1500);
-  } else {
-    btn.textContent = 'Failed';
-    btn.disabled = false;
-    alert('Story generation failed: ' + (data.error || 'Unknown error'));
-  }
+  // Trigger background function directly
+  fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ storyId: id })
+  }).catch(function() {});
+  // Poll until text appears
+  var pollCount = 0;
+  var pollInterval = setInterval(async function() {
+    pollCount++;
+    btn.textContent = 'Writing story... ' + (pollCount * 10) + 's';
+    if (pollCount > 12) { clearInterval(pollInterval); btn.textContent = 'Taking longer than expected...'; loadQueue('pending'); return; }
+    var check = await queueApi('get', { id: id });
+    if (check.story && check.story.story_text && check.story.story_text.length > 200) {
+      clearInterval(pollInterval);
+      btn.textContent = 'Done!';
+      btn.className = 'btn btn-green';
+      setTimeout(() => loadQueue('pending'), 1000);
+    }
+  }, 10000);
 }
 
 async function generateTTS(id, btn) {
   btn.disabled = true;
-  btn.textContent = 'Generating...';
+  btn.textContent = 'Generating audio...';
   const data = await queueApi('generate-tts', {}, { storyId: id });
   if (data.success) {
-    btn.textContent = 'Generating audio...';
-    btn.className = 'btn btn-outline';
-    alert(data.message || 'Generating audio in background. Refresh in a few minutes.');
-    setTimeout(() => loadQueue('pending'), 3000);
+    var pollCount = 0;
+    var pollInterval = setInterval(async function() {
+      pollCount++;
+      btn.textContent = 'Generating audio... ' + (pollCount * 10) + 's';
+      if (pollCount > 30) { clearInterval(pollInterval); btn.textContent = 'Taking longer than expected...'; loadQueue('pending'); return; }
+      var check = await queueApi('get', { id: id });
+      if (check.story && check.story.audio_url) {
+        clearInterval(pollInterval);
+        btn.textContent = 'Audio ready!';
+        btn.className = 'btn btn-green';
+        setTimeout(() => loadQueue('pending'), 1000);
+      }
+    }, 10000);
   } else {
     btn.textContent = 'Failed';
     btn.disabled = false;
@@ -499,10 +518,20 @@ async function submitRegen() {
 
   const data = await queueApi('regenerate', {}, { storyId: regenStoryId, notes });
   if (data.success) {
-    status.textContent = data.message || 'Regenerating in background. Refresh in about a minute.';
-    status.style.color = '#4CAF50';
-    btn.disabled = false;
-    setTimeout(() => { closeModal('regenModal'); loadQueue('pending'); }, 3000);
+    status.textContent = 'Regenerating... this usually takes about a minute.';
+    status.style.color = '#6B2F93';
+    closeModal('regenModal');
+    // Poll until text appears
+    var pollCount = 0;
+    var pollInterval = setInterval(async function() {
+      pollCount++;
+      if (pollCount > 12) { clearInterval(pollInterval); loadQueue('pending'); return; }
+      var check = await queueApi('get', { id: regenStoryId });
+      if (check.story && check.story.story_text && check.story.story_text.length > 200) {
+        clearInterval(pollInterval);
+        loadQueue('pending');
+      }
+    }, 10000);
   } else {
     status.textContent = 'Error: ' + (data.error || 'Unknown');
     status.style.color = '#FF6B9D';
