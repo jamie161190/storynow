@@ -322,10 +322,8 @@ async function sayThankYou() {
   btn.style.opacity = '0.6';
   btn.style.pointerEvents = 'none';
 
-  var message = (document.getElementById('thankMsg').value || '').trim();
-  var nameEl = document.getElementById('thankName');
-  var isAnon = document.getElementById('thankAnon').checked;
-  var displayName = isAnon ? 'Anonymous' : (nameEl.value || '').trim();
+  var message = '';
+  var displayName = '';
 
   try {
     var res = await fetch('/api/create-donation', {
@@ -335,7 +333,11 @@ async function sayThankYou() {
     });
     var data = await res.json();
     if (data.url) {
-      window.location.href = data.url;
+      window.open(data.url, '_blank');
+      btn.textContent = 'Thank you!';
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      return;
     } else {
       throw new Error(data.error || 'Failed');
     }
