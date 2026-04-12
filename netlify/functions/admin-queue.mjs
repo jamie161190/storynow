@@ -412,9 +412,9 @@ export default async (req) => {
     const stories = await storyRes.json();
     if (!stories.length) return json({ error: 'Story not found' }, 404);
     const story = stories[0];
-    const sd = story.story_data || {};
 
-    // Archive the bad version before overwriting
+    // Archive the bad version before clearing
+    const patchData = { story_text: null, status: 'pending', audio_url: null };
     if (story.story_text) {
       const rejectedVersions = story.rejected_versions || [];
       rejectedVersions.push({
@@ -422,61 +422,27 @@ export default async (req) => {
         rejected_at: new Date().toISOString(),
         notes: notes || null
       });
-      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-        method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ rejected_versions: rejectedVersions, status: 'generating' })
-      });
+      patchData.rejected_versions = rejectedVersions;
       console.log(`[ADMIN-QUEUE] Archived rejected version #${rejectedVersions.length} for ${storyId}`);
-    } else {
-      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-        method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ status: 'generating' })
-      });
     }
 
-    try {
-      // Call Claude to regenerate with feedback
-      const prompt = buildRegeneratePrompt(sd, (notes || '') + (story.feedback ? '\n\nOriginal customer feedback: ' + story.feedback : ''));
-      const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 16000,
-          temperature: 1,
-          thinking: { type: 'adaptive' },
-          system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: prompt }]
-        })
-      });
+    // Save notes as feedback so the background function can use them
+    if (notes) patchData.feedback = notes;
 
-      if (!apiRes.ok) {
-        const errBody = await apiRes.text();
-        throw new Error('Claude API ' + apiRes.status + ': ' + errBody.slice(0, 200));
-      }
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify(patchData)
+    });
 
-      const result = await apiRes.json();
-      let newText = '';
-      for (const block of result.content) {
-        if (block.type === 'text') newText += block.text;
-      }
+    // Trigger background function to regenerate
+    fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ storyId })
+    }).catch(e => console.error('[ADMIN-QUEUE] Regen trigger failed:', e.message));
 
-      // Save new story text
-      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-        method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ story_text: newText, status: 'pending' })
-      });
-
-      console.log(`[ADMIN-QUEUE] Story regenerated for ${storyId}, ${newText.split(' ').length} words`);
-      return json({ success: true, wordCount: newText.split(' ').length });
-    } catch (err) {
-      console.error('[ADMIN-QUEUE] Regenerate error:', err.message);
-      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-        method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ status: 'pending' })
-      });
-      return json({ error: 'Regeneration failed: ' + err.message }, 500);
-    }
+    console.log(`[ADMIN-QUEUE] Regeneration triggered for ${storyId}`);
+    return json({ success: true, message: 'Regenerating in background. Refresh in about a minute.' });
   }
 
   // ── SEND: Deliver story to customer via email ──

@@ -498,10 +498,10 @@ async function submitRegen() {
 
   const data = await queueApi('regenerate', {}, { storyId: regenStoryId, notes });
   if (data.success) {
-    status.textContent = 'Story regenerated! ' + (data.wordCount || '') + ' words. You can now generate audio.';
+    status.textContent = data.message || 'Regenerating in background. Refresh in about a minute.';
     status.style.color = '#4CAF50';
     btn.disabled = false;
-    setTimeout(() => { closeModal('regenModal'); loadQueue('pending'); }, 2000);
+    setTimeout(() => { closeModal('regenModal'); loadQueue('pending'); }, 3000);
   } else {
     status.textContent = 'Error: ' + (data.error || 'Unknown');
     status.style.color = '#FF6B9D';

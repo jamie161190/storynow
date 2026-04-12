@@ -2,7 +2,7 @@
 // Uses Lambda handler format (required for background functions).
 // Matches the proven Claude call pattern from full-worker-background.
 
-import { SYSTEM_PROMPT, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
+import { SYSTEM_PROMPT, buildCompleteStoryPrompt, buildRegeneratePrompt } from './lib/story-prompts.mjs';
 
 export const handler = async (event) => {
   try {
@@ -37,9 +37,10 @@ export const handler = async (event) => {
     }
 
     const sd = story.story_data || {};
-    console.log('[STORY-TEXT-BG] Generating text for', storyId, sd.childName);
+    const hasFeedback = story.feedback && story.feedback.trim();
+    console.log('[STORY-TEXT-BG]', hasFeedback ? 'Regenerating with notes' : 'Generating new text', 'for', storyId, sd.childName);
 
-    const fullPrompt = buildCompleteStoryPrompt(sd);
+    const fullPrompt = hasFeedback ? buildRegeneratePrompt(sd, story.feedback) : buildCompleteStoryPrompt(sd);
     const apiBody = JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 16000,
