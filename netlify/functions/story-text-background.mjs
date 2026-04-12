@@ -102,7 +102,7 @@ export const handler = async (event) => {
 
     await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
       method: 'PATCH', headers: headersJson,
-      body: JSON.stringify({ story_text: fullText })
+      body: JSON.stringify({ story_text: fullText, status: 'pending' })
     });
 
     const wordCount = fullText.split(/\s+/).length;
