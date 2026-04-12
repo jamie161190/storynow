@@ -242,6 +242,13 @@ async function loadStory() {
     bgEl.load();
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('storyContent').style.display = 'block';
+
+    // Track page view
+    fetch('/api/track-pageview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ page: '/story/' + storyId, screen_name: 'story_view', referrer: document.referrer || '' })
+    }).catch(function() {});
   } catch (err) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('errorState').style.display = 'block';
@@ -254,6 +261,12 @@ function togglePlay() {
   if (audio.paused) {
     var bg = document.getElementById('bgMusicAudio');
     // Must play BOTH audio elements inside the same user click handler
+    // Track play
+    if (audio.currentTime < 1) {
+      fetch('/api/track-pageview', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page: '/story/' + storyId, screen_name: 'story_play' })
+      }).catch(function() {});
+    }
     // Play music first (at volume 0) to unlock it, then fade in
     bg.volume = 0;
     bg.play().catch(function() {});
@@ -345,7 +358,14 @@ async function sayThankYou() {
   }
 }
 
+function trackShare(method) {
+  fetch('/api/track-pageview', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ page: '/story/' + storyId, screen_name: 'story_share_' + method })
+  }).catch(function() {});
+}
+
 function shareWhatsApp() {
+  trackShare('whatsapp');
   var url = window.location.href;
   var name = storyData ? storyData.childName : 'a child';
   var text = "We had a personalised audio story made for " + name + " by Hear Their Name. It's free and it's lovely. Just tap to listen:\n\n" + url;
@@ -353,6 +373,7 @@ function shareWhatsApp() {
 }
 
 function shareEmail() {
+  trackShare('email');
   var url = window.location.href;
   var name = storyData ? storyData.childName : 'a child';
   var subject = "Listen to " + name + "'s personalised story";
@@ -361,6 +382,7 @@ function shareEmail() {
 }
 
 function copyLink() {
+  trackShare('copy');
   navigator.clipboard.writeText(window.location.href).then(function() {
     var btn = document.getElementById('copyBtn');
     var orig = btn.innerHTML;
