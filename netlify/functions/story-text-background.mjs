@@ -106,7 +106,24 @@ export const handler = async (event) => {
     });
 
     const wordCount = fullText.split(/\s+/).length;
-    console.log('[STORY-TEXT-BG] Complete:', wordCount, 'words for', sd.childName, '(' + storyId + ')');
+    console.log('[STORY-TEXT-BG] Text complete:', wordCount, 'words for', sd.childName, '(' + storyId + ')');
+
+    // Auto-chain: trigger TTS generation immediately
+    const voiceId = story.voice_id || 'N2lVS1w4EtoT3dr4eOWO';
+    console.log('[STORY-TEXT-BG] Chaining to TTS for', storyId, 'voice:', voiceId);
+    fetch('https://heartheirname.com/.netlify/functions/full-worker-background', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'tts-only',
+        storyData: sd,
+        voiceId: voiceId,
+        jobId: storyId,
+        storyText: fullText,
+        childName: sd.childName
+      })
+    }).catch(e => console.error('[STORY-TEXT-BG] TTS chain failed:', e.message));
+
     return { statusCode: 200 };
 
   } catch (err) {
