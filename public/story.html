@@ -333,11 +333,7 @@ async function sayThankYou() {
     });
     var data = await res.json();
     if (data.url) {
-      window.open(data.url, '_blank');
-      btn.textContent = 'Thank you!';
-      btn.style.opacity = '1';
-      btn.style.pointerEvents = 'auto';
-      return;
+      window.location.href = data.url;
     } else {
       throw new Error(data.error || 'Failed');
     }
