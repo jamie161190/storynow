@@ -482,8 +482,10 @@ async function generateTTS(id, btn) {
     var pollCount = 0;
     var pollInterval = setInterval(async function() {
       pollCount++;
-      btn.textContent = 'Generating audio... ' + (pollCount * 10) + 's';
-      if (pollCount > 30) { clearInterval(pollInterval); btn.textContent = 'Taking longer than expected...'; loadQueue('pending'); return; }
+      var mins = Math.floor(pollCount * 10 / 60);
+      var secs = (pollCount * 10) % 60;
+      btn.textContent = 'Generating audio... ' + (mins > 0 ? mins + 'm ' : '') + secs + 's';
+      if (pollCount > 60) { clearInterval(pollInterval); btn.textContent = 'Still generating. Will refresh shortly.'; setTimeout(() => loadQueue('pending'), 5000); return; }
       var check = await queueApi('get', { id: id });
       if (check.story && check.story.audio_url) {
         clearInterval(pollInterval);
