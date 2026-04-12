@@ -670,20 +670,11 @@ export function buildCompleteStoryPrompt(storyData) {
   const wordCount = storyData._targetWords || getWordCount(safe.length, safe.age);
   const isMulti = safe.isMultiChild && safe.children && safe.children.length > 1;
 
-  // Opening rules: the first ~250 words will be used as a 2-minute audio preview.
-  // They must be incredible because they sell the story.
-  const formulaFn = PREVIEW_FORMULAS[safe.category] || PREVIEW_FORMULAS.journey;
-  const openingFormula = formulaFn(safe)
-    // Strip the "IMPORTANT OVERRIDE" and word count from preview formulas since this is a full story
-    .replace(/IMPORTANT OVERRIDE:.*?(?=\n\n)/s, '')
-    .replace(/Write ONLY the opening.*?(?=\n)/s, '')
-    .replace(/approximately 60 to 80 words\./g, '');
-
   return fullPrompt + `
 
 Write the COMPLETE story from beginning to end. Approximately ${wordCount} words. This is the full, finished story that will be read aloud in one sitting.
 
-Let the story breathe naturally from the start. There is no preview or sample. The listener will hear the whole thing in one go, so the pacing should be even throughout. Begin gently, build through the middle, and resolve warmly.
+Let the story breathe naturally from the start. The listener will hear the whole thing in one go, so the pacing should be even throughout. Begin gently, build through the middle, and resolve warmly.
 
 Include natural pauses ( ... ) throughout for the narrator to breathe.
 ${isMulti ? '\nIntroduce each child individually in the opening. Never list them together. Let each name land on its own.' : ''}`;
