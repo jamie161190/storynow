@@ -1,6 +1,6 @@
-// Background function: generates story text via Claude.
-// Called fire-and-forget from request-story.mjs on submission.
+// Background function: generates story text via Claude on submission.
 // Uses Lambda handler format (required for background functions).
+// Matches the proven Claude call pattern from full-worker-background.
 
 import { SYSTEM_PROMPT, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
 
@@ -22,7 +22,6 @@ export const handler = async (event) => {
     const headers = { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey };
     const headersJson = { ...headers, 'Content-Type': 'application/json' };
 
-    // Fetch the story
     const storyRes = await fetch(
       `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=*&limit=1`,
       { headers }
@@ -32,39 +31,65 @@ export const handler = async (event) => {
     if (!stories.length) { console.error('[STORY-TEXT-BG] Story not found:', storyId); return { statusCode: 404 }; }
     const story = stories[0];
 
-    if (story.story_text) {
+    if (story.story_text && story.story_text.split(/\s+/).length > 100) {
       console.log('[STORY-TEXT-BG] Story already has text, skipping:', storyId);
       return { statusCode: 200 };
     }
 
     const sd = story.story_data || {};
-    console.log(`[STORY-TEXT-BG] Generating text for ${storyId} (${sd.childName})...`);
+    console.log('[STORY-TEXT-BG] Generating text for', storyId, sd.childName);
 
     const fullPrompt = buildCompleteStoryPrompt(sd);
-    const genRes = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 16000,
-        temperature: 1,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: fullPrompt }]
-      })
+    const apiBody = JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 16000,
+      temperature: 1,
+      thinking: { type: 'adaptive' },
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: fullPrompt }]
     });
 
-    if (!genRes.ok) {
-      const errText = await genRes.text();
-      console.error('[STORY-TEXT-BG] Claude API error:', genRes.status, errText.slice(0, 200));
+    // Retry logic matching full-worker-background
+    let apiResponse;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        apiResponse = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': process.env.ANTHROPIC_API_KEY,
+            'anthropic-version': '2023-06-01',
+            'Content-Type': 'application/json'
+          },
+          body: apiBody
+        });
+      } catch (networkErr) {
+        console.log('[STORY-TEXT-BG] Network error attempt ' + (attempt + 1) + ': ' + networkErr.message);
+        if (attempt < 4) { await new Promise(r => setTimeout(r, 4000 * (attempt + 1))); continue; }
+        throw networkErr;
+      }
+      if (apiResponse.ok) break;
+      const shouldRetry = apiResponse.status === 429 || apiResponse.status === 529 || apiResponse.status >= 500;
+      if (attempt < 4 && shouldRetry) {
+        const waitMs = apiResponse.status === 429 ? 8000 : 4000 * (attempt + 1);
+        console.log('[STORY-TEXT-BG] Anthropic ' + apiResponse.status + ', retry in ' + waitMs + 'ms');
+        await new Promise(r => setTimeout(r, waitMs));
+        continue;
+      }
+    }
+
+    if (!apiResponse.ok) {
+      const errBody = await apiResponse.text();
+      console.error('[STORY-TEXT-BG] Claude API error:', apiResponse.status, errBody.slice(0, 300));
       return { statusCode: 500 };
     }
 
-    const genResult = await genRes.json();
+    const genResult = await apiResponse.json();
     let storyText = '';
     for (const block of genResult.content) { if (block.type === 'text') storyText += block.text; }
 
     if (!storyText || storyText.split(/\s+/).length < 100) {
-      console.error('[STORY-TEXT-BG] Claude returned insufficient text:', storyText ? storyText.length + ' chars' : 'empty');
+      console.error('[STORY-TEXT-BG] Claude returned insufficient text:', storyText ? storyText.split(/\s+/).length + ' words' : 'empty');
+      console.error('[STORY-TEXT-BG] Response blocks:', JSON.stringify(genResult.content.map(b => ({ type: b.type, length: (b.text || '').length }))));
       return { statusCode: 500 };
     }
 
@@ -80,7 +105,7 @@ export const handler = async (event) => {
     });
 
     const wordCount = fullText.split(/\s+/).length;
-    console.log(`[STORY-TEXT-BG] Complete: ${wordCount} words for ${sd.childName} (${storyId})`);
+    console.log('[STORY-TEXT-BG] Complete:', wordCount, 'words for', sd.childName, '(' + storyId + ')');
     return { statusCode: 200 };
 
   } catch (err) {
