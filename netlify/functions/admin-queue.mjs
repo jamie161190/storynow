@@ -138,6 +138,50 @@ export default async (req) => {
   }
 
   // ── GENERATE-TEXT: Generate story text only (no audio) ──
+  // ── UPDATE-DATA: Save edited customer input ──
+  if (action === 'update-data' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId, updates } = body;
+    if (!storyId || !updates) return json({ error: 'Missing storyId or updates' }, 400);
+
+    // Fetch current story_data
+    const storyRes = await fetch(
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_data,child_name&limit=1`,
+      { headers }
+    );
+    if (!storyRes.ok) return json({ error: 'Failed to fetch story' }, 500);
+    const stories = await storyRes.json();
+    if (!stories.length) return json({ error: 'Story not found' }, 404);
+
+    const sd = stories[0].story_data || {};
+
+    // Merge updates into story_data
+    for (const key in updates) {
+      if (key === 'children' && Array.isArray(updates.children)) {
+        if (!sd.children) sd.children = [];
+        updates.children.forEach(function(child, i) {
+          if (!sd.children[i]) sd.children[i] = {};
+          for (const k in child) { sd.children[i][k] = child[k]; }
+        });
+      } else {
+        sd[key] = updates[key];
+      }
+    }
+
+    // Update child_name if childName changed
+    const newChildName = updates.childName || (sd.children ? sd.children.map(c => c.name).join(', ') : null);
+    const patchData = { story_data: sd };
+    if (newChildName) patchData.child_name = newChildName;
+
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify(patchData)
+    });
+
+    console.log(`[ADMIN-QUEUE] Story data updated for ${storyId}`);
+    return json({ success: true });
+  }
+
   // ── UPDATE-TEXT: Save edited story text ──
   if (action === 'update-text' && req.method === 'POST') {
     const body = await req.json();

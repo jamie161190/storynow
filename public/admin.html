@@ -265,7 +265,9 @@ function renderQueue(stories) {
     if (sd.subject) html += '<strong>Subject:</strong> ' + esc(sd.subject) + '<br>';
     if (sd.learningGoal) html += '<strong>Learning goal:</strong> ' + esc(sd.learningGoal) + '<br>';
 
-    html += '</div></details>';
+    html += '</div>';
+    html += '<button class="btn btn-outline" style="margin-top:0.4rem" onclick="editStoryData(\'' + esc(s.id) + '\',this)">Edit input</button>';
+    html += '</details>';
 
     // Customer feedback (if rewrite request)
     if (hasFeedback) {
@@ -336,6 +338,85 @@ async function viewStory(id) {
   document.getElementById('storyModalTitle').textContent = (s.child_name || 'Story') + ' text';
   document.getElementById('storyModalText').textContent = s.story_text || 'No story text available';
   document.getElementById('storyModal').classList.add('active');
+}
+
+function editStoryData(id, btn) {
+  var card = btn.closest('details');
+  var dataDiv = card.querySelector('div[style*="F8F5FF"]');
+  if (!dataDiv) return;
+
+  // Fetch the story to get the raw story_data
+  queueApi('get', { id: id }).then(function(data) {
+    var s = data.story;
+    if (!s) { alert('Story not found'); return; }
+    var sd = s.story_data || {};
+    var isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
+
+    var fields = '';
+    if (isMulti && sd.children) {
+      sd.children.forEach(function(c, i) {
+        fields += '<div style="margin-bottom:0.5rem;padding-bottom:0.5rem;border-bottom:1px solid #E8E0F0">';
+        fields += '<strong style="font-size:0.75rem">Child ' + (i+1) + '</strong><br>';
+        fields += '<label style="font-size:0.72rem;color:#666">Name</label><input data-field="children.' + i + '.name" value="' + esc(c.name || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+        fields += '<label style="font-size:0.72rem;color:#666">Age</label><input data-field="children.' + i + '.age" value="' + esc(c.age || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+        fields += '<label style="font-size:0.72rem;color:#666">About</label><input data-field="children.' + i + '.about" value="' + esc(c.about || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem">';
+        fields += '</div>';
+      });
+    } else {
+      fields += '<label style="font-size:0.72rem;color:#666">Name</label><input data-field="childName" value="' + esc(sd.childName || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+      fields += '<label style="font-size:0.72rem;color:#666">Age</label><input data-field="age" value="' + esc(sd.age || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+      fields += '<label style="font-size:0.72rem;color:#666">Gender</label><input data-field="gender" value="' + esc(sd.gender || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    }
+    fields += '<label style="font-size:0.72rem;color:#666">Best friend</label><input data-field="friendName" value="' + esc(sd.friendName || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Family</label><input data-field="familyMembers" value="' + esc(sd.familyMembers || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Pet name</label><input data-field="petName" value="' + esc(sd.petName || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Pet type</label><input data-field="petType" value="' + esc(sd.petType || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Villain</label><input data-field="villainName" value="' + esc(sd.villainName || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Special item</label><input data-field="favTeddy" value="' + esc(sd.favTeddy || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Interests</label><input data-field="themes" value="' + esc((sd.themes || []).join(', ')) + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Setting</label><input data-field="setting" value="' + esc(sd.setting || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Extra notes</label><input data-field="extraDetails" value="' + esc(sd.extraDetails || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+    fields += '<label style="font-size:0.72rem;color:#666">Sibling dynamic</label><input data-field="siblingDynamics" value="' + esc(sd.siblingDynamics || '') + '" style="width:100%;padding:0.3rem 0.5rem;border:1.5px solid #E8E0F0;border-radius:6px;font-size:0.82rem;margin-bottom:0.3rem">';
+
+    dataDiv.innerHTML = '<div id="editFields_' + id + '">' + fields +
+      '<div style="display:flex;gap:0.4rem;margin-top:0.75rem">' +
+      '<button class="btn btn-purple" onclick="saveStoryData(\'' + id + '\')">Save input</button>' +
+      '<button class="btn btn-outline" onclick="loadQueue(\'pending\')">Cancel</button>' +
+      '</div></div>';
+  });
+}
+
+function saveStoryData(id) {
+  var container = document.getElementById('editFields_' + id);
+  if (!container) return;
+
+  // Build updated story_data from the fields
+  var updates = {};
+  container.querySelectorAll('input[data-field]').forEach(function(input) {
+    var field = input.dataset.field;
+    var val = input.value.trim();
+    if (field === 'themes') {
+      updates.themes = val ? val.split(',').map(function(t) { return t.trim(); }) : [];
+    } else if (field.startsWith('children.')) {
+      // e.g. children.0.name
+      var parts = field.split('.');
+      if (!updates.children) updates.children = [];
+      var idx = parseInt(parts[1]);
+      if (!updates.children[idx]) updates.children[idx] = {};
+      updates.children[idx][parts[2]] = val;
+    } else {
+      updates[field] = val;
+    }
+  });
+
+  queueApi('update-data', {}, { storyId: id, updates: updates }).then(function(data) {
+    if (data.success) {
+      alert('Input saved. Regenerate the story to apply changes.');
+      loadQueue('pending');
+    } else {
+      alert('Failed: ' + (data.error || 'Unknown'));
+    }
+  });
 }
 
 function editStoryText(id) {
