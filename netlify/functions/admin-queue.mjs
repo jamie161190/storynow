@@ -261,9 +261,9 @@ export default async (req) => {
     const { storyId } = body;
     if (!storyId) return json({ error: 'Missing storyId' }, 400);
 
-    // Fetch the story
+    // Fetch the story to get voice_id and story_data
     const storyRes = await fetch(
-      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=*&limit=1`,
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=id,story_text,voice_id,story_data,child_name&limit=1`,
       { headers }
     );
     if (!storyRes.ok) return json({ error: 'Failed to fetch story' }, 500);
@@ -271,131 +271,30 @@ export default async (req) => {
     if (!stories.length) return json({ error: 'Story not found' }, 404);
     const story = stories[0];
 
-    const sd = story.story_data || {};
+    if (!story.story_text) return json({ error: 'No story text yet. Generate story first.' }, 400);
 
-    // If no story text at all (free request), generate the complete story from scratch
-    if (!story.story_text) {
-      console.log(`[ADMIN-QUEUE] Story ${storyId} has no text (free request). Generating complete story...`);
-      try {
-        const fullPrompt = buildCompleteStoryPrompt(sd);
-        const genRes = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-6',
-            max_tokens: 16000,
-            temperature: 1,
-            thinking: { type: 'adaptive' },
-            system: SYSTEM_PROMPT,
-            messages: [{ role: 'user', content: fullPrompt }]
-          })
-        });
-        if (!genRes.ok) throw new Error('Claude API ' + genRes.status);
-        const genResult = await genRes.json();
-        let storyText = '';
-        for (const block of genResult.content) { if (block.type === 'text') storyText += block.text; }
-
-        // Add message intro and outro
-        let messageIntro = '';
-        if (sd.isGift && sd.giftFrom) {
-          messageIntro = 'This story was made just for you, ' + sd.childName + ', with love from ' + sd.giftFrom + '. ... ';
-          if (sd.giftMessage) messageIntro += sd.giftMessage + ' ... ';
-          messageIntro += 'And now, your story begins. ... ';
-        } else if (sd.personalMessage) {
-          messageIntro = 'Before we begin, there is a special message for ' + sd.childName + '. ... ' + sd.personalMessage + ' ... And now, on with the story. ... ';
-        }
-        const fullText = messageIntro + storyText + ' ... ... A Hear Their Name original ... made with love.';
-
-        await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-          method: 'PATCH', headers: headersJson,
-          body: JSON.stringify({ story_text: fullText })
-        });
-        story.story_text = fullText;
-        console.log(`[ADMIN-QUEUE] Complete story generated: ${fullText.split(/\s+/).length} words`);
-      } catch (genErr) {
-        console.error('[ADMIN-QUEUE] Story generation error:', genErr.message);
-        return json({ error: 'Story generation failed: ' + genErr.message }, 500);
-      }
-    }
-
-
-    // Update status
+    // Set status to generating
     await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
       method: 'PATCH', headers: headersJson,
       body: JSON.stringify({ status: 'generating' })
     });
 
-    // Build full TTS text with message intro (sd already declared above)
-    let messageIntro = '';
-    if (sd.isGift && sd.giftFrom) {
-      messageIntro = `This story was made just for you, ${sd.childName}, with love from ${sd.giftFrom}. ... `;
-      if (sd.giftMessage) messageIntro += `${sd.giftMessage} ... `;
-      messageIntro += `And now, your story begins. ... `;
-    } else if (sd.personalMessage) {
-      messageIntro = `Before we begin, there is a special message for ${sd.childName}. ... ${sd.personalMessage} ... And now, on with the story. ... `;
-    }
+    // Trigger full-worker-background which handles TTS reliably (15 min timeout)
+    fetch('https://heartheirname.com/.netlify/functions/full-worker-background', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'tts-only',
+        storyData: story.story_data,
+        voiceId: story.voice_id,
+        jobId: storyId,
+        storyText: story.story_text,
+        childName: story.child_name
+      })
+    }).catch(e => console.error('[ADMIN-QUEUE] TTS trigger failed:', e.message));
 
-    const fullText = messageIntro + story.story_text + ` ... ... A Hear Their Name original ... made with love.`;
-    const ttsText = prepareTTSText(fullText);
-
-    const useVoiceId = (story.voice_id && /^[a-zA-Z0-9]+$/.test(story.voice_id)) ? story.voice_id : 'EXAVITQu4vr4xnSDxMaL';
-    const chunks = splitIntoChunks(ttsText);
-    console.log(`[ADMIN-QUEUE] Generating TTS for ${storyId}: ${chunks.length} chunks`);
-
-    try {
-      const audioBuffers = [];
-      const BATCH_SIZE = 5;
-      for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
-        const batch = chunks.slice(i, i + BATCH_SIZE);
-        const results = await Promise.all(batch.map((chunk, batchIdx) =>
-          fetchWithRetry(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
-            method: 'POST',
-            headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: chunk, model_id: 'eleven_v3', voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 } })
-          }).then(async (res) => {
-            if (!res.ok) throw new Error(`TTS chunk ${i + batchIdx + 1} failed (${res.status})`);
-            return res.arrayBuffer();
-          })
-        ));
-        audioBuffers.push(...results);
-      }
-
-      // Combine MP3 chunks
-      const processedBuffers = audioBuffers.map(buf => stripID3(buf));
-      if (processedBuffers.length > 1) processedBuffers[0] = stripXingFrame(processedBuffers[0]);
-      const totalLength = processedBuffers.reduce((sum, buf) => sum + buf.byteLength, 0);
-      const combined = new Uint8Array(totalLength);
-      let offset = 0;
-      for (const buf of processedBuffers) { combined.set(buf, offset); offset += buf.byteLength; }
-
-      // Upload to Supabase Storage
-      const safeName = (story.child_name || 'story').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${safeName}.mp3`;
-      const uploadRes = await fetch(`${supabaseUrl}/storage/v1/object/stories/${fileName}`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey, 'Content-Type': 'audio/mpeg', 'x-upsert': 'true' },
-        body: combined
-      });
-      if (!uploadRes.ok) throw new Error('Storage upload failed');
-
-      const audioUrl = `${supabaseUrl}/storage/v1/object/public/stories/${fileName}`;
-
-      // Update story with audio URL and status
-      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-        method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ audio_url: audioUrl, status: 'ready' })
-      });
-
-      console.log(`[ADMIN-QUEUE] TTS complete for ${storyId}: ${audioUrl}`);
-      return json({ success: true, audioUrl });
-    } catch (err) {
-      console.error('[ADMIN-QUEUE] TTS error:', err.message);
-      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-        method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ status: 'pending' })
-      });
-      return json({ error: 'Audio generation failed: ' + err.message }, 500);
-    }
+    console.log(`[ADMIN-QUEUE] TTS generation triggered for ${storyId}`);
+    return json({ success: true, message: 'Generating audio in background. Refresh in a few minutes.' });
   }
 
   // ── REGENERATE: Rewrite story with feedback, then generate TTS ──

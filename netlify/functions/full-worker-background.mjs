@@ -317,6 +317,81 @@ export const handler = async (event) => {
     }
 
     // ── PREVIEW-FULL MODE: Write complete story, TTS only first ~250 words for preview ──
+    // ── TTS-ONLY MODE: Generate audio from existing story text, save to stories table ──
+    if (mode === 'tts-only') {
+      const { storyText, childName: cName } = parsed;
+      console.log('[TTS-ONLY] Starting TTS for story:', jobId, cName);
+
+      if (!storyText) {
+        console.error('[TTS-ONLY] No story text provided');
+        return { statusCode: 200 };
+      }
+
+      if (!process.env.ELEVENLABS_API_KEY) {
+        console.error('[TTS-ONLY] ELEVENLABS_API_KEY not set');
+        return { statusCode: 200 };
+      }
+
+      const headers = { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey };
+      const headersJson = { ...headers, 'Content-Type': 'application/json' };
+
+      const ttsText = prepareTTSText(storyText);
+      const useVoiceId = (voiceId && /^[a-zA-Z0-9]+$/.test(voiceId)) ? voiceId : 'N2lVS1w4EtoT3dr4eOWO';
+      const chunks = splitIntoChunks(ttsText);
+      console.log('[TTS-ONLY] Generating', chunks.length, 'chunks with voice', useVoiceId);
+
+      try {
+        const audioBuffers = [];
+        const BATCH_SIZE = 5;
+        for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
+          const batch = chunks.slice(i, i + BATCH_SIZE);
+          const results = await Promise.all(batch.map((chunk, batchIdx) =>
+            fetchWithRetry(`https://api.elevenlabs.io/v1/text-to-speech/${useVoiceId}`, {
+              method: 'POST',
+              headers: { 'xi-api-key': process.env.ELEVENLABS_API_KEY, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ text: chunk, model_id: 'eleven_v3', voice_settings: { stability: 0.50, similarity_boost: 0.75, style: 0 } })
+            }).then(async (res) => {
+              if (!res.ok) throw new Error('TTS chunk ' + (i + batchIdx + 1) + ' failed (' + res.status + ')');
+              return res.arrayBuffer();
+            })
+          ));
+          audioBuffers.push(...results);
+        }
+
+        const processedBuffers = audioBuffers.map(buf => stripID3(buf));
+        if (processedBuffers.length > 1) processedBuffers[0] = stripXingFrame(processedBuffers[0]);
+        const totalLength = processedBuffers.reduce((sum, buf) => sum + buf.byteLength, 0);
+        const combined = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const buf of processedBuffers) { combined.set(buf, offset); offset += buf.byteLength; }
+
+        const safeName = (cName || 'story').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+        const fileName = Date.now() + '-' + Math.random().toString(36).slice(2, 6) + '-' + safeName + '.mp3';
+        const uploadRes = await fetch(supabaseUrl + '/storage/v1/object/stories/' + fileName, {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + supabaseKey, 'apikey': supabaseKey, 'Content-Type': 'audio/mpeg', 'x-upsert': 'true' },
+          body: combined
+        });
+        if (!uploadRes.ok) throw new Error('Storage upload failed');
+
+        const audioUrl = supabaseUrl + '/storage/v1/object/public/stories/' + fileName;
+
+        await fetch(supabaseUrl + '/rest/v1/stories?id=eq.' + encodeURIComponent(jobId), {
+          method: 'PATCH', headers: headersJson,
+          body: JSON.stringify({ audio_url: audioUrl, status: 'ready' })
+        });
+
+        console.log('[TTS-ONLY] Complete:', audioUrl);
+      } catch (ttsErr) {
+        console.error('[TTS-ONLY] Error:', ttsErr.message);
+        await fetch(supabaseUrl + '/rest/v1/stories?id=eq.' + encodeURIComponent(jobId), {
+          method: 'PATCH', headers: { ...headers, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'pending' })
+        });
+      }
+      return { statusCode: 200 };
+    }
+
     if (mode === 'preview-full') {
       console.log('[PREVIEW-FULL] Starting full story + preview TTS for job:', jobId);
       const startTime = Date.now();

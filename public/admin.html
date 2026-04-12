@@ -469,9 +469,10 @@ async function generateTTS(id, btn) {
   btn.textContent = 'Generating...';
   const data = await queueApi('generate-tts', {}, { storyId: id });
   if (data.success) {
-    btn.textContent = 'Done!';
-    btn.className = 'btn btn-green';
-    setTimeout(() => loadQueue('pending'), 1000);
+    btn.textContent = 'Generating audio...';
+    btn.className = 'btn btn-outline';
+    alert(data.message || 'Generating audio in background. Refresh in a few minutes.');
+    setTimeout(() => loadQueue('pending'), 3000);
   } else {
     btn.textContent = 'Failed';
     btn.disabled = false;
