@@ -4784,19 +4784,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fp) fp.style.display = 'block';
   });
   // Check for shared story link
+  // Redirect old ?listen= URLs to new /story/ page
   const listenId = new URLSearchParams(window.location.search).get('listen');
   if (listenId) {
-    loadSharedStory(listenId);
+    window.location.href = '/story/' + encodeURIComponent(listenId);
     return;
   }
-  // Check for abandoned preview return link
-  const previewJobId = new URLSearchParams(window.location.search).get('preview');
-  if (previewJobId && /^[a-zA-Z0-9_-]+$/.test(previewJobId)) {
-    restorePreviewFromEmail(previewJobId);
-    return;
-  }
-  // Check if returning from Stripe checkout
-  handleStripeReturn();
 
   // Shared audio progress
   const sharedAudio = document.getElementById('sharedAudio');
