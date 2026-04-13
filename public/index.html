@@ -3771,6 +3771,16 @@ async function submitStoryRequest() {
 
 function showRequestConfirmation() {
   var childName = escHtml(storyData.childName || 'your child');
+
+  // Stop any audio that might be playing
+  try {
+    bgMusic.stop();
+    var previewAud = document.getElementById('previewAudio');
+    if (previewAud) { previewAud.pause(); previewAud.src = ''; }
+    var sampleAud = document.getElementById('sampleAudio');
+    if (sampleAud) { sampleAud.pause(); }
+  } catch(e) {}
+
   var container = document.getElementById('screenPreview');
   container.innerHTML = `
     <div style="text-align:center;padding:3rem 1.25rem;max-width:440px;margin:0 auto">
