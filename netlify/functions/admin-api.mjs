@@ -296,6 +296,31 @@ export default async (req) => {
       });
     }
 
+    // ── STORY ANALYTICS: views, plays, shares per story ──
+    if (action === 'story-analytics') {
+      const res = await fetch(
+        `${supabaseUrl}/rest/v1/page_views?screen_name=in.(story_view,story_play,story_share_whatsapp,story_share_email,story_share_copy)&select=page,screen_name`,
+        { headers: sbHeaders }
+      );
+      if (!res.ok) return json({ error: 'Failed to fetch analytics' }, 500);
+      const rows = await res.json();
+
+      // Group by story ID and event type
+      const analytics = {};
+      for (const r of rows) {
+        // Extract story ID from page path like /story/uuid
+        const match = (r.page || '').match(/\/story\/([a-f0-9-]+)/);
+        if (!match) continue;
+        const sid = match[1];
+        const event = r.screen_name;
+        const key = sid + ':' + event;
+        if (!analytics[key]) analytics[key] = { story_id: sid, event: event, count: 0 };
+        analytics[key].count++;
+      }
+
+      return json({ analytics: Object.values(analytics) });
+    }
+
     // ── METRICS DASHBOARD: aggregated sales, visitors, conversions ──
     if (action === 'metrics') {
       const days = parseInt(url.searchParams.get('days') || '30');

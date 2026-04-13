@@ -312,19 +312,50 @@ function renderQueue(stories) {
   document.getElementById('content').innerHTML = html;
 }
 
-function renderDelivered(stories) {
+async function renderDelivered(stories) {
   if (!stories.length) {
     document.getElementById('content').innerHTML = '<div class="empty">No delivered stories yet</div>';
     return;
   }
+
+  // Fetch analytics for all delivered stories
+  var storyAnalytics = {};
+  try {
+    var analyticsData = await adminApi('story-analytics');
+    if (analyticsData.analytics) {
+      for (var a of analyticsData.analytics) {
+        if (!storyAnalytics[a.story_id]) storyAnalytics[a.story_id] = {};
+        storyAnalytics[a.story_id][a.event] = a.count;
+      }
+    }
+  } catch(e) {}
+
   let html = '';
   for (const s of stories) {
     const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
     const date = new Date(s.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || '';
+    const a = storyAnalytics[s.id] || {};
+    const views = a.story_view || 0;
+    const plays = a.story_play || 0;
+    const shares = (a.story_share_whatsapp || 0) + (a.story_share_email || 0) + (a.story_share_copy || 0);
+
     html += '<div class="card">';
     html += '<div class="card-header"><span class="card-title">' + esc(s.child_name) + '</span><span class="card-meta">' + date + '</span></div>';
-    html += '<div class="card-detail">' + catLabel + ' &middot; ' + esc(s.email) + '</div>';
+    html += '<div class="card-detail">' + catLabel + ' &middot; ' + esc(voiceName) + ' &middot; ' + esc(s.email) + '</div>';
+
+    // Analytics row
+    html += '<div style="display:flex;gap:1rem;margin:0.5rem 0;font-size:0.75rem;font-weight:700">';
+    html += '<span style="color:#6B2F93">' + views + ' views</span>';
+    html += '<span style="color:#4CAF50">' + plays + ' plays</span>';
+    html += '<span style="color:#F1753B">' + shares + ' shares</span>';
+    html += '</div>';
+
     if (s.audio_url) html += '<audio controls preload="none" src="' + esc(s.audio_url) + '"></audio>';
+
+    // Story link
+    html += '<div style="margin-top:0.4rem"><a href="https://heartheirname.com/story/' + esc(s.id) + '" target="_blank" style="font-size:0.72rem;color:#6B2F93;font-weight:600">Open playback page</a></div>';
+
     html += '</div>';
   }
   document.getElementById('content').innerHTML = html;
