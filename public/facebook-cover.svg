@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 312" width="820" height="312">
+  <defs>
+    <linearGradient id="bgCover" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A0F2E"/>
+      <stop offset="60%" style="stop-color:#2D1B4E"/>
+      <stop offset="100%" style="stop-color:#3D1F5C"/>
+    </linearGradient>
+    <linearGradient id="orangeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF8C42"/>
+      <stop offset="100%" style="stop-color:#F1753B"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF8C42"/>
+      <stop offset="100%" style="stop-color:#FFB347"/>
+    </linearGradient>
+    <radialGradient id="glowRight" cx="75%" cy="50%" r="40%">
+      <stop offset="0%" style="stop-color:#7C5CFC;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#7C5CFC;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="glowLeft" cx="25%" cy="50%" r="35%">
+      <stop offset="0%" style="stop-color:#FF8C42;stop-opacity:0.08"/>
+      <stop offset="100%" style="stop-color:#FF8C42;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="820" height="312" fill="url(#bgCover)"/>
+  <rect width="820" height="312" fill="url(#glowRight)"/>
+  <rect width="820" height="312" fill="url(#glowLeft)"/>
+
+  <!-- Decorative dots / stars scattered -->
+  <circle cx="48" cy="42" r="2" fill="#7C5CFC" opacity="0.5"/>
+  <circle cx="130" cy="28" r="1.5" fill="#FF8C42" opacity="0.4"/>
+  <circle cx="210" cy="55" r="1.5" fill="white" opacity="0.25"/>
+  <circle cx="72" cy="285" r="2" fill="#7C5CFC" opacity="0.35"/>
+  <circle cx="170" cy="295" r="1.5" fill="white" opacity="0.2"/>
+  <circle cx="520" cy="25" r="2" fill="white" opacity="0.3"/>
+  <circle cx="600" cy="290" r="2" fill="#FF8C42" opacity="0.35"/>
+  <circle cx="720" cy="35" r="2.5" fill="#7C5CFC" opacity="0.4"/>
+  <circle cx="790" cy="270" r="1.5" fill="white" opacity="0.2"/>
+  <circle cx="460" cy="300" r="1.5" fill="#FF8C42" opacity="0.3"/>
+
+  <!-- Sparkle accents -->
+  <text x="490" y="55" font-size="18" opacity="0.4" fill="#C8B5FF">✦</text>
+  <text x="760" y="85" font-size="14" opacity="0.35" fill="#FF8C42">✦</text>
+  <text x="55" y="200" font-size="12" opacity="0.3" fill="#C8B5FF">✦</text>
+  <text x="430" y="285" font-size="10" opacity="0.3" fill="white">✦</text>
+
+  <!-- LEFT SIDE: Main headline text -->
+  <!-- "Hear Their" line -->
+  <text x="62" y="135" font-family="'Nunito', 'Arial Rounded MT Bold', Arial, sans-serif" font-size="74" font-weight="900" fill="#E8DCFF" letter-spacing="-1.5">Hear Their</text>
+
+  <!-- "Name." line in orange -->
+  <text x="62" y="215" font-family="'Nunito', 'Arial Rounded MT Bold', Arial, sans-serif" font-size="90" font-weight="900" fill="url(#orangeGrad)" letter-spacing="-2">Name.</text>
+
+  <!-- Tagline -->
+  <text x="64" y="256" font-family="'Quicksand', Arial, sans-serif" font-size="19" font-weight="600" fill="rgba(200,181,255,0.8)" letter-spacing="0.5">A personalised audio story — made just for them.</text>
+
+  <!-- URL -->
+  <text x="64" y="287" font-family="'Quicksand', Arial, sans-serif" font-size="14" font-weight="700" fill="rgba(255,140,66,0.7)" letter-spacing="1">heartheirname.com</text>
+
+  <!-- RIGHT SIDE: Icon illustration -->
+  <g transform="translate(660, 156) scale(3.0)">
+    <!-- Open book -->
+    <path d="M-28 28 Q-28 -8 0 -14 L0 22 Q-28 28 -28 28Z" fill="white" opacity="0.9"/>
+    <path d="M28 28 Q28 -8 0 -14 L0 22 Q28 28 28 28Z" fill="white" opacity="0.7"/>
+    <!-- Spine -->
+    <line x1="0" y1="-14" x2="0" y2="22" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+
+    <!-- Headphone arc -->
+    <path d="M-30 10 Q-30 -24 0 -30 Q30 -24 30 10" fill="none" stroke="url(#iconGrad)" stroke-width="5" stroke-linecap="round"/>
+
+    <!-- Ear pieces -->
+    <rect x="-36" y="6" width="13" height="18" rx="6.5" fill="url(#iconGrad)"/>
+    <rect x="23" y="6" width="13" height="18" rx="6.5" fill="url(#iconGrad)"/>
+
+    <!-- Sound waves -->
+    <path d="M12 -4 Q19 -7 12 -14" fill="none" stroke="#FFD580" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+    <path d="M17 0 Q26 -5 17 -16" fill="none" stroke="#FFD580" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+  </g>
+
+  <!-- Subtle arc / glow circle behind icon -->
+  <circle cx="660" cy="156" r="95" fill="none" stroke="#7C5CFC" stroke-width="1" opacity="0.2"/>
+  <circle cx="660" cy="156" r="75" fill="#7C5CFC" opacity="0.07"/>
+
+  <!-- Subtle divider line -->
+  <line x1="490" y1="60" x2="490" y2="252" stroke="rgba(124,92,252,0.15)" stroke-width="1"/>
+</svg>

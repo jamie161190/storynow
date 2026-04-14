@@ -69,60 +69,6 @@ export default async (req) => {
       return json({ customers: Object.values(customers) });
     }
 
-    // ── LIST ATTEMPTS: recent story generation attempts ──
-    if (action === 'attempts') {
-      const res = await fetch(
-        `${supabaseUrl}/rest/v1/story_attempts?select=*&order=created_at.desc&limit=100`,
-        { headers: sbHeaders(supabaseKey) }
-      );
-      const attempts = await res.json();
-      return json({ attempts });
-    }
-
-    // ── GET CUSTOMER: full detail for one email ──
-    if (action === 'customer') {
-      const email = url.searchParams.get('email');
-      if (!email) return json({ error: 'Email required' }, 400);
-
-      const [storiesRes, attemptsRes] = await Promise.all([
-        fetch(
-          `${supabaseUrl}/rest/v1/stories?email=eq.${enc(email)}&order=created_at.desc`,
-          { headers: sbHeaders(supabaseKey) }
-        ),
-        fetch(
-          `${supabaseUrl}/rest/v1/story_attempts?story_data->>childName=ilike.*${enc(email)}*&order=created_at.desc&limit=50`,
-          { headers: sbHeaders(supabaseKey) }
-        )
-      ]);
-
-      const stories = await storiesRes.json();
-      const attempts = await attemptsRes.json();
-
-      return json({ email, stories, attempts });
-    }
-
-    // ── SEARCH: find customers or attempts by email or child name ──
-    if (action === 'search') {
-      const q = url.searchParams.get('q');
-      if (!q) return json({ error: 'Search query required' }, 400);
-
-      const [storiesRes, attemptsRes] = await Promise.all([
-        fetch(
-          `${supabaseUrl}/rest/v1/stories?or=(email.ilike.*${enc(q)}*,child_name.ilike.*${enc(q)}*)&order=created_at.desc&limit=50`,
-          { headers: sbHeaders(supabaseKey) }
-        ),
-        fetch(
-          `${supabaseUrl}/rest/v1/story_attempts?or=(child_name.ilike.*${enc(q)}*,story_data->>childName.ilike.*${enc(q)}*)&order=created_at.desc&limit=50`,
-          { headers: sbHeaders(supabaseKey) }
-        )
-      ]);
-
-      const stories = await storiesRes.json();
-      const attempts = await attemptsRes.json();
-
-      return json({ stories: Array.isArray(stories) ? stories : [], attempts: Array.isArray(attempts) ? attempts : [] });
-    }
-
     // ── ADMIN GENERATE: generate a story and add to customer account ──
     if (action === 'generate' && req.method === 'POST') {
       const body = await req.json();
@@ -326,16 +272,16 @@ export default async (req) => {
       const days = parseInt(url.searchParams.get('days') || '30');
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
 
-      // Fetch stories (sales), attempts (funnels), and page views in parallel
-      const [storiesRes, attemptsRes, viewsRes] = await Promise.all([
+      // Fetch stories, donations, and page views in parallel
+      const [storiesRes, donationsRes, viewsRes] = await Promise.all([
         fetch(
-          `${supabaseUrl}/rest/v1/stories?created_at=gte.${enc(since)}&select=id,email,child_name,category,created_at&order=created_at.desc`,
+          `${supabaseUrl}/rest/v1/stories?created_at=gte.${enc(since)}&select=id,email,child_name,category,status,created_at&order=created_at.desc`,
           { headers: sbHeaders(supabaseKey) }
         ),
         fetch(
-          `${supabaseUrl}/rest/v1/story_attempts?created_at=gte.${enc(since)}&select=id,child_name,category,status,created_at&order=created_at.desc`,
+          `${supabaseUrl}/rest/v1/donations?created_at=gte.${enc(since)}&select=id,amount,created_at&order=created_at.desc`,
           { headers: sbHeaders(supabaseKey) }
-        ),
+        ).catch(() => ({ ok: false })),
         fetch(
           `${supabaseUrl}/rest/v1/page_views?created_at=gte.${enc(since)}&select=page,referrer,utm_source,utm_medium,utm_campaign,device,screen_name,visitor_id,created_at&order=created_at.desc`,
           { headers: sbHeaders(supabaseKey) }
@@ -344,8 +290,11 @@ export default async (req) => {
 
       const storiesData = await storiesRes.json().catch(() => []);
       const stories = Array.isArray(storiesData) ? storiesData : [];
-      const attemptsData = await attemptsRes.json().catch(() => []);
-      const attempts = Array.isArray(attemptsData) ? attemptsData : [];
+      let donations = [];
+      if (donationsRes.ok) {
+        const dData = await donationsRes.json().catch(() => []);
+        donations = Array.isArray(dData) ? dData : [];
+      }
       let views = [];
       if (viewsRes.ok) {
         const vData = await viewsRes.json().catch(() => []);
@@ -359,21 +308,22 @@ export default async (req) => {
         const d = new Date(now);
         d.setDate(d.getDate() - i);
         const key = d.toISOString().slice(0, 10);
-        dailyMap[key] = { date: key, sales: 0, revenue: 0, visitors: 0, previews: 0, checkouts: 0 };
+        dailyMap[key] = { date: key, requests: 0, delivered: 0, donations: 0, donationAmount: 0, visitors: 0 };
       }
 
       for (const s of stories) {
         const key = s.created_at?.slice(0, 10);
         if (dailyMap[key]) {
-          dailyMap[key].sales++;
-          dailyMap[key].revenue += 19.99;
+          dailyMap[key].requests++;
+          if (s.status === 'delivered') dailyMap[key].delivered++;
         }
       }
 
-      for (const a of attempts) {
-        const key = a.created_at?.slice(0, 10);
+      for (const d of donations) {
+        const key = d.created_at?.slice(0, 10);
         if (dailyMap[key]) {
-          dailyMap[key].previews++;
+          dailyMap[key].donations++;
+          dailyMap[key].donationAmount += Number(d.amount || 0);
         }
       }
 
@@ -447,37 +397,32 @@ export default async (req) => {
       let playedHomepage = 0;
       for (const v of views) { if (v.screen_name && v.screen_name.startsWith('sample_play_')) playedHomepage++; }
 
-      // Played on preview (reached screenPreview)
-      let playedPreview = 0;
-      for (const v of views) { if (v.screen_name === 'screenPreview') playedPreview++; }
-
       // Unique customers
       const uniqueEmails = new Set(stories.map(s => s.email).filter(Boolean));
 
       // Totals
-      const totalSales = stories.length;
-      const totalRevenue = stories.length * 19.99;
+      const totalRequests = stories.length;
+      const totalDelivered = stories.filter(s => s.status === 'delivered').length;
+      const totalDonations = donations.length;
+      const totalDonationAmount = donations.reduce((sum, d) => sum + Number(d.amount || 0), 0);
       const totalVisitors = views.length;
-      const totalPreviews = attempts.length;
-      const conversionRate = totalPreviews > 0 ? ((totalSales / totalPreviews) * 100).toFixed(1) : '0.0';
-      const visitorToPreview = totalVisitors > 0 ? ((totalPreviews / totalVisitors) * 100).toFixed(1) : '0.0';
+      const requestRate = totalVisitors > 0 ? ((totalRequests / totalVisitors) * 100).toFixed(1) : '0.0';
 
       return json({
         period: { days, since },
         totals: {
-          sales: totalSales,
-          revenue: Math.round(totalRevenue * 100) / 100,
+          requests: totalRequests,
+          delivered: totalDelivered,
+          donations: totalDonations,
+          donationAmount: Math.round(totalDonationAmount * 100) / 100,
           visitors: totalVisitors,
-          previews: totalPreviews,
           uniqueCustomers: uniqueEmails.size,
-          conversionRate: parseFloat(conversionRate),
-          visitorToPreview: parseFloat(visitorToPreview)
+          requestRate: parseFloat(requestRate)
         },
         simplified: {
           uniqueVisitors: uniqueVisitorSet.size,
           creatingStory: creatingSet.size,
-          playedHomepage,
-          playedPreview
+          playedHomepage
         },
         daily,
         categories: catCount,
@@ -486,77 +431,6 @@ export default async (req) => {
         devices: deviceCount,
         funnel: screenCount
       });
-    }
-
-    // ── REFERRALS: list all referral links ──
-    if (action === 'referrals') {
-      const res = await fetch(
-        `${supabaseUrl}/rest/v1/referrals?select=*&order=created_at.desc`,
-        { headers: sbHeaders(supabaseKey) }
-      );
-      const referrals = res.ok ? await res.json() : [];
-      return json({ referrals: Array.isArray(referrals) ? referrals : [] });
-    }
-
-    // ── CREATE REFERRAL: generate a new referral link ──
-    if (action === 'create-referral') {
-      const body = await req.json().catch(() => ({}));
-      const name = (body.name || '').trim();
-      const email = (body.email || '').trim();
-      if (!name) return json({ error: 'Name is required' }, 400);
-
-      // Generate a clean ref code from the name
-      let refCode = name.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 20);
-      if (!refCode) refCode = 'ref' + Date.now();
-
-      // Check for duplicates and add suffix if needed
-      const existing = await fetch(
-        `${supabaseUrl}/rest/v1/referrals?ref_code=eq.${enc(refCode)}&select=id`,
-        { headers: sbHeaders(supabaseKey) }
-      );
-      if (existing.ok) {
-        const rows = await existing.json();
-        if (rows.length > 0) {
-          refCode = refCode + Math.floor(Math.random() * 999);
-        }
-      }
-
-      const insertRes = await fetch(`${supabaseUrl}/rest/v1/referrals`, {
-        method: 'POST',
-        headers: {
-          ...sbHeaders(supabaseKey),
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify({
-          referrer_name: name,
-          referrer_email: email || null,
-          ref_code: refCode,
-          visits: 0,
-          conversions: 0,
-          revenue: 0,
-          referred_emails: []
-        })
-      });
-
-      if (!insertRes.ok) {
-        const errText = await insertRes.text();
-        return json({ error: 'Failed to create referral: ' + errText }, 500);
-      }
-
-      const created = await insertRes.json();
-      return json({ success: true, referral: created[0] || { ref_code: refCode } });
-    }
-
-    // ── DELETE REFERRAL ──
-    if (action === 'delete-referral') {
-      const refId = url.searchParams.get('id');
-      if (!refId) return json({ error: 'ID required' }, 400);
-      await fetch(
-        `${supabaseUrl}/rest/v1/referrals?id=eq.${enc(refId)}`,
-        { method: 'DELETE', headers: sbHeaders(supabaseKey) }
-      );
-      return json({ success: true });
     }
 
     return json({ error: 'Unknown action: ' + action }, 400);

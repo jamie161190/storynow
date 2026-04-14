@@ -644,9 +644,9 @@ async function loadRejected() {
 async function loadStats() {
   try {
     const data = await adminApi('metrics', { days: 30 });
-    const s = data.simplified || {};
+    const t = data.totals || {};
     document.getElementById('statsLine').textContent =
-      (s.totalStories || 0) + ' stories delivered';
+      (t.delivered || 0) + ' stories delivered (last 30 days)';
   } catch(e) {
     document.getElementById('statsLine').textContent = 'Admin ready';
   }
@@ -657,9 +657,13 @@ async function loadStatsTab() {
 
   try {
     const data = await adminApi('metrics', { days: 30 });
-    const s = data.simplified || {};
-    html += statCard(s.totalStories || 0, 'Stories delivered');
-    html += statCard(s.totalRequests || s.totalCustomers || 0, 'Requests');
+    const t = data.totals || {};
+    html += statCard(t.requests || 0, 'Requests');
+    html += statCard(t.delivered || 0, 'Delivered');
+    html += statCard(t.donations || 0, 'Donations');
+    html += statCard('£' + (t.donationAmount || 0).toFixed(2), 'Donated');
+    html += statCard(t.visitors || 0, 'Page views');
+    html += statCard(t.uniqueCustomers || 0, 'Unique customers');
   } catch(e) {
     html += '<div class="empty">Could not load stats</div>';
   }
