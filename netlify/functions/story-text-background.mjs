@@ -45,7 +45,6 @@ export const handler = async (event) => {
       model: 'claude-sonnet-4-6',
       max_tokens: 16000,
       temperature: 1,
-      thinking: { type: 'adaptive' },
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: fullPrompt }]
     });
