@@ -126,13 +126,17 @@ export default async (req) => {
       }
     }
 
-    // Auto-generate story text via background function (fire-and-forget)
+    // Auto-generate story text via background function
     if (orderId) {
-      fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ storyId: orderId })
-      }).catch(e => console.error('Auto-generate trigger failed:', e.message));
+      try {
+        await fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storyId: orderId })
+        });
+      } catch(e) {
+        console.error('Auto-generate trigger failed:', e.message);
+      }
     }
 
     return new Response(JSON.stringify({ success: true, orderId, status: 'pending' }), {
