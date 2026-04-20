@@ -246,7 +246,7 @@ export default async (req) => {
     if (action === 'story-analytics') {
       const res = await fetch(
         `${supabaseUrl}/rest/v1/page_views?screen_name=in.(story_view,story_play,story_share_whatsapp,story_share_email,story_share_copy)&select=page,screen_name`,
-        { headers: sbHeaders }
+        { headers: sbHeaders(supabaseKey) }
       );
       if (!res.ok) return json({ error: 'Failed to fetch analytics' }, 500);
       const rows = await res.json();
