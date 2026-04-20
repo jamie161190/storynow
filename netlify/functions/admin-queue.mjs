@@ -4,6 +4,7 @@
 
 import { SYSTEM_PROMPT, buildRegeneratePrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
 import { logError } from './lib/log-error.mjs';
+import { BRAND_FROM } from './lib/constants.mjs';
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
@@ -389,7 +390,7 @@ export default async (req) => {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          from: 'Jamie and Chase from Hear Their Name <jamie@heartheirname.com>',
+          from: BRAND_FROM,
           to: [story.email],
           subject,
           html: emailHtml

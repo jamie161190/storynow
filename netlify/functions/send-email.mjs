@@ -1,6 +1,8 @@
 // Transactional email sending via Resend
 // Types: review (internal notification), contact (internal notification), share (story shared with someone)
 
+import { BRAND_FROM } from './lib/constants.mjs';
+
 function esc(str) {
   if (!str) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -103,7 +105,7 @@ ${message ? `<p style="margin:0 0 16px;font-style:italic;color:#666;line-height:
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'Jamie and Chase from Hear Their Name <jamie@heartheirname.com>',
+        from: BRAND_FROM,
         to: [recipient],
         subject,
         html

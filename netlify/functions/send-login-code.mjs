@@ -1,6 +1,7 @@
 // Sends a 6-digit login code to the user's email
 
 import { randomInt } from 'crypto';
+import { BRAND_FROM } from './lib/constants.mjs';
 
 export default async (req) => {
   try {
@@ -82,7 +83,7 @@ export default async (req) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Jamie and Chase from Hear Their Name <jamie@heartheirname.com>',
+        from: BRAND_FROM,
         to: [email],
         subject: 'Your Hear Their Name login code',
         html: `

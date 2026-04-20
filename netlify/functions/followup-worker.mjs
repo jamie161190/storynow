@@ -3,6 +3,8 @@
 // - delivered_at is 24-48 hours ago
 // - followup_sent is false
 
+import { BRAND_FROM } from './lib/constants.mjs';
+
 function esc(str) {
   if (!str) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -69,7 +71,7 @@ export default async () => {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            from: 'Jamie and Chase from Hear Their Name <jamie@heartheirname.com>',
+            from: BRAND_FROM,
             to: [story.email],
             subject,
             html: emailHtml

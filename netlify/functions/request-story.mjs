@@ -5,6 +5,8 @@
 // No payment required. Admin processes it from the queue.
 // ============================================================
 
+import { BRAND_FROM } from './lib/constants.mjs';
+
 function esc(str) {
   if (!str) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -114,7 +116,7 @@ export default async (req) => {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            from: 'Jamie and Chase from Hear Their Name <jamie@heartheirname.com>',
+            from: BRAND_FROM,
             to: [email],
             subject: `We're creating ${storyData.childName}'s story`,
             html: emailHtml
