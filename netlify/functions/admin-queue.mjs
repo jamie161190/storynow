@@ -349,7 +349,7 @@ export default async (req) => {
   // ── SEND: Deliver story to customer via email ──
   if (action === 'send' && req.method === 'POST') {
     const body = await req.json();
-    const { storyId } = body;
+    const { storyId, customMessage } = body;
     if (!storyId) return json({ error: 'Missing storyId' }, 400);
 
     const storyRes = await fetch(
@@ -376,9 +376,14 @@ export default async (req) => {
     const subject = isMulti ? "Their story is ready" : `${story.child_name}'s story is ready`;
     const greeting = requesterName ? `Hi ${requesterName},` : 'Hi,';
 
+    const customBlock = (customMessage && customMessage.trim())
+      ? `<p style="margin:0 0 16px;line-height:1.75">${esc(customMessage.trim()).replace(/\n/g, '<br>')}</p>`
+      : '';
+
     const emailHtml = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:500px;margin:0 auto;padding:20px;color:#333">
 <p style="margin:0 0 16px;line-height:1.75">${greeting}</p>
 <p style="margin:0 0 16px;line-height:1.75">${isMulti ? "Their story is ready for you." : safeChild + "'s story is ready for you."}</p>
+${customBlock}
 <p style="text-align:center;margin:24px 0"><a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 32px;border-radius:50px;font-size:1rem;font-weight:700">${isMulti ? "Listen to their story" : "Listen to " + safeChild + "'s story"}</a></p>
 <p style="margin:0 0 16px;line-height:1.75">${isMulti ? "We hope it becomes something they ask to hear again and again." : "We hope it becomes something " + safeChild.split("'")[0] + " asks to hear again and again."}</p>
 <p style="margin:24px 0 2px;line-height:1.75;font-weight:600">Jamie and Chase</p>

@@ -123,6 +123,20 @@ audio { width: 100%; margin-top: 0.5rem; }
   </div>
 </div>
 
+<div class="modal-overlay" id="sendModal">
+  <div class="modal">
+    <h2>Send story</h2>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:0.5rem">Add an optional personal note. It will appear in the delivery email just before the listen button. Leave blank for the standard email.</p>
+    <label>Personal note (optional)</label>
+    <textarea id="sendMessage" placeholder="e.g. I loved writing this one. Hope she loves it too."></textarea>
+    <p id="sendStatus" style="font-size:0.82rem;color:#6B2F93;margin-top:0.5rem;display:none"></p>
+    <div class="modal-actions">
+      <button class="btn btn-green" id="sendBtn" onclick="submitSend()">Send to customer</button>
+      <button class="btn btn-outline" onclick="closeModal('sendModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 let adminSecret = '';
 let currentTab = 'queue';
@@ -572,19 +586,36 @@ async function submitRegen() {
   }
 }
 
-async function sendStory(id, btn) {
-  if (!confirm('Send the delivery email to the customer?')) return;
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-  const data = await queueApi('send', {}, { storyId: id });
+function sendStory(id, btn) {
+  currentSendId = id;
+  currentSendBtn = btn;
+  document.getElementById('sendMessage').value = '';
+  document.getElementById('sendStatus').style.display = 'none';
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('sendBtn').textContent = 'Send to customer';
+  document.getElementById('sendModal').classList.add('active');
+}
+
+let currentSendId = null, currentSendBtn = null;
+
+async function submitSend() {
+  const customMessage = document.getElementById('sendMessage').value.trim();
+  const sendBtnEl = document.getElementById('sendBtn');
+  const status = document.getElementById('sendStatus');
+  sendBtnEl.disabled = true;
+  sendBtnEl.textContent = 'Sending...';
+  status.style.display = 'block';
+  status.textContent = 'Sending delivery email...';
+  const data = await queueApi('send', {}, { storyId: currentSendId, customMessage });
   if (data.success) {
-    btn.textContent = 'Sent!';
-    btn.className = 'btn btn-green';
-    setTimeout(() => loadQueue('pending'), 1500);
+    status.textContent = 'Sent.';
+    if (currentSendBtn) { currentSendBtn.textContent = 'Sent!'; currentSendBtn.disabled = true; }
+    setTimeout(() => { closeModal('sendModal'); loadQueue('pending'); }, 1200);
   } else {
-    btn.textContent = 'Failed';
-    btn.disabled = false;
-    alert('Send failed: ' + (data.error || 'Unknown error'));
+    sendBtnEl.disabled = false;
+    sendBtnEl.textContent = 'Send to customer';
+    status.textContent = 'Failed: ' + (data.error || 'Unknown error');
+    status.style.color = '#c00';
   }
 }
 
