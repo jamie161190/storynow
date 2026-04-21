@@ -496,19 +496,20 @@ async function saveStoryText(id) {
 
 async function generateStoryText(id, btn) {
   btn.disabled = true;
-  btn.textContent = 'Writing story...';
-  // Trigger background function directly
-  fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ storyId: id })
-  }).catch(function() {});
-  // Poll until text appears
+  btn.textContent = 'Queueing...';
+  const res = await queueApi('generate-text', {}, { storyId: id });
+  if (!res.success) {
+    btn.textContent = 'Failed';
+    btn.disabled = false;
+    alert('Queue failed: ' + (res.error || 'Unknown error'));
+    return;
+  }
+  btn.textContent = 'Queued';
   var pollCount = 0;
   var pollInterval = setInterval(async function() {
     pollCount++;
-    btn.textContent = 'Writing story... ' + (pollCount * 10) + 's';
-    if (pollCount > 12) { clearInterval(pollInterval); btn.textContent = 'Taking longer than expected...'; loadQueue('pending'); return; }
+    btn.textContent = 'Working... ' + Math.floor(pollCount * 10 / 60) + 'm ' + (pollCount * 10) % 60 + 's';
+    if (pollCount > 90) { clearInterval(pollInterval); btn.textContent = 'Still queued. Refresh to check.'; setTimeout(() => loadQueue('pending'), 2000); return; }
     var check = await queueApi('get', { id: id });
     if (check.story && check.story.story_text && check.story.story_text.length > 200) {
       clearInterval(pollInterval);
@@ -521,16 +522,17 @@ async function generateStoryText(id, btn) {
 
 async function generateTTS(id, btn) {
   btn.disabled = true;
-  btn.textContent = 'Generating audio...';
+  btn.textContent = 'Queueing...';
   const data = await queueApi('generate-tts', {}, { storyId: id });
   if (data.success) {
+    btn.textContent = 'Queued';
     var pollCount = 0;
     var pollInterval = setInterval(async function() {
       pollCount++;
       var mins = Math.floor(pollCount * 10 / 60);
       var secs = (pollCount * 10) % 60;
-      btn.textContent = 'Generating audio... ' + (mins > 0 ? mins + 'm ' : '') + secs + 's';
-      if (pollCount > 60) { clearInterval(pollInterval); btn.textContent = 'Still generating. Will refresh shortly.'; setTimeout(() => loadQueue('pending'), 5000); return; }
+      btn.textContent = 'Working... ' + (mins > 0 ? mins + 'm ' : '') + secs + 's';
+      if (pollCount > 120) { clearInterval(pollInterval); btn.textContent = 'Still queued. Refresh to check.'; setTimeout(() => loadQueue('pending'), 5000); return; }
       var check = await queueApi('get', { id: id });
       if (check.story && check.story.audio_url) {
         clearInterval(pollInterval);

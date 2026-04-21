@@ -10,6 +10,51 @@ function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
 }
 
+// ── Queue helpers ──
+async function enqueueJob(storyId, jobType, payload, supabaseUrl, headersJson) {
+  const res = await fetch(`${supabaseUrl}/rest/v1/job_queue`, {
+    method: 'POST',
+    headers: { ...headersJson, 'Prefer': 'return=representation' },
+    body: JSON.stringify({ story_id: storyId, job_type: jobType, payload: payload || null })
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    return { ok: false, error: 'Failed to enqueue: ' + err.slice(0, 200) };
+  }
+  const rows = await res.json();
+  return { ok: true, job: rows[0] };
+}
+
+async function maybeStartWorker(jobType, supabaseUrl, headers) {
+  // Only start a new worker if none is currently running for this jobType.
+  const checkRes = await fetch(`${supabaseUrl}/rest/v1/rpc/worker_running`, {
+    method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_job_type: jobType })
+  });
+  if (!checkRes.ok) {
+    console.error('[ADMIN-QUEUE] worker_running check failed:', checkRes.status);
+    return;
+  }
+  const running = await checkRes.json();
+  if (running === true) {
+    console.log('[ADMIN-QUEUE] Worker already running for', jobType, '— new job will be picked up.');
+    return;
+  }
+  // Fire-and-forget trigger. We don't await Netlify's response; worker has its own poll.
+  const base = process.env.URL || 'https://heartheirname.com';
+  try {
+    await fetch(`${base}/.netlify/functions/queue-worker-background`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobType })
+    });
+    console.log('[ADMIN-QUEUE] Spawned worker for', jobType);
+  } catch (e) {
+    console.error('[ADMIN-QUEUE] Failed to spawn worker:', e.message);
+  }
+}
+
 // TTS helpers (same as full-worker-background)
 function prepareTTSText(text) {
   text = text.replace(/\.\s*\.\.\s*\.\.\./g, '.\n\n');
@@ -199,114 +244,66 @@ export default async (req) => {
     return json({ success: true });
   }
 
-  // ── GENERATE-TEXT: Generate story text only (no audio) ──
+  // ── GENERATE-TEXT: Queue a text generation job ──
   if (action === 'generate-text' && req.method === 'POST') {
     const body = await req.json();
     const { storyId } = body;
     if (!storyId) return json({ error: 'Missing storyId' }, 400);
 
     const storyRes = await fetch(
-      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=*&limit=1`,
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_text&limit=1`,
       { headers }
     );
     if (!storyRes.ok) return json({ error: 'Failed to fetch story' }, 500);
     const stories = await storyRes.json();
     if (!stories.length) return json({ error: 'Story not found' }, 404);
-    const story = stories[0];
-    const sd = story.story_data || {};
+    if (stories[0].story_text) return json({ success: true, message: 'Story text already exists' });
 
-    if (story.story_text) return json({ success: true, message: 'Story text already exists', wordCount: story.story_text.split(/\s+/).length });
+    const queued = await enqueueJob(storyId, 'text', null, supabaseUrl, headersJson);
+    if (!queued.ok) return json({ error: queued.error }, 500);
 
-    console.log(`[ADMIN-QUEUE] Generating complete story text for ${storyId}...`);
-    try {
-      const fullPrompt = buildCompleteStoryPrompt(sd);
-      const genRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 16000,
-          temperature: 1,
-          thinking: { type: 'adaptive' },
-          system: SYSTEM_PROMPT,
-          messages: [{ role: 'user', content: fullPrompt }]
-        })
-      });
-      if (!genRes.ok) throw new Error('Claude API ' + genRes.status);
-      const genResult = await genRes.json();
-      let storyText = '';
-      for (const block of genResult.content) { if (block.type === 'text') storyText += block.text; }
+    await maybeStartWorker('text', supabaseUrl, headers);
 
-      let messageIntro = '';
-      if (sd.personalMessage) {
-        messageIntro = 'Before we begin, there is a special message for ' + sd.childName + '. ... ' + sd.personalMessage + ' ... And now, on with the story. ... ';
-      }
-      const fullText = messageIntro + storyText + ' ... ... A Hear Their Name original ... made with love.';
-
-      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
-        method: 'PATCH', headers: headersJson,
-        body: JSON.stringify({ story_text: fullText })
-      });
-
-      const wordCount = fullText.split(/\s+/).length;
-      console.log(`[ADMIN-QUEUE] Story text generated: ${wordCount} words`);
-      return json({ success: true, wordCount });
-    } catch (genErr) {
-      console.error('[ADMIN-QUEUE] Story text generation error:', genErr.message);
-      return json({ error: 'Story generation failed: ' + genErr.message }, 500);
-    }
+    return json({ success: true, message: 'Queued. Refresh to see when it completes.', jobId: queued.job.id });
   }
 
-  // ── GENERATE-TTS: Generate audio from existing story text ──
+  // ── GENERATE-TTS: Queue an audio generation job ──
   if (action === 'generate-tts' && req.method === 'POST') {
     const body = await req.json();
     const { storyId } = body;
     if (!storyId) return json({ error: 'Missing storyId' }, 400);
 
-    // Fetch the story to get voice_id and story_data
     const storyRes = await fetch(
-      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=id,story_text,voice_id,story_data,child_name&limit=1`,
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_text&limit=1`,
       { headers }
     );
     if (!storyRes.ok) return json({ error: 'Failed to fetch story' }, 500);
     const stories = await storyRes.json();
     if (!stories.length) return json({ error: 'Story not found' }, 404);
-    const story = stories[0];
+    if (!stories[0].story_text) return json({ error: 'No story text yet. Generate story first.' }, 400);
 
-    if (!story.story_text) return json({ error: 'No story text yet. Generate story first.' }, 400);
-
-    // Set status to generating
+    // Mark generating so admin UI reflects state
     await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
       method: 'PATCH', headers: headersJson,
       body: JSON.stringify({ status: 'generating' })
     });
 
-    // Trigger full-worker-background which handles TTS reliably (15 min timeout)
-    fetch('https://heartheirname.com/.netlify/functions/full-worker-background', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        mode: 'tts-only',
-        storyData: story.story_data,
-        voiceId: story.voice_id,
-        jobId: storyId,
-        storyText: story.story_text,
-        childName: story.child_name
-      })
-    }).catch(e => console.error('[ADMIN-QUEUE] TTS trigger failed:', e.message));
+    const queued = await enqueueJob(storyId, 'audio', null, supabaseUrl, headersJson);
+    if (!queued.ok) return json({ error: queued.error }, 500);
 
-    console.log(`[ADMIN-QUEUE] TTS generation triggered for ${storyId}`);
-    return json({ success: true, message: 'Generating audio in background. Refresh in a few minutes.' });
+    await maybeStartWorker('audio', supabaseUrl, headers);
+
+    return json({ success: true, message: 'Queued. Audio will generate when earlier jobs finish.', jobId: queued.job.id });
   }
 
-  // ── REGENERATE: Rewrite story with feedback, then generate TTS ──
+  // ── REGENERATE: Queue a regeneration job (archives current text first) ──
   if (action === 'regenerate' && req.method === 'POST') {
     const body = await req.json();
     const { storyId, notes } = body;
     if (!storyId) return json({ error: 'Missing storyId' }, 400);
 
     const storyRes = await fetch(
-      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=*&limit=1`,
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_text,rejected_versions&limit=1`,
       { headers }
     );
     if (!storyRes.ok) return json({ error: 'Failed to fetch story' }, 500);
@@ -314,8 +311,8 @@ export default async (req) => {
     if (!stories.length) return json({ error: 'Story not found' }, 404);
     const story = stories[0];
 
-    // Archive the bad version before clearing
-    const patchData = { story_text: null, status: 'pending', audio_url: null };
+    // Archive the bad version before clearing (worker will clear text when it starts)
+    const patchData = { audio_url: null };
     if (story.story_text) {
       const rejectedVersions = story.rejected_versions || [];
       rejectedVersions.push({
@@ -324,26 +321,37 @@ export default async (req) => {
         notes: notes || null
       });
       patchData.rejected_versions = rejectedVersions;
-      console.log(`[ADMIN-QUEUE] Archived rejected version #${rejectedVersions.length} for ${storyId}`);
     }
-
-    // Save notes as feedback so the background function can use them
-    if (notes) patchData.feedback = notes;
-
     await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
       method: 'PATCH', headers: headersJson,
       body: JSON.stringify(patchData)
     });
 
-    // Trigger background function to regenerate
-    fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ storyId })
-    }).catch(e => console.error('[ADMIN-QUEUE] Regen trigger failed:', e.message));
+    const queued = await enqueueJob(storyId, 'regenerate', { feedback: notes || '' }, supabaseUrl, headersJson);
+    if (!queued.ok) return json({ error: queued.error }, 500);
 
-    console.log(`[ADMIN-QUEUE] Regeneration triggered for ${storyId}`);
-    return json({ success: true, message: 'Regenerating in background. Refresh in about a minute.' });
+    await maybeStartWorker('regenerate', supabaseUrl, headers);
+
+    return json({ success: true, message: 'Queued for regeneration.', jobId: queued.job.id });
+  }
+
+  // ── QUEUE STATUS: Returns queue position + running state per story ──
+  if (action === 'queue-status') {
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/job_queue?status=in.(queued,running)&select=id,story_id,job_type,status,created_at&order=created_at.asc`,
+      { headers }
+    );
+    const jobs = res.ok ? await res.json() : [];
+    // Compute position within each job_type group
+    const byType = { text: [], audio: [], regenerate: [] };
+    for (const j of jobs) if (byType[j.job_type]) byType[j.job_type].push(j);
+    const annotated = [];
+    for (const type of Object.keys(byType)) {
+      byType[type].forEach((j, idx) => {
+        annotated.push({ ...j, position: j.status === 'running' ? 0 : idx + 1 });
+      });
+    }
+    return json({ jobs: annotated });
   }
 
   // ── SEND: Deliver story to customer via email ──
