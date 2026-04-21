@@ -14,17 +14,20 @@ const INTER_JOB_WAIT_MS = 45000;                // cushion between Claude jobs t
 
 export const handler = async (event) => {
   const startedAt = Date.now();
+  let jobType;
+  let supabaseUrl, supabaseKey, headers, headersJson;
   try {
-    const { jobType } = JSON.parse(event.body || '{}');
+    const parsed = JSON.parse(event.body || '{}');
+    jobType = parsed.jobType;
     if (!['text', 'audio', 'regenerate'].includes(jobType)) {
       console.error('[QUEUE-WORKER] Invalid jobType:', jobType);
       return { statusCode: 400 };
     }
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SECRET_KEY;
-    const headers = { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey };
-    const headersJson = { ...headers, 'Content-Type': 'application/json' };
+    supabaseUrl = process.env.SUPABASE_URL;
+    supabaseKey = process.env.SUPABASE_SECRET_KEY;
+    headers = { 'Authorization': `Bearer ${supabaseKey}`, 'apikey': supabaseKey };
+    headersJson = { ...headers, 'Content-Type': 'application/json' };
 
     console.log('[QUEUE-WORKER] Start', jobType);
 
@@ -66,6 +69,9 @@ export const handler = async (event) => {
     }
 
     // If we exited because of time but queue might still have work, self-retrigger.
+    // Don't release the slot — pass it to the successor. The successor will
+    // eventually release it (or pass it on again).
+    let passedSlot = false;
     if (Date.now() - startedAt >= MAX_RUNTIME_MS) {
       const remainingRes = await fetch(
         `${supabaseUrl}/rest/v1/job_queue?status=eq.queued&job_type=eq.${jobType}&select=id&limit=1`,
@@ -74,16 +80,44 @@ export const handler = async (event) => {
       const remaining = remainingRes.ok ? await remainingRes.json() : [];
       if (remaining.length) {
         console.log('[QUEUE-WORKER] Timeout approaching, triggering successor for', jobType);
+        // Refresh slot timestamp so the successor's 15-min staleness check doesn't fire.
+        await fetch(`${supabaseUrl}/rest/v1/worker_slots?job_type=eq.${jobType}`, {
+          method: 'PATCH', headers: headersJson,
+          body: JSON.stringify({ spawned_at: new Date().toISOString() })
+        });
         await triggerSelf(jobType);
+        passedSlot = true;
       }
+    }
+
+    // Release the slot unless we handed it off to a successor.
+    if (!passedSlot) {
+      await releaseSlot(jobType, supabaseUrl, headersJson);
     }
 
     return { statusCode: 200 };
   } catch (err) {
     console.error('[QUEUE-WORKER] Fatal', err.message);
+    // Best effort: release the slot even on fatal errors so the system can recover.
+    if (jobType && supabaseUrl && headersJson) {
+      await releaseSlot(jobType, supabaseUrl, headersJson).catch(() => {});
+    }
     return { statusCode: 500 };
   }
 };
+
+async function releaseSlot(jobType, supabaseUrl, headersJson) {
+  try {
+    await fetch(`${supabaseUrl}/rest/v1/rpc/release_worker_slot`, {
+      method: 'POST',
+      headers: headersJson,
+      body: JSON.stringify({ p_job_type: jobType })
+    });
+    console.log('[QUEUE-WORKER] Released slot for', jobType);
+  } catch (e) {
+    console.error('[QUEUE-WORKER] Failed to release slot:', e.message);
+  }
+}
 
 async function runJob(job, supabaseUrl, headers, headersJson) {
   const storyId = job.story_id;

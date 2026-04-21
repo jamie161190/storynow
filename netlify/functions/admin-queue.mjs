@@ -27,22 +27,26 @@ async function enqueueJob(storyId, jobType, payload, supabaseUrl, headersJson) {
 }
 
 async function maybeStartWorker(jobType, supabaseUrl, headers) {
-  // Only start a new worker if none is currently running for this jobType.
-  const checkRes = await fetch(`${supabaseUrl}/rest/v1/rpc/worker_running`, {
+  // Atomically try to claim the worker slot. If another worker holds it,
+  // we do nothing — that worker will pick up the new queued job when it
+  // finishes its current one. Slots older than 15 minutes are taken over
+  // (handles crashed workers). This eliminates the race where multiple
+  // admin clicks in quick succession each spawned their own worker.
+  const claimRes = await fetch(`${supabaseUrl}/rest/v1/rpc/try_claim_worker_slot`, {
     method: 'POST',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify({ p_job_type: jobType })
   });
-  if (!checkRes.ok) {
-    console.error('[ADMIN-QUEUE] worker_running check failed:', checkRes.status);
+  if (!claimRes.ok) {
+    console.error('[ADMIN-QUEUE] try_claim_worker_slot failed:', claimRes.status);
     return;
   }
-  const running = await checkRes.json();
-  if (running === true) {
-    console.log('[ADMIN-QUEUE] Worker already running for', jobType, '— new job will be picked up.');
+  const claimed = await claimRes.json();
+  if (claimed !== true) {
+    console.log('[ADMIN-QUEUE] Worker slot already held for', jobType, '— new job will be picked up by current worker.');
     return;
   }
-  // Fire-and-forget trigger. We don't await Netlify's response; worker has its own poll.
+  // We own the slot. Spawn the worker. The worker releases the slot on exit.
   const base = process.env.URL || 'https://heartheirname.com';
   try {
     await fetch(`${base}/.netlify/functions/queue-worker-background`, {
@@ -50,9 +54,15 @@ async function maybeStartWorker(jobType, supabaseUrl, headers) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ jobType })
     });
-    console.log('[ADMIN-QUEUE] Spawned worker for', jobType);
+    console.log('[ADMIN-QUEUE] Claimed slot + spawned worker for', jobType);
   } catch (e) {
     console.error('[ADMIN-QUEUE] Failed to spawn worker:', e.message);
+    // Release slot so a retry can spawn.
+    await fetch(`${supabaseUrl}/rest/v1/rpc/release_worker_slot`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_job_type: jobType })
+    }).catch(() => {});
   }
 }
 
