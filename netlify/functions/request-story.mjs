@@ -128,18 +128,8 @@ export default async (req) => {
       }
     }
 
-    // Auto-generate story text via background function
-    if (orderId) {
-      try {
-        await fetch('https://heartheirname.com/.netlify/functions/story-text-background', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ storyId: orderId })
-        });
-      } catch(e) {
-        console.error('Auto-generate trigger failed:', e.message);
-      }
-    }
+    // Do NOT auto-generate text here. Admin reviews the customer's input first
+    // (e.g. names that need cleaning up) and clicks Generate manually from the queue.
 
     return new Response(JSON.stringify({ success: true, orderId, status: 'pending' }), {
       status: 200, headers: { 'Content-Type': 'application/json' }
