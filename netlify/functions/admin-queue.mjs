@@ -2,7 +2,8 @@
 // Actions: list (pending/delivered), generate-tts, regenerate, send, rewrite-request
 // Protected by ADMIN_SECRET header.
 
-import { SYSTEM_PROMPT, buildRegeneratePrompt, buildCompleteStoryPrompt } from './lib/story-prompts.mjs';
+// Note: admin-queue no longer generates text itself. It enqueues jobs
+// which are picked up by queue-worker-background → story-text-background.
 import { logError } from './lib/log-error.mjs';
 import { BRAND_FROM } from './lib/constants.mjs';
 

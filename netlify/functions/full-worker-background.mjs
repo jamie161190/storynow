@@ -3,7 +3,12 @@
 // then generates TTS audio, uploads to Supabase.
 // Uses direct fetch() calls - ZERO SDK dependencies.
 
-import { SYSTEM_PROMPT, buildPreviewPrompt, buildFullStoryPrompt, buildCompleteStoryPrompt, buildRegeneratePrompt } from './lib/story-prompts.mjs';
+// Note: the text-generation modes (preview / preview-full / default) in this
+// function are LEGACY from the paid-model flow and are no longer reached in
+// the free-model pipeline. Only mode === 'tts-only' is actively called, by
+// queue-worker-background.mjs. The text modes reference prompt functions
+// that no longer exist — if they are ever called again, they will throw.
+// Leaving them in place rather than deleting, pending a separate cleanup.
 import { logError } from './lib/log-error.mjs';
 
 // Preprocess story text so ElevenLabs TTS creates natural pauses

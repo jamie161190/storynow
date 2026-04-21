@@ -128,8 +128,50 @@ export default async (req) => {
       }
     }
 
-    // Do NOT auto-generate text here. Admin reviews the customer's input first
-    // (e.g. names that need cleaning up) and clicks Generate manually from the queue.
+    // Auto-enqueue a text-generation job via the admin queue. The queue worker
+    // processes text jobs one at a time (respects Claude rate limit). The worker
+    // triggers story-text-background which runs the middle layer + writer.
+    if (orderId) {
+      try {
+        const sbHeadersJson = {
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': supabaseKey,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation'
+        };
+        const sbHeaders = {
+          'Authorization': `Bearer ${supabaseKey}`,
+          'apikey': supabaseKey,
+          'Content-Type': 'application/json'
+        };
+
+        // Insert queue row
+        await fetch(`${supabaseUrl}/rest/v1/job_queue`, {
+          method: 'POST',
+          headers: sbHeadersJson,
+          body: JSON.stringify({ story_id: orderId, job_type: 'text', payload: null })
+        });
+
+        // Check if a worker is already running; spawn one if not.
+        const checkRes = await fetch(`${supabaseUrl}/rest/v1/rpc/worker_running`, {
+          method: 'POST',
+          headers: sbHeaders,
+          body: JSON.stringify({ p_job_type: 'text' })
+        });
+        const running = checkRes.ok ? await checkRes.json() : false;
+        if (running !== true) {
+          const base = process.env.URL || 'https://heartheirname.com';
+          await fetch(`${base}/.netlify/functions/queue-worker-background`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jobType: 'text' })
+          });
+        }
+      } catch (queueErr) {
+        // Non-fatal: the story is saved, admin can manually kick generation later.
+        console.error('Auto-enqueue failed (non-fatal):', queueErr.message);
+      }
+    }
 
     return new Response(JSON.stringify({ success: true, orderId, status: 'pending' }), {
       status: 200, headers: { 'Content-Type': 'application/json' }

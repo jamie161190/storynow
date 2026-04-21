@@ -1,8 +1,11 @@
-// Background function: generates story text via Claude on submission.
-// Uses Lambda handler format (required for background functions).
-// Matches the proven Claude call pattern from full-worker-background.
+// Background function: runs the two-stage pipeline for a story.
+// Stage 1: middle layer (brief analyst) turns raw storyData into a JSON brief.
+// Stage 2: story writer consumes the brief and produces the story text.
+//
+// Uses Lambda handler format (required for Netlify background functions).
 
-import { SYSTEM_PROMPT, buildCompleteStoryPrompt, buildRegeneratePrompt } from './lib/story-prompts.mjs';
+import { SYSTEM_PROMPT, buildUserPrompt, sanitiseStoryData, getWordCount } from './lib/story-prompts.mjs';
+import { analyzeBrief } from './lib/brief-analyst.mjs';
 
 export const handler = async (event) => {
   try {
@@ -36,20 +39,49 @@ export const handler = async (event) => {
       return { statusCode: 200 };
     }
 
-    const sd = story.story_data || {};
+    const sd = sanitiseStoryData(story.story_data || {});
     const hasFeedback = story.feedback && story.feedback.trim();
-    console.log('[STORY-TEXT-BG]', hasFeedback ? 'Regenerating with notes' : 'Generating new text', 'for', storyId, sd.childName);
+    const category = sd.category || 'bedtime';
+    const wordCount = getWordCount(sd.length, sd); // uses oldest child for multi-child
 
-    const fullPrompt = hasFeedback ? buildRegeneratePrompt(sd, story.feedback) : buildCompleteStoryPrompt(sd);
+    console.log('[STORY-TEXT-BG]', hasFeedback ? 'Regenerating with notes' : 'Generating new text',
+                'for', storyId, sd.childName, '(age', sd.age, ',', category + ')');
+
+    // ───── Stage 1: brief analyst ─────
+    console.log('[STORY-TEXT-BG] Calling brief analyst...');
+    let brief;
+    try {
+      brief = await analyzeBrief(sd);
+    } catch (err) {
+      console.error('[STORY-TEXT-BG] Brief analyst failed:', err.message);
+      return { statusCode: 500 };
+    }
+    console.log('[STORY-TEXT-BG] Brief confidence:', brief.confidence, 'flags:', JSON.stringify(brief.flags || []));
+    if (brief.confidence === 'low') {
+      console.warn('[STORY-TEXT-BG] LOW CONFIDENCE BRIEF for', storyId, '— proceeding but review recommended.');
+    }
+    console.log('[STORY-TEXT-BG] Full brief:', JSON.stringify(brief, null, 2));
+
+    // Save brief to DB (for debugging; never shown in admin UI)
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ brief })
+    });
+
+    // ───── Stage 2: story writer ─────
+    const userPrompt = buildUserPrompt(brief, wordCount, category, {
+      adminFeedback: hasFeedback ? story.feedback.trim() : null
+    });
+
     const apiBody = JSON.stringify({
       model: 'claude-sonnet-4-6',
       max_tokens: 16000,
       temperature: 1,
       system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: fullPrompt }]
+      messages: [{ role: 'user', content: userPrompt }]
     });
 
-    // Retry logic matching full-worker-background
+    console.log('[STORY-TEXT-BG] Calling writer...');
     let apiResponse;
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
@@ -77,22 +109,24 @@ export const handler = async (event) => {
       }
     }
 
-    if (!apiResponse.ok) {
-      const errBody = await apiResponse.text();
-      console.error('[STORY-TEXT-BG] Claude API error:', apiResponse.status, errBody.slice(0, 300));
+    if (!apiResponse || !apiResponse.ok) {
+      const status = apiResponse ? apiResponse.status : 'no-response';
+      const errBody = apiResponse ? await apiResponse.text() : '';
+      console.error('[STORY-TEXT-BG] Writer API error:', status, errBody.slice(0, 300));
       return { statusCode: 500 };
     }
 
     const genResult = await apiResponse.json();
     let storyText = '';
     for (const block of genResult.content) { if (block.type === 'text') storyText += block.text; }
+    storyText = storyText.trim();
 
     if (!storyText || storyText.split(/\s+/).length < 100) {
-      console.error('[STORY-TEXT-BG] Claude returned insufficient text:', storyText ? storyText.split(/\s+/).length + ' words' : 'empty');
-      console.error('[STORY-TEXT-BG] Response blocks:', JSON.stringify(genResult.content.map(b => ({ type: b.type, length: (b.text || '').length }))));
+      console.error('[STORY-TEXT-BG] Writer returned insufficient text:', storyText ? storyText.split(/\s+/).length + ' words' : 'empty');
       return { statusCode: 500 };
     }
 
+    // Post-processing: optional personal message intro + Hear Their Name signature suffix.
     let messageIntro = '';
     if (sd.personalMessage) {
       messageIntro = 'Before we begin, there is a special message for ' + sd.childName + '. ... ' + sd.personalMessage + ' ... And now, on with the story. ... ';
@@ -104,8 +138,8 @@ export const handler = async (event) => {
       body: JSON.stringify({ story_text: fullText, status: 'pending' })
     });
 
-    const wordCount = fullText.split(/\s+/).length;
-    console.log('[STORY-TEXT-BG] Complete:', wordCount, 'words for', sd.childName, '(' + storyId + ')');
+    const wordCountDone = fullText.split(/\s+/).length;
+    console.log('[STORY-TEXT-BG] Complete:', wordCountDone, 'words for', sd.childName, '(' + storyId + ')');
     return { statusCode: 200 };
 
   } catch (err) {
