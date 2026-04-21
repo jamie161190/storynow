@@ -316,11 +316,13 @@ function renderQueue(stories) {
     html += '<div class="card-actions">';
     if (!s.story_text) {
       html += '<button class="btn btn-purple" onclick="generateStoryText(\'' + esc(s.id) + '\',this)">Generate story</button>';
-    } else if (!s.audio_url || s.status !== 'ready') {
-      html += '<button class="btn btn-purple" onclick="generateTTS(\'' + esc(s.id) + '\',this)">Generate audio</button>';
+    } else {
+      // Text exists: always offer audio generation. Relabel if audio already exists.
+      var audioLabel = s.audio_url ? 'Regenerate audio' : 'Generate audio';
+      html += '<button class="btn btn-purple" onclick="generateTTS(\'' + esc(s.id) + '\',this)">' + audioLabel + '</button>';
     }
     if (s.story_text) {
-      html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate</button>';
+      html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate text</button>';
     }
     if (s.audio_url) {
       html += '<button class="btn btn-green" onclick="sendStory(\'' + esc(s.id) + '\',this)">Send to customer</button>';
