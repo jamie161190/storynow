@@ -112,12 +112,16 @@ audio { width: 100%; margin-top: 0.5rem; }
 <div class="modal-overlay" id="regenModal">
   <div class="modal">
     <h2>Regenerate story</h2>
-    <p style="font-size:0.82rem;color:#666;margin-bottom:0.5rem">Add notes for the rewrite. The customer's original feedback (if any) will also be included.</p>
+    <div style="background:#FFF4E5;border:2px solid #F1753B;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.75rem">
+      <p style="margin:0;font-size:0.82rem;color:#8B4500;font-weight:700">⚠ This wipes the current story text and writes a new one.</p>
+      <p style="margin:0.25rem 0 0;font-size:0.78rem;color:#8B4500">Any edits you made will be lost. If you just want to tweak specific lines, use Edit text instead.</p>
+    </div>
+    <p style="font-size:0.82rem;color:#666;margin-bottom:0.5rem">Add notes telling Claude what to change in the rewrite.</p>
     <label>Your notes</label>
     <textarea id="regenNotes" placeholder="e.g. Make the dragon less scary, add more dialogue for the friend"></textarea>
     <p id="regenStatus" style="font-size:0.82rem;color:#6B2F93;margin-top:0.5rem;display:none"></p>
     <div class="modal-actions">
-      <button class="btn btn-orange" id="regenBtn" onclick="submitRegen()">Regenerate</button>
+      <button class="btn btn-orange" id="regenBtn" onclick="submitRegen()">Wipe and regenerate</button>
       <button class="btn btn-outline" onclick="closeModal('regenModal')">Cancel</button>
     </div>
   </div>
