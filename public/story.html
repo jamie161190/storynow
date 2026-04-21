@@ -236,10 +236,12 @@ async function loadStory() {
     storyData = data.story;
     // Format names with "and" before the last name
     function formatNames(name) {
-      var parts = name.split(/,\s*/);
+      // Split on both "," and "&" so names stored like "Oliver, Aurora & Elyse"
+      // render cleanly as "Oliver, Aurora, and Elyse".
+      var parts = name.split(/\s*[,&]\s*/).map(function(s){ return s.trim(); }).filter(Boolean);
       if (parts.length <= 1) return name;
       if (parts.length === 2) return parts[0] + ' and ' + parts[1];
-      return parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1];
+      return parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
     }
     var displayName = formatNames(storyData.childName);
     document.title = displayName + "'s Story | Hear Their Name";
