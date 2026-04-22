@@ -930,11 +930,13 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 .htn-hero-overlay h1{font-family:var(--htn-serif);font-weight:400;font-size:46px;line-height:1.02;letter-spacing:-0.025em;margin:0 0 14px;color:#fff;text-wrap:balance}
 .htn-hero-overlay h1 em{font-style:italic;color:var(--htn-honey);font-family:var(--htn-serif)}
 .htn-hero-overlay p.lead{font-family:var(--htn-sans);font-size:15px;line-height:1.5;color:rgba(255,255,255,0.82);max-width:340px;margin:0 0 22px;text-wrap:pretty;font-weight:400}
-.htn-capture{background:rgba(255,255,255,0.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.18);border-radius:18px;padding:10px;display:flex;gap:8px;align-items:center;margin-bottom:16px}
-.htn-capture input{flex:1;background:transparent;border:none;outline:none;padding:12px 14px;font-size:15px;font-family:var(--htn-sans);color:#fff;font-weight:400}
+.htn-capture{background:rgba(255,255,255,0.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.18);border-radius:18px;padding:6px;display:flex;gap:6px;align-items:stretch;margin-bottom:12px;max-width:540px}
+.htn-capture input{flex:1;min-width:0;background:transparent;border:none;outline:none;padding:12px 14px;font-size:15px;font-family:var(--htn-sans);color:#fff;font-weight:400}
 .htn-capture input::placeholder{color:rgba(255,255,255,0.58)}
-.htn-capture button{background:var(--htn-honey);color:var(--htn-ink);border:none;border-radius:9999px;padding:12px 18px;font-family:var(--htn-sans);font-size:14.5px;font-weight:500;letter-spacing:-0.005em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:8px}
+.htn-capture button{flex-shrink:0;background:var(--htn-honey);color:var(--htn-ink);border:none;border-radius:14px;padding:12px 18px;font-family:var(--htn-sans);font-size:14.5px;font-weight:500;letter-spacing:-0.005em;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .htn-capture button:hover{background:var(--htn-honey-2)}
+.htn-add-sibling{display:inline-block;font-family:var(--htn-sans);font-size:13px;color:rgba(255,255,255,0.72);cursor:pointer;text-decoration:underline;text-underline-offset:3px;margin-bottom:16px;background:transparent;border:none;padding:0}
+.htn-add-sibling:hover{color:#fff}
 .htn-trust{display:flex;gap:14px;font-family:var(--htn-sans);font-size:11.5px;color:rgba(255,255,255,0.72);flex-wrap:wrap}
 
 /* Shared section wrappers (paper / paper-2) */
@@ -1047,6 +1049,159 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   .htn-hero-overlay h1{font-size:40px}
   .htn-section{padding:40px 22px}
 }
+
+/* Force play button to stay honey even when old JS sets purple */
+#samplePlayBtn{background:var(--htn-honey) !important;box-shadow:none !important}
+#samplePlayBtn svg path,#samplePlayBtn svg rect{fill:var(--htn-ink) !important}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET (≥768px) — middle ground, condensed 2-col
+   ═══════════════════════════════════════════════════════════ */
+@media(min-width:768px){
+  .htn-top{padding:24px 36px}
+  .htn-hero{min-height:720px}
+  .htn-hero-overlay{padding:140px 36px 44px;align-items:flex-start}
+  .htn-hero-overlay .htn-cap{margin-bottom:22px}
+  .htn-hero-overlay h1{font-size:74px;line-height:0.98;letter-spacing:-0.03em;max-width:680px;margin-bottom:22px}
+  .htn-hero-overlay p.lead{font-size:16px;max-width:560px;margin-bottom:28px}
+  .htn-capture{max-width:560px;padding:12px}
+  .htn-section{padding:80px 36px;max-width:900px}
+  .htn-h2{font-size:56px;line-height:1.02;letter-spacing:-0.025em}
+  .htn-body{font-size:16.5px;max-width:600px}
+
+  /* 01 · Cinema 2-col */
+  #sectionCinema{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;max-width:1100px;padding:100px 36px}
+  #sectionCinema > p.htn-cap,#sectionCinema > h2,#sectionCinema > p.htn-body{grid-column:1}
+  #sectionCinema > .htn-recipe{grid-column:2;grid-row:1/span 3;align-self:start;padding:28px}
+
+  /* Values 3-col */
+  .htn-values{grid-template-columns:repeat(3,1fr)}
+  .htn-values > div{padding:32px 28px}
+  .htn-values > div .title{font-size:24px}
+  .htn-values > div .body{font-size:14.5px;max-width:300px}
+
+  /* Founder side-by-side */
+  .htn-founder{display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:center;max-width:1100px}
+  .htn-founder-photo{margin-bottom:0}
+  .htn-founder h2{font-size:52px;line-height:1.02}
+
+  /* Second CTA wider */
+  .htn-cta2{padding:44px 36px}
+  .htn-cta2 h3{font-size:32px}
+  .htn-btn-primary{width:auto;display:inline-flex}
+
+  /* How it works horizontal timeline */
+  .htn-how{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding-left:0}
+  .htn-how::before{display:none}
+  .htn-how > div{padding-bottom:0}
+  .htn-how > div .num{position:relative;left:0;top:0;margin-bottom:16px}
+  .htn-how > div .title{font-size:22px}
+
+  /* Dark card grid */
+  .htn-darkcard{padding:48px 56px}
+  .htn-darkcard p.headline{font-size:32px;max-width:420px}
+
+  /* Reviews 2-col grid */
+  #sectionFaq{max-width:1100px}
+  .htn-section .htn-review-head{align-items:flex-end}
+
+  /* FAQ 2-col */
+  .htn-faq summary{font-size:19px}
+
+  /* Footer nav row */
+  .htn-footer{max-width:1100px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding:48px 36px}
+  .htn-footer .links,.htn-footer .email{grid-column:span 4}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP (≥1024px) — editorial magazine, asymmetric grids
+   ═══════════════════════════════════════════════════════════ */
+@media(min-width:1024px){
+  .htn-top{padding:26px 56px}
+  .htn-top .wordmark{font-size:15px}
+  .htn-top nav{display:flex;gap:32px;font-family:var(--htn-sans);font-size:13.5px}
+  .htn-top nav a{color:rgba(255,255,255,0.78);text-decoration:none}
+  .htn-top .desk-cta{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:1px solid rgba(255,255,255,0.28);border-radius:9999px;color:#fff;font-family:var(--htn-sans);font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;background:transparent}
+  .htn-top .desk-cta:hover{background:rgba(255,255,255,0.08)}
+
+  .htn-hero{min-height:820px}
+  .htn-hero-overlay{padding:140px 56px 64px;display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:end}
+  .htn-hero-overlay .hero-text{grid-column:1}
+  .htn-hero-overlay .hero-text h1{font-size:108px;line-height:0.96;letter-spacing:-0.035em;margin-bottom:28px;max-width:780px}
+  .htn-hero-overlay .hero-text p.lead{font-size:18px;max-width:540px;margin:0}
+  .htn-hero-overlay .htn-capture{grid-column:2;max-width:none;padding:24px;flex-direction:column;gap:12px;align-items:stretch;margin:0}
+  .htn-hero-overlay .htn-capture::before{content:'Start here';display:block;font-family:var(--htn-mono);font-size:11px;color:rgba(255,255,255,0.6);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px}
+  .htn-hero-overlay .htn-capture input{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);border-radius:14px;padding:14px;font-size:15px}
+  .htn-hero-overlay .htn-capture button{width:100%;justify-content:center;padding:14px 24px;font-size:15.5px;border-radius:14px}
+  .htn-hero-overlay .htn-trust{display:flex;justify-content:space-between;font-size:11.5px;grid-column:1/-1;margin-top:4px}
+
+  .htn-section{padding:120px 56px;max-width:1300px}
+
+  /* Cinema: 2-col equal with large typography */
+  #sectionCinema{grid-template-columns:1fr 1fr;gap:80px;padding:120px 56px}
+  #sectionCinema > h2{font-size:72px;line-height:0.98;letter-spacing:-0.03em}
+  #sectionCinema > p.htn-body{font-size:17px;max-width:480px}
+  #sectionCinema > .htn-recipe{padding:32px}
+
+  /* Values */
+  .htn-values > div{padding:40px 36px}
+  .htn-values > div .title{font-size:28px;letter-spacing:-0.01em}
+  .htn-values > div .body{font-size:15px}
+
+  /* Founder large */
+  .htn-founder{grid-template-columns:1.1fr 1fr;gap:80px;max-width:1300px}
+  .htn-founder h2{font-size:64px;line-height:1.02;letter-spacing:-0.025em}
+  .htn-founder .body{font-size:17px;line-height:1.65;max-width:520px}
+  .htn-founder .sig{font-size:20px}
+  .htn-founder-photo{max-height:none}
+
+  /* Second CTA centered */
+  .htn-cta2{max-width:720px;margin:0 auto;padding:48px 56px}
+  .htn-cta2 h3{font-size:36px}
+
+  /* How it works timeline with connecting line */
+  .htn-how{position:relative}
+  .htn-how::before{display:block;content:'';position:absolute;top:14px;left:40px;right:40px;bottom:auto;height:1px;background:var(--htn-line);width:auto}
+  .htn-how > div .num{width:28px;height:28px;font-size:12px;z-index:1;background:var(--htn-paper)}
+  .htn-how > div .title{font-size:24px;letter-spacing:-0.01em}
+  .htn-how > div .body{font-size:14.5px;max-width:260px}
+
+  /* Dark card 2-col */
+  .htn-darkcard{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;padding:80px}
+  .htn-darkcard p.headline{font-size:40px;line-height:1.1;letter-spacing:-0.02em;max-width:none;margin:0}
+  .htn-darkcard p.body{font-size:17px;line-height:1.65}
+  .htn-darkcard::before{top:-80px;right:-80px;width:360px;height:360px}
+
+  /* Reviews 3-col */
+  .htn-section .htn-review-head{margin-bottom:48px}
+  .htn-review{padding:28px;border:1px solid var(--htn-line);border-radius:20px}
+  .htn-section:has(.htn-review){max-width:1300px}
+  /* Stack reviews with CSS grid */
+  .htn-review-head{display:flex;justify-content:space-between;align-items:flex-end}
+
+  /* FAQ + CTA 2-col */
+  .htn-faq summary{font-size:19px}
+
+  /* Quiet signoff */
+  .htn-signoff .quote{font-size:24px}
+
+  /* Footer grid */
+  .htn-footer{grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding:56px 56px 40px;max-width:1300px;border-top:1px solid var(--htn-line)}
+  .htn-footer .wordmark{grid-column:1}
+
+  /* Sticky bar: centered on desktop */
+  #stickyBar{max-width:none;padding:14px 56px 18px;justify-content:flex-end}
+  #stickyBar .left-block{margin-right:auto}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP-ONLY NAV + DESKTOP CTA (hidden on mobile)
+   ═══════════════════════════════════════════════════════════ */
+.htn-top nav,.htn-top .desk-cta{display:none}
+@media(min-width:1024px){
+  .htn-top nav,.htn-top .desk-cta{display:inline-flex}
+  .htn-top a.login{display:none}
+}
 </style>
 
 <!-- LANDING -->
@@ -1060,12 +1215,21 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
     <!-- Top header (absolute over hero) -->
     <div class="htn-top">
       <span class="wordmark"><em>Hear</em>·<span class="their">their</span>·name</span>
+      <nav>
+        <a href="#sectionCinema">How it works</a>
+        <a href="#sectionCinema">Sample story</a>
+        <a href="#sectionFaq">Reviews</a>
+        <a href="#sectionFaq">FAQ</a>
+      </nav>
       <a class="login" onclick="goTo('screenLogin')">Log in</a>
+      <a class="desk-cta" href="javascript:void(0)" onclick="document.getElementById('heroChildName').focus()">Start their story →</a>
     </div>
     <div class="htn-hero-overlay">
-      <p class="htn-cap">✦ a free personalised audio story</p>
-      <h1>Hear their name<br>in their own <em>story</em>.</h1>
-      <p class="lead">Their name. Their world. Spoken back to them, in a 15-minute story made just for your child, by a dad and his son.</p>
+      <div class="hero-text">
+        <p class="htn-cap">✦ a free personalised audio story</p>
+        <h1>Hear their name<br>in their own <em>story</em>.</h1>
+        <p class="lead">A 15-minute story made just for your child, or for your whole brood, with brothers and sisters written in side by side. Free, made by a dad and his son.</p>
+      </div>
 
       <!-- Name capture -->
       <div class="htn-capture">
@@ -1074,9 +1238,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </div>
 
       <div class="htn-trust">
-        <span>✺ 15-minute story</span>
+        <span>✺ One or several</span>
         <span>✺ No card needed</span>
-        <span>✺ By a dad and his son</span>
+        <span>✺ ~2 min</span>
       </div>
 
       <!-- Legacy hero controls (hidden, preserved for JS wiring) -->
