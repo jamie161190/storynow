@@ -1037,7 +1037,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
 .htn-footer .email{margin-top:4px;font-family:var(--htn-mono);font-size:11px}
 
 /* Sticky bottom bar — Dusk */
-#stickyBar{position:fixed;bottom:0;left:0;right:0;background:var(--htn-paper);border-top:1px solid var(--htn-line);padding:12px 16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:50;box-shadow:0 -4px 16px rgba(26,20,38,0.06)}
+#stickyBar{position:fixed;bottom:0;left:0;right:0;transform:none !important;max-width:none !important;background:var(--htn-paper);border-top:1px solid var(--htn-line);padding:12px 16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:50;box-shadow:0 -4px 16px rgba(26,20,38,0.06)}
 #stickyBar .left-block{font-family:var(--htn-sans)}
 #stickyBar .left-block .t1{font-size:12.5px;font-weight:500;color:var(--htn-ink)}
 #stickyBar .left-block .t2{font-size:11px;color:var(--htn-muted)}
@@ -1156,8 +1156,9 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   .htn-founder-photo{max-height:none}
 
   /* Second CTA centered */
-  .htn-cta2{max-width:720px;margin:0 auto;padding:48px 56px}
+  .htn-cta2{max-width:720px;margin:0 auto;padding:48px 56px;text-align:center}
   .htn-cta2 h3{font-size:36px}
+  .htn-cta2 .htn-btn-primary{width:auto;padding:18px 34px}
 
   /* How it works timeline with connecting line */
   .htn-how{position:relative}
@@ -1172,12 +1173,12 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
   .htn-darkcard p.body{font-size:17px;line-height:1.65}
   .htn-darkcard::before{top:-80px;right:-80px;width:360px;height:360px}
 
-  /* Reviews 3-col */
-  .htn-section .htn-review-head{margin-bottom:48px}
-  .htn-review{padding:28px;border:1px solid var(--htn-line);border-radius:20px}
+  /* Reviews section wraps review cards in a 3-col grid */
   .htn-section:has(.htn-review){max-width:1300px}
-  /* Stack reviews with CSS grid */
-  .htn-review-head{display:flex;justify-content:space-between;align-items:flex-end}
+  .htn-section:has(.htn-review) .htn-review-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  /* When grid wrap isn't present (older markup), still lay out cards */
+  .htn-section > .htn-review{padding:28px;border:1px solid var(--htn-line);border-radius:20px;display:flex;flex-direction:column}
+  .htn-review-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:48px}
 
   /* FAQ + CTA 2-col */
   .htn-faq summary{font-size:19px}
@@ -1386,6 +1387,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       <span class="meta"><span class="stars">★★★★★</span> 5.0 · verified</span>
     </div>
 
+    <div class="htn-review-wrap">
     <div class="htn-review">
       <div class="row1">
         <div>
@@ -1420,6 +1422,7 @@ if (new URLSearchParams(window.location.search).get('session_id')) {
       </div>
       <p class="body">My daughter absolutely loved hearing her own name, friends and family in the story. She's nearly 5, and was engaged from start to end. 100% recommend.</p>
       <div class="who">Lisa K. · GB</div>
+    </div>
     </div>
 
     <!-- Trustpilot widget: preserved exactly (business id 69da2e55cc3e51f96462e437) -->
