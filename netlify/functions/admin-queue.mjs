@@ -396,18 +396,44 @@ export default async (req) => {
     const greeting = requesterName ? `Hi ${requesterName},` : 'Hi,';
 
     const customBlock = (customMessage && customMessage.trim())
-      ? `<p style="margin:0 0 16px;line-height:1.75">${esc(customMessage.trim()).replace(/\n/g, '<br>')}</p>`
+      ? `<p style="margin:0 0 16px;font-size:15.5px;line-height:1.65">${esc(customMessage.trim()).replace(/\n/g, '<br>')}</p>`
       : '';
 
-    const emailHtml = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:500px;margin:0 auto;padding:20px;color:#333">
-<p style="margin:0 0 16px;line-height:1.75">${greeting}</p>
-<p style="margin:0 0 16px;line-height:1.75">${isMulti ? "Their story is ready for you." : safeChild + "'s story is ready for you."}</p>
-${customBlock}
-<p style="text-align:center;margin:24px 0"><a href="${listenUrl}" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:14px 32px;border-radius:50px;font-size:1rem;font-weight:700">${isMulti ? "Listen to their story" : "Listen to " + safeChild + "'s story"}</a></p>
-<p style="margin:0 0 16px;line-height:1.75">${isMulti ? "We hope it becomes something they ask to hear again and again." : "We hope it becomes something " + safeChild.split("'")[0] + " asks to hear again and again."}</p>
-<p style="margin:24px 0 2px;line-height:1.75;font-weight:600">Jamie and Chase</p>
-<p style="margin:0;font-size:13px;color:#999">Hear Their Name</p>
-</div>`;
+    const readyLine = isMulti
+      ? `Their story is <em style="color:#3D2A5C;font-style:italic">ready for you</em>.`
+      : `${safeChild}'s story is <em style="color:#3D2A5C;font-style:italic">ready for you</em>.`;
+    const closingLine = isMulti
+      ? "We hope it becomes something they ask to hear again and again. The link is yours — anyone you share it with can listen too."
+      : "We hope it becomes something " + safeChild.split("'")[0] + " asks to hear again and again. The link is yours — anyone you share it with can listen too.";
+    const ctaLabel = isMulti ? "Open their story →" : `Open ${safeChild}'s story →`;
+    const visibleUrl = listenUrl.replace(/^https?:\/\//, '');
+
+    const emailHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${esc(subject)}</title></head>
+<body style="margin:0;padding:0;background:#F7F1E6;-webkit-font-smoothing:antialiased">
+<div style="max-width:600px;margin:0 auto;background:#F7F1E6;padding:40px 24px;font-family:'Newsreader',Georgia,serif;color:#1A1426">
+  <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65">${greeting}</p>
+  <p style="margin:0 0 22px;font-size:15.5px;line-height:1.65">${readyLine}</p>
+  ${customBlock}
+  <p style="margin:0 0 22px;font-size:15.5px;line-height:1.65">Tap the link below whenever you're both ready. The story lives at its own page — you can open it any time, share it with family, and come back to it as many times as you like.</p>
+
+  <!-- Plain dark rectangular CTA -->
+  <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin:0 0 14px">
+    <tr><td align="center">
+      <a href="${listenUrl}" style="display:block;padding:18px 20px;background:#1A1426;color:#F7F1E6;border-radius:16px;text-decoration:none;text-align:center;font-family:'Newsreader',Georgia,serif;font-size:16px;font-weight:500">
+        ${ctaLabel}
+      </a>
+    </td></tr>
+  </table>
+  <p style="margin:0 0 22px;font-family:'Courier New',monospace;font-size:11px;color:rgba(26,20,38,0.58);word-break:break-all">${esc(visibleUrl)}</p>
+
+  <p style="margin:0 0 16px;font-size:15.5px;line-height:1.65;font-style:italic;color:rgba(26,20,38,0.58)">${closingLine}</p>
+  <p style="margin:0;font-size:15.5px;line-height:1.65;font-style:italic;color:#3D2A5C">Jamie and Chase</p>
+
+  <p style="margin:30px 0 0;padding-top:16px;border-top:1px solid rgba(26,20,38,0.14);font-family:'Courier New',monospace;font-size:11px;color:rgba(26,20,38,0.58);text-align:center">
+    Hear Their Name &middot; jamie@heartheirname.com
+  </p>
+</div>
+</body></html>`;
 
     try {
       const emailRes = await fetch('https://api.resend.com/emails', {

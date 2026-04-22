@@ -101,15 +101,32 @@ export default async (req) => {
       const voiceNames = { 'N2lVS1w4EtoT3dr4eOWO': 'Callum', 'oWAxZDx7w5VEj9dCyTzz': 'Grace', 'onwK4e9ZLuTAKqWW03F9': 'Daniel', 'ThT5KcBeYPX3keUQqHPh': 'Dorothy', 'g5CIjZEefAph4nQFvHAz': 'Ethan', 'ZQe5CZNOzWyzPSCn5a3c': 'James', 'cjVigY5qzO86Huf0OWal': 'Eric' };
       const narratorName = voiceNames[voiceId] || 'Callum';
 
-      const emailHtml = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:500px;margin:0 auto;padding:20px;color:#333">
-<p style="margin:0 0 16px;line-height:1.75">${greeting}</p>
-<p style="margin:0 0 16px;line-height:1.75">Thank you for requesting a story for ${childName}.</p>
-<p style="margin:0 0 16px;line-height:1.75">We'll put it together carefully using everything you shared, and send it to you once it's ready. That's usually within a few days.</p>
-<p style="margin:0 0 16px;line-height:1.75">If anything changes or you'd like to add something, just reply to this email.</p>
-<p style="margin:24px 0 2px;line-height:1.75;font-weight:600">Jamie and Chase</p>
-<p style="margin:0 0 20px;font-size:13px;color:#999">Hear Their Name</p>
-<p style="margin:0;padding-top:16px;border-top:1px solid #eee;font-size:13px;color:#aaa">Story for ${childName} &middot; ${esc(catLabel)} &middot; Narrated by ${esc(narratorName)}</p>
-</div>`;
+      const refShort = (orderId || '').replace(/-/g, '').slice(0, 6) || 'pending';
+      const emailHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>We're creating ${childName}'s story</title></head>
+<body style="margin:0;padding:0;background:#F7F1E6;-webkit-font-smoothing:antialiased">
+<div style="max-width:600px;margin:0 auto;background:#F7F1E6;padding:40px 24px;font-family:'Newsreader',Georgia,serif;color:#1A1426">
+  <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65">${greeting}</p>
+  <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65">Thank you for requesting a story for ${childName}.</p>
+  <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65">We'll put it together carefully using everything you shared, and send it to you once it's ready. That's usually within a few days.</p>
+  <p style="margin:0 0 20px;font-size:15.5px;line-height:1.65">If anything changes or you'd like to add something, just reply to this email.</p>
+  <p style="margin:0 0 4px;font-size:15.5px;line-height:1.65;font-style:italic;color:#3D2A5C">Jamie and Chase</p>
+
+  <!-- Receipt card -->
+  <div style="margin-top:30px;padding:18px;background:#F0E8D7;border-radius:14px;font-family:'Helvetica Neue',Arial,sans-serif">
+    <p style="margin:0 0 10px;font-family:'Courier New',monospace;font-size:11px;color:rgba(26,20,38,0.58);letter-spacing:0.06em;text-transform:uppercase">your request</p>
+    <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;font-size:13px;line-height:1.5">
+      <tr><td style="color:rgba(26,20,38,0.58);padding:3px 14px 3px 0;width:74px">For</td><td style="color:#1A1426">${childName}</td></tr>
+      <tr><td style="color:rgba(26,20,38,0.58);padding:3px 14px 3px 0">Kind</td><td style="color:#1A1426">${esc(catLabel)}</td></tr>
+      <tr><td style="color:rgba(26,20,38,0.58);padding:3px 14px 3px 0">Narrator</td><td style="color:#1A1426">${esc(narratorName)}</td></tr>
+      <tr><td style="color:rgba(26,20,38,0.58);padding:3px 14px 3px 0">Ref</td><td style="color:#1A1426;font-family:'Courier New',monospace;font-size:11.5px">htn_${refShort}</td></tr>
+    </table>
+  </div>
+
+  <p style="margin:30px 0 0;padding-top:16px;border-top:1px solid rgba(26,20,38,0.14);font-family:'Courier New',monospace;font-size:11px;color:rgba(26,20,38,0.58);text-align:center">
+    Hear Their Name &middot; jamie@heartheirname.com
+  </p>
+</div>
+</body></html>`;
 
       try {
         await fetch('https://api.resend.com/emails', {

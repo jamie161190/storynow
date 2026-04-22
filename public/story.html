@@ -6,421 +6,465 @@
 <title>Your Story | Hear Their Name</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-<script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@300..500&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Nunito', sans-serif; background: #FEFBF6; color: #2D2844; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+/* ---------- Design tokens (Dusk palette) ---------- */
+:root{
+  --htn-ink:#1A1426;
+  --htn-ink-2:#2D2238;
+  --htn-paper:#F7F1E6;
+  --htn-paper-2:#F0E8D7;
+  --htn-paper-3:#E9DFC8;
+  --htn-plum:#3D2A5C;
+  --htn-plum-2:#5A3F83;
+  --htn-honey:#E8A34A;
+  --htn-honey-2:#C88632;
+  --htn-blush:#D97757;
+  --htn-line:rgba(26,20,38,0.14);
+  --htn-line-2:rgba(26,20,38,0.08);
+  --htn-muted:rgba(26,20,38,0.58);
+  --htn-muted-2:rgba(26,20,38,0.42);
+  --htn-serif:'Newsreader',Georgia,serif;
+  --htn-sans:'Instrument Sans','Helvetica Neue',sans-serif;
+  --htn-mono:'JetBrains Mono',ui-monospace,monospace;
+}
 
-.story-page { width: 100%; max-width: 100%; padding: 0 0 0; }
-.section { width: 100%; padding: 0 1.25rem; }
-.section-inner { max-width: 480px; margin: 0 auto; }
-.section-alt { background: #F8F6F2; }
-.section-warm { background: #F5F0FB; }
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--htn-paper);color:var(--htn-ink)}
+body{font-family:var(--htn-sans);min-height:100vh;display:flex;flex-direction:column;align-items:center;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"ss01","cv11"}
+body h1,body h2,body h3,body h4{font-family:var(--htn-serif);font-weight:450;letter-spacing:-0.01em;margin:0;text-wrap:balance}
+body p{margin:0;text-wrap:pretty}
 
-.loading { text-align: center; padding: 6rem 1rem; }
-.loading p { color: #bbb; font-size: 0.88rem; }
+/* Layout */
+.story-page{width:100%;max-width:100%;background:var(--htn-paper)}
+.section{width:100%;padding:0 20px}
+.section-inner{max-width:440px;margin:0 auto}
+.section-alt{background:var(--htn-paper-2)}
 
-.error { text-align: center; padding: 6rem 1rem; }
-.error h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.3rem; margin-bottom: 0.5rem; }
-.error p { color: #999; font-size: 0.85rem; line-height: 1.7; }
-.error a { color: #6B2F93; font-weight: 700; text-decoration: none; }
+.loading{text-align:center;padding:6rem 1rem}
+.loading p{color:var(--htn-muted-2);font-size:13px;font-family:var(--htn-mono)}
+.error{text-align:center;padding:6rem 1rem}
+.error h2{font-family:var(--htn-serif);font-size:28px;margin-bottom:8px}
+.error p{color:var(--htn-muted);font-size:14.5px;line-height:1.6}
+.error a{color:var(--htn-plum);font-weight:600;text-decoration:none}
+
+/* Wordmark */
+.wordmark{display:inline-flex;align-items:center;gap:6px;font-family:var(--htn-serif);font-size:14px;color:var(--htn-ink);letter-spacing:-0.01em;font-style:italic}
+.wordmark .their{color:var(--htn-plum)}
+
+/* Caption micro-label */
+.caption{font-family:var(--htn-mono);font-size:11px;color:var(--htn-muted);letter-spacing:0.06em;text-transform:uppercase}
+
+/* Header */
+.player-section{padding:56px 20px 32px}
+.player-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.player-head .meta{font-size:11.5px;color:var(--htn-muted);font-family:var(--htn-mono)}
+
+.child-name{font-family:var(--htn-serif);font-size:30px;line-height:1.08;letter-spacing:-0.02em;font-weight:400;color:var(--htn-ink);margin:12px 0}
+.child-name em{font-style:italic;color:var(--htn-plum)}
+.story-sub{font-size:14px;color:var(--htn-muted);line-height:1.55;margin-bottom:26px}
 
 /* Player */
-.player-section { text-align: center; padding: 3rem 0 0; }
-.child-name { font-family: 'Playfair Display', Georgia, serif; font-size: 1.9rem; font-weight: 800; color: #2D2844; line-height: 1.2; margin: 0 0 0.25rem; }
-.story-label { font-size: 0.78rem; color: #bbb; font-weight: 600; letter-spacing: 0.03em; margin: 0 0 2rem; }
+.player-row{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.play-btn{width:76px;height:76px;border-radius:50%;border:none;background:var(--htn-honey);color:var(--htn-ink);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 28px rgba(61,42,92,0.22);transition:transform .12s ease,background .2s}
+.play-btn:hover{transform:scale(1.03)}
+.play-btn.playing{background:var(--htn-ink);color:var(--htn-paper)}
+.play-btn svg{display:block}
+.progress-col{flex:1;min-width:0}
+.progress-bar{height:4px;background:var(--htn-line-2);border-radius:2px;cursor:pointer;position:relative}
+.progress-fill{height:100%;background:var(--htn-ink);border-radius:2px;transition:width .25s linear;width:0%}
+.progress-times{display:flex;justify-content:space-between;margin-top:8px;font-family:var(--htn-mono);font-size:11px;color:var(--htn-muted)}
 
-.play-btn { width: 84px; height: 84px; border-radius: 50%; border: none; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; box-shadow: 0 6px 24px rgba(107, 47, 147, 0.25); transition: transform 0.2s, box-shadow 0.2s; }
-.play-btn:hover { transform: scale(1.05); box-shadow: 0 8px 32px rgba(107, 47, 147, 0.35); }
-.play-btn svg { width: 30px; height: 30px; fill: white; margin-left: 3px; }
-.play-btn.playing svg { margin-left: 0; }
+.music-toggle{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid var(--htn-line);background:var(--htn-paper-2);font-size:12px;color:var(--htn-ink);cursor:pointer;font-family:var(--htn-sans);font-weight:500}
+.music-toggle:hover{background:var(--htn-paper-3)}
 
-.progress-wrap { width: 100%; max-width: 300px; margin: 0 auto; }
-.progress-bar { width: 100%; height: 4px; background: #E8E0F0; border-radius: 2px; overflow: hidden; cursor: pointer; }
-.progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #6B2F93, #A872C8); border-radius: 2px; transition: width 0.3s linear; }
-.time-display { display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 0.7rem; color: #bbb; font-weight: 600; }
+/* Quiet moment */
+.quiet-moment{padding:36px 24px;background:var(--htn-paper-2);text-align:center}
+.quiet-moment p{font-family:var(--htn-serif);font-style:italic;font-size:19px;line-height:1.4;color:var(--htn-plum)}
 
-/* Divider */
-.divider { width: 40px; height: 1.5px; background: #E8E0F0; margin: 1.75rem auto; }
+/* Review hero (finished state) */
+.review-hero{padding:44px 20px 44px;background:var(--htn-paper);position:relative;overflow:hidden;display:none}
+.review-hero.is-visible{display:block;animation:swell 600ms cubic-bezier(0.22,1,0.36,1)}
+@keyframes swell{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.review-hero .glow{position:absolute;top:-40px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(232,163,74,.18),transparent 70%);pointer-events:none}
+.review-hero .caption{margin-bottom:14px;position:relative}
+.review-hero h2{font-family:var(--htn-serif);font-size:28px;line-height:1.1;margin-bottom:12px;letter-spacing:-0.01em;position:relative}
+.review-hero h2 em{font-style:italic;color:var(--htn-plum)}
+.review-hero p{font-size:15px;line-height:1.55;color:var(--htn-ink-2);margin-bottom:22px;position:relative}
 
-/* Text sections */
-.quiet-line { font-family: 'Playfair Display', Georgia, serif; font-size: 1rem; font-style: italic; color: #2D2844; text-align: center; line-height: 1.6; }
-.made-line { font-size: 0.88rem; color: #999; text-align: center; line-height: 1.6; }
+.tp-cta{display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;border-radius:16px;text-decoration:none;background:var(--htn-ink);color:var(--htn-paper);margin-bottom:12px;box-shadow:0 10px 24px rgba(26,20,38,.18);position:relative}
+.tp-cta:hover{background:#26203A}
+.tp-star{width:44px;height:44px;border-radius:12px;flex-shrink:0;background:#00b67a;color:#fff;display:flex;align-items:center;justify-content:center}
+.tp-text{flex:1;text-align:left}
+.tp-text .title{font-size:16px;font-family:var(--htn-serif);font-weight:500}
+.tp-text .sub{font-size:11.5px;opacity:0.7;font-family:var(--htn-mono);margin-top:2px}
+.tp-arrow{opacity:0.55;font-size:16px}
+.reassure{text-align:center;font-size:12px;color:var(--htn-muted);margin-bottom:28px;position:relative}
 
-/* Thank you */
-.thankyou-copy { font-size: 0.85rem; color: #999; text-align: center; line-height: 1.8; margin: 0 0 1rem; }
+.jamie-note{padding:16px 18px;background:var(--htn-paper-2);border-radius:14px;position:relative}
+.jamie-note .caption{margin-bottom:6px}
+.jamie-note p{font-family:var(--htn-serif);font-style:italic;font-size:14.5px;line-height:1.5;color:var(--htn-ink-2)}
+.jamie-note .sig{margin-top:8px;font-size:12px;color:var(--htn-plum);font-family:var(--htn-serif);font-style:italic}
 
-.amount-row { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 1.5rem; }
-.amt { padding: 0.55rem 1.15rem; border-radius: 50px; border: 1.5px solid #E8E0F0; background: #fff; font-size: 0.88rem; font-weight: 700; color: #2D2844; cursor: pointer; font-family: 'Nunito', sans-serif; transition: all 0.2s; }
-.amt:hover, .amt.on { border-color: #6B2F93; background: #F8F5FF; color: #6B2F93; }
-.amt-custom { padding: 0.55rem 0.8rem; border-radius: 50px; border: 1.5px solid #E8E0F0; background: #fff; font-size: 0.88rem; font-weight: 700; color: #2D2844; width: 72px; text-align: center; font-family: 'Nunito', sans-serif; }
-.amt-custom:focus { border-color: #6B2F93; outline: none; }
+/* Share */
+.share-section{padding:28px 20px;background:var(--htn-paper)}
+.share-section .caption{margin-bottom:10px}
+.share-section p{font-size:14px;line-height:1.55;color:var(--htn-ink-2);margin-bottom:16px}
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 
-.msg-label { font-size: 0.82rem; color: #aaa; text-align: center; margin: 0 0 0.6rem; }
-.msg-box { width: 100%; padding: 0.6rem 0.85rem; border: 1.5px solid #E8E0F0; border-radius: 10px; font-size: 0.82rem; font-family: 'Nunito', sans-serif; resize: none; height: 56px; color: #2D2844; }
-.msg-box:focus { border-color: #6B2F93; outline: none; }
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--htn-sans);font-weight:500;border-radius:12px;border:1px solid transparent;cursor:pointer;letter-spacing:-0.005em;transition:transform .12s ease,background .12s;font-size:14.5px;padding:14px 22px;min-height:44px}
+.btn:hover{transform:translateY(-1px)}
+.btn.quiet{background:var(--htn-paper-2);color:var(--htn-ink);border:1px solid var(--htn-line)}
+.btn.quiet:hover{background:var(--htn-paper-3)}
+.btn.ghost{background:transparent;color:var(--htn-ink);border:1px solid var(--htn-line)}
+.btn.ghost:hover{background:var(--htn-paper-2)}
+.btn.primary{background:var(--htn-ink);color:var(--htn-paper)}
+.btn.primary:hover{background:#26203A}
+.btn.full{width:100%}
 
-.ty-btn { width: 100%; padding: 0.8rem; border: none; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; font-size: 0.95rem; font-weight: 700; cursor: pointer; font-family: 'Nunito', sans-serif; margin-top: 1rem; }
+/* New visitor CTA */
+.visitor-cta{padding:24px 20px 16px;text-align:center;background:var(--htn-paper)}
+.visitor-cta p{font-size:14px;color:var(--htn-muted);margin-bottom:12px}
 
-/* Families */
-.families-intro { font-size: 0.82rem; color: #999; text-align: center; line-height: 1.7; margin: 0 0 1rem; }
-.families-title { font-size: 0.85rem; font-weight: 800; color: #2D2844; text-align: center; margin: 0 0 0.75rem; }
+/* Footer */
+.footer{padding:26px 20px 54px;border-top:1px solid var(--htn-line);text-align:center;font-size:11.5px;color:var(--htn-muted);line-height:1.8}
+.footer .mono{margin-top:6px;font-family:var(--htn-mono);font-size:11px}
 
-.fam { padding: 0.85rem 0; border-bottom: 1px solid #F0ECF5; text-align: center; }
-.fam:last-child { border-bottom: none; }
-.fam-quote { font-size: 0.85rem; color: #666; line-height: 1.6; font-style: italic; margin: 0 0 0.25rem; }
-.fam-name { font-size: 0.75rem; font-weight: 700; color: #bbb; }
+/* Toast (copy link) */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--htn-ink);color:var(--htn-paper);padding:10px 18px;border-radius:999px;font-size:13px;font-family:var(--htn-sans);font-weight:500;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
 
-/* CTA */
-.cta-section { text-align: center; }
-.cta-section p { font-size: 0.85rem; color: #999; line-height: 1.7; margin: 0 0 0.6rem; }
-.cta-link { display: inline-block; padding: 0.75rem 2rem; border-radius: 50px; background: linear-gradient(135deg, #6B2F93, #A872C8); color: #fff; text-decoration: none; font-size: 0.92rem; font-weight: 700; font-family: 'Nunito', sans-serif; }
-
-.footer { margin-top: 3rem; text-align: center; font-size: 0.7rem; color: #ccc; line-height: 1.7; }
+@media (max-width:380px){
+  .child-name{font-size:26px}
+  .review-hero h2{font-size:25px}
+}
 </style>
 </head>
 <body>
-
 <div class="story-page">
-  <div class="loading" id="loadingState"><p>Loading...</p></div>
 
-  <div class="error" id="errorState" style="display:none">
-    <h2>This story isn't ready yet</h2>
-    <p>It might still be being created, or this link may not be right.<br><br><a href="https://heartheirname.com">Go to Hear Their Name</a></p>
+  <div id="loadingState" class="loading">
+    <p>Loading your story…</p>
   </div>
 
-  <div id="storyContent" style="display:none">
+  <div id="errorState" class="error" style="display:none">
+    <h2>We couldn't load this story</h2>
+    <p>Reply to the email you got and we'll sort it. <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a></p>
+  </div>
 
-    <!-- Player -->
-    <div class="section" style="padding-bottom:2.5rem">
-      <div class="section-inner">
-        <div class="player-section">
-          <h1 class="child-name" id="childNameDisplay"></h1>
-          <p class="story-label">A Hear Their Name story</p>
-          <button class="play-btn" id="playBtn" onclick="togglePlay()">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </button>
-          <div class="progress-wrap">
-            <div class="progress-bar" id="progressBar" onclick="seekAudio(event)">
-              <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="time-display">
-              <span id="currentTime">0:00</span>
-              <span id="totalTime">0:00</span>
-            </div>
+  <div id="storyContent" style="display:none;width:100%">
+
+    <!-- 1 · Player -->
+    <section class="player-section section-inner" style="max-width:440px;margin:0 auto">
+      <div class="player-head">
+        <span class="wordmark"><em>Hear</em>·<span class="their">their</span>·name</span>
+        <span class="meta">a story for you</span>
+      </div>
+
+      <p class="caption" id="storyMeta">✦ bedtime · 12m 11s</p>
+      <h1 class="child-name" id="childNameDisplay"></h1>
+      <p class="story-sub">Made just for them. Made only once. Yours to keep.</p>
+
+      <div class="player-row">
+        <button id="playBtn" class="play-btn" onclick="togglePlay()" aria-label="Play story">
+          <svg width="20" height="24" viewBox="0 0 22 26" fill="currentColor" aria-hidden><path d="M2 2 L20 13 L2 24 Z" /></svg>
+        </button>
+        <div class="progress-col">
+          <div class="progress-bar" onclick="seekAudio(event)">
+            <div class="progress-fill" id="progressFill"></div>
           </div>
-          <button id="musicToggle" onclick="toggleMusic()" style="margin-top:1rem;background:none;border:1.5px solid #E8E0F0;border-radius:50px;padding:0.35rem 0.9rem;font-size:0.72rem;font-weight:700;color:#999;cursor:pointer;font-family:'Nunito',sans-serif">&#9835; Music on</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quiet moment -->
-    <div class="section section-alt" style="padding:2rem 1.25rem">
-      <div class="section-inner" style="text-align:center">
-        <p class="made-line" id="madeLine"></p>
-      </div>
-    </div>
-
-    <!-- Say thank you -->
-    <div class="section" style="padding:2.5rem 1.25rem 2rem">
-      <div class="section-inner">
-        <p style="font-size:0.85rem;color:#999;text-align:center;line-height:1.7;margin:0 0 0.5rem">If you'd like to support what we do, any amount means the world.</p>
-        <p style="font-size:0.75rem;color:#bbb;text-align:center;margin:0 0 1.25rem">12 families supported us this week</p>
-
-        <div style="max-width:200px;margin:0 auto 1.25rem">
-          <div style="display:flex;align-items:center;border:1.5px solid #E8E0F0;border-radius:50px;padding:0.55rem 1rem;background:#fff">
-            <span style="font-size:0.92rem;font-weight:700;color:#999;margin-right:0.4rem">£</span>
-            <input type="number" id="thankAmount" placeholder="Amount" style="border:none;outline:none;font-size:0.95rem;font-weight:700;color:#2D2844;font-family:'Nunito',sans-serif;width:100%;background:transparent">
+          <div class="progress-times">
+            <span id="currentTime">0:00</span>
+            <span id="duration">0:00</span>
           </div>
         </div>
-
-        <button class="ty-btn" id="tyBtn" onclick="sayThankYou()">Support us</button>
       </div>
-    </div>
 
-    <!-- Share -->
-    <div class="section section-alt" style="padding:2rem 1.25rem">
-      <div class="section-inner" style="text-align:center">
-        <p style="font-size:0.85rem;color:#888;line-height:1.7;margin:0 0 1.25rem">You can share this story with anyone. They just tap the link and listen. No login needed. If you'd like to keep multiple stories in one place, reply to any of our emails and we'll set that up for you.</p>
-        <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap">
-          <button onclick="shareWhatsApp()" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border-radius:50px;border:1.5px solid #25D366;background:#fff;font-size:0.82rem;font-weight:700;color:#25D366;cursor:pointer;font-family:'Nunito',sans-serif">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
-          </button>
-          <button onclick="shareEmail()" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border-radius:50px;border:1.5px solid #6B2F93;background:#fff;font-size:0.82rem;font-weight:700;color:#6B2F93;cursor:pointer;font-family:'Nunito',sans-serif">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B2F93" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4l-10 8L2 4"/></svg>
-            Email
-          </button>
-          <button onclick="copyLink()" id="copyBtn" style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.2rem;border-radius:50px;border:1.5px solid #E8E0F0;background:#fff;font-size:0.82rem;font-weight:700;color:#999;cursor:pointer;font-family:'Nunito',sans-serif">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            Copy link
-          </button>
-        </div>
-      </div>
-    </div>
+      <button class="music-toggle" onclick="toggleMusic()" id="musicToggle">♫ Music on</button>
+    </section>
 
-    <!-- CTA -->
-    <div class="section" style="padding:2rem 1.25rem 0.75rem">
-      <div class="section-inner">
-        <div class="cta-section">
-          <p>Been sent this story and love what we're doing?</p>
-          <a href="https://heartheirname.com" class="cta-link">Make a free story</a>
-        </div>
-      </div>
-    </div>
+    <!-- 2 · Quiet moment -->
+    <section class="quiet-moment">
+      <p id="madeLine"></p>
+    </section>
 
-    <!-- Trustpilot -->
-    <div class="section" style="padding:1.5rem 1.25rem 0">
-      <div class="section-inner" style="text-align:center">
-        <div class="trustpilot-widget" data-locale="en-US" data-template-id="56278e9abfbbba0bdcd568bc" data-businessunit-id="69da2e55cc3e51f96462e437" data-style-height="52px" data-style-width="100%">
-          <a href="https://www.trustpilot.com/review/heartheirname.com" target="_blank" rel="noopener">Trustpilot</a>
-        </div>
+    <!-- 3 · Review hero (only shows on `finished`) -->
+    <section class="review-hero section-inner" id="reviewHero" style="max-width:440px;margin:0 auto">
+      <div class="glow"></div>
+      <p class="caption">✦ the story has ended</p>
+      <h2>If it landed, tell us in <em>one sentence</em>.</h2>
+      <p>A quick review is the single biggest thing that helps other parents find us. It's the reason a family like yours ends up here in the first place.</p>
+      <a class="tp-cta" href="https://www.trustpilot.com/review/heartheirname.com" target="_blank" rel="noopener" onclick="trackReviewClick()">
+        <span class="tp-star">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 2l2.9 6.9L22 10l-5.5 4.8L18 22l-6-3.7L6 22l1.5-7.2L2 10l7.1-1.1z"/></svg>
+        </span>
+        <span class="tp-text">
+          <span class="title">Leave a quick review</span>
+          <span class="sub">opens trustpilot · about 60 seconds</span>
+        </span>
+        <span class="tp-arrow">↗</span>
+      </a>
+      <div class="reassure">No account. No signup. Just a star rating and a line.</div>
+      <div class="jamie-note">
+        <p class="caption">a note from Jamie</p>
+        <p>"If your child smiled, or went quiet, or asked to hear it again, a short review helps another family find their way here. That's the whole reason we ask."</p>
+        <div class="sig">Jamie &amp; Chase</div>
       </div>
-    </div>
+    </section>
 
-    <!-- Footer -->
-    <div class="section" style="padding:1rem 1.25rem 3rem">
-      <div class="section-inner">
-        <div class="footer">
-          <p>Made by a dad and his son.<br>jamie@heartheirname.com</p>
-        </div>
+    <!-- 4 · Share -->
+    <section class="share-section section-inner" style="max-width:440px;margin:0 auto">
+      <p class="caption">share</p>
+      <p>Send this link to anyone. They just tap and listen. No login, no sign up.</p>
+      <div class="share-grid">
+        <button class="btn quiet" onclick="shareWhatsApp()">WhatsApp</button>
+        <button class="btn quiet" onclick="shareEmail()">Email</button>
       </div>
-    </div>
+      <button class="btn ghost full" id="copyLinkBtn" onclick="copyLink()">⌘ Copy link</button>
+    </section>
+
+    <!-- 5 · New visitor CTA -->
+    <section class="visitor-cta">
+      <p>Know someone who'd love one?</p>
+      <a class="btn ghost" href="/">Make a free story →</a>
+    </section>
+
+    <!-- 6 · Footer -->
+    <footer class="footer">
+      <span class="wordmark"><em>Hear</em>·<span class="their">their</span>·name</span>
+      <div class="mono">made by a dad and his son · jamie@heartheirname.com</div>
+    </footer>
+
   </div>
 </div>
 
 <audio id="storyAudio" preload="auto"></audio>
-<audio id="bgMusicAudio" loop preload="auto" volume="0"></audio>
+<audio id="bgMusicAudio" loop preload="auto"></audio>
+
+<div class="toast" id="toast">Link copied.</div>
 
 <script>
 const pathParts = window.location.pathname.split('/');
 const storyId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+const audio = document.getElementById('storyAudio');
+const bg = document.getElementById('bgMusicAudio');
+let musicOn = true;
 let storyData = null;
-let bgAudio = null;
-let musicEnabled = true;
+let finishedState = false;
+
+function fmt(s){ if(!s||isNaN(s))return '0:00'; const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
 
 function toggleMusic() {
-  musicEnabled = !musicEnabled;
+  musicOn = !musicOn;
   const btn = document.getElementById('musicToggle');
-  if (musicEnabled) {
-    btn.innerHTML = '&#9835; Music on';
-    btn.style.color = '#999';
-    var bg = document.getElementById('bgMusicAudio');
-    if (!document.getElementById('storyAudio').paused) {
-      bg.play().catch(function() {});
-      bg.volume = 0.4;
-    }
+  if (musicOn) {
+    btn.textContent = '♫ Music on';
+    if (!audio.paused) bg.play().catch(function(){});
+    bg.volume = 0.4;
   } else {
-    btn.innerHTML = '&#9835; Music off';
-    btn.style.color = '#ccc';
-    var bg2 = document.getElementById('bgMusicAudio'); bg2.pause(); bg2.volume = 0;
+    btn.textContent = '♫ Music off';
+    bg.volume = 0;
   }
 }
 
-const musicTracks = {
-  bedtime: '/music/bedtime-ambient.mp3?v=5',
-  journey: '/music/adventure-ambient.mp3?v=7',
-  learning: '/music/bedtime-ambient.mp3?v=5'
-};
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || 'Link copied.';
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 1800);
+}
+
+function showFinishedState() {
+  if (finishedState) return;
+  finishedState = true;
+  const hero = document.getElementById('reviewHero');
+  if (hero) hero.classList.add('is-visible');
+  try { localStorage.setItem('htn_playback_state_' + storyId, 'finished'); } catch(e){}
+}
 
 async function loadStory() {
   try {
     const res = await fetch('/api/shared-story?id=' + encodeURIComponent(storyId));
+    if (!res.ok) throw new Error();
     const data = await res.json();
-    if (!data.success || !data.story || !data.story.audioUrl) {
-      document.getElementById('loadingState').style.display = 'none';
-      document.getElementById('errorState').style.display = 'block';
-      return;
-    }
+    if (!data.success || !data.story) throw new Error();
+
     storyData = data.story;
-    // Format names with "and" before the last name
+
     function formatNames(name) {
-      // Split on both "," and "&" so names stored like "Oliver, Aurora & Elyse"
-      // render cleanly as "Oliver, Aurora, and Elyse".
       var parts = name.split(/\s*[,&]\s*/).map(function(s){ return s.trim(); }).filter(Boolean);
       if (parts.length <= 1) return name;
       if (parts.length === 2) return parts[0] + ' and ' + parts[1];
       return parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
     }
-    var displayName = formatNames(storyData.childName);
-    document.title = displayName + "'s Story | Hear Their Name";
-    document.getElementById('childNameDisplay').textContent = displayName + "'s Story";
-    document.getElementById('madeLine').textContent = 'This story was made for ' + displayName + '.';
-    document.getElementById('storyAudio').src = storyData.audioUrl;
-    var bgEl = document.getElementById('bgMusicAudio');
-    bgEl.src = musicTracks[storyData.category] || musicTracks.bedtime;
-    bgEl.volume = 0;
-    bgEl.load();
+    var displayName = formatNames(storyData.childName || '');
+    document.title = displayName + "'s story | Hear Their Name";
+    const h1 = document.getElementById('childNameDisplay');
+    h1.innerHTML = displayName + ' <em>story</em>.';
+    document.getElementById('madeLine').textContent = '"This story was made for ' + displayName + '."';
+
+    // Meta caption (category · duration unknown until loadedmetadata)
+    const cat = (storyData.category === 'journey') ? 'adventure' : 'bedtime';
+    document.getElementById('storyMeta').textContent = '✦ ' + cat;
+
+    // Audio
+    audio.src = storyData.audioUrl || '';
+    const bgSrc = (storyData.category === 'journey') ? '/music/adventure-ambient.mp3?v=7' : '/music/bedtime-ambient.mp3?v=5';
+    bg.src = bgSrc;
+    bg.volume = 0;
+
+    // Restore finished state if they've heard it before
+    try {
+      const prev = localStorage.getItem('htn_playback_state_' + storyId);
+      if (prev === 'finished') showFinishedState();
+    } catch(e){}
+
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('storyContent').style.display = 'block';
 
-    // Track page view
+    // Track view
     fetch('/api/track-pageview', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ page: '/story/' + storyId, screen_name: 'story_view', referrer: document.referrer || '' })
-    }).catch(function() {});
-  } catch (err) {
+    }).catch(function(){});
+  } catch(e) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('errorState').style.display = 'block';
   }
 }
 
 function togglePlay() {
-  const audio = document.getElementById('storyAudio');
   const btn = document.getElementById('playBtn');
   if (audio.paused) {
-    var bg = document.getElementById('bgMusicAudio');
-    // Must play BOTH audio elements inside the same user click handler
-    // Track play
-    if (audio.currentTime < 1) {
+    audio.play();
+    btn.classList.add('playing');
+    btn.innerHTML = '<svg width="20" height="22" viewBox="0 0 22 24" fill="currentColor" aria-hidden><rect x="2" y="2" width="6" height="20" rx="1"/><rect x="14" y="2" width="6" height="20" rx="1"/></svg>';
+    btn.setAttribute('aria-label', 'Pause story');
+    if (musicOn) {
+      bg.play().catch(function(){});
+      // Fade music in
+      bg.volume = 0;
+      var target = 0.4;
+      var step = 0;
+      var fadeIn = setInterval(function(){
+        step += 0.04;
+        if (step >= target) { bg.volume = target; clearInterval(fadeIn); }
+        else { bg.volume = step; }
+      }, 120);
+    }
+    // Track first play
+    if (!audio.dataset.played) {
+      audio.dataset.played = '1';
       fetch('/api/track-pageview', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ page: '/story/' + storyId, screen_name: 'story_play' })
-      }).catch(function() {});
+      }).catch(function(){});
     }
-    // Play music first (at volume 0) to unlock it, then fade in
-    bg.volume = 0;
-    bg.play().catch(function() {});
-    audio.play();
-    if (musicEnabled) {
-      var vol = 0;
-      var fadeIn = setInterval(function() {
-        vol = Math.min(vol + 0.02, 0.4);
-        bg.volume = vol;
-        if (vol >= 0.4) clearInterval(fadeIn);
-      }, 100);
-    } else {
-      bg.pause();
-    }
-    btn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/></svg>';
-    btn.classList.add('playing');
   } else {
     audio.pause();
-    document.getElementById('bgMusicAudio').pause();
-    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    bg.pause();
     btn.classList.remove('playing');
+    btn.innerHTML = '<svg width="20" height="24" viewBox="0 0 22 26" fill="currentColor" aria-hidden><path d="M2 2 L20 13 L2 24 Z"/></svg>';
+    btn.setAttribute('aria-label', 'Play story');
   }
 }
 
-const audio = document.getElementById('storyAudio');
-audio.addEventListener('timeupdate', () => {
-  if (!audio.duration) return;
-  document.getElementById('progressFill').style.width = (audio.currentTime / audio.duration * 100) + '%';
+audio.addEventListener('timeupdate', function(){
+  const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
   document.getElementById('currentTime').textContent = fmt(audio.currentTime);
-});
-audio.addEventListener('loadedmetadata', () => {
-  document.getElementById('totalTime').textContent = fmt(audio.duration);
-});
-audio.addEventListener('ended', function() {
-  var bg = document.getElementById('bgMusicAudio');
-  if (bg && !bg.paused) {
-    var vol = bg.volume;
-    var fadeOut = setInterval(function() {
-      vol = Math.max(vol - 0.02, 0);
-      bg.volume = vol;
-      if (vol <= 0) { clearInterval(fadeOut); bg.pause(); }
-    }, 100);
+  // Approximate 'finished' a second early to tolerate round-off
+  if (audio.duration && audio.currentTime >= audio.duration - 1) {
+    showFinishedState();
   }
-  document.getElementById('playBtn').innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
-  document.getElementById('playBtn').classList.remove('playing');
+});
+
+audio.addEventListener('loadedmetadata', function(){
+  document.getElementById('duration').textContent = fmt(audio.duration);
+  // Append duration to meta caption
+  const cat = (storyData && storyData.category === 'journey') ? 'adventure' : 'bedtime';
+  document.getElementById('storyMeta').textContent = '✦ ' + cat + ' · ' + fmt(audio.duration);
+});
+
+audio.addEventListener('ended', function(){
+  const btn = document.getElementById('playBtn');
+  btn.classList.remove('playing');
+  btn.innerHTML = '<svg width="20" height="24" viewBox="0 0 22 26" fill="currentColor" aria-hidden><path d="M2 2 L20 13 L2 24 Z"/></svg>';
+  // Fade music out
+  var step = bg.volume;
+  var fadeOut = setInterval(function(){
+    step -= 0.04;
+    if (step <= 0) { bg.volume = 0; bg.pause(); clearInterval(fadeOut); }
+    else bg.volume = step;
+  }, 120);
+  showFinishedState();
+  // Scroll review hero into view
+  setTimeout(function(){
+    const hero = document.getElementById('reviewHero');
+    if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 200);
 });
 
 function seekAudio(e) {
-  const bar = document.getElementById('progressBar');
-  const rect = bar.getBoundingClientRect();
-  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+  if (!audio.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  audio.currentTime = Math.max(0, Math.min(audio.duration, pct * audio.duration));
 }
 
-function fmt(s) {
-  if (!s || isNaN(s)) return '0:00';
-  return Math.floor(s / 60) + ':' + (Math.floor(s % 60) < 10 ? '0' : '') + Math.floor(s % 60);
-}
-
-async function sayThankYou() {
-  var amountEl = document.getElementById('thankAmount');
-  var amount = parseFloat(amountEl.value);
-  if (!amount || amount < 1) { amountEl.focus(); return; }
-
-  var btn = document.getElementById('tyBtn');
-  btn.textContent = 'Processing...';
-  btn.style.opacity = '0.6';
-  btn.style.pointerEvents = 'none';
-
-  var message = '';
-  var displayName = '';
-
-  try {
-    var res = await fetch('/api/create-donation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: amount, storyId: storyId, message: message, displayName: displayName })
-    });
-    var data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      throw new Error(data.error || 'Failed');
-    }
-  } catch (err) {
-    btn.textContent = 'Say thank you';
-    btn.style.opacity = '1';
-    btn.style.pointerEvents = 'auto';
-    alert('Something went wrong. Please try again.');
-  }
+function trackReviewClick() {
+  fetch('/api/track-pageview', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ page: '/story/' + storyId, screen_name: 'story_review_click' })
+  }).catch(function(){});
 }
 
 function trackShare(method) {
   fetch('/api/track-pageview', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ page: '/story/' + storyId, screen_name: 'story_share_' + method })
-  }).catch(function() {});
+  }).catch(function(){});
 }
 
 function shareWhatsApp() {
   trackShare('whatsapp');
   var url = window.location.href;
-  var name = storyData ? storyData.childName : 'a child';
-  var text = "We had a personalised audio story made for " + name + " by Hear Their Name. It's free and it's lovely. Just tap to listen:\n\n" + url;
+  var name = (storyData && storyData.childName) || 'a child';
+  var text = 'We had a personalised audio story made for ' + name + ' by Hear Their Name. It\'s free and it\'s lovely. Just tap to listen: ' + url;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
 function shareEmail() {
   trackShare('email');
   var url = window.location.href;
-  var name = storyData ? storyData.childName : 'a child';
-  var subject = "Listen to " + name + "'s personalised story";
-  var body = "We had a personalised audio story made for " + name + " by Hear Their Name. It's completely free and really special. Just tap the link to listen:\n\n" + url + "\n\nIf you'd like one made for a child you love, you can get one at heartheirname.com";
+  var name = (storyData && storyData.childName) || 'a child';
+  var subject = 'Listen to ' + name + "'s personalised story";
+  var body = 'We had a personalised audio story made for ' + name + ' by Hear Their Name. It\'s completely free and really special. Just tap the link to listen: ' + url + '\n\nIf you\'d like one made for a child you love, you can get one at heartheirname.com';
   window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 }
 
 function copyLink() {
   trackShare('copy');
-  navigator.clipboard.writeText(window.location.href).then(function() {
-    var btn = document.getElementById('copyBtn');
-    var orig = btn.innerHTML;
-    btn.innerHTML = 'Copied!';
-    setTimeout(function() { btn.innerHTML = orig; }, 2000);
+  navigator.clipboard.writeText(window.location.href).then(function(){
+    toast('Link copied.');
+  }).catch(function(){
+    // Fallback
+    var t = document.createElement('textarea');
+    t.value = window.location.href; document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); toast('Link copied.'); } catch(e){}
+    document.body.removeChild(t);
   });
 }
 
 loadStory();
 
-// Check if returning from successful thank-you payment
-if (window.location.search.includes('thankyou=1')) {
-  window.history.replaceState({}, '', window.location.pathname);
-  document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-      var ty = document.querySelector('.thankyou-copy');
-      if (ty) {
-        ty.innerHTML = '<strong style="color:#2D2844">Thank you. That really means a lot to us.</strong>';
-        var btn = document.getElementById('tyBtn');
-        if (btn) btn.style.display = 'none';
-        var amtField = document.querySelector('.amt-custom') || document.getElementById('thankAmount');
-        if (amtField) amtField.parentElement.style.display = 'none';
-      }
-    }, 500);
-  });
-}
+// Keyboard: space toggles play/pause
+document.addEventListener('keydown', function(e){
+  if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if (e.key === ' ' || e.code === 'Space') {
+    if (storyData) { e.preventDefault(); togglePlay(); }
+  }
+});
 </script>
 </body>
 </html>

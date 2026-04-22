@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lost · Hear Their Name</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Instrument+Sans:ital,wght@0,400..700&family=JetBrains+Mono:wght@300..500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --htn-ink:#1A1426; --htn-ink-2:#2D2238;
+  --htn-paper:#F7F1E6; --htn-paper-2:#F0E8D7;
+  --htn-plum:#3D2A5C; --htn-honey:#E8A34A;
+  --htn-line:rgba(26,20,38,0.14);
+  --htn-muted:rgba(26,20,38,0.58); --htn-muted-2:rgba(26,20,38,0.42);
+  --htn-serif:'Newsreader',Georgia,serif;
+  --htn-sans:'Instrument Sans','Helvetica Neue',sans-serif;
+  --htn-mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--htn-sans);background:var(--htn-paper);color:var(--htn-ink);min-height:100vh;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11";display:flex;flex-direction:column}
+.wordmark{display:inline-flex;align-items:center;gap:6px;font-family:var(--htn-serif);font-size:14px;color:var(--htn-ink);letter-spacing:-0.01em;font-style:italic;text-decoration:none}
+.wordmark .their{color:var(--htn-plum)}
+.top{padding:56px 24px 0}
+.content{flex:1;padding:40px 30px;display:flex;flex-direction:column;justify-content:center;max-width:520px;margin:0 auto;width:100%}
+.display{font-family:var(--htn-serif);font-size:110px;font-style:italic;color:var(--htn-plum);line-height:1;margin-bottom:30px;letter-spacing:-0.04em;font-weight:400}
+.line1{font-size:16px;color:var(--htn-ink-2);line-height:1.55;margin-bottom:10px}
+.line2{font-size:14px;color:var(--htn-muted);line-height:1.55;margin-bottom:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--htn-sans);font-weight:500;border-radius:14px;cursor:pointer;padding:16px 22px;font-size:15.5px;background:var(--htn-ink);color:var(--htn-paper);border:none;text-decoration:none;align-self:flex-start}
+.btn:hover{background:#26203A}
+.foot{margin-top:26px;font-family:var(--htn-mono);font-size:11px;color:var(--htn-muted-2)}
+@media (max-width:400px){.display{font-size:90px}}
+</style>
+</head>
+<body>
+  <div class="top"><a class="wordmark" href="/"><em>Hear</em>·<span class="their">their</span>·name</a></div>
+  <div class="content">
+    <div class="display">lost.</div>
+    <p class="line1">This story doesn't live at this address.</p>
+    <p class="line2">If someone sent you a link that's broken, reply to any of our emails and we'll find it for you.</p>
+    <a class="btn" href="/">Take me home →</a>
+    <p class="foot">404 · story not found</p>
+  </div>
+</body>
+</html>

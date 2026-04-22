@@ -219,40 +219,73 @@ if (localStorage.getItem('st_cookies') === 'accepted') {
 <link rel="preconnect" href="https://widget.trustpilot.com">
 <link rel="preload" as="image" href="/images/hero-banner.jpg" fetchpriority="high">
 <script type="text/javascript" src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Instrument+Sans:ital,wght@0,400..700&family=JetBrains+Mono:wght@300..500&family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
+/* ─── Dusk palette (new design system) ─────────────────────────
+   Existing class names are preserved; the old --purple, --bg etc.
+   variables are remapped to Dusk palette values. This re-themes
+   the entire app without changing any markup. ────────────────── */
 :root{
-  --purple:#6B2F93;
-  --purple-light:#F0E5F7;
-  --purple-soft:#A872C8;
-  --purple-deep:#2D1B4E;
-  --orange:#F1753B;
-  --orange-light:#FFF0E8;
-  --orange-glow:#F49A6A;
+  /* Dusk tokens */
+  --htn-ink:#1A1426;
+  --htn-ink-2:#2D2238;
+  --htn-paper:#F7F1E6;
+  --htn-paper-2:#F0E8D7;
+  --htn-paper-3:#E9DFC8;
+  --htn-plum:#3D2A5C;
+  --htn-plum-2:#5A3F83;
+  --htn-honey:#E8A34A;
+  --htn-honey-2:#C88632;
+  --htn-blush:#D97757;
+  --htn-line:rgba(26,20,38,0.14);
+  --htn-line-2:rgba(26,20,38,0.08);
+  --htn-muted:rgba(26,20,38,0.58);
+  --htn-muted-2:rgba(26,20,38,0.42);
+  --htn-serif:'Newsreader',Georgia,serif;
+  --htn-sans:'Instrument Sans','Helvetica Neue','Quicksand',sans-serif;
+  --htn-mono:'JetBrains Mono',ui-monospace,monospace;
+
+  /* Legacy names remapped to Dusk values, preserves existing styles */
+  --purple:#3D2A5C;
+  --purple-light:#F0E8D7;
+  --purple-soft:#5A3F83;
+  --purple-deep:#1A1426;
+  --orange:#E8A34A;
+  --orange-light:#F8E4CB;
+  --orange-glow:#C88632;
   --sky:#4FC3F7;
   --sky-light:#E1F5FE;
-  --pink:#FF6B9D;
-  --pink-light:#FFE4EE;
+  --pink:#D97757;
+  --pink-light:#F5E2D8;
   --green:#4ECB71;
   --green-light:#E3FAEB;
-  --yellow:#FFD166;
-  --yellow-light:#FFF8E1;
-  --bg:#FEFBF6;
-  --card:#FFFFFF;
-  --text:#2D2844;
-  --text-soft:#6B6490;
-  --text-muted:#7A7285;
-  --border:#EDE8FF;
-  --shadow:0 4px 24px rgba(124,92,252,0.08);
-  --shadow-lg:0 8px 40px rgba(124,92,252,0.12);
+  --yellow:#E8A34A;
+  --yellow-light:#F8E4CB;
+  --bg:#F7F1E6;
+  --card:#F0E8D7;
+  --text:#1A1426;
+  --text-soft:rgba(26,20,38,0.58);
+  --text-muted:rgba(26,20,38,0.42);
+  --border:rgba(26,20,38,0.14);
+  --shadow:0 10px 24px rgba(26,20,38,0.08);
+  --shadow-lg:0 14px 40px rgba(26,20,38,0.10);
   --radius:16px;
-  --radius-lg:24px;
+  --radius-lg:18px;
   --radius-full:9999px;
 }
-body{font-family:'Quicksand',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-body::before{content:'';position:fixed;top:-200px;right:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(124,92,252,0.06) 0%,transparent 70%);pointer-events:none;z-index:0}
-body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(255,140,66,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+body{font-family:var(--htn-sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"ss01","cv11"}
+/* Soft radial background flourishes, Dusk-tinted */
+body::before{content:'';position:fixed;top:-200px;right:-200px;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(61,42,92,0.06) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(232,163,74,0.05) 0%,transparent 70%);pointer-events:none;z-index:0}
+/* Serif on headings */
+h1,h2,h3,h4,.section-title,.hero-headline,.full-title,.nsb-title{font-family:var(--htn-serif);font-weight:450;letter-spacing:-0.01em;text-wrap:balance}
+h1 em,h2 em,h3 em,.section-title em,.hero-headline em{font-style:italic;color:var(--htn-plum)}
+/* Mono caption helper (new) */
+.htn-caption{font-family:var(--htn-mono);font-size:11px;color:var(--htn-muted);letter-spacing:0.06em;text-transform:uppercase}
+/* Per redesign handoff: remove login / My Stories UI. Endpoints stay live
+   for legacy email links; no on-page entry points. */
+a[onclick*="screenLogin"]{display:none !important}
 
 .screen{display:none;min-height:100vh;padding:2rem 1.5rem 3rem;max-width:540px;margin:0 auto;flex-direction:column;align-items:center;position:relative;z-index:1;animation:fadeIn 0.3s ease}
 .screen.active{display:flex}
@@ -285,8 +318,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* Mobile: image full width, text below */
 .hero-img{width:100%;height:auto;display:block}
 .hero-overlay{display:flex;flex-direction:column;align-items:center;text-align:center;padding:1.25rem 1.5rem 0.5rem}
-.hero-headline{font-family:'Playfair Display',Georgia,serif;font-size:1.85rem;font-weight:800;color:var(--text);line-height:1.15;margin:0 0 0.5rem 0}
-.hero-headline em{color:#e8860c;font-style:normal}
+.hero-headline{font-family:var(--htn-serif);font-size:2.4rem;font-weight:450;color:var(--htn-ink);line-height:1.02;letter-spacing:-0.025em;margin:0 0 0.5rem 0;text-wrap:balance}
+.hero-headline em{color:var(--htn-plum);font-style:italic}
 .hero-sub-1{font-size:0.9rem;color:var(--text-soft);margin:0 0 0.15rem 0}
 .hero-sub-1 span{color:#e8860c;font-weight:600}
 .hero-sub-2{font-size:0.8rem;color:var(--text-soft);margin:0 0 1rem 0}
@@ -309,9 +342,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 .cta-group{display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:340px;margin:0.5rem auto 0}
 .btn{padding:1rem 2rem;border:none;border-radius:var(--radius);font-family:'Quicksand',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.25s ease;text-align:center;position:relative;overflow:hidden}
-.btn-primary{background:linear-gradient(135deg,var(--cat-accent,var(--purple)),var(--cat-accent-dark,#A872C8));color:#fff;box-shadow:0 4px 20px var(--cat-glow,rgba(124,92,252,0.3))}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 28px var(--cat-glow,rgba(124,92,252,0.4))}
-.btn-primary:active{transform:translateY(0)}
+.btn-primary{background:var(--htn-ink);color:var(--htn-paper);box-shadow:0 10px 24px rgba(26,20,38,0.18);font-weight:500;letter-spacing:-0.005em}
+.btn-primary:hover{background:#26203A;transform:translateY(-1px);box-shadow:0 14px 32px rgba(26,20,38,0.22)}
+.btn-primary:active{transform:translateY(0);transform:scale(0.98)}
 .btn-gift{background:var(--card);color:var(--cat-accent,var(--purple));border:2px solid var(--border);border-radius:var(--radius)}
 .btn-gift:hover{border-color:var(--purple-soft);background:var(--purple-light)}
 .btn-gift .gift-icon{margin-right:0.4rem}
@@ -391,7 +424,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .back-btn:hover{background:var(--cat-accent,var(--purple));color:#fff}
 
 /* ===== SECTION HEADERS ===== */
-.section-title{font-family:'Nunito',sans-serif;font-size:1.7rem;font-weight:900;color:var(--text);text-align:center;margin-bottom:0.4rem}
+.section-title{font-family:var(--htn-serif);font-size:1.9rem;font-weight:450;color:var(--htn-ink);text-align:center;margin-bottom:0.4rem;letter-spacing:-0.02em;line-height:1.08;text-wrap:balance}
 .section-sub{font-size:0.9rem;color:var(--text-soft);text-align:center;margin-bottom:2rem;line-height:1.5;font-weight:500}
 
 /* ===== CATEGORY CARDS ===== */

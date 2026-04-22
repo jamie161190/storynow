@@ -56,15 +56,39 @@ export default async () => {
 
       const subject = 'How did it go?';
 
-      const emailHtml = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:500px;margin:0 auto;padding:20px;color:#333">
-<p style="margin:0 0 16px;line-height:1.75">${greeting}</p>
-<p style="margin:0 0 16px;line-height:1.75">We hope ${isMulti ? 'their' : childName + "'s"} story landed well.</p>
-<p style="margin:0 0 16px;line-height:1.75">If it made them smile, or if bedtime felt a little different that night, we'd really love to hear about it.</p>
-<p style="text-align:center;margin:24px 0"><a href="https://www.trustpilot.com/review/heartheirname.com" style="display:inline-block;background:#6B2F93;color:#fff;text-decoration:none;padding:12px 28px;border-radius:50px;font-size:0.95rem;font-weight:700">Tell us on Trustpilot</a></p>
-<p style="margin:0 0 16px;line-height:1.75">It only takes a minute and it helps other families find their way to us.</p>
-<p style="margin:24px 0 2px;line-height:1.75;font-weight:600">Jamie and Chase</p>
-<p style="margin:0;font-size:13px;color:#999">Hear Their Name</p>
-</div>`;
+      const storyPronoun = isMulti ? 'their' : `${childName}'s`;
+      const emailHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>How did it go?</title></head>
+<body style="margin:0;padding:0;background:#F7F1E6;-webkit-font-smoothing:antialiased">
+<div style="max-width:600px;margin:0 auto;background:#F7F1E6;padding:40px 24px;font-family:'Newsreader',Georgia,serif;color:#1A1426">
+  <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65">${greeting}</p>
+  <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65">We hope ${storyPronoun} story landed well.</p>
+  <p style="margin:0 0 22px;font-size:15.5px;line-height:1.65">If it made them smile, or if bedtime felt a little different that night, we'd really love to hear about it.</p>
+
+  <!-- CTA card -->
+  <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin:0 0 22px">
+    <tr><td>
+      <a href="https://www.trustpilot.com/review/heartheirname.com" style="display:block;padding:18px 20px;background:#F0E8D7;border:1px solid rgba(26,20,38,0.14);border-radius:16px;text-decoration:none;color:#1A1426;font-family:'Helvetica Neue',Arial,sans-serif">
+        <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%"><tr>
+          <td style="vertical-align:middle">
+            <div style="font-size:14px;font-weight:500;color:#1A1426">Tell us on Trustpilot</div>
+            <div style="font-size:12px;color:rgba(26,20,38,0.58);margin-top:3px">Takes about a minute.</div>
+          </td>
+          <td align="right" style="vertical-align:middle;font-size:16px;color:#1A1426">
+            <span style="color:#E8A34A">★★★★★</span>&nbsp;→
+          </td>
+        </tr></table>
+      </a>
+    </td></tr>
+  </table>
+
+  <p style="margin:0 0 14px;font-size:14px;color:rgba(26,20,38,0.58);line-height:1.6">It helps other families find their way to us.</p>
+  <p style="margin:0;font-size:15.5px;line-height:1.65;font-style:italic;color:#3D2A5C">Jamie and Chase</p>
+
+  <p style="margin:30px 0 0;padding-top:16px;border-top:1px solid rgba(26,20,38,0.14);font-family:'Courier New',monospace;font-size:11px;color:rgba(26,20,38,0.58);text-align:center">
+    Hear Their Name &middot; jamie@heartheirname.com
+  </p>
+</div>
+</body></html>`;
 
       try {
         const emailRes = await fetch('https://api.resend.com/emails', {
