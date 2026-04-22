@@ -1,3 +1,21 @@
 {
-  "siteId": "b1bc1873-8092-4354-a2f5-89c840bd98b3"
+	"siteId": "b1bc1873-8092-4354-a2f5-89c840bd98b3",
+	"geolocation": {
+		"data": {
+			"city": "Wolverhampton",
+			"country": {
+				"code": "GB",
+				"name": "United Kingdom"
+			},
+			"subdivision": {
+				"code": "ENG",
+				"name": "England"
+			},
+			"timezone": "Europe/London",
+			"latitude": 52.5964,
+			"longitude": -2.1841,
+			"postalCode": "WV6"
+		},
+		"timestamp": 1776841128224
+	}
 }

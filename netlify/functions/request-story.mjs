@@ -135,8 +135,14 @@ export default async (req) => {
           body: JSON.stringify({
             from: BRAND_FROM,
             to: [email],
+            reply_to: 'jamie@heartheirname.com',
             subject: `We're creating ${storyData.childName}'s story`,
-            html: emailHtml
+            html: emailHtml,
+            text: `${greeting}\n\nThank you for requesting a story for ${storyData.childName}.\n\nWe'll put it together carefully using everything you shared, and send it to you once it's ready. That's usually within a few days.\n\nIf anything changes or you'd like to add something, just reply to this email.\n\nYour request\n  For: ${storyData.childName}\n  Kind: ${catLabel}\n  Narrator: ${narratorName}\n  Ref: htn_${refShort}\n\nJamie and Chase\nHear Their Name\njamie@heartheirname.com`,
+            headers: {
+              'List-Unsubscribe': '<mailto:jamie@heartheirname.com?subject=unsubscribe>',
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
           })
         });
         console.log('Confirmation email sent to', email);

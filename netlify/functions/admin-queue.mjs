@@ -442,8 +442,14 @@ export default async (req) => {
         body: JSON.stringify({
           from: BRAND_FROM,
           to: [story.email],
+          reply_to: 'jamie@heartheirname.com',
           subject,
-          html: emailHtml
+          html: emailHtml,
+          text: `${greeting}\n\n${isMulti ? 'Their' : story.child_name + "'s"} story is ready for you.\n\n${customMessage && customMessage.trim() ? customMessage.trim() + '\n\n' : ''}Tap the link below whenever you're both ready. The story lives at its own page — you can open it any time, share it with family, and come back to it as many times as you like.\n\nOpen: ${listenUrl}\n\n${closingLine}\n\nJamie and Chase\nHear Their Name\njamie@heartheirname.com`,
+          headers: {
+            'List-Unsubscribe': '<mailto:jamie@heartheirname.com?subject=unsubscribe>',
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+          }
         })
       });
       const emailData = await emailRes.json();

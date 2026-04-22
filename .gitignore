@@ -7,3 +7,9 @@ generate_previews.mjs
 generate_stories_batch2.mjs
 test-api.mjs
 test-sdk.mjs
+
+# Local Netlify folder
+.netlify
+
+# Claude Code local settings (may contain API keys from command history)
+.claude/settings.local.json

@@ -2,9 +2,15 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "static-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "const h=require('http'),fs=require('fs'),p=require('path');h.createServer((q,r)=>{let u=q.url.split('?')[0];if(u==='/')u='/index.html';const f=p.join(process.cwd(),'public',u),e=p.extname(f),t={'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.svg':'image/svg+xml','.mp3':'audio/mpeg','.json':'application/json','.ico':'image/x-icon'}[e]||'application/octet-stream';fs.readFile(f,(err,d)=>{if(err){r.writeHead(404);r.end('Not found')}else{r.writeHead(200,{'Content-Type':t});r.end(d)}})}).listen(3456,()=>console.log('Server running on port 3456'))"],
+      "port": 3456
+    },
+    {
       "name": "netlify-dev",
-      "runtimeExecutable": "/Users/jamieharish/.nvm/versions/node/v24.14.1/bin/node",
-      "runtimeArgs": ["/Users/jamieharish/.nvm/versions/node/v24.14.1/bin/npx", "netlify", "dev"],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["netlify", "dev"],
       "port": 8888
     }
   ]

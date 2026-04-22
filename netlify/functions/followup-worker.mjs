@@ -97,8 +97,14 @@ export default async () => {
           body: JSON.stringify({
             from: BRAND_FROM,
             to: [story.email],
+            reply_to: 'jamie@heartheirname.com',
             subject,
-            html: emailHtml
+            html: emailHtml,
+            text: `${requesterName ? 'Hi ' + requesterName + ',' : 'Hi,'}\n\nWe hope ${storyPronoun} story landed well. If it made them smile, or if bedtime felt a little different that night, we'd really love to hear about it.\n\nTell us on Trustpilot: https://www.trustpilot.com/review/heartheirname.com\n\nIt helps other families find their way to us.\n\nJamie and Chase\nHear Their Name\njamie@heartheirname.com\n\nTo unsubscribe: reply with "unsubscribe" in the subject.`,
+            headers: {
+              'List-Unsubscribe': '<mailto:jamie@heartheirname.com?subject=unsubscribe>',
+              'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+            }
           })
         });
 
