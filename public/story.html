@@ -85,8 +85,9 @@ body p{margin:0;text-wrap:pretty}
 .quiet-moment p{font-family:var(--htn-serif);font-style:italic;font-size:19px;line-height:1.4;color:var(--htn-plum)}
 
 /* Review hero (finished state) */
-.review-hero{padding:44px 20px 44px;background:var(--htn-paper);position:relative;overflow:hidden;display:none}
-.review-hero.is-visible{display:block;animation:swell 600ms cubic-bezier(0.22,1,0.36,1)}
+.review-hero{padding:44px 20px 44px;background:var(--htn-paper);position:relative;overflow:hidden;display:block}
+.review-hero.is-visible{animation:swell 600ms cubic-bezier(0.22,1,0.36,1)}
+.review-hero.is-visible .caption{color:var(--htn-plum)}
 @keyframes swell{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .review-hero .glow{position:absolute;top:-40px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(232,163,74,.18),transparent 70%);pointer-events:none}
 .review-hero .caption{margin-bottom:14px;position:relative}
@@ -193,8 +194,8 @@ body p{margin:0;text-wrap:pretty}
     <!-- 3 · Review hero (only shows on `finished`) -->
     <section class="review-hero section-inner" id="reviewHero" style="max-width:440px;margin:0 auto">
       <div class="glow"></div>
-      <p class="caption">✦ the story has ended</p>
-      <h2>If it landed, tell us in <em>one sentence</em>.</h2>
+      <p class="caption" id="reviewCaption">✦ one small thing</p>
+      <h2>If this lands, tell us in <em>one sentence</em>.</h2>
       <p>A quick review is the single biggest thing that helps other parents find us. It's the reason a family like yours ends up here in the first place.</p>
       <a class="tp-cta" href="https://www.trustpilot.com/review/heartheirname.com" target="_blank" rel="noopener" onclick="trackReviewClick()">
         <span class="tp-star">
@@ -281,6 +282,10 @@ function showFinishedState() {
   finishedState = true;
   const hero = document.getElementById('reviewHero');
   if (hero) hero.classList.add('is-visible');
+  const cap = document.getElementById('reviewCaption');
+  if (cap) cap.textContent = '✦ the story has ended';
+  const h = document.querySelector('#reviewHero h2');
+  if (h) h.innerHTML = 'If it landed, tell us in <em>one sentence</em>.';
   try { localStorage.setItem('htn_playback_state_' + storyId, 'finished'); } catch(e){}
 }
 
