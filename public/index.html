@@ -883,6 +883,77 @@ details summary span:last-child{transition:transform 0.2s;display:inline-block}
 .chip-row{display:flex;gap:8px;flex-wrap:wrap;width:100%;margin-bottom:14px}
 .chip-row > *{padding:10px 14px;border-radius:9999px;font-family:var(--htn-sans);font-size:13px;font-weight:500;border:1px solid var(--htn-line);background:var(--htn-paper-2);color:var(--htn-ink-2);cursor:pointer;transition:all 120ms ease-out}
 .chip-row > *.on,.chip-row > *.active{background:var(--htn-ink);color:var(--htn-paper);border-color:var(--htn-ink)}
+
+/* ---------- Dusk cleanup: homepage polish ---------- */
+/* Kill background radial blobs */
+body::before,body::after{display:none !important}
+
+/* Hero subtitle — replace orange highlight with plum italic */
+.hero-sub-1 span{color:var(--htn-plum) !important;font-style:italic !important;font-weight:500 !important;font-family:var(--htn-serif) !important}
+@media (min-width:768px){.hero-overlay{background:linear-gradient(to right,rgba(26,20,38,0.78) 0%,rgba(26,20,38,0.55) 35%,rgba(26,20,38,0.1) 55%,transparent 100%) !important}}
+
+/* Trust badges — flat Dusk tints, no gradient glows */
+.hero-trust-item{color:var(--htn-ink-2) !important;font-family:var(--htn-mono) !important;font-size:10.5px !important;letter-spacing:0.08em !important;text-transform:uppercase !important;font-weight:400 !important}
+.hero-trust-item svg,.hero-trust-item img{background:var(--htn-paper-2) !important;box-shadow:none !important;border:1px solid var(--htn-line) !important;border-radius:9999px !important;padding:8px !important}
+.hero-trust-icon{background:var(--htn-paper-2) !important;box-shadow:none !important;border:1px solid var(--htn-line) !important}
+.hero-trust-icon svg{filter:none !important}
+
+/* Sample pill category chips — flat, no gradients */
+.sample-pill{border-radius:9999px !important;font-family:var(--htn-sans) !important;font-weight:500 !important;letter-spacing:0}
+.sample-pill.active[data-cat="bedtime"]{background:var(--htn-ink) !important;color:var(--htn-paper) !important;border-color:var(--htn-ink) !important;box-shadow:none !important}
+.sample-pill.active[data-cat="adventure"]{background:var(--htn-honey) !important;color:var(--htn-ink) !important;border-color:var(--htn-honey) !important;box-shadow:none !important}
+
+/* Sample player — paper-2 card, honey button */
+.sample-play-btn{background:var(--htn-honey) !important;box-shadow:none !important;border:1px solid rgba(26,20,38,0.08) !important}
+.sample-play-btn svg{color:var(--htn-ink) !important;fill:var(--htn-ink) !important}
+.sample-progress-fill{background:var(--htn-ink) !important}
+.sample-player{background:var(--htn-paper-2) !important;border:1px solid var(--htn-line) !important;box-shadow:none !important;border-radius:16px !important}
+
+/* Decorative floating shapes — remove */
+.floating-shapes{display:none !important}
+
+/* Emotion block — calmer paper-2, no purple gradient */
+.emotion-block{background:var(--htn-paper-2) !important;border:1px solid var(--htn-line) !important;border-radius:16px !important;box-shadow:none !important}
+
+/* Category cards — flat Dusk, single honey accent on selected */
+.cat-card{border-radius:16px !important;box-shadow:none !important;background:var(--htn-paper-2) !important;border:1px solid var(--htn-line) !important}
+.cat-card.selected{border-color:var(--htn-ink) !important;background:var(--htn-paper) !important;box-shadow:0 0 0 2px var(--htn-ink) inset !important}
+.cat-bedtime::before,.cat-journey::before,.cat-learning::before{display:none !important}
+.cat-bedtime.selected,.cat-journey.selected,.cat-learning.selected{background:var(--htn-paper) !important;border-color:var(--htn-ink) !important}
+.cat-bedtime .cat-icon,.cat-journey .cat-icon,.cat-learning .cat-icon{background:var(--htn-paper) !important;box-shadow:none !important;border:1px solid var(--htn-line) !important;border-radius:12px !important}
+
+/* Story book / audio player — lighter ink, no heavy shadows */
+.story-book{background:var(--htn-ink) !important;border:1px solid rgba(247,241,230,0.1) !important;box-shadow:0 8px 30px rgba(26,20,38,0.18) !important;border-radius:20px !important}
+.story-book::before{background:linear-gradient(90deg,transparent,rgba(247,241,230,0.25),transparent) !important}
+.story-book-fade{background:linear-gradient(to bottom,transparent,var(--htn-ink)) !important}
+.audio-player{background:var(--htn-honey) !important;box-shadow:0 6px 20px rgba(232,163,74,0.3) !important}
+.audio-player svg{color:var(--htn-ink) !important;fill:var(--htn-ink) !important}
+
+/* Unlock / primary CTAs — flat honey, no gradient */
+.unlock-btn,.primary-cta,.heroBtn,#heroBtn,#unlockBtn,#cta2Btn{background:var(--htn-honey) !important;color:var(--htn-ink) !important;border:none !important;border-radius:14px !important;font-family:var(--htn-sans) !important;font-weight:600 !important;letter-spacing:-0.005em !important;box-shadow:0 4px 16px rgba(232,163,74,0.28) !important;transition:transform 120ms ease-out,box-shadow 120ms ease-out !important}
+.unlock-btn:hover,.primary-cta:hover,#heroBtn:hover,#cta2Btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,163,74,0.35) !important}
+
+/* Full-hero on preview — paper-2 calm card */
+.full-hero{background:var(--htn-paper-2) !important;border:1px solid var(--htn-line) !important;border-radius:20px !important}
+.progress-fill{background:var(--htn-ink) !important}
+
+/* Story counter / sticky counters — mono micro */
+.story-counter,#storyCounter{font-family:var(--htn-mono) !important;font-size:11px !important;letter-spacing:0.08em !important;text-transform:uppercase !important;color:var(--htn-muted) !important;font-weight:400 !important}
+
+/* Section headings — serif editorial */
+.section-title,h1.section-title,h2.section-title{font-family:var(--htn-serif) !important;font-weight:400 !important;letter-spacing:-0.02em !important;color:var(--htn-ink) !important}
+.section-title em,.section-title i{color:var(--htn-plum) !important;font-style:italic !important}
+
+/* Sample name / title */
+.sample-name{font-family:var(--htn-serif) !important;font-weight:500 !important;color:var(--htn-ink) !important;letter-spacing:-0.01em !important}
+.sample-desc{font-family:var(--htn-sans) !important;color:var(--htn-muted) !important;font-size:13px !important}
+.sample-time{font-family:var(--htn-mono) !important;font-size:11px !important;color:var(--htn-muted) !important}
+
+/* Tighten shadows everywhere — plum-tinted instead of black */
+.card,.story-card,.review-card,.recipe-card{box-shadow:0 4px 20px rgba(61,42,92,0.06) !important;border:1px solid var(--htn-line) !important;border-radius:16px !important}
+
+/* Kill chunky Nunito weights that slip through */
+body,p,div,span{text-rendering:optimizeLegibility}
 </style>
 </head>
 <body>
