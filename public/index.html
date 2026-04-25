@@ -954,6 +954,87 @@ body::before,body::after{display:none !important}
 
 /* Kill chunky Nunito weights that slip through */
 body,p,div,span{text-rendering:optimizeLegibility}
+
+/* ================================================================
+   DESKTOP LAYER — applies only at ≥1024px
+   Light-touch: widens containers, gives hero/sections breathing room,
+   gridifies stacked items. Does NOT touch DOM — pure CSS overrides.
+   ================================================================ */
+@media (min-width:1024px){
+
+  /* Container: phone column → desktop page */
+  #screenLanding.screen{max-width:1180px !important;padding:1.5rem 2rem 4rem !important}
+
+  /* Top nav */
+  #screenLanding.screen > div:first-of-type[style*="flex-end"]{max-width:none !important;padding:0 0.5rem}
+
+  /* Hero banner — keep full-bleed, increase overlay padding */
+  .hero-banner-wrap{margin-bottom:2rem !important}
+  .hero-overlay{padding:4rem 6rem !important;max-width:1400px;margin:0 auto;background:linear-gradient(to right,rgba(26,20,38,0.78) 0%,rgba(26,20,38,0.55) 35%,rgba(26,20,38,0.1) 60%,transparent 100%) !important}
+  .hero-headline{font-size:3.4rem !important;line-height:1.05 !important}
+  .hero-sub-1{font-size:1.2rem !important;margin-bottom:0.4rem !important}
+  .hero-sub-2{font-size:1.05rem !important}
+  .hero-trust-row{margin-top:1.6rem !important;gap:2rem !important}
+  .hero-trust-item{font-size:0.78rem !important}
+
+  /* Hero section container: lift max-width so name-card can centre nicely */
+  #sectionHero{max-width:none !important}
+
+  /* Name capture card — sized for desktop, centred */
+  .name-card{max-width:540px !important;margin:0 auto 0.5rem !important;padding:2rem 2rem !important;border-radius:20px !important}
+
+  /* Story cinema — wider recipe card, more breathing room */
+  .section-divider{max-width:760px !important;margin:3rem auto 1.75rem !important;text-align:center}
+  .section-divider h2{font-size:2rem !important;line-height:1.15 !important}
+  .section-divider p{font-size:1.05rem !important;line-height:1.6 !important}
+
+  .story-cinema{max-width:820px !important;margin:0 auto !important}
+  .recipe-card{padding:2rem 2.25rem !important;border-radius:20px !important}
+  .recipe-chips{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:0.5rem 1rem !important}
+
+  /* Generic 440px-locked content blocks → breathe to 720px on desktop.
+     Targets the inline-styled "max-width:440px" divs used throughout. */
+  #screenLanding [style*="max-width:440px"]{max-width:720px !important}
+
+  /* But narrower for actual form rows / pill rows that don't need width */
+  #screenLanding .story-types{max-width:520px !important;margin-left:auto !important;margin-right:auto !important}
+  #screenLanding .cta-group{max-width:380px !important}
+  #screenLanding .progress-steps{max-width:600px !important}
+
+  /* Story counter card */
+  #storyCounter{max-width:520px !important;margin:2.5rem auto 0 !important}
+
+  /* What-kind-of-story (category) cards — 3 column grid on desktop */
+  #screenLanding .cat-cards,#screenLanding [id*="catCards"]{display:grid !important;grid-template-columns:repeat(3,1fr) !important;gap:1rem !important;max-width:900px !important;margin:1rem auto !important}
+
+  /* Voice cards / sample cards — multi-column */
+  #voiceCards,#sampleCards{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:0.75rem !important;max-width:760px !important;margin:0 auto !important}
+
+  /* Story library cards */
+  #libraryList,#childCards{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:1rem !important;max-width:820px !important;margin:0 auto !important}
+
+  /* Footer wider */
+  #sectionFooter{max-width:900px !important;margin-left:auto !important;margin-right:auto !important}
+
+  /* Sticky bar — release the 480px lock on desktop */
+  .sticky-bar{max-width:none !important;width:100% !important;left:0 !important;transform:translateY(100%) !important;border-radius:0 !important}
+  .sticky-bar.show{transform:translateY(0) !important}
+  .sticky-bar-inner{max-width:1180px !important;padding:0 2rem !important}
+
+  /* Section sub-headings get more presence */
+  #screenLanding .section-title{font-size:2rem !important;line-height:1.15 !important;margin-bottom:0.5rem !important}
+  #screenLanding .section-sub{font-size:1.05rem !important;max-width:600px !important;margin-left:auto !important;margin-right:auto !important;text-align:center !important}
+
+  /* Buttons feel less compressed */
+  .hero-btn,.btn-primary{font-size:1rem !important;padding:1.1rem 1.5rem !important}
+}
+
+/* Wide screen polish — tighter container at >1280 */
+@media (min-width:1280px){
+  #screenLanding.screen{max-width:1200px !important}
+  .hero-overlay{padding:5rem 7rem !important}
+  .hero-headline{font-size:3.8rem !important}
+}
 </style>
 </head>
 <body>
