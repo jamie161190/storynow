@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your preview — HearTheirName</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{--paper:#F4ECDB;--paper-2:#EFE4CD;--ink:#1F1B2E;--ink-2:#3D2E5A;--muted:#5C5240;--muted-2:#8A7E64;--line:rgba(31,27,46,.12);--plum:#4B2E83;--plum-2:#7A55C9;--terra:#D87A3E;--terra-2:#C46A2E;--rose:#E0B7A0;--serif:"Cormorant Garamond",Georgia,serif;--sans:"Inter",system-ui,sans-serif;--hand:"Caveat",cursive;--mono:"JetBrains Mono",monospace}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.container{width:100%;max-width:680px;margin:0 auto;padding:0 24px}
+.serif{font-family:var(--serif);font-weight:500;letter-spacing:-.005em}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);font-weight:500}
+.italic-plum{font-style:italic;color:var(--plum)}
+.btn{appearance:none;border:0;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:16px;padding:18px 28px;border-radius:999px;background:var(--terra);color:#fff;box-shadow:0 8px 24px -10px rgba(216,122,62,.55);text-decoration:none;display:inline-flex;align-items:center;gap:10px;justify-content:center}
+.btn:hover{background:var(--terra-2)}
+.btn--ink{background:var(--ink);color:var(--paper)}
+.btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn--ghost:hover{background:rgba(0,0,0,.04)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+header.s{border-bottom:1px solid var(--line);background:rgba(244,236,219,.85)}
+.headerbar{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.logo-text{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--ink)}
+.logo-text em{font-style:italic;font-weight:500;color:var(--plum)}
+.nav-r{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.nav-r a{color:inherit;text-decoration:none}
+
+main.s{padding:48px 0 64px}
+
+.state{text-align:center}
+.state-icon{width:64px;height:64px;border-radius:18px;background:var(--paper-2);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px}
+.state h1{font-family:var(--serif);font-size:clamp(28px,4vw,38px);margin:0;font-weight:500;line-height:1.2}
+.state .sub{color:var(--muted);font-size:15px;margin-top:14px;line-height:1.65}
+
+/* Player */
+.player{margin-top:28px;background:var(--ink);color:var(--paper);border-radius:24px;padding:clamp(20px,3vw,28px);box-shadow:0 30px 80px -30px rgba(31,27,46,.5)}
+.player-head{display:flex;align-items:center;gap:18px}
+.player-cover{width:88px;height:88px;border-radius:12px;background:linear-gradient(135deg,#4B2E83 0%,#7A55C9 50%,#C46A2E 100%);padding:1px;flex-shrink:0}
+.player-cover-inner{background:#1A1428;border-radius:11px;height:100%;width:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:8px}
+.player-cover-for{font-family:var(--serif);font-style:italic;font-size:10px;color:rgba(255,255,255,.55)}
+.player-cover-name{font-family:var(--serif);font-weight:600;font-size:18px;line-height:1.05;margin-top:2px;color:#F4ECDB;word-break:break-word}
+.player-meta{flex:1;min-width:0}
+.player-kicker{font-family:var(--mono);font-size:10px;color:rgba(244,236,219,.6);letter-spacing:.1em}
+.player-title{font-family:var(--serif);font-size:20px;font-weight:500;margin-top:4px;line-height:1.3}
+.player-controls{margin-top:22px;display:flex;align-items:center;gap:14px}
+.player-play{appearance:none;border:0;cursor:pointer;width:48px;height:48px;border-radius:999px;background:var(--terra);color:#fff;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 8px 24px -6px rgba(216,122,62,.6)}
+.player-progress-wrap{flex:1;min-width:0}
+.player-bar{height:5px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;cursor:pointer}
+.player-bar-fill{height:100%;width:0%;background:var(--rose);transition:width .1s linear}
+.player-time{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:rgba(244,236,219,.55);margin-top:6px}
+
+/* Decision card */
+.decision{margin-top:28px;padding:28px;background:var(--ink);color:var(--paper);border-radius:14px}
+.decision .h{font-family:var(--serif);font-size:24px;font-weight:500;margin:0 0 8px}
+.decision .p{font-size:15px;color:rgba(244,236,219,.75);margin:0 0 22px;line-height:1.55}
+.decision-row{display:flex;gap:12px;flex-wrap:wrap}
+.decision-row .btn--ghost{color:var(--paper);border-color:rgba(244,236,219,.3)}
+.decision-row .btn--ghost:hover{background:rgba(255,255,255,.05)}
+
+.jamie-note{margin-top:32px;padding:18px 22px;background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:12px;display:flex;gap:14px;align-items:flex-start}
+.jamie-avatar{width:44px;height:44px;border-radius:999px;background:#E5D6B7;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--hand);font-size:22px;color:var(--plum)}
+.jamie-text{font-size:14px;color:var(--muted);line-height:1.55}
+
+.timeline{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px;text-align:left;margin-top:24px}
+.timeline li{display:flex;gap:14px;align-items:flex-start}
+.timeline li .when{flex:0 0 110px;font-family:var(--mono);font-size:10px;color:var(--plum);padding-top:3px;letter-spacing:.06em;text-transform:uppercase}
+.timeline li .what{font-size:14px;color:var(--muted);line-height:1.55}
+
+.refresh-note{margin-top:24px;font-size:13px;color:var(--muted-2)}
+</style>
+</head>
+<body>
+
+<header class="s">
+  <div class="container headerbar">
+    <a href="/" class="logo">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect x="3" y="6" width="26" height="20" rx="3" fill="#1F1B2E"/>
+        <path d="M16 8v18M11 12v10M21 12v10M7 14v6M25 14v6" stroke="#F4ECDB" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text">Hear<em>Their</em>Name</span>
+    </a>
+    <div class="nav-r">
+      <a href="/account">My stories</a>
+    </div>
+  </div>
+</header>
+
+<main class="s">
+  <div class="container" id="root">
+    <div class="state">
+      <div class="state-icon">⏳</div>
+      <h1>Loading…</h1>
+    </div>
+  </div>
+</main>
+
+<script>
+const pathParts = window.location.pathname.split('/').filter(Boolean);
+const storyId = pathParts[pathParts.length - 1];
+const accessToken = new URLSearchParams(window.location.search).get('t') || '';
+
+let pollTimer = null;
+
+function esc(s){
+  if (s == null) return '';
+  return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+}
+
+async function load(){
+  try {
+    const url = `/api/preview-meta?id=${encodeURIComponent(storyId)}${accessToken ? `&t=${encodeURIComponent(accessToken)}` : ''}`;
+    const res = await fetch(url, { credentials: 'include' });
+    if (res.status === 403) { showLogin(); return; }
+    if (!res.ok) { showError(); return; }
+    const data = await res.json();
+    render(data);
+  } catch (e) { showError(); }
+}
+
+function showLogin(){
+  document.getElementById('root').innerHTML = `
+    <div class="state">
+      <div class="state-icon">🔒</div>
+      <h1>Sign in to listen.</h1>
+      <p class="sub">This preview is tied to your email. Sign in or use the link from your inbox.</p>
+      <div style="margin-top:24px"><a class="btn btn--ink" href="/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}">Sign in</a></div>
+    </div>`;
+}
+
+function showError(){
+  document.getElementById('root').innerHTML = `
+    <div class="state">
+      <div class="state-icon">⚠️</div>
+      <h1>Something went wrong.</h1>
+      <p class="sub">Try refreshing. If it keeps happening, email <a href="mailto:hello@heartheirname.com" style="color:var(--plum)">hello@heartheirname.com</a>.</p>
+    </div>`;
+}
+
+function render(data){
+  if (data.paid && data.full){
+    // Story already paid for — bounce them to /listen/[id] (paid v2 player)
+    window.location.href = `/listen/${storyId}${accessToken ? `?t=${accessToken}` : ''}`;
+    return;
+  }
+
+  if (!data.preview){
+    renderWaiting(data);
+    if (!pollTimer) pollTimer = setInterval(load, 30000);
+    return;
+  }
+
+  renderReady(data);
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+function renderWaiting(data){
+  const childName = esc(data.childName || 'their');
+  document.getElementById('root').innerHTML = `
+    <div class="state">
+      <div class="state-icon">✍️</div>
+      <div class="kicker" style="margin-top:6px">${data.verified ? "WE'RE WRITING IT NOW" : 'WAITING ON VERIFICATION'}</div>
+      <h1 style="margin-top:10px">${data.verified ? `${childName}'s preview is being written.` : 'Check your inbox first.'}</h1>
+      <p class="sub" style="max-width:480px;margin:14px auto 0">
+        ${data.verified
+          ? "Two minutes of audio, made by hand. Usually within an hour, occasionally up to 24h. We'll email you the moment it's ready."
+          : "We sent a verification link to your inbox. Tap it and we'll get to work straight away."}
+      </p>
+      <ul class="timeline" style="max-width:520px;margin:30px auto 0">
+        <li><span class="when">Today</span><span class="what">We read what you sent us. Properly.</span></li>
+        <li><span class="when">Tonight</span><span class="what">We write a 2-minute opening.</span></li>
+        <li><span class="when">Tomorrow</span><span class="what">A storyteller records it in the voice you chose.</span></li>
+        <li><span class="when">When ready</span><span class="what">It lands at your inbox and shows up here.</span></li>
+      </ul>
+      <div class="refresh-note">This page refreshes automatically.</div>
+    </div>`;
+}
+
+function renderReady(data){
+  const childName = esc(data.childName || 'their');
+  const title = data.preview?.title || `${childName}'s preview`;
+  document.getElementById('root').innerHTML = `
+    <div class="state" style="text-align:left">
+      <div class="kicker" style="color:var(--terra)">${esc(childName.toUpperCase())}'S 2-MINUTE PREVIEW · READY</div>
+      <h1 class="serif" style="font-size:clamp(32px,5vw,46px);font-weight:500;letter-spacing:-.01em;line-height:1.05;margin:14px 0 12px">${esc(title)}</h1>
+      <p style="font-size:16px;color:var(--muted);line-height:1.6;margin:0 0 8px;max-width:520px">A 2-minute taste of what we've made for ${childName}. Names pronounced, details woven in, voice warmed up.</p>
+
+      <div class="player">
+        <div class="player-head">
+          <div class="player-cover"><div class="player-cover-inner">
+            <div class="player-cover-for">a story for</div>
+            <div class="player-cover-name">${childName}</div>
+          </div></div>
+          <div class="player-meta">
+            <div class="player-kicker">PREVIEW · 2 MIN</div>
+            <div class="player-title">${esc(title.replace(/^and /, ''))}</div>
+          </div>
+        </div>
+        <div class="player-controls">
+          <button class="player-play" id="playBtn" aria-label="Play">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5L7 4.5z"/></svg>
+          </button>
+          <div class="player-progress-wrap">
+            <div class="player-bar" id="bar"><div class="player-bar-fill" id="barFill"></div></div>
+            <div class="player-time"><span id="cur">0:00</span><span id="dur">0:00</span></div>
+          </div>
+        </div>
+        <audio id="audio" preload="auto" src="${esc(data.preview.url)}"></audio>
+      </div>
+
+      <div class="decision">
+        <div class="h">Did ${childName} smile?</div>
+        <div class="p">If yes, the full 15-minute version is £24.99. We'll have it with you by tomorrow 7pm UK.</div>
+        <div class="decision-row">
+          <button class="btn" id="checkoutBtn">Order the full story · £24.99</button>
+          <a class="btn btn--ghost" href="mailto:jamie@heartheirname.com?subject=Preview%20for%20${encodeURIComponent(childName)}%20-%20feedback">Not quite right? Tell Jamie</a>
+        </div>
+      </div>
+
+      <div class="jamie-note">
+        <div class="jamie-avatar">J</div>
+        <div class="jamie-text"><strong style="color:var(--ink)">From Jamie:</strong> If the pronunciation's off or the vibe isn't quite right, just reply to my email. I'll redo it. Promise.</div>
+      </div>
+    </div>`;
+
+  setupPlayer();
+  document.getElementById('checkoutBtn').addEventListener('click', startCheckout);
+}
+
+function setupPlayer(){
+  const audio = document.getElementById('audio');
+  const playBtn = document.getElementById('playBtn');
+  const bar = document.getElementById('bar');
+  const fill = document.getElementById('barFill');
+  const cur = document.getElementById('cur');
+  const dur = document.getElementById('dur');
+  function fmt(s){ if(!s||isNaN(s))return '0:00'; const m=Math.floor(s/60),sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+  audio.addEventListener('loadedmetadata', () => dur.textContent = fmt(audio.duration));
+  audio.addEventListener('timeupdate', () => {
+    cur.textContent = fmt(audio.currentTime);
+    fill.style.width = (audio.duration ? (audio.currentTime / audio.duration * 100) : 0) + '%';
+  });
+  audio.addEventListener('ended', () => {
+    playBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5L7 4.5z"/></svg>';
+  });
+  playBtn.addEventListener('click', () => {
+    if (audio.paused){
+      audio.play();
+      playBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>';
+    } else {
+      audio.pause();
+      playBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5L7 4.5z"/></svg>';
+    }
+  });
+  bar.addEventListener('click', e => {
+    const r = bar.getBoundingClientRect();
+    const ratio = (e.clientX - r.left) / r.width;
+    if (audio.duration) audio.currentTime = ratio * audio.duration;
+  });
+}
+
+async function startCheckout(){
+  const btn = document.getElementById('checkoutBtn');
+  btn.disabled = true;
+  btn.textContent = 'Opening checkout…';
+  try {
+    const res = await fetch('/api/checkout-paid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ storyId, accessToken })
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else throw new Error();
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'Order the full story · £24.99';
+    alert("Couldn't open checkout. Please try again, or email hello@heartheirname.com");
+  }
+}
+
+load();
+</script>
+</body>
+</html>
