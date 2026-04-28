@@ -4,6 +4,7 @@
 
 import { analyzeBrief } from './lib/brief-analyst.mjs';
 import { sanitiseStoryData, SYSTEM_PROMPT, buildUserPrompt, getOldestAge } from './lib/story-prompts.mjs';
+import { v2ToV1 } from './lib/v2-to-v1.mjs';
 import { emailStoryReady } from './lib/email-templates-v2.mjs';
 import { BRAND_FROM } from './lib/constants.mjs';
 
@@ -78,7 +79,8 @@ export default async (req) => {
       const sRows = await sRes.json();
       if (!sRows.length) { await failJob(supabaseUrl, headersJson, jobId, 'Story not found'); continue; }
       const story = sRows[0];
-      const storyData = sanitiseStoryData(story.story_data || {});
+      const rawData = story.story_data || {};
+      const storyData = sanitiseStoryData(v2ToV1(rawData));
       const childList = story.child_name || 'them';
       const requesterName = storyData.giftFrom || (storyData.children?.[0]?.parentName) || '';
 
@@ -90,7 +92,7 @@ export default async (req) => {
       const targetWords = wordCountForAge(oldestAge);
 
       // Generate full story
-      const userPrompt = buildUserPrompt(brief, targetWords, storyData.storyKind || storyData.category || 'bedtime', { isPreview: false });
+      const userPrompt = buildUserPrompt(brief, targetWords, storyData.category || 'bedtime', { isPreview: false });
       const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': anthropicKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
@@ -116,7 +118,7 @@ export default async (req) => {
       if (!storyText) { await failJob(supabaseUrl, headersJson, jobId, 'Empty story text'); continue; }
 
       // TTS
-      const voiceId = VOICE_MAP[storyData.voice] || DEFAULT_VOICE;
+      const voiceId = VOICE_MAP[rawData.voice] || VOICE_MAP[storyData.voice] || DEFAULT_VOICE;
       const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
         headers: { 'xi-api-key': elevenKey, 'Content-Type': 'application/json' },
@@ -188,14 +190,14 @@ export default async (req) => {
       }
 
       // If gift mode, also send to recipient with the gift template
-      if (resendKey && story.gift_recipient_email && storyData.isGift){
+      if (resendKey && story.gift_recipient_email && rawData.isGift){
         const { emailGiftClaim } = await import('./lib/email-templates-v2.mjs');
         const claimUrl = `${appUrl}/listen/${storyId}?t=${story.access_token}`;
         const giftTmpl = emailGiftClaim({
           recipientName: '',
-          fromName: storyData.giftFrom || 'Your friend',
+          fromName: rawData.giftFrom || 'Your friend',
           childName: childList,
-          giftMessage: storyData.giftMessage || '',
+          giftMessage: rawData.giftMessage || '',
           claimUrl
         });
         try {

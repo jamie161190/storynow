@@ -5,6 +5,7 @@
 
 import { analyzeBrief } from './lib/brief-analyst.mjs';
 import { sanitiseStoryData, SYSTEM_PROMPT, buildUserPrompt, getOldestAge } from './lib/story-prompts.mjs';
+import { v2ToV1 } from './lib/v2-to-v1.mjs';
 import { emailPreviewReady } from './lib/email-templates-v2.mjs';
 import { BRAND_FROM } from './lib/constants.mjs';
 
@@ -83,7 +84,8 @@ export default async (req) => {
       const sRows = await sRes.json();
       if (!sRows.length) { await failJob(supabaseUrl, headersJson, jobId, 'Story not found'); continue; }
       const story = sRows[0];
-      const storyData = sanitiseStoryData(story.story_data || {});
+      const rawData = story.story_data || {};
+      const storyData = sanitiseStoryData(v2ToV1(rawData));
       const childList = story.child_name || (storyData.children?.map(c => c.name).filter(Boolean).join(' & ')) || 'them';
       const requesterName = storyData.giftFrom || (storyData.children?.[0]?.parentName) || '';
 
@@ -93,7 +95,7 @@ export default async (req) => {
 
       // 2. Generate 2-min preview text via Claude
       console.log('[PREVIEW-WORKER] Generating preview text...');
-      const userPrompt = buildUserPrompt(brief, PREVIEW_WORD_COUNT, storyData.storyKind || storyData.category || 'bedtime', { isPreview: true });
+      const userPrompt = buildUserPrompt(brief, PREVIEW_WORD_COUNT, storyData.category || 'bedtime', { isPreview: true });
       const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: { 'x-api-key': anthropicKey, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
@@ -123,7 +125,7 @@ export default async (req) => {
       previewText += "\n\n... To hear what happens next, the full 15-minute story is one tap away.";
 
       // 3. ElevenLabs TTS
-      const voiceId = VOICE_MAP[storyData.voice] || DEFAULT_VOICE;
+      const voiceId = VOICE_MAP[rawData.voice] || VOICE_MAP[storyData.voice] || DEFAULT_VOICE;
       console.log('[PREVIEW-WORKER] Generating audio with voice', voiceId);
       const ttsRes = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
         method: 'POST',
