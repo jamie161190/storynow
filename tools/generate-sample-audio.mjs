@@ -112,6 +112,32 @@ async function generate(text, voiceId) {
   return Buffer.from(await res.arrayBuffer());
 }
 
+// Each sample maps to a category for the background-music mix (see public/music/).
+const KIND = {
+  oliver: 'bedtime',
+  maya:   'adventure',
+  arlo:   'bedtime'
+};
+
+import { execFileSync } from 'node:child_process';
+import { unlinkSync } from 'node:fs';
+
+function mix(narrationPath, musicPath, outPath) {
+  // Use ffmpeg to overlay narration on a looped ambient bed at low volume.
+  execFileSync('ffmpeg', [
+    '-y',
+    '-i', narrationPath,
+    '-stream_loop', '-1',
+    '-i', musicPath,
+    '-filter_complex',
+    '[0:a]volume=1.0[v];[1:a]volume=0.18[m];[v][m]amix=inputs=2:duration=first:dropout_transition=0[mix]',
+    '-map', '[mix]',
+    '-ac', '2',
+    '-b:a', '128k',
+    outPath
+  ], { stdio: 'inherit' });
+}
+
 async function main() {
   if (!process.env.ELEVENLABS_API_KEY) {
     console.error('ELEVENLABS_API_KEY required');
@@ -121,9 +147,18 @@ async function main() {
   for (const s of SAMPLES) {
     console.log(`Generating ${s.slot} (voice ${s.voiceId})…`);
     const buf = await generate(s.text, s.voiceId);
-    const out = join(OUT, `${s.slot}.mp3`);
-    writeFileSync(out, buf);
-    console.log(`  → ${out} (${(buf.length / 1024 | 0)} KB)`);
+    const rawPath = join(OUT, `${s.slot}-raw.mp3`);
+    const finalPath = join(OUT, `${s.slot}.mp3`);
+    writeFileSync(rawPath, buf);
+    console.log(`  → ${rawPath} (${(buf.length / 1024 | 0)} KB)`);
+
+    // Mix with ambient music
+    const kind = KIND[s.slot] || 'bedtime';
+    const musicPath = join(__dirname, '..', 'public', 'music', `${kind}-ambient.mp3`);
+    console.log(`  Mixing with ${kind}-ambient…`);
+    mix(rawPath, musicPath, finalPath);
+    unlinkSync(rawPath);
+    console.log(`  → ${finalPath}`);
   }
   console.log('\nDone.');
 }
