@@ -54,7 +54,8 @@ export default async (req) => {
       verify_token_hash: verifyTokenHash,
       access_token: accessToken,
       payment_status: 'unpaid',
-      story_data: payload
+      story_data: payload,
+      gift_recipient_email: (payload.isGift && payload.giftRecipientEmail) ? payload.giftRecipientEmail.trim().toLowerCase() : null
     })
   });
 

@@ -7,6 +7,9 @@
 <meta name="description" content="Eight quick questions, a free 2-minute preview lands in your inbox within 24 hours.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="/favicon.png">
+<meta name="posthog-key" content="">
+<meta name="sentry-dsn" content="">
+<script defer src="/analytics.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -339,6 +342,7 @@ const STEPS = [
         ${state.data.isGift ? `
           <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
             <input class="txt" placeholder="From (your name)" value="${esc(state.data.giftFrom)}" data-action="setGiftFrom">
+            <input class="txt" type="email" placeholder="Recipient's email (so we can send it to them too)" value="${esc(state.data.giftRecipientEmail || '')}" data-action="setGiftRecipientEmail">
             <textarea class="txt" rows="3" placeholder="A short message to include with the story" data-action="setGiftMessage">${esc(state.data.giftMessage)}</textarea>
           </div>` : ''}
       </div>` }
@@ -542,6 +546,7 @@ function handleAction(action, el, e){
     case 'setIsGift': state.data.isGift = (v === 'true'); render(); break;
     case 'setGiftFrom': state.data.giftFrom = el.value; break;
     case 'setGiftMessage': state.data.giftMessage = el.value; break;
+    case 'setGiftRecipientEmail': state.data.giftRecipientEmail = el.value; break;
   }
 }
 

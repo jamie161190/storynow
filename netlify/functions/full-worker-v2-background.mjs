@@ -74,7 +74,7 @@ export default async (req) => {
     console.log('[FULL-V2-WORKER] Job', jobId, 'story', storyId);
 
     try {
-      const sRes = await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=id,email,child_name,story_data,access_token`, { headers });
+      const sRes = await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=id,email,child_name,story_data,access_token,gift_recipient_email`, { headers });
       const sRows = await sRes.json();
       if (!sRows.length) { await failJob(supabaseUrl, headersJson, jobId, 'Story not found'); continue; }
       const story = sRows[0];
@@ -164,7 +164,7 @@ export default async (req) => {
         body: JSON.stringify({ status: 'done', finished_at: new Date().toISOString() })
       });
 
-      // Send story-ready email
+      // Send story-ready email to buyer
       if (resendKey && story.email){
         const storyUrl = `${appUrl}/listen/${storyId}?t=${story.access_token}`;
         const tmpl = emailStoryReady({
@@ -185,6 +185,29 @@ export default async (req) => {
             })
           });
         } catch (e) { console.error('[FULL-V2-WORKER] Email failed:', e.message); }
+      }
+
+      // If gift mode, also send to recipient with the gift template
+      if (resendKey && story.gift_recipient_email && storyData.isGift){
+        const { emailGiftClaim } = await import('./lib/email-templates-v2.mjs');
+        const claimUrl = `${appUrl}/listen/${storyId}?t=${story.access_token}`;
+        const giftTmpl = emailGiftClaim({
+          recipientName: '',
+          fromName: storyData.giftFrom || 'Your friend',
+          childName: childList,
+          giftMessage: storyData.giftMessage || '',
+          claimUrl
+        });
+        try {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: BRAND_FROM, to: [story.gift_recipient_email], reply_to: 'jamie@heartheirname.com',
+              subject: giftTmpl.subject, html: giftTmpl.html, text: giftTmpl.text, headers: RESEND_LIST_UNSUB
+            })
+          });
+        } catch (e) { console.error('[FULL-V2-WORKER] Gift email failed:', e.message); }
       }
     } catch (err) {
       console.error('[FULL-V2-WORKER] Error:', err.message);
