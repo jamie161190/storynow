@@ -699,9 +699,9 @@ function scrollToId(id){
   window.scrollTo({ top: y, behavior: 'smooth' });
 }
 
-// Sample tabs
+// Sample tabs — real audio playback
 const SAMPLES = [
-  { name:'Oliver', age:5, kind:'bedtime', voice:'British (warm)', title:'and the Fox Who Was Waiting',
+  { name:'Oliver', age:5, kind:'bedtime', voice:'British (warm)', title:'and the Fox Who Was Waiting', src:'/audio/samples/oliver.mp3',
     lines:[
       "It was a quiet evening at the end of Sycamore Lane,",
       "and {N} was tucked beneath a blanket the colour of moonlight.",
@@ -713,7 +713,7 @@ const SAMPLES = [
       "\"Hello, {N},\" said the fox. \"I've been waiting for you.\""
     ]
   },
-  { name:'Maya', age:6, kind:'adventure', voice:'Irish (lilting)', title:'and the Map Inside the Drawer',
+  { name:'Maya', age:6, kind:'adventure', voice:'Irish (lilting)', title:'and the Map Inside the Drawer', src:'/audio/samples/maya.mp3',
     lines:[
       "{N} found the drawer on a Tuesday afternoon,",
       "the kind of afternoon when something new is bound to happen.",
@@ -725,7 +725,7 @@ const SAMPLES = [
       "{N} smiled. \"Then we'd better go, hadn't we?\""
     ]
   },
-  { name:'Arlo', age:4, kind:'bedtime', voice:'Scottish (kind)', title:'and the Night the Stars Came Down',
+  { name:'Arlo', age:4, kind:'bedtime', voice:'Scottish (kind)', title:'and the Night the Stars Came Down', src:'/audio/samples/arlo.mp3',
     lines:[
       "It was the quietest night {N} had ever known.",
       "Outside the window, the trees stood still as paintings.",
@@ -739,17 +739,14 @@ const SAMPLES = [
   }
 ];
 let currentSample = 0;
-let playing = false;
-let raf = null;
-let lastTs = null;
-let posSec = 0;
-const DURATION = 122;
+let sampleAudio = null;
 
-function fmt(s){ const m = Math.floor(s/60); const sec = Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+function fmt(s){ if (!s || isNaN(s)) return '0:00'; const m = Math.floor(s/60); const sec = Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
+function escName(s){ return s.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 
 function renderWaveform(){
   const wave = document.getElementById('waveform');
-  if (wave.children.length) return; // only build once
+  if (wave.children.length) return;
   const bars = 56;
   let seed = 7;
   for (let i = 0; i < bars; i++){
@@ -770,7 +767,33 @@ function updateWaveform(progress){
     else b.classList.remove('played');
   });
 }
+
+function updateAlong(){
+  const s = SAMPLES[currentSample];
+  const dur = (sampleAudio && sampleAudio.duration && !isNaN(sampleAudio.duration)) ? sampleAudio.duration : 120;
+  const cur = sampleAudio ? sampleAudio.currentTime : 0;
+  const lineDur = dur / s.lines.length;
+  const idx = Math.min(Math.floor(cur / lineDur), s.lines.length - 1);
+  const line = s.lines[idx];
+  const html = line.split('{N}').map(p => p.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))).join(`<span class="name">${escName(s.name)}</span>`);
+  document.getElementById('playerAlong').innerHTML = html;
+}
+
+function setPlayIcon(playing){
+  const btn = document.getElementById('playerPlay');
+  if (playing){
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>';
+    btn.setAttribute('aria-label','Pause sample');
+  } else {
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5L7 4.5z"/></svg>';
+    btn.setAttribute('aria-label','Play sample');
+  }
+}
+
 function setSample(i){
+  const wasPlaying = sampleAudio && !sampleAudio.paused;
+  if (sampleAudio){ sampleAudio.pause(); sampleAudio = null; }
+
   currentSample = i;
   const s = SAMPLES[i];
   document.querySelectorAll('.sample-tab').forEach((tab, idx) => tab.dataset.on = (idx === i) ? 'true' : 'false');
@@ -780,50 +803,55 @@ function setSample(i){
   document.getElementById('playerTitleName').textContent = s.name;
   document.getElementById('bookName').textContent = s.name;
   document.getElementById('bookTitle').textContent = s.title;
-  posSec = 0;
-  updateAlong();
-  updateWaveform(0);
   document.getElementById('playerCur').textContent = '0:00';
-  if (playing) togglePlay(); // stop if playing
-}
-function updateAlong(){
-  const s = SAMPLES[currentSample];
-  const lineDur = DURATION / s.lines.length;
-  const idx = Math.min(Math.floor(posSec / lineDur), s.lines.length - 1);
-  const line = s.lines[idx];
-  const html = line.split('{N}').map(p => p.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))).join(`<span class="name">${s.name.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>`);
-  document.getElementById('playerAlong').innerHTML = html;
-}
-function tick(now){
-  if (lastTs == null) lastTs = now;
-  const dt = (now - lastTs) / 1000;
-  lastTs = now;
-  posSec += dt;
-  if (posSec >= DURATION){ posSec = DURATION; togglePlay(); }
-  document.getElementById('playerCur').textContent = fmt(posSec);
-  updateWaveform(posSec / DURATION);
+  document.getElementById('playerDur').textContent = '2:00';
+  updateWaveform(0);
+  document.getElementById('player').dataset.playing = 'false';
+  setPlayIcon(false);
+
+  // Build new audio element
+  sampleAudio = new Audio(s.src);
+  sampleAudio.preload = 'metadata';
+  sampleAudio.addEventListener('loadedmetadata', () => {
+    document.getElementById('playerDur').textContent = fmt(sampleAudio.duration);
+  });
+  sampleAudio.addEventListener('timeupdate', () => {
+    document.getElementById('playerCur').textContent = fmt(sampleAudio.currentTime);
+    if (sampleAudio.duration) updateWaveform(sampleAudio.currentTime / sampleAudio.duration);
+    updateAlong();
+  });
+  sampleAudio.addEventListener('ended', () => {
+    document.getElementById('player').dataset.playing = 'false';
+    setPlayIcon(false);
+  });
   updateAlong();
-  if (playing) raf = requestAnimationFrame(tick);
-}
-function togglePlay(){
-  playing = !playing;
-  const btn = document.getElementById('playerPlay');
-  const player = document.getElementById('player');
-  player.dataset.playing = playing ? 'true' : 'false';
-  if (playing){
-    if (posSec >= DURATION) posSec = 0;
-    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1.2"/><rect x="14" y="4.5" width="4" height="15" rx="1.2"/></svg>';
-    btn.setAttribute('aria-label','Pause sample');
-    lastTs = null;
-    raf = requestAnimationFrame(tick);
-  } else {
-    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5L7 4.5z"/></svg>';
-    btn.setAttribute('aria-label','Play sample');
-    cancelAnimationFrame(raf);
+
+  if (wasPlaying){
+    // Auto-play the new sample if user was already playing
+    sampleAudio.play().then(() => {
+      document.getElementById('player').dataset.playing = 'true';
+      setPlayIcon(true);
+    }).catch(() => {});
   }
 }
+
+function togglePlay(){
+  if (!sampleAudio) return;
+  if (sampleAudio.paused){
+    sampleAudio.play().then(() => {
+      document.getElementById('player').dataset.playing = 'true';
+      setPlayIcon(true);
+    }).catch(err => console.error('Sample play failed', err));
+  } else {
+    sampleAudio.pause();
+    document.getElementById('player').dataset.playing = 'false';
+    setPlayIcon(false);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderWaveform();
+  setSample(0);
   document.querySelectorAll('.sample-tab').forEach(tab => {
     tab.addEventListener('click', () => setSample(parseInt(tab.dataset.i, 10)));
   });
