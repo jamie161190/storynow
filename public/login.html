@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in — HearTheirName</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F4ECDB;--paper-2:#EFE4CD;--ink:#1F1B2E;--muted:#5C5240;--muted-2:#8A7E64;--line:rgba(31,27,46,.12);--plum:#4B2E83;--terra:#D87A3E;--terra-2:#C46A2E}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:"Inter",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.container{width:100%;max-width:460px;margin:0 auto;padding:60px 24px}
+.serif{font-family:"Cormorant Garamond",serif;font-weight:500;letter-spacing:-.005em}
+.kicker{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);font-weight:500}
+.btn{appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:16px;padding:16px 26px;border-radius:999px;background:var(--terra);color:#fff;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{background:var(--terra-2)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.txt{appearance:none;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-family:inherit;font-size:16px;background:rgba(255,253,247,.7);outline:none;color:var(--ink);width:100%;margin-bottom:14px}
+.txt:focus{border-color:var(--plum)}
+.error{color:#a8462a;font-size:13px;margin-top:14px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);margin-bottom:32px}
+.logo-text{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600}
+.logo-text em{font-style:italic;font-weight:500;color:var(--plum)}
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="/" class="logo">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect x="3" y="6" width="26" height="20" rx="3" fill="#1F1B2E"/><path d="M16 8v18M11 12v10M21 12v10M7 14v6M25 14v6" stroke="#F4ECDB" stroke-width="1.5" stroke-linecap="round"/></svg>
+    <span class="logo-text">Hear<em>Their</em>Name</span>
+  </a>
+  <div class="kicker">SIGN IN</div>
+  <h1 class="serif" style="font-size:32px;margin:10px 0 6px">Welcome back.</h1>
+  <p style="color:var(--muted);margin:0 0 28px">Enter the email you used and we'll send you a one-tap sign-in link.</p>
+  <div id="form-area">
+    <input type="email" class="txt" id="emailInput" placeholder="you@example.com" autofocus autocomplete="email">
+    <button class="btn" id="submitBtn" disabled>Send sign-in link</button>
+    <div id="errorMsg" class="error" style="display:none"></div>
+  </div>
+  <div id="success-area" style="display:none">
+    <div style="padding:24px;background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:12px;text-align:center">
+      <div style="font-size:36px;margin-bottom:12px">✉️</div>
+      <h2 class="serif" style="font-size:22px;margin:0 0 6px">Check your inbox.</h2>
+      <p style="color:var(--muted);margin:0;font-size:14.5px">If you have stories with us, the sign-in link is on its way. The link is good for 30 minutes.</p>
+    </div>
+  </div>
+  <p style="margin-top:30px;text-align:center;font-size:13px;color:var(--muted-2)">No account yet? <a href="/start" style="color:var(--ink)">Order a story</a> first.</p>
+</div>
+<script>
+const params = new URLSearchParams(window.location.search);
+const next = params.get('next') || '/account';
+const errParam = params.get('error');
+if (errParam){
+  const map = { invalid:'That link has already been used or expired. Try again.', expired:'That link has expired (30-min limit). Try again.', missing:'Missing token.', config:'Server not configured.' };
+  document.getElementById('errorMsg').textContent = map[errParam] || 'Something went wrong.';
+  document.getElementById('errorMsg').style.display = 'block';
+}
+const input = document.getElementById('emailInput');
+const btn = document.getElementById('submitBtn');
+function valid(){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim()); }
+input.addEventListener('input', () => { btn.disabled = !valid(); });
+input.addEventListener('keydown', e => { if (e.key === 'Enter' && !btn.disabled) submit(); });
+btn.addEventListener('click', submit);
+async function submit(){
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await fetch('/api/account/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: input.value.trim().toLowerCase(), next }) });
+    document.getElementById('form-area').style.display='none';
+    document.getElementById('success-area').style.display='block';
+  } catch(e){
+    btn.disabled=false; btn.textContent='Send sign-in link';
+    document.getElementById('errorMsg').textContent = "Couldn't send. Try again.";
+    document.getElementById('errorMsg').style.display='block';
+  }
+}
+</script>
+</body>
+</html>

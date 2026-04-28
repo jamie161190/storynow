@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Action — HearTheirName</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F4ECDB;--ink:#1F1B2E;--muted:#5C5240;--muted-2:#8A7E64;--line:rgba(31,27,46,.12);--plum:#4B2E83;--terra:#D87A3E}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:"Inter",sans-serif;font-size:16px;line-height:1.55}
+.container{width:100%;max-width:560px;margin:0 auto;padding:40px 24px}
+.serif{font-family:"Cormorant Garamond",serif;font-weight:500;letter-spacing:-.005em}
+.kicker{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);font-weight:500}
+.btn{appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:15px;padding:14px 22px;border-radius:10px;background:var(--ink);color:var(--paper);width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.txt{appearance:none;border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-family:inherit;font-size:14px;background:var(--paper);outline:none;color:var(--ink);width:100%;resize:vertical}
+.txt:focus{border-color:var(--plum)}
+.warn{padding:14px 16px;background:rgba(216,122,62,.08);border:1px solid rgba(216,122,62,.2);border-radius:10px;font-size:13.5px;margin-bottom:18px}
+.warn a{color:var(--terra);text-decoration:underline}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:8px 14px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px;font-size:13px;cursor:pointer;font-family:inherit}
+.chip[data-on=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.back{background:transparent;border:0;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:18px;padding:0;font-family:inherit}
+.success{padding:24px;background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container" id="root"><p>Loading…</p></div>
+<script>
+const path = window.location.pathname; // e.g. /account/story/{id}/re-record OR /account/story/{id}/refund
+const m = path.match(/\/account\/story\/([^/]+)\/(re-record|refund)/);
+if (!m){ document.getElementById('root').innerHTML = '<p>Not found.</p>'; }
+else {
+  const [, storyId, action] = m;
+  const accessToken = new URLSearchParams(window.location.search).get('t') || '';
+
+  function esc(s){ if (s == null) return ''; return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+
+  if (action === 're-record'){
+    document.getElementById('root').innerHTML = `
+      <button class="back" onclick="history.back()">← Back to story</button>
+      <div class="kicker" style="color:var(--terra)">RE-RECORD REQUEST</div>
+      <h1 class="serif" style="font-size:28px;font-weight:500;margin:8px 0 12px">What's not quite right?</h1>
+      <p style="color:var(--muted);margin:0 0 20px">Just tell me, in your own words. I'll re-record any line, fix pronunciation, swap a detail. No charge, no quota.</p>
+      <div style="padding:22px;background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:12px">
+        <div class="kicker" style="margin-bottom:8px">WHAT NEEDS FIXING?</div>
+        <div class="chip-row" id="tagRow">
+          ${['Pronunciation','A name is wrong','A detail is wrong','The voice/tone','Something else'].map((t,i) => `<button class="chip" data-on="${i===0?'true':'false'}" data-tag="${esc(t)}">${t}</button>`).join('')}
+        </div>
+        <div class="kicker" style="margin-bottom:8px">TELL ME MORE</div>
+        <textarea class="txt" id="bodyInput" rows="5" placeholder="e.g. Maeve is pronounced 'Mayv' not 'Meev', and her actual best friend is Stella not her cousin."></textarea>
+        <div style="margin-top:14px;padding:12px 14px;background:rgba(75,46,131,.08);border-radius:8px;font-size:13px;color:var(--muted)">⏱ Most re-records are back with you within 24 hours.</div>
+        <button class="btn" id="submitBtn" style="margin-top:18px">Send to Jamie</button>
+      </div>`;
+    let tag = 'Pronunciation';
+    document.querySelectorAll('#tagRow .chip').forEach(c => c.addEventListener('click', e => {
+      document.querySelectorAll('#tagRow .chip').forEach(x => x.dataset.on = 'false');
+      c.dataset.on = 'true'; tag = c.dataset.tag;
+    }));
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        await fetch('/api/rerecord-request', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ storyId, accessToken, reasonTag: tag, body: document.getElementById('bodyInput').value }) });
+        document.getElementById('root').innerHTML = `<div class="success"><div style="font-size:40px;margin-bottom:8px">✓</div><h2 class="serif" style="font-size:24px;margin:0 0 6px">Sent to Jamie.</h2><p style="color:var(--muted);margin:0 0 18px">I'll fix it and send the new version within 24 hours.</p><a class="btn" href="/account">Back to my stories</a></div>`;
+      } catch(e){ btn.disabled=false; btn.textContent='Try again'; }
+    });
+  }
+
+  if (action === 'refund'){
+    document.getElementById('root').innerHTML = `
+      <button class="back" onclick="history.back()">← Back to story</button>
+      <div class="kicker">REFUND REQUEST</div>
+      <h1 class="serif" style="font-size:28px;font-weight:500;margin:8px 0 12px">Refund this story.</h1>
+      <p style="color:var(--muted);margin:0 0 20px">No drama. £24.99 back to your card within 5 working days. The story stays in your account in case you change your mind.</p>
+      <div style="padding:22px;background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:12px">
+        <div class="warn">Sometimes a re-record fixes it for free. <a href="${path.replace('/refund','/re-record')}${window.location.search}">Try a re-record first?</a></div>
+        <div class="kicker" style="margin-bottom:8px">REASON (OPTIONAL, HELPS ME)</div>
+        <textarea class="txt" id="reasonInput" rows="4" placeholder="Anything you want to share."></textarea>
+        <button class="btn btn--ghost" id="submitBtn" style="margin-top:18px">Refund my £24.99</button>
+        <div style="text-align:center;margin-top:10px;font-size:12px;color:var(--muted-2)">Within 14 days of delivery. No questions asked.</div>
+      </div>`;
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.textContent = 'Processing…';
+      try {
+        const res = await fetch('/api/refund-request', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ storyId, accessToken, reason: document.getElementById('reasonInput').value }) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        document.getElementById('root').innerHTML = `<div class="success"><div style="font-size:40px;margin-bottom:8px">${data.refunded?'✓':'⏳'}</div><h2 class="serif" style="font-size:24px;margin:0 0 6px">${data.refunded?'Refunded.':'Sent to Jamie.'}</h2><p style="color:var(--muted);margin:0 0 18px">${data.refunded?'£24.99 back to your card within 5 working days.':'I\\'ll process this manually within 24 hours.'}</p><a class="btn" href="/account">Back to my stories</a></div>`;
+      } catch(e){ btn.disabled=false; btn.textContent='Try again'; alert(e.message || "Couldn't refund. Email hello@heartheirname.com"); }
+    });
+  }
+}
+</script>
+</body>
+</html>

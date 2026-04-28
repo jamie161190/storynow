@@ -9,6 +9,21 @@
 [functions."generate-preview"]
   external_node_modules = []
 
+[functions."preview-worker-background"]
+  external_node_modules = []
+
+[functions."full-worker-v2-background"]
+  external_node_modules = []
+
+[functions."stripe-webhook-paid"]
+  external_node_modules = ["stripe"]
+
+[functions."checkout-paid"]
+  external_node_modules = ["stripe"]
+
+[functions."refund-request"]
+  external_node_modules = ["stripe"]
+
 [functions."story-worker-background"]
   external_node_modules = []
 
@@ -46,6 +61,126 @@
 [[redirects]]
   from = "/story/*"
   to = "/story.html"
+  status = 200
+
+[[redirects]]
+  from = "/preview/*"
+  to = "/preview.html"
+  status = 200
+
+[[redirects]]
+  from = "/listen/*"
+  to = "/listen.html"
+  status = 200
+
+[[redirects]]
+  from = "/start"
+  to = "/start.html"
+  status = 200
+
+[[redirects]]
+  from = "/start/*"
+  to = "/start.html"
+  status = 200
+
+[[redirects]]
+  from = "/account"
+  to = "/account.html"
+  status = 200
+
+[[redirects]]
+  from = "/account/story/*/re-record"
+  to = "/account-action.html"
+  status = 200
+
+[[redirects]]
+  from = "/account/story/*/refund"
+  to = "/account-action.html"
+  status = 200
+
+[[redirects]]
+  from = "/account/*"
+  to = "/account.html"
+  status = 200
+
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200
+
+[[redirects]]
+  from = "/gift/claim"
+  to = "/gift-claim.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/account/login"
+  to = "/.netlify/functions/account-login"
+  status = 200
+
+[[redirects]]
+  from = "/api/account/verify"
+  to = "/.netlify/functions/account-verify"
+  status = 200
+
+[[redirects]]
+  from = "/api/account/me"
+  to = "/.netlify/functions/account-me"
+  status = 200
+
+[[redirects]]
+  from = "/api/account/logout"
+  to = "/.netlify/functions/account-logout"
+  status = 200
+
+[[redirects]]
+  from = "/api/preview-request"
+  to = "/.netlify/functions/preview-request"
+  status = 200
+
+[[redirects]]
+  from = "/api/preview-meta"
+  to = "/.netlify/functions/preview-meta"
+  status = 200
+
+[[redirects]]
+  from = "/api/resend-verify"
+  to = "/.netlify/functions/resend-verify"
+  status = 200
+
+[[redirects]]
+  from = "/api/checkout-paid"
+  to = "/.netlify/functions/checkout-paid"
+  status = 200
+
+[[redirects]]
+  from = "/api/stripe-webhook-paid"
+  to = "/.netlify/functions/stripe-webhook-paid"
+  status = 200
+
+[[redirects]]
+  from = "/api/weekly-count"
+  to = "/.netlify/functions/weekly-count"
+  status = 200
+
+[[redirects]]
+  from = "/api/rerecord-request"
+  to = "/.netlify/functions/rerecord-request"
+  status = 200
+
+[[redirects]]
+  from = "/api/refund-request"
+  to = "/.netlify/functions/refund-request"
+  status = 200
+
+[[redirects]]
+  from = "/api/gift-claim"
+  to = "/.netlify/functions/gift-claim"
+  status = 200
+
+[[redirects]]
+  from = "/verify"
+  to = "/.netlify/functions/verify"
   status = 200
 
 [[redirects]]

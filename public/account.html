@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your stories — HearTheirName</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F4ECDB;--paper-2:#EFE4CD;--ink:#1F1B2E;--muted:#5C5240;--muted-2:#8A7E64;--line:rgba(31,27,46,.12);--plum:#4B2E83;--terra:#D87A3E}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:"Inter",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.container{width:100%;max-width:780px;margin:0 auto;padding:0 24px}
+.serif{font-family:"Cormorant Garamond",serif;font-weight:500;letter-spacing:-.005em}
+.kicker{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);font-weight:500}
+.btn{appearance:none;border:0;cursor:pointer;font-family:inherit;font-weight:600;font-size:14px;padding:10px 18px;border-radius:8px;background:var(--ink);color:var(--paper);text-decoration:none;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+header.s{border-bottom:1px solid var(--line);background:rgba(244,236,219,.85)}
+.headerbar{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+.logo-text{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:600}
+.logo-text em{font-style:italic;font-weight:500;color:var(--plum)}
+.nav-r{display:flex;align-items:center;gap:14px;font-size:13px;color:var(--muted)}
+.nav-r a,.nav-r button{color:inherit;text-decoration:none;background:none;border:0;cursor:pointer;font-family:inherit;font-size:13px}
+main.s{padding:48px 0 64px}
+.head-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.head-row h1{font-family:"Cormorant Garamond",serif;font-size:38px;font-weight:500;margin:0 0 4px}
+.story-card{display:flex;gap:18px;padding:18px;background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:14px;align-items:center;margin-bottom:14px}
+.story-cover{width:60px;height:80px;background:#E5D6B7;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:"Cormorant Garamond",serif;font-size:11px;color:rgba(80,60,30,.55);text-align:center;padding:6px;line-height:1.2;flex-shrink:0}
+.story-info{flex:1;min-width:0}
+.story-title{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:18px;margin-bottom:2px}
+.story-meta{font-size:13px;color:var(--muted)}
+.story-status{padding:8px 14px;background:rgba(216,122,62,.12);color:var(--terra);border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.story-status.delivered{background:var(--ink);color:var(--paper)}
+.empty{text-align:center;padding:60px 24px;color:var(--muted)}
+.empty .e{font-size:48px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<header class="s">
+  <div class="container headerbar">
+    <a href="/" class="logo">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect x="3" y="6" width="26" height="20" rx="3" fill="#1F1B2E"/><path d="M16 8v18M11 12v10M21 12v10M7 14v6M25 14v6" stroke="#F4ECDB" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <span class="logo-text">Hear<em>Their</em>Name</span>
+    </a>
+    <div class="nav-r">
+      <a href="mailto:hello@heartheirname.com">Help</a>
+      <button id="logoutBtn">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="s">
+  <div class="container" id="root">
+    <p>Loading…</p>
+  </div>
+</main>
+
+<script>
+async function load(){
+  try {
+    const res = await fetch('/api/account/me', { credentials: 'include' });
+    if (res.status === 401){
+      window.location.href = '/login?next=/account';
+      return;
+    }
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    render(data);
+  } catch(e){
+    document.getElementById('root').innerHTML = `<p>Couldn't load your stories. <a href="/login">Sign in again</a>.</p>`;
+  }
+}
+
+function render(data){
+  if (!data.stories || !data.stories.length){
+    document.getElementById('root').innerHTML = `
+      <div class="empty">
+        <div class="e">📖</div>
+        <h1 class="serif" style="font-size:24px;margin:0 0 6px">No stories yet.</h1>
+        <p style="margin:0 0 18px">Order a free preview to get started.</p>
+        <a class="btn" href="/start">Get a free preview</a>
+      </div>`;
+    return;
+  }
+  document.getElementById('root').innerHTML = `
+    <div class="head-row">
+      <div>
+        <h1>Your stories</h1>
+        <p style="margin:0;color:var(--muted);font-size:14px">${data.stories.length} ${data.stories.length === 1 ? 'story' : 'stories'} for ${esc(data.email)}.</p>
+      </div>
+      <a class="btn" href="/start">+ New story</a>
+    </div>
+    ${data.stories.map(s => storyCard(s)).join('')}`;
+}
+
+function esc(s){ if (s == null) return ''; return String(s).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+
+function fmtDate(iso){
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+}
+
+function storyCard(s){
+  let statusEl = '';
+  let actionEl = '';
+  if (s.delivered && s.paid){
+    statusEl = `<span class="story-status delivered">Listen</span>`;
+    actionEl = `<a class="btn" href="/listen/${s.id}?t=${s.accessToken}">Listen</a>`;
+  } else if (s.previewReady){
+    statusEl = `<span class="story-status">Preview ready</span>`;
+    actionEl = `<a class="btn" href="/preview/${s.id}?t=${s.accessToken}">Open preview</a>`;
+  } else {
+    statusEl = `<span class="story-status">Preview being written</span>`;
+    actionEl = `<a class="btn btn--ghost" href="/preview/${s.id}?t=${s.accessToken}">View status</a>`;
+  }
+  if (s.refunded) statusEl = `<span class="story-status" style="background:#eee;color:var(--muted)">Refunded</span>`;
+  return `
+    <div class="story-card">
+      <div class="story-cover">${esc(s.childName).split(' ')[0]}</div>
+      <div class="story-info">
+        <div class="story-title">${esc(s.childName)}'s story</div>
+        <div class="story-meta">${esc(s.voice || '')}${s.voice ? ' · ' : ''}ordered ${fmtDate(s.createdAt)}${s.deliveredAt ? ` · delivered ${fmtDate(s.deliveredAt)}` : ''}</div>
+      </div>
+      ${actionEl}
+    </div>`;
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await fetch('/api/account/logout', { method:'POST', credentials:'include' });
+  window.location.href = '/';
+});
+
+load();
+</script>
+</body>
+</html>
