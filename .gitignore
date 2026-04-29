@@ -13,3 +13,4 @@ test-sdk.mjs
 
 # Claude Code local settings (may contain API keys from command history)
 .claude/settings.local.json
+out/

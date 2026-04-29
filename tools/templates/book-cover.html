@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Book cover static</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4ECDB; --paper-2:#EFE4CD; --paper-3:#E7D9BA;
+  --ink:#1F1B2E; --ink-2:#3D2E5A;
+  --muted:#5C5240; --muted-2:#8A7E64;
+  --line:rgba(31,27,46,.12);
+  --plum:#4B2E83; --plum-2:#7A55C9;
+  --terra:#D87A3E; --terra-2:#C46A2E;
+  --rose:#E0B7A0; --gold:#B89149;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Inter",sans-serif;
+  --hand:"Caveat",cursive;
+  --mono:"JetBrains Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100vw;height:100vh;background:var(--paper);
+  font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:radial-gradient(rgba(80,60,30,.05) 1px,transparent 1px),radial-gradient(rgba(80,60,30,.04) 1px,transparent 1px);
+  background-size:3px 3px,7px 7px;background-position:0 0,1px 2px;
+  opacity:.55;mix-blend-mode:multiply;
+}
+
+.canvas{position:relative;z-index:2;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6vw}
+
+.book{position:relative;aspect-ratio:4 / 5;width:62vw;max-width:600px}
+.book-cover{position:absolute;inset:0;background:linear-gradient(160deg,#3D2E5A 0%,#1F1B2E 60%,#0F0B20 100%);border-radius:18px 24px 24px 18px;box-shadow:-2px 0 0 rgba(255,255,255,.05) inset, 0 40px 80px -30px rgba(31,27,46,.6);overflow:hidden}
+.book-spine{position:absolute;left:0;top:0;bottom:0;width:14px;background:linear-gradient(90deg,rgba(0,0,0,.5),transparent)}
+.book-glow{position:absolute;inset:-30%;background:radial-gradient(circle at 60% 40%,rgba(216,122,62,.35),transparent 55%);pointer-events:none}
+.book-content{position:absolute;inset:36px 36px 36px 50px;display:flex;flex-direction:column;justify-content:space-between;color:#F4ECDB}
+.book-volume{font-family:var(--mono);font-size:13px;letter-spacing:.15em;color:rgba(244,236,219,.6)}
+.book-storyfor{font-family:var(--serif);font-style:italic;font-size:18px;color:rgba(244,236,219,.7);margin-top:10px}
+.book-name{font-family:var(--serif);font-size:96px;line-height:.95;font-weight:500;margin-top:8px;letter-spacing:-.01em;color:#F4ECDB;text-shadow:0 2px 0 rgba(0,0,0,.2);word-break:break-word}
+.book-name.long{font-size:72px}
+.book-name.xlong{font-size:56px}
+.book-title-row{display:flex;align-items:center;gap:12px;margin-top:18px}
+.book-title-rule{width:42px;height:1px;background:var(--rose);flex-shrink:0}
+.book-title{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--rose);line-height:1.25}
+.book-bottom{display:flex;align-items:center;justify-content:space-between}
+.book-hand{font-family:var(--hand);font-size:30px;color:rgba(244,236,219,.7)}
+.book-stamp{position:absolute;top:-18px;right:-18px;width:120px;height:120px;border-radius:999px;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;transform:rotate(8deg);box-shadow:0 14px 36px -10px rgba(216,122,62,.6), 0 0 0 8px rgba(216,122,62,.2)}
+.book-stamp-1{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1}
+.book-stamp-2{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.1;margin-top:3px}
+.book-stamp-rule{width:30px;height:1px;background:rgba(255,255,255,.5);margin:5px 0}
+.book-stamp-3{font-family:var(--mono);font-size:10px;letter-spacing:.1em}
+
+.headline-wrap{margin-top:6vh;text-align:center;max-width:80vw}
+.headline{font-family:var(--serif);font-size:46px;font-weight:500;line-height:1.1;letter-spacing:-.005em;color:var(--ink)}
+.headline em{font-style:italic;color:var(--plum)}
+.subline{font-family:var(--sans);font-size:18px;color:var(--muted);margin-top:14px;line-height:1.5}
+
+.brand-foot{margin-top:4vh;display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)}
+.brand-dot{width:6px;height:6px;border-radius:999px;background:var(--terra)}
+
+/* Layout variants per ratio (set on body class) */
+body.r-1080x1080 .book{width:48vw;max-width:480px}
+body.r-1080x1080 .headline{font-size:42px}
+body.r-1080x1080 .canvas{padding:4vw}
+
+body.r-1080x1350 .book{width:56vw;max-width:540px}
+body.r-1080x1350 .headline{font-size:46px}
+
+body.r-1080x1920 .book{width:64vw;max-width:520px}
+body.r-1080x1920 .canvas{justify-content:flex-start;padding-top:14vh}
+body.r-1080x1920 .headline{font-size:52px;margin-top:8vh}
+body.r-1080x1920 .subline{font-size:20px}
+
+/* Headline tone variants */
+body.tone-statement .headline em{font-style:italic;color:var(--plum)}
+body.tone-question .headline{color:var(--plum)}
+body.tone-soft .headline{color:var(--ink-2)}
+</style>
+</head>
+<body data-ready="false">
+<div class="canvas">
+  <div class="book">
+    <div class="book-cover">
+      <div class="book-spine"></div>
+      <div class="book-glow"></div>
+      <div class="book-content">
+        <div>
+          <div class="book-volume">VOLUME I</div>
+          <div class="book-storyfor">a story for</div>
+          <div class="book-name" id="bookName">Oliver</div>
+          <div class="book-title-row">
+            <span class="book-title-rule"></span>
+            <span class="book-title" id="bookTitle">and the Fox Who Was Waiting</span>
+          </div>
+        </div>
+        <div class="book-bottom">
+          <div class="book-hand">made for them</div>
+          <svg width="48" height="48" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="14" stroke="rgba(244,236,219,.3)" stroke-width="1"/>
+            <path d="M20 8v24M8 20h24" stroke="rgba(244,236,219,.3)" stroke-width="1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="book-stamp">
+      <div class="book-stamp-1">made by</div>
+      <div class="book-stamp-2">hand</div>
+      <div class="book-stamp-rule"></div>
+      <div class="book-stamp-3">SAME DAY</div>
+    </div>
+  </div>
+
+  <div class="headline-wrap" id="headlineWrap">
+    <div class="headline" id="headline">A story made just for <em id="headlineName">Oliver</em>.</div>
+    <div class="subline" id="subline">15 minutes of audio. Their name, woven through.</div>
+  </div>
+
+  <div class="brand-foot">
+    <span class="brand-dot"></span>
+    <span>HEARTHEIRNAME.COM · FREE 2-MIN PREVIEW</span>
+  </div>
+</div>
+
+<script>
+// Read query params
+const params = new URLSearchParams(window.location.search);
+const name = params.get('name') || 'Oliver';
+const tone = params.get('tone') || 'statement';   // statement | question | soft
+const ratio = params.get('ratio') || '1080x1350'; // 1080x1080 | 1080x1350 | 1080x1920
+const titleHook = params.get('titleHook') || 'and the Fox Who Was Waiting';
+
+document.body.classList.add('r-' + ratio);
+document.body.classList.add('tone-' + tone);
+
+document.getElementById('bookName').textContent = name;
+const nameEl = document.getElementById('bookName');
+if (name.length > 9) nameEl.classList.add('long');
+if (name.length > 13) nameEl.classList.replace('long', 'xlong');
+
+document.getElementById('bookTitle').textContent = titleHook;
+document.getElementById('headlineName').textContent = name;
+
+// Headline tone copy variants — gender-neutral, no pronouns required
+const headlineCopy = {
+  statement: { h: `A story made just for <em>${name}</em>.`, s: '15 minutes of audio. Their name, woven through.' },
+  question:  { h: `What if <em>${name}</em> heard <em>their</em> name in a story tonight?`, s: 'A free 2-minute preview lands in your inbox within 24h.' },
+  soft:      { h: `<em>${name}</em>, the hero of their own story.`, s: '£24.99. Yours forever. By Jamie + family.' }
+};
+const copy = headlineCopy[tone] || headlineCopy.statement;
+document.getElementById('headline').innerHTML = copy.h;
+document.getElementById('subline').textContent = copy.s;
+
+// Wait for fonts to load before declaring ready (Puppeteer reads this)
+document.fonts.ready.then(() => {
+  // Settle a frame to let layout finalize
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.body.dataset.ready = 'true';
+  }));
+});
+</script>
+</body>
+</html>
