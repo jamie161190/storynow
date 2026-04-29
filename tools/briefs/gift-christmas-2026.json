@@ -1,0 +1,33 @@
+{
+  "name": "gift-christmas-2026",
+  "voice": "British (warm)",
+  "music": "public/music/bedtime-ambient.mp3",
+  "music_volume": 0.18,
+  "voiceover": "This Christmas, give them something they'll remember. A story made just for them. Their name woven through. Made by hand. Just twenty four ninety nine. heartheirname dot com.",
+  "scenes": [
+    {
+      "duration": 5,
+      "image_prompt": "Editorial photograph of a grandparent (around 65) and a 6-year-old grandchild sitting close together on a sofa in late afternoon light, the grandchild leaning into the grandparent's shoulder with a dreamy expression. Phone propped on a wooden side table between them. Warm cream walls, soft cushions. Shot on medium format, Portra 400, natural window light, slight grain. No brand logos, no screens visible. Vertical 9:16.",
+      "motion": "kenburns-in",
+      "caption": "This Christmas..."
+    },
+    {
+      "duration": 5,
+      "image_prompt": "Close editorial photograph of a 6-year-old grandchild's face, eyes closed, listening intently with a small smile, late afternoon golden light catching their hair, head tilted slightly toward an unseen speaker. Soft focus background of a living room. Shot on medium format, Portra 400, slight grain, warm tones. Vertical 9:16.",
+      "motion": "kenburns-pan",
+      "caption": "...give them something they'll remember."
+    },
+    {
+      "duration": 2,
+      "image_prompt": "Editorial photograph of an open hardback children's book on a wooden coffee table, a mug of tea beside it, soft afternoon light, two pairs of hands (one elderly, one a child's) reaching toward the page. Shot on medium format, Portra 400, slight grain, warm tones. Vertical 9:16.",
+      "motion": "kenburns-out",
+      "caption": "Made by hand."
+    }
+  ],
+  "end_card": {
+    "duration": 3,
+    "eyebrow": "HEARTHEIRNAME.COM",
+    "headline": "Their name. Their world.",
+    "subline": "£24.99 · Free 2-min preview"
+  }
+}
