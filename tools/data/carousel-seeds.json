@@ -1,0 +1,35 @@
+{
+  "_note": "Quote copy is written from scratch in the spirit of common parental reactions. Speakers are framed as anonymous parents, not real Trustpilot reviewers, to avoid impersonating any individual.",
+  "seeds": {
+    "bedtime": {
+      "name": "Oliver",
+      "titleHook": "and the Fox Who Was Waiting",
+      "quotes": [
+        { "title": "He didn't move for 15 minutes", "body": "He sat completely still. The only thing that moved was his eyes when his name came up in the story. Bedtime hasn't been like this in a year.", "label": "A dad · bedtime listener" },
+        { "title": "We've replayed it three times", "body": "He asked for it again before lights out. And again the next morning. Hearing his own name does something to him.", "label": "A mum · age 5" },
+        { "title": "The yellow torch bit", "body": "I told them about his torch on the form, never thought they'd actually use it. It's now the bit of the story he waits for.", "label": "A dad · age 6" },
+        { "title": "Asleep in 12 minutes", "body": "The voice is calm. The story is calm. He's calm. I'm calm. That hasn't all happened in the same evening for ages.", "label": "A mum · age 4" }
+      ]
+    },
+    "gift": {
+      "name": "Sofia",
+      "titleHook": "and the Map Inside the Drawer",
+      "quotes": [
+        { "title": "Grandma cried before Sofia did", "body": "I sent it to my mum to play to her. The look on her face when she heard her granddaughter's name in a story she could keep forever — I'll remember it.", "label": "A mum · gifted to grandparent" },
+        { "title": "Beats every plastic gift", "body": "We've spent more on toys that lasted four days. This was £24.99 and she's listened to it 11 times this week.", "label": "An auntie · age 5" },
+        { "title": "Best birthday present I've given", "body": "Better than the bike, frankly. She kept asking how the lady knew her name.", "label": "A grandparent · age 6" },
+        { "title": "Used it for the Christmas Eve box", "body": "We added it to the audio for the Christmas Eve box. The kids' faces when they realised it was theirs alone — magic.", "label": "A mum · Christmas gift" }
+      ]
+    },
+    "adventure": {
+      "name": "Maya",
+      "titleHook": "and the Map Inside the Drawer",
+      "quotes": [
+        { "title": "Eyes got wide. Total shock.", "body": "She actually paused chewing her toast when her name came up. Then she made me play it again. Then again. Three times before school.", "label": "A dad · age 7" },
+        { "title": "She made up her own ending", "body": "She listened twice and then started narrating her own version to her dolls. Now she calls it 'her' story.", "label": "A mum · age 6" },
+        { "title": "Survived a 4-hour car journey", "body": "We played it three times in a row. No 'are we there yet'. That alone was worth £24.99.", "label": "A dad · road trip" },
+        { "title": "Now she asks for adventures only", "body": "Once she heard the first one, the bedtime ones weren't enough. She wants the dragons and the maps. Brilliant problem to have.", "label": "A mum · age 6" }
+      ]
+    }
+  }
+}

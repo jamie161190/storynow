@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Carousel slide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F4ECDB; --paper-2:#EFE4CD; --paper-3:#E7D9BA;
+  --ink:#1F1B2E; --ink-2:#3D2E5A;
+  --muted:#5C5240; --muted-2:#8A7E64;
+  --line:rgba(31,27,46,.12);
+  --plum:#4B2E83; --plum-2:#7A55C9;
+  --terra:#D87A3E;
+  --rose:#E0B7A0;
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Inter",sans-serif;
+  --hand:"Caveat",cursive;
+  --mono:"JetBrains Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:1080px;height:1350px;background:var(--paper);
+  font-family:var(--sans);color:var(--ink);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background-image:radial-gradient(rgba(80,60,30,.05) 1px,transparent 1px),radial-gradient(rgba(80,60,30,.04) 1px,transparent 1px);
+  background-size:3px 3px,7px 7px;background-position:0 0,1px 2px;
+  opacity:.55;mix-blend-mode:multiply;
+}
+
+.canvas{position:relative;z-index:2;width:1080px;height:1350px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 60px}
+
+.kicker{font-family:var(--mono);font-size:18px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2);font-weight:500}
+.brand-foot{position:absolute;bottom:48px;left:0;right:0;display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:16px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2);justify-content:center}
+.brand-dot{width:8px;height:8px;border-radius:999px;background:var(--terra)}
+.slide-num{position:absolute;top:48px;right:60px;font-family:var(--mono);font-size:14px;color:var(--muted-2);letter-spacing:.1em}
+
+/* ───────── Slide 1: Cover ─────────────────────────────────────── */
+body.slide-1 .canvas{padding-top:120px}
+.book{position:relative;aspect-ratio:4 / 5;width:520px}
+.book-cover{position:absolute;inset:0;background:linear-gradient(160deg,#3D2E5A 0%,#1F1B2E 60%,#0F0B20 100%);border-radius:18px 24px 24px 18px;box-shadow:-2px 0 0 rgba(255,255,255,.05) inset, 0 40px 80px -30px rgba(31,27,46,.6);overflow:hidden}
+.book-spine{position:absolute;left:0;top:0;bottom:0;width:14px;background:linear-gradient(90deg,rgba(0,0,0,.5),transparent)}
+.book-glow{position:absolute;inset:-30%;background:radial-gradient(circle at 60% 40%,rgba(216,122,62,.35),transparent 55%);pointer-events:none}
+.book-content{position:absolute;inset:36px 36px 36px 50px;display:flex;flex-direction:column;justify-content:space-between;color:#F4ECDB}
+.book-volume{font-family:var(--mono);font-size:13px;letter-spacing:.15em;color:rgba(244,236,219,.6)}
+.book-storyfor{font-family:var(--serif);font-style:italic;font-size:18px;color:rgba(244,236,219,.7);margin-top:10px}
+.book-name{font-family:var(--serif);font-size:96px;line-height:.95;font-weight:500;margin-top:8px;letter-spacing:-.01em;color:#F4ECDB;text-shadow:0 2px 0 rgba(0,0,0,.2);word-break:break-word}
+.book-name.long{font-size:72px}.book-name.xlong{font-size:56px}
+.book-title-row{display:flex;align-items:center;gap:12px;margin-top:18px}
+.book-title-rule{width:42px;height:1px;background:var(--rose);flex-shrink:0}
+.book-title{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--rose);line-height:1.25}
+.book-bottom{display:flex;align-items:center;justify-content:space-between}
+.book-hand{font-family:var(--hand);font-size:30px;color:rgba(244,236,219,.7)}
+.book-stamp{position:absolute;top:-18px;right:-18px;width:120px;height:120px;border-radius:999px;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;transform:rotate(8deg);box-shadow:0 14px 36px -10px rgba(216,122,62,.6), 0 0 0 8px rgba(216,122,62,.2)}
+.book-stamp-1{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1}
+.book-stamp-2{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.1;margin-top:3px}
+.book-stamp-rule{width:30px;height:1px;background:rgba(255,255,255,.5);margin:5px 0}
+.book-stamp-3{font-family:var(--mono);font-size:10px;letter-spacing:.1em}
+
+.cover-tagline{margin-top:48px;text-align:center;max-width:780px}
+.cover-tagline h1{font-family:var(--serif);font-size:52px;font-weight:500;line-height:1.1;letter-spacing:-.005em}
+.cover-tagline em{font-style:italic;color:var(--plum)}
+.cover-tagline .sub{font-family:var(--sans);font-size:20px;color:var(--muted);margin-top:18px;line-height:1.5}
+.cover-tagline .swipe{margin-top:32px;font-family:var(--mono);font-size:14px;color:var(--terra);letter-spacing:.18em;text-transform:uppercase}
+
+/* ───────── Slides 2–5: Quote cards ─────────────────────────────── */
+.quote-wrap{width:100%;max-width:840px;display:flex;flex-direction:column;gap:32px;align-items:flex-start}
+.quote-stars{display:inline-flex;gap:4px;color:#00B67A;font-size:36px}
+.quote-title{font-family:var(--serif);font-size:64px;font-weight:500;line-height:1.05;letter-spacing:-.005em;color:var(--ink)}
+.quote-body{font-family:var(--serif);font-style:italic;font-size:36px;line-height:1.4;color:var(--ink-2);max-width:780px}
+.quote-meta{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
+.quote-meta-rule{width:40px;height:1px;background:var(--muted-2)}
+
+/* ───────── Slide 6: Offer card ─────────────────────────────────── */
+.offer-wrap{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:880px}
+.offer-eyebrow{font-family:var(--mono);font-size:18px;letter-spacing:.18em;text-transform:uppercase;color:var(--terra);margin-bottom:32px}
+.offer-h{font-family:var(--serif);font-size:88px;font-weight:500;line-height:1.05;letter-spacing:-.01em;color:var(--ink);margin-bottom:24px}
+.offer-h em{font-style:italic;color:var(--plum)}
+.offer-sub{font-family:var(--sans);font-size:24px;color:var(--muted);line-height:1.55;margin-bottom:48px}
+.offer-cta{display:inline-flex;align-items:center;justify-content:center;padding:28px 56px;border-radius:999px;background:var(--terra);color:#fff;font-family:var(--sans);font-weight:600;font-size:26px;box-shadow:0 14px 36px -10px rgba(216,122,62,.6)}
+.offer-url{margin-top:36px;font-family:var(--mono);font-size:18px;letter-spacing:.1em;color:var(--muted)}
+.offer-stamps{margin-top:32px;display:flex;gap:24px;font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);flex-wrap:wrap;justify-content:center}
+.offer-stamps span{display:inline-flex;align-items:center;gap:6px}
+.offer-stamps span::before{content:"✓";color:var(--plum)}
+</style>
+</head>
+<body data-ready="false">
+<div class="canvas" id="canvas">
+  <div class="slide-num" id="slideNum">01 / 06</div>
+  <div id="content"></div>
+  <div class="brand-foot"><span class="brand-dot"></span><span>HEARTHEIRNAME.COM</span></div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const slide = parseInt(params.get('slide') || '1', 10);
+const seed = params.get('seed') || 'bedtime';
+const name = params.get('name') || 'Oliver';
+const titleHook = params.get('titleHook') || 'and the Fox Who Was Waiting';
+const quoteIndex = parseInt(params.get('quoteIndex') || '0', 10);
+const quoteTitle = params.get('quoteTitle') || '';
+const quoteBody = params.get('quoteBody') || '';
+const quoteLabel = params.get('quoteLabel') || '';
+
+document.body.classList.add('slide-' + slide);
+document.body.classList.add('seed-' + seed);
+document.getElementById('slideNum').textContent = String(slide).padStart(2,'0') + ' / 06';
+
+const content = document.getElementById('content');
+
+if (slide === 1){
+  // Book cover
+  let nameClass = '';
+  if (name.length > 9) nameClass = 'long';
+  if (name.length > 13) nameClass = 'xlong';
+  content.innerHTML = `
+    <div class="book">
+      <div class="book-cover">
+        <div class="book-spine"></div>
+        <div class="book-glow"></div>
+        <div class="book-content">
+          <div>
+            <div class="book-volume">VOLUME I</div>
+            <div class="book-storyfor">a story for</div>
+            <div class="book-name ${nameClass}">${name.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</div>
+            <div class="book-title-row">
+              <span class="book-title-rule"></span>
+              <span class="book-title">${titleHook.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>
+            </div>
+          </div>
+          <div class="book-bottom">
+            <div class="book-hand">made for them</div>
+            <svg width="48" height="48" viewBox="0 0 40 40" fill="none">
+              <circle cx="20" cy="20" r="14" stroke="rgba(244,236,219,.3)" stroke-width="1"/>
+              <path d="M20 8v24M8 20h24" stroke="rgba(244,236,219,.3)" stroke-width="1"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="book-stamp">
+        <div class="book-stamp-1">made by</div>
+        <div class="book-stamp-2">hand</div>
+        <div class="book-stamp-rule"></div>
+        <div class="book-stamp-3">SAME DAY</div>
+      </div>
+    </div>
+    <div class="cover-tagline">
+      <h1>A story made just for <em>${name}</em>.</h1>
+      <div class="sub">A 15-minute audio story made by hand. Their name woven through. Free 2-min preview.</div>
+      <div class="swipe">→ swipe ←</div>
+    </div>
+  `;
+} else if (slide >= 2 && slide <= 5){
+  content.innerHTML = `
+    <div class="quote-wrap">
+      <div class="quote-stars">★★★★★</div>
+      <div class="quote-title">"${quoteTitle.replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}"</div>
+      <div class="quote-body">"${quoteBody.replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]))}"</div>
+      <div class="quote-meta">
+        <span class="quote-meta-rule"></span>
+        <span>${quoteLabel.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</span>
+      </div>
+    </div>
+  `;
+} else if (slide === 6){
+  content.innerHTML = `
+    <div class="offer-wrap">
+      <div class="offer-eyebrow">★★★★★ · 4.9 average across 14 reviews</div>
+      <div class="offer-h">A story made just for <em>${name}</em>.</div>
+      <div class="offer-sub">Made by Jamie + family. By hand. Same day delivery. Yours forever, no subscription.</div>
+      <div class="offer-cta">Get a free 2-min preview →</div>
+      <div class="offer-url">heartheirname.com</div>
+      <div class="offer-stamps">
+        <span>No card today</span>
+        <span>£24.99 full story</span>
+        <span>Money-back if it isn't right</span>
+      </div>
+    </div>
+  `;
+}
+
+document.fonts.ready.then(() => {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.body.dataset.ready = 'true';
+  }));
+});
+</script>
+</body>
+</html>
