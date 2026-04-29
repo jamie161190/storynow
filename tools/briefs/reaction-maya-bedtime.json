@@ -1,0 +1,16 @@
+{
+  "name": "reaction-maya-bedtime",
+  "child_name": "Maya",
+  "voice": "Irish (lilting)",
+  "music": "public/music/bedtime-ambient.mp3",
+  "music_volume": 0.10,
+  "hook_caption": "I PLAYED HER A STORY WITH HER NAME IN IT",
+  "story_passage": "Maya found the drawer on a Tuesday afternoon, the kind of Tuesday where something new is bound to happen. Inside, beneath a tangle of string and old buttons, was a map drawn in careful blue ink with one word at the top — Maya. Her cousin Leo crowded in to look. \"That's your name,\" he whispered. And the map, as if hearing them, gave the smallest shiver.",
+  "kid_image_prompt": "Close editorial photograph of a 5-year-old girl in pyjamas listening to a phone, tucked into a knitted blanket, eyes wide with surprise then breaking into a small smile, late evening lamp light, slight grain, Portra 400, vertical 9:16, head and shoulders only.",
+  "end_card": {
+    "duration": 3,
+    "eyebrow": "HEARTHEIRNAME.COM",
+    "headline": "A story that knows their name.",
+    "subline": "Free 2-min preview · £24.99"
+  }
+}
