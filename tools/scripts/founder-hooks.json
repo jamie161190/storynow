@@ -1,0 +1,75 @@
+{
+  "_note": "10 founder-style hook scripts for AI-actor delivery (Arcads). Each script is a 25-35s monologue. The actor speaks in first person AS A FOUNDER FIGURE — not impersonating Jamie specifically. Scripts respect the storytold-marketing skill's voice rules: no 'AI', no 'magical', no 'bespoke', no 'journey'. First person, specific not generic, show-the-seams.",
+  "hooks": [
+    {
+      "id": "founder-origin",
+      "angle": "founder",
+      "duration_target": 30,
+      "script": "I'm a dad. My son asked me one night why he wasn't in any of his stories. He wanted to hear his own name read out loud, in a story made just for him. So I made one. Now my family makes one for yours, by hand, same day. Free 2-minute preview. No card today. Heartheirname.com.",
+      "tone_note": "Warm, slightly tired, honest. Speaking to camera as if explaining to a friend at a school gate."
+    },
+    {
+      "id": "bedtime-quiet-moment",
+      "angle": "bedtime",
+      "duration_target": 28,
+      "script": "Bedtime in our house used to be twenty minutes of negotiation. Then I tried this. He sat completely still for fifteen minutes. The only thing that moved was his eyes when he heard his own name. Now we listen to a new one every other Sunday. If you've got a 3 to 7 year old, try the free preview. You'll see what I mean.",
+      "tone_note": "Quiet, intimate, almost confessional. As if remembering the moment."
+    },
+    {
+      "id": "bedtime-the-look",
+      "angle": "bedtime",
+      "duration_target": 25,
+      "script": "I want you to watch the look on your kid's face the first time they hear their own name in a story. There's about a half-second pause where they're not sure if they heard it right. Then their eyes widen. That's the bit. That's what we make. Free preview, no card today.",
+      "tone_note": "Direct, building anticipation. Lean into the pause."
+    },
+    {
+      "id": "gift-grandparent",
+      "angle": "gift",
+      "duration_target": 32,
+      "script": "If you're trying to find a gift for a grandchild that isn't another piece of plastic — try this. A 15-minute audio story made by hand, with their name woven through, their best friend, their pet. Twenty four ninety nine. They'll listen to it dozens of times. It lives in their inbox forever. Free 2-minute preview at heartheirname.com.",
+      "tone_note": "Slightly older speaker. Practical, confident. The kind of thing a grandparent would tell another grandparent."
+    },
+    {
+      "id": "gift-actually-remembers",
+      "angle": "gift",
+      "duration_target": 28,
+      "script": "My niece is four. The two things she remembered from her birthday were the trampoline her mum and dad got her, and the audio story I sent. The trampoline cost nine hundred. The story cost twenty four ninety nine. Make of that what you will. Heartheirname.com.",
+      "tone_note": "Dry, slightly amused. The implicit punchline lands without overselling."
+    },
+    {
+      "id": "adventure-replay-loop",
+      "angle": "adventure",
+      "duration_target": 26,
+      "script": "She made me play it three times. She made me play it three times. Then she asked again before school. If you've got a kid who doesn't quit once they like something, that's exactly the kid this works for. Free 2-minute preview. Made by hand, same day.",
+      "tone_note": "First repetition is the hook. Slight grin between the two 'three times'. Energy builds."
+    },
+    {
+      "id": "adventure-car-journey",
+      "angle": "adventure",
+      "duration_target": 30,
+      "script": "Four hours in the car last weekend. Three kids. Zero arguments. We played one of these stories on a loop. Their cousin's name was in it, their dog's name was in it, the football team was in it. They didn't shut up about it for the next two days. If you've got a road trip coming up, take a free preview. heartheirname.com.",
+      "tone_note": "Casual, a parent speaking to other parents. The kind of thing you'd say at a barbeque."
+    },
+    {
+      "id": "teacher-classroom",
+      "angle": "b2b-teacher",
+      "duration_target": 32,
+      "script": "I'm a year 1 teacher. We had a child in our class who hadn't connected with reading. I made a story for him with his name in it, his nan's name, his dog's name. He sat completely still for ten minutes. He's been picking up books in choosing time ever since. If you teach early years, you might want to know about this.",
+      "tone_note": "Slightly formal, professional. Not a hard sell — a recommendation between professionals."
+    },
+    {
+      "id": "memorial-gentle",
+      "angle": "memorial",
+      "duration_target": 35,
+      "script": "Some people use this for a different reason. They send us their voice — a recording of their dad reading a few sentences, or their mum singing a song — and we narrate the story in that voice. So a child can hear someone they've lost call their name. We do this carefully, and only when families ask. If that's you, write to me. Jamie at heartheirname dot com.",
+      "tone_note": "Gentle, slow, deeply respectful. Pauses between sentences. Should feel like a conversation, not a sales pitch. Direct eye contact at the end."
+    },
+    {
+      "id": "founder-show-the-seams",
+      "angle": "founder",
+      "duration_target": 28,
+      "script": "I want to be honest about how this works. We use modern tools to help us write and produce the stories. But the people, the places, the voice direction, the final shape — those are decided by us. By hand. We're not pretending it's quill-and-ink, but it isn't a template either. Try the free preview. If you think we cut corners, write to me.",
+      "tone_note": "Honest, transparent, slightly self-deprecating. The 'show the seams' rule from the brand voice."
+    }
+  ]
+}
