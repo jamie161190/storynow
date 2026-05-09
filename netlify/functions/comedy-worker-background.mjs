@@ -173,7 +173,7 @@ COMEDY RULES:
     let audioBuffer = await ttsRes.arrayBuffer();
     let finalNarrationText = narrationText;
 
-    // Check audio duration vs video duration — retry if narration is too long or too short
+    // Check audio duration vs video duration: retry if narration is too long or too short
     // ElevenLabs returns MP3 at ~128kbps. Duration ≈ bytes / (128000/8) = bytes / 16000
     if (duration) {
       const estimatedAudioDuration = audioBuffer.byteLength / 16000;
@@ -184,7 +184,7 @@ COMEDY RULES:
         const direction = tooLong ? 'long' : 'short';
         const instruction = tooLong
           ? `SHORTEN this script to fit ${duration} seconds. Cut words, remove some pauses, tighten sentences. Keep the best jokes and the punchline. Remove the weakest material.`
-          : `EXPAND this script to fill ${duration} seconds. Add more dramatic pauses (...), extend descriptions, add another comedic beat or observation. Don't pad with filler — add genuinely funny material in the same style.`;
+          : `EXPAND this script to fill ${duration} seconds. Add more dramatic pauses (...), extend descriptions, add another comedic beat or observation. Don't pad with filler: add genuinely funny material in the same style.`;
 
         console.log(`[COMEDY] Narration too ${direction}: ~${Math.round(estimatedAudioDuration)}s vs ${duration}s video. Adjusting...`);
 

@@ -16,6 +16,7 @@
         "npm:dotenv@^17.3.1",
         "npm:express@^5.2.1",
         "npm:multer@^2.1.1",
+        "npm:puppeteer@^24.42.0",
         "npm:stripe@15"
       ]
     }

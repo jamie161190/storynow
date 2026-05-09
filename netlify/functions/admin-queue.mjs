@@ -6,6 +6,7 @@
 // which are picked up by queue-worker-background → story-text-background.
 import { logError } from './lib/log-error.mjs';
 import { BRAND_FROM } from './lib/constants.mjs';
+import { emailPreviewReady } from './lib/email-templates-v2.mjs';
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json' } });
@@ -28,7 +29,7 @@ async function enqueueJob(storyId, jobType, payload, supabaseUrl, headersJson) {
 
 async function maybeStartWorker(jobType, supabaseUrl, headers) {
   // Atomically try to claim the worker slot. If another worker holds it,
-  // we do nothing — that worker will pick up the new queued job when it
+  // we do nothing; that worker will pick up the new queued job when it
   // finishes its current one. Slots older than 15 minutes are taken over
   // (handles crashed workers). This eliminates the race where multiple
   // admin clicks in quick succession each spawned their own worker.
@@ -43,7 +44,7 @@ async function maybeStartWorker(jobType, supabaseUrl, headers) {
   }
   const claimed = await claimRes.json();
   if (claimed !== true) {
-    console.log('[ADMIN-QUEUE] Worker slot already held for', jobType, '— new job will be picked up by current worker.');
+    console.log('[ADMIN-QUEUE] Worker slot already held for', jobType, '. New job will be picked up by current worker.');
     return;
   }
   // We own the slot. Spawn the worker. The worker releases the slot on exit.
@@ -172,15 +173,82 @@ export default async (req) => {
   if (action === 'list') {
     const status = url.searchParams.get('status') || 'pending';
     const limit = parseInt(url.searchParams.get('limit')) || 50;
-    const statusFilter = status === 'pending' ? 'status=in.(pending,generating,ready)' : `status=eq.${encodeURIComponent(status)}`;
+    // Queue (pending) = anything we (admin) need to action, BEFORE the
+    // preview goes to the customer. Once admin clicks Send → status moves to
+    // preview_sent and the row appears in the new "Sent previews" tab instead.
+    const statusFilter = status === 'pending' ? 'status=in.(brief_running,brief_ready,brief_failed,preview_running,preview_ready,preview_failed,full_running,full_failed,pending,generating,ready)' : `status=eq.${encodeURIComponent(status)}`;
     const res = await fetch(
-      `${supabaseUrl}/rest/v1/stories?${statusFilter}&select=id,email,child_name,category,voice_id,story_text,audio_url,story_data,status,feedback,rejected_versions,gift_delivery_preference,is_gift,gift_email,gift_from,created_at&order=created_at.desc&limit=${limit}`,
+      `${supabaseUrl}/rest/v1/stories?${statusFilter}&select=id,email,child_name,category,voice_id,story_text,audio_url,story_data,status,feedback,rejected_versions,gift_delivery_preference,is_gift,gift_email,gift_from,gift_message,created_at,preview_url,preview_text,preview_ready_at,verified_at,payment_status,paid_at&order=created_at.desc&limit=${limit}`,
       { headers }
     );
     if (!res.ok) return json({ error: 'Failed to query stories' }, 500);
     const stories = await res.json();
     return json({ stories });
   }
+
+  // ── NEEDS-ATTENTION: paid orders that haven't been delivered yet ──
+  // Use this to spot stuck full-worker runs or new payments needing manual nudge.
+  if (action === 'needs-attention') {
+    const limit = parseInt(url.searchParams.get('limit')) || 50;
+    // payment_status = paid AND status != delivered (so freshly-paid + stuck full_running + full_failed all appear)
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/stories?payment_status=eq.paid&status=neq.delivered&select=id,email,child_name,category,voice_id,story_text,audio_url,story_data,status,feedback,rejected_versions,gift_delivery_preference,is_gift,gift_email,gift_from,gift_message,created_at,preview_url,preview_text,preview_ready_at,verified_at,payment_status,paid_at,access_token&order=paid_at.desc.nullslast&limit=${limit}`,
+      { headers }
+    );
+    if (!res.ok) return json({ error: 'Failed to query needs-attention' }, 500);
+    const stories = await res.json();
+    return json({ stories, count: stories.length });
+  }
+
+  // ── PREVIEWS: preview generated, customer hasn't paid yet ──
+  // Covers both the new in-browser flow (status=preview_ready) and the legacy
+  // email flow (status=preview_sent). When a customer pays, the stripe
+  // webhook flips them into needs-attention and they vanish from this tab.
+  // If they never pay, they stay here as a non-converted lead.
+  if (action === 'sent-previews' || action === 'previews') {
+    const limit = parseInt(url.searchParams.get('limit')) || 100;
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/stories?or=(status.eq.preview_ready,status.eq.preview_sent)&payment_status=neq.paid&version=eq.2&select=id,email,child_name,category,voice_id,story_data,status,gift_delivery_preference,is_gift,gift_email,gift_from,gift_message,created_at,preview_url,preview_text,preview_ready_at,verified_at,payment_status,access_token,preview_first_played_at,preview_play_count,preview_last_played_at&order=preview_ready_at.desc.nullslast&limit=${limit}`,
+      { headers }
+    );
+    if (!res.ok) return json({ error: 'Failed to query previews' }, 500);
+    const stories = await res.json();
+    return json({ stories, count: stories.length });
+  }
+
+  // ── ISSUES: failed states + stuck rows that need triage ──
+  // Catches anything that's broken (brief_failed, preview_failed, full_failed)
+  // OR stuck in a running/queued state for more than 30 minutes (preview-worker
+  // or brief-worker hung, or a row that was queued but never picked up).
+  if (action === 'issues') {
+    const limit = parseInt(url.searchParams.get('limit')) || 100;
+    const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+    const select = 'id,email,child_name,story_data,status,payment_status,created_at,paid_at,preview_ready_at,access_token,gift_from,gift_message,is_gift';
+
+    // Two queries unioned in JS: failed states (any age) + stuck running/queued (older than 30 min).
+    const [failedRes, stuckRes] = await Promise.all([
+      fetch(
+        `${supabaseUrl}/rest/v1/stories?or=(status.eq.brief_failed,status.eq.preview_failed,status.eq.full_failed)&version=eq.2&select=${select}&order=created_at.desc&limit=${limit}`,
+        { headers }
+      ),
+      fetch(
+        `${supabaseUrl}/rest/v1/stories?or=(status.eq.preview_queued,status.eq.brief_running,status.eq.preview_running,status.eq.full_running)&created_at=lt.${thirtyMinAgo}&version=eq.2&select=${select}&order=created_at.desc&limit=${limit}`,
+        { headers }
+      )
+    ]);
+    if (!failedRes.ok || !stuckRes.ok) return json({ error: 'Failed to query issues' }, 500);
+    const failed = await failedRes.json();
+    const stuck = await stuckRes.json();
+    // Merge, dedupe by id, sort newest first
+    const map = new Map();
+    [...failed, ...stuck].forEach(r => map.set(r.id, r));
+    const stories = [...map.values()].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return json({ stories, count: stories.length });
+  }
+
+  // resend-verify action removed. The verify email flow was retired with the
+  // in-browser preview rollout. The resend-verify, send-login-code, and
+  // followup-worker functions were also deleted.
 
   // ── GET: Single story detail ──
   if (action === 'get') {
@@ -237,6 +305,77 @@ export default async (req) => {
     });
 
     console.log(`[ADMIN-QUEUE] Story data updated for ${storyId}`);
+    return json({ success: true });
+  }
+
+  // ── UPDATE-BRIEF: Save edited middle-layer brief ──
+  // Brief lives at story_data.brief. We accept either a full brief object
+  // (typical case from the structured form) or a JSON string (escape-hatch
+  // edits via raw textarea). Validates JSON shape minimally and merges back
+  // without touching anything else in story_data.
+  if (action === 'update-brief' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId, brief } = body;
+    if (!storyId) return json({ error: 'Missing storyId' }, 400);
+    if (brief == null) return json({ error: 'Missing brief' }, 400);
+
+    let parsedBrief = brief;
+    if (typeof brief === 'string') {
+      try { parsedBrief = JSON.parse(brief); }
+      catch (e) { return json({ error: 'Brief is not valid JSON: ' + e.message }, 400); }
+    }
+    if (typeof parsedBrief !== 'object' || Array.isArray(parsedBrief)) {
+      return json({ error: 'Brief must be a JSON object' }, 400);
+    }
+
+    const storyRes = await fetch(
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_data&limit=1`,
+      { headers }
+    );
+    if (!storyRes.ok) return json({ error: 'Failed to fetch story' }, 500);
+    const stories = await storyRes.json();
+    if (!stories.length) return json({ error: 'Story not found' }, 404);
+
+    const sd = stories[0].story_data || {};
+    sd.brief = parsedBrief;
+    sd.brief_edited_at = new Date().toISOString();
+
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ story_data: sd })
+    });
+
+    console.log(`[ADMIN-QUEUE] Brief updated for ${storyId}`);
+    return json({ success: true });
+  }
+
+  // ── ACK-CUSTOMER-MESSAGE: mark a stored customer message as acknowledged ──
+  // Customer messages live as { at, body, from, acknowledged_at } objects in
+  // story_data.customer_messages. This action stamps acknowledged_at on a
+  // single entry (matched by `at` timestamp). Acknowledged messages stay
+  // visible in the admin detail view but get a different visual state.
+  if (action === 'ack-customer-message' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId, at } = body;
+    if (!storyId || !at) return json({ error: 'Missing storyId or at' }, 400);
+
+    const storyRes = await fetch(
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_data&limit=1`,
+      { headers }
+    );
+    if (!storyRes.ok) return json({ error: 'Failed to fetch story' }, 500);
+    const stories = await storyRes.json();
+    if (!stories.length) return json({ error: 'Story not found' }, 404);
+
+    const sd = stories[0].story_data || {};
+    const messages = Array.isArray(sd.customer_messages) ? sd.customer_messages : [];
+    const updated = messages.map(m => m.at === at ? { ...m, acknowledged_at: new Date().toISOString() } : m);
+    sd.customer_messages = updated;
+
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ story_data: sd })
+    });
     return json({ success: true });
   }
 
@@ -403,8 +542,8 @@ export default async (req) => {
       ? `Their story is <em style="color:#3D2A5C;font-style:italic">ready for you</em>.`
       : `${safeChild}'s story is <em style="color:#3D2A5C;font-style:italic">ready for you</em>.`;
     const closingLine = isMulti
-      ? "We hope it becomes something they ask to hear again and again. The link is yours — anyone you share it with can listen too."
-      : "We hope it becomes something " + safeChild.split("'")[0] + " asks to hear again and again. The link is yours — anyone you share it with can listen too.";
+      ? "We hope it becomes something they ask to hear again and again. The link is yours, anyone you share it with can listen too."
+      : "We hope it becomes something " + safeChild.split("'")[0] + " asks to hear again and again. The link is yours, anyone you share it with can listen too.";
     const ctaLabel = isMulti ? "Open their story →" : `Open ${safeChild}'s story →`;
     const visibleUrl = listenUrl.replace(/^https?:\/\//, '');
 
@@ -414,7 +553,7 @@ export default async (req) => {
   <p style="margin:0 0 14px;font-size:15.5px;line-height:1.65">${greeting}</p>
   <p style="margin:0 0 22px;font-size:15.5px;line-height:1.65">${readyLine}</p>
   ${customBlock}
-  <p style="margin:0 0 22px;font-size:15.5px;line-height:1.65">Tap the link below whenever you're both ready. The story lives at its own page — you can open it any time, share it with family, and come back to it as many times as you like.</p>
+  <p style="margin:0 0 22px;font-size:15.5px;line-height:1.65">Tap the link below whenever you're both ready. The story lives at its own page. You can open it any time, share it with family, and come back to it as many times as you like.</p>
 
   <!-- Plain dark rectangular CTA -->
   <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin:0 0 14px">
@@ -445,7 +584,7 @@ export default async (req) => {
           reply_to: 'jamie@heartheirname.com',
           subject,
           html: emailHtml,
-          text: `${greeting}\n\n${isMulti ? 'Their' : story.child_name + "'s"} story is ready for you.\n\n${customMessage && customMessage.trim() ? customMessage.trim() + '\n\n' : ''}Tap the link below whenever you're both ready. The story lives at its own page — you can open it any time, share it with family, and come back to it as many times as you like.\n\nOpen: ${listenUrl}\n\n${closingLine}\n\nJamie and Chase\nHear Their Name\njamie@heartheirname.com`,
+          text: `${greeting}\n\n${isMulti ? 'Their' : story.child_name + "'s"} story is ready for you.\n\n${customMessage && customMessage.trim() ? customMessage.trim() + '\n\n' : ''}Tap the link below whenever you're both ready. The story lives at its own page. You can open it any time, share it with family, and come back to it as many times as you like.\n\nOpen: ${listenUrl}\n\n${closingLine}\n\nJamie and Chase\nHear Their Name\njamie@heartheirname.com`,
           headers: {
             'List-Unsubscribe': '<mailto:jamie@heartheirname.com?subject=unsubscribe>',
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
@@ -468,6 +607,209 @@ export default async (req) => {
       return json({ success: true });
     } catch (err) {
       console.error('[ADMIN-QUEUE] Send error:', err.message);
+      return json({ error: 'Send failed: ' + err.message }, 500);
+    }
+  }
+
+  // ── RETRY-FULL: Re-trigger the full-story worker for a paid story that failed ──
+  // Use when status=full_failed or full_running has stalled. Worker has its own
+  // idempotency guard, so a stuck-running re-trigger is safe.
+  if (action === 'retry-full' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId } = body;
+    if (!storyId) return json({ error: 'Missing storyId' }, 400);
+
+    // Sanity: must be paid
+    const sRes = await fetch(
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=payment_status`,
+      { headers }
+    );
+    if (!sRes.ok) return json({ error: 'Failed to fetch story' }, 500);
+    const sRows = await sRes.json();
+    if (!sRows.length) return json({ error: 'Story not found' }, 404);
+    if (sRows[0]?.payment_status !== 'paid') return json({ error: 'Story not paid' }, 400);
+
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ status: 'full_running' })
+    });
+
+    const base = process.env.URL || process.env.PUBLIC_APP_URL || 'https://heartheirname.com';
+    try {
+      await fetch(`${base}/.netlify/functions/full-worker-v2-background`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId }),
+        signal: AbortSignal.timeout(5000)
+      });
+    } catch (e) {
+      console.error('[ADMIN-QUEUE] Failed to trigger full-worker:', e.message);
+      return json({ error: 'Failed to trigger worker' }, 500);
+    }
+    return json({ success: true });
+  }
+
+  // ── REGENERATE-BRIEF: Re-run the middle-layer brief analyst on a story ──
+  // Use when brief_failed (retry) or brief_ready and the analyst output looks off.
+  if (action === 'regenerate-brief' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId } = body;
+    if (!storyId) return json({ error: 'Missing storyId' }, 400);
+
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ status: 'brief_running' })
+    });
+
+    const base = process.env.URL || process.env.PUBLIC_APP_URL || 'https://heartheirname.com';
+    try {
+      await fetch(`${base}/.netlify/functions/brief-worker-background`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId })
+      });
+    } catch (e) {
+      console.error('[ADMIN-QUEUE] Failed to trigger brief-worker:', e.message);
+      return json({ error: 'Failed to trigger worker' }, 500);
+    }
+    return json({ success: true });
+  }
+
+  // ── GENERATE-PREVIEW: Run the writer + ElevenLabs against the persisted brief ──
+  // Requires status=brief_ready (or preview_ready/preview_failed for re-run).
+  if (action === 'generate-preview' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId } = body;
+    if (!storyId) return json({ error: 'Missing storyId' }, 400);
+
+    // Sanity check: brief must exist on story_data.
+    const sRes = await fetch(
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_data`,
+      { headers }
+    );
+    if (!sRes.ok) return json({ error: 'Failed to fetch story' }, 500);
+    const sRows = await sRes.json();
+    if (!sRows.length) return json({ error: 'Story not found' }, 404);
+    if (!sRows[0]?.story_data?.brief) {
+      return json({ error: 'No brief on story; run regenerate-brief first' }, 400);
+    }
+
+    await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+      method: 'PATCH', headers: headersJson,
+      body: JSON.stringify({ status: 'preview_running' })
+    });
+
+    const base = process.env.URL || process.env.PUBLIC_APP_URL || 'https://heartheirname.com';
+    try {
+      await fetch(`${base}/.netlify/functions/preview-worker-background`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId })
+      });
+    } catch (e) {
+      console.error('[ADMIN-QUEUE] Failed to trigger preview-worker:', e.message);
+      return json({ error: 'Failed to trigger worker' }, 500);
+    }
+    return json({ success: true });
+  }
+
+  // ── SEND-PREVIEW: Email the customer the preview-ready link ──
+  // Uses the existing emailPreviewReady template. Requires preview_url + email + access_token.
+  // Idempotent: refuses if status is already preview_sent unless body.force === true.
+  if (action === 'send-preview' && req.method === 'POST') {
+    const body = await req.json();
+    const { storyId, force, jamieNote } = body;
+    if (!storyId) return json({ error: 'Missing storyId' }, 400);
+
+    const sRes = await fetch(
+      `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=id,email,child_name,access_token,preview_url,status,story_data&limit=1`,
+      { headers }
+    );
+    if (!sRes.ok) return json({ error: 'Failed to fetch story' }, 500);
+    const sRows = await sRes.json();
+    if (!sRows.length) return json({ error: 'Story not found' }, 404);
+    const story = sRows[0];
+
+    if (!story.preview_url) return json({ error: 'No preview generated yet' }, 400);
+    if (!story.email) return json({ error: 'No customer email' }, 400);
+    if (!story.child_name) return json({ error: 'No child name on row; fill it via Edit input first' }, 400);
+    if (!story.access_token) return json({ error: 'No access_token (legacy v1 row?); cannot build a valid preview link' }, 400);
+    if (story.status === 'preview_sent' && !force) {
+      return json({ error: 'Preview already sent. Pass {force:true} to resend.' }, 409);
+    }
+
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!resendKey) return json({ error: 'Email not configured' }, 503);
+
+    const appUrl = process.env.PUBLIC_APP_URL || 'https://heartheirname.com';
+    const sd = story.story_data || {};
+    const requesterName = sd.giftFrom || sd.requesterName || sd.children?.[0]?.parentName || '';
+    const childList = story.child_name;
+    const previewListenUrl = `${appUrl}/preview/${story.id}?t=${story.access_token}`;
+    const noteTrimmed = (jamieNote && typeof jamieNote === 'string') ? jamieNote.trim().slice(0, 1000) : '';
+    const tmpl = emailPreviewReady({
+      firstName: requesterName,
+      childList,
+      previewTitle: sd.brief?.story_world || '',
+      previewUrl: previewListenUrl,
+      jamieNote: noteTrimmed
+    });
+
+    // Persist note to story_data so it shows in admin history + survives a resend.
+    if (noteTrimmed) {
+      const updatedData = { ...sd, preview_email_note: noteTrimmed, preview_email_note_sent_at: new Date().toISOString() };
+      try {
+        await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+          method: 'PATCH',
+          headers: { ...headers, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+          body: JSON.stringify({ story_data: updatedData }),
+          signal: AbortSignal.timeout(3000),
+        });
+      } catch (e) { console.error('[admin-queue] Failed to persist preview note:', e.message); }
+    }
+
+    try {
+      const emailRes = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: BRAND_FROM,
+          to: [story.email],
+          reply_to: 'jamie@heartheirname.com',
+          subject: tmpl.subject,
+          html: tmpl.html,
+          text: tmpl.text,
+          headers: {
+            'List-Unsubscribe': '<mailto:jamie@heartheirname.com?subject=unsubscribe>',
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+          }
+        })
+      });
+      if (!emailRes.ok) {
+        const errText = await emailRes.text();
+        console.error('[ADMIN-QUEUE] Send-preview email failed:', errText);
+        return json({ error: 'Email failed' }, 500);
+      }
+
+      // Re-fetch story_data to minimise the race window between any concurrent
+      // edits and this PATCH. We're stashing preview_sent_at inside the JSONB
+      // since there's no dedicated column.
+      const refRes = await fetch(
+        `${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_data&limit=1`,
+        { headers }
+      );
+      const refRows = refRes.ok ? await refRes.json() : [];
+      const freshSd = refRows[0]?.story_data || sd;
+      const mergedSd = { ...freshSd, preview_sent_at: new Date().toISOString() };
+      await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+        method: 'PATCH', headers: headersJson,
+        body: JSON.stringify({ status: 'preview_sent', story_data: mergedSd })
+      });
+
+      console.log(`[ADMIN-QUEUE] Preview sent for story ${storyId} to ${story.email}`);
+      return json({ success: true });
+    } catch (err) {
+      console.error('[ADMIN-QUEUE] Send-preview error:', err.message);
       return json({ error: 'Send failed: ' + err.message }, 500);
     }
   }

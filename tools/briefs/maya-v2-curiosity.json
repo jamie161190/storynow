@@ -1,0 +1,21 @@
+{
+  "name": "maya-v2-curiosity",
+  "child_name": "Maya",
+  "voice": "Irish (lilting)",
+  "music": "public/music/bedtime-ambient.mp3",
+  "music_volume": 0.10,
+  "walkthrough_hook": "WATCH WHAT HAPPENS AT THE END",
+  "walkthrough_voiceover": "She doesn't know yet. The story she's about to hear has her name in it. Her best friend's name. Her dog's name. We made it tonight. Watch her face. Tonight's story is hers. Hers alone. The hero is... Maya.",
+  "spoken_captions": [
+    { "text": "Tonight's story is hers.", "start": 0.0, "end": 1.7 },
+    { "text": "Hers alone.",               "start": 1.7, "end": 2.7 },
+    { "text": "The hero is...",            "start": 2.8, "end": 4.0 },
+    { "text": "Maya.",                     "start": 4.1, "end": 6.5, "highlight": true }
+  ],
+  "end_card": {
+    "duration": 3,
+    "eyebrow": "HEARTHEIRNAME.COM",
+    "headline": "A story that knows their name.",
+    "subline": "Free 2-min preview · £24.99"
+  }
+}

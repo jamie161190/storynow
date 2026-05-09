@@ -1,4 +1,4 @@
-// POST /api/account/logout — clears the session cookie.
+// POST /api/account/logout: clears the session cookie.
 import { clearSessionCookie } from './lib/auth.mjs';
 
 export default async () => {

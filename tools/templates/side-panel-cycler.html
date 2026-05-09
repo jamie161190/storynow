@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Card cycler overlay (v6)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* v6 — single card near the top, content cycles through 4 states.
+     Same plum / terracotta palette as v3/v5, but instead of 4 cards
+     stacked down a left rail, ONE card floats at the top of the frame
+     and morphs through what would have been the four sections. The
+     Home Alone footage shows below and (where applicable) around it.
+
+     Driven by window.setTime(t). Each state has a startTime and a
+     visibleDuration. Inside a state's window, the body content fades
+     in (opacity tween) and types out values in turn. */
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: transparent; }
+
+  :root {
+    --plum-deep: #1F1A2E;
+    --plum-card: #2F283A;
+    --plum-card-border: rgba(216, 122, 62, .55);
+    --plum-row: #3E3845;
+    --plum-row-border: rgba(255,255,255,.05);
+    --terra: #D87A3E;
+    --terra-soft: rgba(216, 122, 62, .85);
+    --gold-label: #C8B385;
+    --paper-italic: #EFE3CB;
+    --paper: #F4ECDB;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--paper-italic);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Top wordmark band */
+  .wordmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--word-h-band);
+    background: var(--plum-deep);
+    padding: var(--word-pad);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    z-index: 2;
+  }
+  .wordmark .h {
+    font-style: italic;
+    font-weight: 500;
+    font-size: var(--word-h);
+    line-height: 1.05;
+    color: #fff;
+  }
+  .wordmark .h em {
+    color: var(--terra);
+    font-style: italic;
+  }
+  .wordmark .sub {
+    margin-top: var(--word-sub-margin);
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-size: var(--word-sub);
+    color: rgba(255,255,255,.55);
+    font-weight: 400;
+  }
+
+  /* Bottom CTA bar — pill floats, no opaque band, so the source's
+     mid-ad modesty/CTA chip retains as much of its space as possible. */
+  .cta {
+    position: absolute;
+    bottom: var(--cta-bottom-offset);
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .cta-pill {
+    background: var(--terra);
+    color: #fff;
+    padding: var(--cta-pad);
+    border-radius: 28px;
+    text-align: center;
+    line-height: 1.18;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .cta-pill .cta-primary {
+    font-weight: 700;
+    font-size: var(--cta-font);
+    letter-spacing: .005em;
+  }
+  .cta-pill .cta-secondary {
+    font-weight: 500;
+    font-size: var(--cta-secondary-font);
+    opacity: .9;
+    letter-spacing: .015em;
+  }
+  .cta-pill.is-pulsing {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 8px rgba(216, 122, 62, .15);
+  }
+
+  /* The single morphing card */
+  .card {
+    position: absolute;
+    top: var(--card-top);
+    left: var(--card-side-margin);
+    right: var(--card-side-margin);
+    background: var(--plum-card);
+    border: 1.5px solid var(--plum-card-border);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad);
+    box-shadow: 0 16px 48px -16px rgba(0,0,0,.6);
+    z-index: 3;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: var(--head-gap);
+    margin-bottom: var(--head-margin);
+  }
+  .card-num {
+    width: var(--num-size);
+    height: var(--num-size);
+    border-radius: 999px;
+    background: var(--terra);
+    color: var(--plum-deep);
+    font-weight: 700;
+    font-size: var(--num-font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .card-head-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: var(--head-font);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--terra);
+  }
+  .card-step-counter {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: var(--step-counter-font);
+    color: rgba(255,255,255,.45);
+    letter-spacing: .06em;
+  }
+
+  /* States — only one visible at a time */
+  .state {
+    display: none;
+  }
+  .state.is-active {
+    display: block;
+  }
+
+  /* State 1: WHAT KIND chips (2 chips side-by-side) */
+  .kind-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--row-gap);
+  }
+  .kind-chip {
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: var(--row-radius);
+    padding: var(--kind-pad);
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: var(--kind-font);
+    color: var(--paper-italic);
+  }
+  .kind-chip .icon {
+    font-size: var(--kind-icon-font);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .kind-chip.selected {
+    background: rgba(216, 122, 62, .14);
+    border-color: var(--terra);
+    color: #fff;
+  }
+
+  /* State 2: THE KIDS rows */
+  .kid-row {
+    display: flex;
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: var(--row-radius);
+    overflow: hidden;
+  }
+  .kid-row + .kid-row {
+    margin-top: var(--row-gap);
+  }
+  .kid-row .name-cell {
+    flex: 1 1 auto;
+    padding: var(--cell-pad);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .kid-row .name-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .kid-row .age-cell {
+    flex: 0 0 var(--age-w);
+    padding: var(--cell-pad);
+    background: rgba(0,0,0,.18);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .kid-row .age-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  /* State 3: THE WORLD rows (label above value) */
+  .world-row {
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: var(--row-radius);
+    padding: var(--world-pad);
+  }
+  .world-row + .world-row {
+    margin-top: var(--row-gap);
+  }
+  .world-row .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .world-row .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    line-height: 1.1;
+    margin-top: 2px;
+  }
+
+  /* State 4: HOW IT WORKS list */
+  .how-row {
+    display: flex;
+    gap: var(--how-gap);
+    align-items: flex-start;
+    padding: var(--how-pad);
+  }
+  .how-row + .how-row {
+    margin-top: var(--how-gap);
+    border-top: 1px solid rgba(255,255,255,.06);
+    padding-top: calc(var(--how-pad) * 1.4);
+  }
+  .how-row .step-num {
+    width: var(--step-size);
+    height: var(--step-size);
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.7);
+    font-weight: 600;
+    font-size: var(--step-font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin-top: 1px;
+  }
+  .how-row .step-text {
+    font-size: var(--step-text);
+    line-height: 1.25;
+    color: #fff;
+    font-weight: 500;
+  }
+  .how-row .step-text em {
+    color: var(--terra);
+    font-style: normal;
+    font-weight: 600;
+  }
+  .how-row .step-sub {
+    font-size: var(--step-sub);
+    color: rgba(255,255,255,.55);
+    margin-top: 2px;
+  }
+
+  /* ============================================================
+     Format-specific tokens
+     ============================================================ */
+
+  /* 9:16 (1080x1920)
+     Source video has burned-in subtitles around y=180-400 and a
+     mid-ad CTA / modesty chip around y=1100-1440. Card sits between
+     them: top at 440 (clear of subtitles), max height ~520 so it
+     ends above 1000 with breathing room before the chip. */
+  body[data-fmt="916"] {
+    --word-h-band: 130px;
+    --word-pad: 22px 36px 18px 36px;
+    --word-h: 32px;
+    --word-sub: 12px;
+    --word-sub-margin: 6px;
+
+    --card-top: 440px;
+    --card-side-margin: 50px;
+    --card-radius: 22px;
+    --card-pad: 26px 32px 28px 32px;
+
+    --head-gap: 14px;
+    --head-margin: 22px;
+    --num-size: 36px;
+    --num-font: 18px;
+    --head-font: 16px;
+    --step-counter-font: 12px;
+
+    --row-gap: 10px;
+    --row-radius: 14px;
+    --cell-pad: 14px 18px;
+    --label-font: 11px;
+    --value-font: 24px;
+    --age-w: 110px;
+
+    --kind-pad: 28px 18px;
+    --kind-font: 24px;
+    --kind-icon-font: 32px;
+
+    --world-pad: 14px 18px 16px 18px;
+
+    --how-gap: 14px;
+    --how-pad: 6px 0;
+    --step-size: 28px;
+    --step-font: 14px;
+    --step-text: 20px;
+    --step-sub: 14px;
+
+    --cta-bottom-offset: 50px;
+    --cta-font: 30px;
+    --cta-secondary-font: 19px;
+    --cta-pad: 20px 42px 18px 42px;
+  }
+
+  /* 4:5 (1080x1350) cropped from top of subbed source.
+     Subtitle survives at y=180-400. Modesty chip at y=1100+ partly visible. */
+  body[data-fmt="45"] {
+    --word-h-band: 100px;
+    --word-pad: 16px 30px 14px 30px;
+    --word-h: 28px;
+    --word-sub: 11px;
+    --word-sub-margin: 5px;
+
+    --card-top: 440px;
+    --card-side-margin: 40px;
+    --card-radius: 20px;
+    --card-pad: 22px 26px 24px 26px;
+
+    --head-gap: 12px;
+    --head-margin: 18px;
+    --num-size: 32px;
+    --num-font: 16px;
+    --head-font: 14px;
+    --step-counter-font: 11px;
+
+    --row-gap: 8px;
+    --row-radius: 12px;
+    --cell-pad: 11px 16px;
+    --label-font: 10px;
+    --value-font: 20px;
+    --age-w: 95px;
+
+    --kind-pad: 22px 16px;
+    --kind-font: 20px;
+    --kind-icon-font: 28px;
+
+    --world-pad: 11px 16px 13px 16px;
+
+    --how-gap: 11px;
+    --how-pad: 5px 0;
+    --step-size: 24px;
+    --step-font: 12px;
+    --step-text: 17px;
+    --step-sub: 12px;
+
+    --cta-bottom-offset: 28px;
+    --cta-font: 18px;
+    --cta-secondary-font: 12px;
+    --cta-pad: 12px 26px 11px 26px;
+  }
+
+  /* 1:1 (1080x1080) cropped from top of subbed source.
+     Subtitle survives at y=180-400. Modesty chip mostly cut off below y=1080. */
+  body[data-fmt="11"] {
+    --word-h-band: 80px;
+    --word-pad: 14px 28px 12px 28px;
+    --word-h: 24px;
+    --word-sub: 10px;
+    --word-sub-margin: 4px;
+
+    --card-top: 440px;
+    --card-side-margin: 36px;
+    --card-radius: 18px;
+    --card-pad: 18px 24px 20px 24px;
+
+    --head-gap: 10px;
+    --head-margin: 14px;
+    --num-size: 28px;
+    --num-font: 14px;
+    --head-font: 13px;
+    --step-counter-font: 11px;
+
+    --row-gap: 6px;
+    --row-radius: 10px;
+    --cell-pad: 9px 14px;
+    --label-font: 10px;
+    --value-font: 18px;
+    --age-w: 90px;
+
+    --kind-pad: 18px 14px;
+    --kind-font: 18px;
+    --kind-icon-font: 24px;
+
+    --world-pad: 9px 14px 11px 14px;
+
+    --how-gap: 9px;
+    --how-pad: 4px 0;
+    --step-size: 22px;
+    --step-font: 11px;
+    --step-text: 15px;
+    --step-sub: 11px;
+
+    --cta-bottom-offset: 22px;
+    --cta-font: 16px;
+    --cta-secondary-font: 11px;
+    --cta-pad: 11px 24px 10px 24px;
+  }
+
+  /* No clip-path. The .frame has no background, so the only opaque
+     regions are the absolutely-positioned wordmark, card, and CTA.
+     Everywhere else is transparent and the underlying footage shows
+     through. */
+</style>
+</head>
+<body>
+<div class="frame">
+  <!-- Top wordmark band -->
+  <div class="wordmark">
+    <div class="h"><em>Their</em> name<br>in their <em>story</em>.</div>
+    <div class="sub">Made by hand. By a dad and his son.</div>
+  </div>
+
+  <!-- The single morphing card -->
+  <div class="card" id="card">
+    <div class="card-head">
+      <div class="card-num" id="card-num">1</div>
+      <div class="card-head-text" id="card-head-text">What kind?</div>
+      <div class="card-step-counter" id="card-step-counter">1 / 3</div>
+    </div>
+
+    <!-- State 1: WHAT KIND -->
+    <div class="state" id="state-1">
+      <div class="kind-row">
+        <div class="kind-chip" id="kind-bedtime"><span class="icon">🌙</span>A bedtime story</div>
+        <div class="kind-chip" id="kind-adventure"><span class="icon">⭐</span>A bigger adventure</div>
+      </div>
+    </div>
+
+    <!-- State 2: THE COUSINS (was "The kids" — relationship type
+         is "cousins" not "siblings"; mirrors the sibling_dynamics
+         free-text field on the form). -->
+    <div class="state" id="state-2">
+      <div class="kid-row" id="kid-1">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-1-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-1-age"></span></div>
+      </div>
+      <div class="kid-row" id="kid-2">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-2-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-2-age"></span></div>
+      </div>
+      <div class="kid-row" id="kid-3">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-3-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-3-age"></span></div>
+      </div>
+    </div>
+
+    <!-- State 3: THE WORLD
+         Each row mirrors a real /start form field:
+         Row 1 = place (chip + "OR A REAL PLACE THEY LOVE" free-text)
+         Row 2 = themesOther ("OR TELL US SOMETHING ELSE" on themes step)
+         Row 3 = others ("OTHER PEOPLE IN THE STORY (OPTIONAL)" on casting step)
+         Row 4 = per-child quirk ("SOMETHING SPECIAL ABOUT [CHILD]'S") -->
+    <div class="state" id="state-3">
+      <div class="world-row" id="world-1">
+        <div class="label">Place</div>
+        <div class="value" id="world-1-value"></div>
+      </div>
+      <div class="world-row" id="world-2">
+        <div class="label">What they love</div>
+        <div class="value" id="world-2-value"></div>
+      </div>
+      <div class="world-row" id="world-3">
+        <div class="label">Other people</div>
+        <div class="value" id="world-3-value"></div>
+      </div>
+      <div class="world-row" id="world-4">
+        <div class="label">About Chase</div>
+        <div class="value" id="world-4-value"></div>
+      </div>
+    </div>
+
+    <!-- State 4: HOW IT WORKS -->
+    <div class="state" id="state-4">
+      <div class="how-row">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-text">Write your kids' story</div>
+          <div class="step-sub">a few quick questions on heartheirname.com</div>
+        </div>
+      </div>
+      <div class="how-row">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-text">Listen to the <em>FREE 2-min</em> preview</div>
+          <div class="step-sub">within 24 hours, by email</div>
+        </div>
+      </div>
+      <div class="how-row">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-text">Buy the full story for £24.99</div>
+          <div class="step-sub">only if it wins you over</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom CTA — two-line pill: action + offer.
+       Primary: emotional pull (make a story for the kids you love)
+       Secondary: offer reminder (free 2-min preview) -->
+  <div class="cta">
+    <span class="cta-pill" id="cta-pill">
+      <span class="cta-primary">Make a story for the kids you love</span>
+      <span class="cta-secondary">free 2-min preview</span>
+    </span>
+  </div>
+</div>
+
+<script>
+  // State timeline. Each state shows for its window. Values type in
+  // progressively within that window so you can see the form being
+  // "filled in" before it cycles to the next state.
+
+  const STATES = [
+    {
+      id: 'state-1', num: '1', title: 'What kind?', counter: '1 / 3',
+      start: 1.0, end: 6.5,
+      // Selection animation: A bigger adventure highlights at start+1
+      onTime: (t, local) => {
+        if (local >= 1.0) document.getElementById('kind-adventure').classList.add('selected');
+        else document.getElementById('kind-adventure').classList.remove('selected');
+      }
+    },
+    {
+      id: 'state-2', num: '2', title: 'The cousins', counter: '2 / 3',
+      start: 7.0, end: 13.5,
+      kids: [
+        { name: 'Chase', age: '9', start: 0.4 },
+        { name: 'Darcy', age: '5', start: 1.7 },
+        { name: 'Ethan', age: '3', start: 3.0 },
+      ],
+      onTime: (t, local, spec) => {
+        for (let i = 0; i < spec.kids.length; i++) {
+          const k = spec.kids[i];
+          const row = document.getElementById(`kid-${i+1}`);
+          if (local < k.start) {
+            row.style.opacity = '0';
+            document.getElementById(`kid-${i+1}-name`).textContent = '';
+            document.getElementById(`kid-${i+1}-age`).textContent = '';
+            continue;
+          }
+          row.style.opacity = '1';
+          // Type chars across 0.7s
+          const localK = local - k.start;
+          const typeProgress = Math.min(1, localK / 0.7);
+          const charsName = Math.ceil(k.name.length * typeProgress);
+          const charsAge = Math.ceil(k.age.length * typeProgress);
+          document.getElementById(`kid-${i+1}-name`).textContent = k.name.slice(0, charsName);
+          document.getElementById(`kid-${i+1}-age`).textContent = k.age.slice(0, charsAge);
+        }
+      }
+    },
+    {
+      id: 'state-3', num: '3', title: 'The world', counter: '3 / 3',
+      start: 14.0, end: 20.5,
+      worlds: [
+        // Each row mirrors a real form field:
+        // 1) place chip / placeReal free-text
+        // 2) themesOther ("OR TELL US SOMETHING ELSE" on themes step)
+        // 3) others ("OTHER PEOPLE IN THE STORY (OPTIONAL)" on casting step)
+        // 4) per-child quirk ("SOMETHING SPECIAL ABOUT [CHILD]'S")
+        { label: 'Place',           value: "Nanny's House",            start: 0.4 },
+        { label: 'What they love',  value: 'Home Alone',                start: 1.7 },
+        { label: 'Other people',    value: 'Nanny',                     start: 3.0 },
+        { label: 'About Chase',     value: 'always has his shoes on',   start: 4.2 },
+      ],
+      onTime: (t, local, spec) => {
+        for (let i = 0; i < spec.worlds.length; i++) {
+          const w = spec.worlds[i];
+          const row = document.getElementById(`world-${i+1}`);
+          if (local < w.start) {
+            row.style.opacity = '0';
+            document.getElementById(`world-${i+1}-value`).textContent = '';
+            continue;
+          }
+          row.style.opacity = '1';
+          const localK = local - w.start;
+          const typeProgress = Math.min(1, localK / 0.8);
+          const chars = Math.ceil(w.value.length * typeProgress);
+          document.getElementById(`world-${i+1}-value`).textContent = w.value.slice(0, chars);
+        }
+      }
+    },
+    // State 4 (HOW IT WORKS) intentionally disabled. The subbed source already
+    // has a baked-in "+ MAKE YOURS / Free 2-min preview" chip around t=20-23
+    // and it would visually conflict with our card. Better to let the original
+    // chip have the spotlight: card disappears after state 3 ends.
+  ];
+
+  // After state 3 ends, hide the card entirely so the original mid-ad CTA chip
+  // (which is below the card position anyway) gets clean attention.
+  const CARD_HIDE_AFTER = 20.7;
+
+  function clearAll() {
+    for (const s of STATES) {
+      document.getElementById(s.id).classList.remove('is-active');
+    }
+    document.getElementById('cta-pill').classList.remove('is-pulsing');
+  }
+
+  function applyState(state, t) {
+    document.getElementById('card-num').textContent = state.num;
+    document.getElementById('card-head-text').textContent = state.title;
+    document.getElementById('card-step-counter').textContent = state.counter;
+    document.getElementById(state.id).classList.add('is-active');
+    if (state.onTime) state.onTime(t, t - state.start, state);
+  }
+
+  function setTime(t) {
+    clearAll();
+    const card = document.getElementById('card');
+    const ctaPill = document.getElementById('cta-pill');
+
+    // The source's mid-ad CTA / modesty chip is on screen roughly
+    // t=17 to t=23. Hide our floating bottom pill during that window
+    // so it doesn't compete for attention or visually overlap (which
+    // happens in the 4:5 and 1:1 crops where vertical space is tighter).
+    const SOURCE_CHIP_START = 16.5;
+    const SOURCE_CHIP_END = 23.5;
+    if (t >= SOURCE_CHIP_START && t <= SOURCE_CHIP_END) {
+      ctaPill.style.opacity = '0';
+    } else {
+      ctaPill.style.opacity = '1';
+    }
+
+    // Hide card entirely after the form has finished filling, so the
+    // original ad's mid-ad CTA chip and the rest of the closing arc
+    // get clean focus.
+    if (t >= CARD_HIDE_AFTER) {
+      card.style.opacity = '0';
+      return;
+    }
+    card.style.opacity = '1';
+
+    // Find current state.
+    let active = STATES[0];
+    for (const s of STATES) {
+      if (t >= s.start) active = s;
+    }
+    if (t < STATES[0].start) {
+      document.getElementById('card-num').textContent = STATES[0].num;
+      document.getElementById('card-head-text').textContent = STATES[0].title;
+      document.getElementById('card-step-counter').textContent = STATES[0].counter;
+      return;
+    }
+    applyState(active, t);
+  }
+
+  const params = new URLSearchParams(location.search);
+  const fmt = params.get('fmt') || '916';
+  const initialT = parseFloat(params.get('t') || '0');
+  document.body.setAttribute('data-fmt', fmt);
+
+  window.setTime = setTime;
+  document.fonts.ready.then(() => {
+    setTime(initialT);
+    document.body.setAttribute('data-ready', 'true');
+  });
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-// GET /api/account/me — returns the signed-in user's stories (v2 only).
+// GET /api/account/me: returns the signed-in user's stories (v2 only).
 
 import { getSessionFromHeaders, clearSessionCookie } from './lib/auth.mjs';
 

@@ -46,8 +46,10 @@
 # [functions."retry-worker"]
 #   schedule = "*/5 * * * *"
 
-[functions."followup-worker"]
-  schedule = "*/30 * * * *"
+# followup-worker.mjs deleted along with resend-verify.mjs, send-login-code.mjs,
+# request-story.mjs and send-email.mjs (May 2026). All five powered the old
+# verify-then-wait flow which the in-browser flow replaced. None had any
+# active customer-facing call sites.
 
 
 [[edge_functions]]
@@ -144,11 +146,6 @@
   status = 200
 
 [[redirects]]
-  from = "/api/resend-verify"
-  to = "/.netlify/functions/resend-verify"
-  status = 200
-
-[[redirects]]
   from = "/api/checkout-paid"
   to = "/.netlify/functions/checkout-paid"
   status = 200
@@ -169,11 +166,6 @@
   status = 200
 
 [[redirects]]
-  from = "/api/refund-request"
-  to = "/.netlify/functions/refund-request"
-  status = 200
-
-[[redirects]]
   from = "/api/gift-claim"
   to = "/.netlify/functions/gift-claim"
   status = 200
@@ -181,6 +173,11 @@
 [[redirects]]
   from = "/verify"
   to = "/.netlify/functions/verify"
+  status = 200
+
+[[redirects]]
+  from = "/thanks"
+  to = "/thanks.html"
   status = 200
 
 [[redirects]]

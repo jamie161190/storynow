@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Maya variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Maya 8s ad variants. Three positional variants share the same plum +
+     terra brand chrome and a single static form-card state. The card
+     content is identical across variants (STEP 2 / Who's the story for? /
+     Maya · 5 / Continue) — the variation is WHERE the card and the
+     subtitle sit on the frame. Driven by ?variant=1|2|3 + window.setTime.
+  */
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: transparent; }
+
+  :root {
+    --plum-deep: #1F1A2E;
+    --plum-card: #2F283A;
+    --plum-card-border: rgba(216, 122, 62, .35);
+    --plum-row: #3E3845;
+    --plum-row-border: rgba(255,255,255,.05);
+    --terra: #D87A3E;
+    --terra-soft: rgba(216, 122, 62, .85);
+    --gold-label: #C8B385;
+    --paper-italic: #EFE3CB;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--paper-italic);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .frame { position: relative; width: 100%; height: 100%; }
+
+  /* Top wordmark band — appears in V1 and V2 (combined with card in V1) */
+  .wordmark {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    background: var(--plum-deep);
+    padding: 22px 36px 18px 36px;
+    z-index: 2;
+  }
+  .wordmark .h {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1.05;
+    color: #fff;
+  }
+  .wordmark .h em { color: var(--terra); font-style: italic; }
+  .wordmark .sub {
+    margin-top: 6px;
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+    font-weight: 400;
+  }
+
+  /* Form card — same content across variants, position differs */
+  .card {
+    position: absolute;
+    left: 50px; right: 50px;
+    background: var(--plum-card);
+    border: 1.5px solid var(--plum-card-border);
+    border-radius: 22px;
+    padding: 22px 28px 22px 28px;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,.65);
+    z-index: 3;
+  }
+  .card .step-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 11.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold-label);
+    margin-bottom: 8px;
+  }
+  .card .heading {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 500;
+    font-size: 30px;
+    line-height: 1.1;
+    color: #fff;
+    margin: 0 0 14px 0;
+  }
+  .card .heading em { font-style: italic; color: var(--terra); }
+
+  .kid-row {
+    display: flex;
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+  .kid-row .name-cell {
+    flex: 1 1 auto;
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--paper-italic);
+  }
+  .kid-row .name-cell .label,
+  .kid-row .age-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 10px;
+    color: var(--gold-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .kid-row .age-cell {
+    flex: 0 0 100px;
+    padding: 13px 16px;
+    background: rgba(0,0,0,.18);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--paper-italic);
+  }
+
+  .continue-row { display: flex; justify-content: flex-end; }
+  .continue-btn {
+    background: var(--terra);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 12px 22px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Subtitle pill (the "TONIGHT'S STORY IS HERS." mono pill) and
+     subtitle text (the "Her cousin Leo crowded in to look," dialog) */
+  .subtitle-stack {
+    position: absolute;
+    left: 0; right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 4;
+  }
+  .sub-pill {
+    background: var(--plum-deep);
+    border: 1px solid rgba(216, 122, 62, .4);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 11px 22px 10px 18px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sub-pill::before {
+    content: "";
+    display: inline-block;
+    width: 10px; height: 10px;
+    background: var(--terra);
+    border-radius: 999px;
+  }
+  .sub-text {
+    background: var(--plum-deep);
+    color: #fff;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1.2;
+    padding: 14px 28px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 920px;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,.5);
+  }
+
+  /* Bottom CTA pill */
+  .cta {
+    position: absolute;
+    bottom: 30px;
+    left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .cta-pill {
+    background: var(--terra);
+    color: #fff;
+    padding: 14px 32px 12px 32px;
+    border-radius: 24px;
+    text-align: center;
+    line-height: 1.18;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .cta-pill .cta-primary { font-weight: 700; font-size: 22px; letter-spacing: .005em; }
+  .cta-pill .cta-secondary { font-weight: 500; font-size: 14px; opacity: .9; letter-spacing: .015em; }
+
+  /* ============================================================
+     VARIANT 1 — card above her head (slim, top of frame)
+     subtitle stack at bottom
+     ============================================================ */
+  body[data-variant="1"] .wordmark {
+    /* Wordmark merged into card area — keep it but smaller */
+    padding: 16px 36px 12px 36px;
+  }
+  body[data-variant="1"] .wordmark .h { font-size: 26px; }
+  body[data-variant="1"] .wordmark .sub { font-size: 11px; margin-top: 4px; }
+  body[data-variant="1"] .card {
+    top: 110px;
+    padding: 16px 24px 16px 24px;
+    border-radius: 18px;
+  }
+  body[data-variant="1"] .card .step-counter { font-size: 10.5px; margin-bottom: 4px; }
+  body[data-variant="1"] .card .heading { font-size: 22px; margin-bottom: 10px; }
+  body[data-variant="1"] .card .kid-row { margin-bottom: 8px; }
+  body[data-variant="1"] .card .kid-row .name-cell { font-size: 18px; padding: 9px 14px; }
+  body[data-variant="1"] .card .kid-row .age-cell { font-size: 18px; padding: 9px 14px; flex: 0 0 80px; }
+  body[data-variant="1"] .card .continue-btn { font-size: 13px; padding: 9px 18px; }
+  body[data-variant="1"] .subtitle-stack {
+    bottom: 240px;
+  }
+
+  /* ============================================================
+     VARIANT 2 — card below her body, subtitle stack at top
+     ============================================================ */
+  body[data-variant="2"] .card {
+    bottom: 230px;
+  }
+  body[data-variant="2"] .subtitle-stack {
+    top: 150px;
+  }
+
+  /* ============================================================
+     VARIANT 3 — card below her body, subtitle stack also at bottom
+     (stacked together, mirroring the existing finished ad)
+     ============================================================ */
+  body[data-variant="3"] .card {
+    bottom: 480px;
+  }
+  body[data-variant="3"] .subtitle-stack {
+    bottom: 240px;
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="wordmark" id="wordmark">
+    <div class="h"><em>Their</em> name in their <em>story</em>.</div>
+    <div class="sub">Made by hand. By a dad and his son.</div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="step-counter">STEP 2 OF 11</div>
+    <h2 class="heading">Who's the story for?</h2>
+    <div class="kid-row">
+      <div class="name-cell"><span class="label">Name</span><span>Maya</span></div>
+      <div class="age-cell"><span class="label">Age</span><span>5</span></div>
+    </div>
+    <div class="continue-row">
+      <span class="continue-btn">Continue <span style="font-size:16px;line-height:1">→</span></span>
+    </div>
+  </div>
+
+  <div class="subtitle-stack" id="subtitle-stack">
+    <span class="sub-pill" id="sub-pill">TONIGHT'S STORY IS HERS.</span>
+    <span class="sub-text" id="sub-text">Her cousin Leo crowded in to look,</span>
+  </div>
+
+  <div class="cta">
+    <span class="cta-pill">
+      <span class="cta-primary">Make a story for the kids you love</span>
+      <span class="cta-secondary">free 2-min preview</span>
+    </span>
+  </div>
+</div>
+
+<script>
+  // The subtitle pill + text fade in slightly after the card so the
+  // viewer reads the form first, then the dialogue. Kept simple for
+  // an 8s clip.
+  const SUB_PILL_START = 0.5;
+  const SUB_TEXT_START = 2.5;
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function setTime(t) {
+    const pill = document.getElementById('sub-pill');
+    const text = document.getElementById('sub-text');
+    pill.style.opacity = String(clamp((t - SUB_PILL_START) / 0.4, 0, 1));
+    text.style.opacity = String(clamp((t - SUB_TEXT_START) / 0.4, 0, 1));
+  }
+
+  const params = new URLSearchParams(location.search);
+  const variant = params.get('variant') || '1';
+  document.body.setAttribute('data-variant', variant);
+
+  // Hide subtitle elements that this variant doesn't want
+  // (none currently - all variants show both pill and text)
+
+  window.setTime = setTime;
+  document.fonts.ready.then(() => {
+    setTime(parseFloat(params.get('t') || '0'));
+    document.body.setAttribute('data-ready', 'true');
+  });
+</script>
+</body>
+</html>

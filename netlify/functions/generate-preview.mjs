@@ -1,5 +1,5 @@
 // ============================================================
-// GENERATE PREVIEW — Rate limiting only
+// GENERATE PREVIEW: Rate limiting only
 // Actual generation runs in full-worker-background (mode=preview)
 // which has a 15-minute timeout and saves results to Supabase.
 // ============================================================

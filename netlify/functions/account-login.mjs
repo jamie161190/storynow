@@ -43,7 +43,7 @@ export default async (req) => {
   );
   const rows = lookup.ok ? await lookup.json() : [];
   if (!rows.length){
-    // Don't leak info — pretend we sent regardless.
+    // Don't leak info; pretend we sent regardless.
     return json({ ok: true });
   }
 

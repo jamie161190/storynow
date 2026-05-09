@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Side panel Card 3 (THE WORLD)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ---------------------------------------------------------------
+     Card 3 of the v3 side-panel ad. Replaces the original "THE STORY"
+     card (which had fictitious labels: SETTING / FAVOURITE FILM /
+     ANOTHER CHARACTER) with "THE WORLD" using labels that match the
+     real /start questionnaire: PLACE / BEST FRIEND / THEIR TOY.
+
+     The HTML is rendered at three sizes by Puppeteer to match the
+     bounding box of Card 3 in each aspect ratio output:
+       - 9:16 → 277 x 420 px
+       - 4:5  → 277 x 291 px
+       - 1:1  → 427 x 238 px
+
+     Sizing is driven by the body data attribute set via query string,
+     so a single template handles all three.
+  --------------------------------------------------------------- */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: transparent; }
+
+  :root {
+    --plum-deep: #1F1A2E;
+    --plum-card: #2F283A;
+    --plum-card-border: #423B4B;
+    --plum-row: #3E3845;
+    --plum-row-border: rgba(255,255,255,.05);
+    --terra: #D87A3E;
+    --terra-soft: rgba(216, 122, 62, .85);
+    --gold-label: #C8B385;
+    --paper-italic: #EFE3CB;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--paper-italic);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .card {
+    width: 100%;
+    height: 100%;
+    background: var(--plum-card);
+    border: 1px solid var(--plum-card-border);
+    border-radius: var(--radius);
+    padding: var(--pad);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: var(--head-gap);
+  }
+  .num {
+    width: var(--num-size);
+    height: var(--num-size);
+    border-radius: 999px;
+    background: var(--terra);
+    color: var(--plum-deep);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: var(--num-font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .head-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: var(--head-font);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--terra);
+  }
+
+  .rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--row-gap);
+    flex: 1 1 auto;
+  }
+  .row {
+    display: flex;
+    flex-direction: column;
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: var(--row-radius);
+    padding: var(--cell-pad);
+    gap: 2px;
+  }
+  .row .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .row .value {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    line-height: 1.1;
+  }
+
+  .pill-row-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-top: var(--pill-row-margin);
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pill-gap);
+    margin-top: var(--pill-margin);
+  }
+  .pill {
+    border: 1px solid var(--terra-soft);
+    color: var(--terra-soft);
+    background: transparent;
+    border-radius: 999px;
+    padding: var(--pill-pad);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--pill-font);
+    letter-spacing: .01em;
+    white-space: nowrap;
+  }
+
+  /* 9:16 (277 x 420) ----------------------------------------- */
+  body[data-fmt="916"] {
+    --radius: 18px;
+    --pad: 16px 14px 18px 14px;
+    --gap: 14px;
+    --head-gap: 10px;
+    --num-size: 26px;
+    --num-font: 13px;
+    --head-font: 12px;
+    --row-gap: 6px;
+    --row-radius: 10px;
+    --cell-pad: 7px 12px 9px 12px;
+    --label-font: 9px;
+    --value-font: 17px;
+    --pill-row-margin: 4px;
+    --pill-margin: 6px;
+    --pill-gap: 5px;
+    --pill-pad: 5px 11px;
+    --pill-font: 11px;
+  }
+
+  /* 4:5 (277 x 291) ------------------------------------------ */
+  body[data-fmt="45"] {
+    --radius: 16px;
+    --pad: 12px 14px;
+    --gap: 10px;
+    --head-gap: 8px;
+    --num-size: 22px;
+    --num-font: 11px;
+    --head-font: 11px;
+    --row-gap: 4px;
+    --row-radius: 8px;
+    --cell-pad: 5px 10px 7px 10px;
+    --label-font: 8px;
+    --value-font: 14px;
+    --pill-row-margin: 2px;
+    --pill-margin: 4px;
+    --pill-gap: 4px;
+    --pill-pad: 4px 9px;
+    --pill-font: 10px;
+  }
+
+  /* 1:1 (427 x 238) ------------------------------------------ */
+  body[data-fmt="11"] {
+    --radius: 14px;
+    --pad: 12px 16px;
+    --gap: 10px;
+    --head-gap: 10px;
+    --num-size: 24px;
+    --num-font: 12px;
+    --head-font: 12px;
+    --row-gap: 5px;
+    --row-radius: 8px;
+    --cell-pad: 5px 12px 7px 12px;
+    --label-font: 9px;
+    --value-font: 15px;
+    --pill-row-margin: 4px;
+    --pill-margin: 4px;
+    --pill-gap: 5px;
+    --pill-pad: 4px 10px;
+    --pill-font: 10px;
+  }
+
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="head">
+      <div class="num">3</div>
+      <div class="head-text">The world</div>
+    </div>
+
+    <div class="rows">
+      <div class="row">
+        <div class="label">Place</div>
+        <div class="value">Nanny's House</div>
+      </div>
+      <div class="row">
+        <div class="label">Best Friend</div>
+        <div class="value">Maya</div>
+      </div>
+      <div class="row">
+        <div class="label">Their Toy</div>
+        <div class="value">Bear-Bear</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="pill-row-label">Optional extras</div>
+      <div class="pills">
+        <span class="pill">+ themes</span>
+        <span class="pill">+ pet</span>
+        <span class="pill">+ a bit only you'd know</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Read ?fmt=916|45|11 and apply tokens via data attribute
+    const fmt = new URLSearchParams(location.search).get('fmt') || '916';
+    document.body.setAttribute('data-fmt', fmt);
+    // Mark ready so Puppeteer can wait
+    document.fonts.ready.then(() => {
+      document.body.setAttribute('data-ready', 'true');
+    });
+  </script>
+</body>
+</html>

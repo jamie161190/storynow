@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Side panel animated</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Full-frame v5 side-panel overlay. Same plum chrome as v3 but with the
+     left rail animated across t=0..29s. Right pane is transparent so the
+     original Home Alone footage shows through unchanged.
+
+     Time is driven by window.setTime(t), called externally by the
+     Puppeteer renderer once per frame. Each animated element has a
+     start time and a 0.4s fade-in duration; opacity is computed from
+     (t - start) / 0.4, clamped to [0,1]. This means we can render at
+     any fps and still get smooth fades, because the opacity is
+     time-derived, not animation-driven. */
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: transparent; }
+
+  :root {
+    --plum-deep: #1F1A2E;
+    --plum-card: #2F283A;
+    --plum-card-border: #423B4B;
+    --plum-row: #3E3845;
+    --plum-row-border: rgba(255,255,255,.05);
+    --terra: #D87A3E;
+    --terra-soft: rgba(216, 122, 62, .85);
+    --gold-label: #C8B385;
+    --paper-italic: #EFE3CB;
+    --paper: #F4ECDB;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--paper-italic);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--plum-deep);
+  }
+
+  /* The transparent window where the Home Alone footage from the original
+     video shows through. Position and size set per format below. */
+  .pane-hole {
+    position: absolute;
+    background: transparent;
+    /* Critical: punch a hole so the underlying video shows through */
+    /* Achieved by making the frame have a clip-path that excludes this */
+  }
+
+  /* We use a CSS clip-path on the .frame to punch the right pane hole.
+     mask-image with a radial-gradient or polygon would be simpler but
+     clip-path is well supported and produces a clean cutout. */
+
+  /* Top wordmark band */
+  .wordmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: var(--word-pad);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+  .wordmark .h {
+    font-style: italic;
+    font-weight: 500;
+    font-size: var(--word-h);
+    line-height: 1.05;
+    color: #fff;
+  }
+  .wordmark .h em {
+    color: var(--terra);
+    font-style: italic;
+  }
+  .wordmark .sub {
+    margin-top: var(--word-sub-margin);
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-size: var(--word-sub);
+    color: rgba(255,255,255,.55);
+    font-weight: 400;
+  }
+
+  /* Left rail */
+  .rail {
+    position: absolute;
+    top: var(--rail-top);
+    left: var(--rail-left);
+    width: var(--rail-width);
+    bottom: var(--rail-bottom);
+    display: flex;
+    flex-direction: column;
+    gap: var(--rail-gap);
+  }
+
+  .card {
+    background: var(--plum-card);
+    border: 1px solid var(--plum-card-border);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad);
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-gap);
+  }
+
+  .card.glow {
+    box-shadow: 0 0 0 0 rgba(216, 122, 62, 0);
+    transition: box-shadow .4s ease;
+  }
+  .card.is-glowing {
+    box-shadow: 0 0 32px 4px rgba(216, 122, 62, .35);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: var(--head-gap);
+  }
+  .num {
+    width: var(--num-size);
+    height: var(--num-size);
+    border-radius: 999px;
+    background: var(--terra);
+    color: var(--plum-deep);
+    font-weight: 700;
+    font-size: var(--num-font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+  .head-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: var(--head-font);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--terra);
+  }
+
+  /* Card 1: WHAT KIND chips */
+  .kind-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--row-gap);
+    margin-top: 4px;
+  }
+  .kind-chip {
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: var(--row-radius);
+    padding: var(--cell-pad);
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    font-style: italic;
+    position: relative;
+  }
+  .kind-chip .icon {
+    font-size: var(--value-font);
+    margin-bottom: 2px;
+    display: block;
+  }
+  .kind-chip.selected {
+    background: rgba(216, 122, 62, .12);
+    border-color: var(--terra);
+  }
+
+  /* Card 2: name+age rows */
+  .kid-row {
+    display: flex;
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: var(--row-radius);
+    overflow: hidden;
+  }
+  .kid-row .name-cell {
+    flex: 1 1 auto;
+    padding: var(--cell-pad);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .kid-row .name-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .kid-row .age-cell {
+    flex: 0 0 var(--age-w);
+    padding: var(--cell-pad);
+    background: rgba(0,0,0,.18);
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .kid-row .age-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .pill-row-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-top: var(--pill-row-margin);
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pill-gap);
+    margin-top: var(--pill-margin);
+  }
+  .pill {
+    border: 1px solid var(--terra-soft);
+    color: var(--terra-soft);
+    background: transparent;
+    border-radius: 999px;
+    padding: var(--pill-pad);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: var(--pill-font);
+    white-space: nowrap;
+  }
+
+  /* Card 3: world rows (label above value) */
+  .world-row {
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: var(--row-radius);
+    padding: var(--cell-pad);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .world-row .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: var(--label-font);
+    color: var(--gold-label);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .world-row .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: var(--value-font);
+    color: var(--paper-italic);
+    line-height: 1.1;
+  }
+
+  /* Card 4: how it works */
+  .how-row {
+    display: flex;
+    gap: var(--how-gap);
+    align-items: flex-start;
+  }
+  .how-row .step-num {
+    width: var(--step-size);
+    height: var(--step-size);
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    color: rgba(255,255,255,.7);
+    font-weight: 600;
+    font-size: var(--step-font);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin-top: 1px;
+  }
+  .how-row .step-text {
+    font-size: var(--step-text);
+    line-height: 1.25;
+    color: #fff;
+    font-weight: 500;
+  }
+  .how-row .step-text em {
+    color: var(--terra);
+    font-style: normal;
+    font-weight: 600;
+  }
+  .how-row .step-sub {
+    font-size: var(--step-sub);
+    color: rgba(255,255,255,.55);
+    margin-top: 1px;
+  }
+
+  /* Bottom CTA pill */
+  .cta {
+    position: absolute;
+    bottom: var(--cta-bottom);
+    left: var(--cta-left);
+    right: var(--cta-right);
+    text-align: center;
+  }
+  .cta-pill {
+    display: inline-block;
+    background: var(--terra);
+    color: #fff;
+    font-weight: 700;
+    font-size: var(--cta-font);
+    padding: var(--cta-pad);
+    border-radius: 999px;
+    letter-spacing: .01em;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .cta-pill.is-pulsing {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 8px rgba(216, 122, 62, .15);
+  }
+
+  /* Animated value visibility */
+  .value-anim, .row-anim, .chip-anim {
+    transition: opacity .15s linear;
+  }
+
+  /* ============================================================
+     Format dimensions and proportions
+     ============================================================ */
+
+  /* 9:16 (1080x1920) */
+  body[data-fmt="916"] {
+    --word-pad: 30px 36px 24px 36px;
+    --word-h: 38px;
+    --word-sub: 14px;
+    --word-sub-margin: 8px;
+
+    --rail-top: 180px;
+    --rail-left: 22px;
+    --rail-width: 280px;
+    --rail-bottom: 110px;
+    --rail-gap: 20px;
+
+    --card-radius: 18px;
+    --card-pad: 16px 14px;
+    --card-gap: 14px;
+
+    --head-gap: 10px;
+    --num-size: 26px;
+    --num-font: 13px;
+    --head-font: 12px;
+
+    --row-gap: 6px;
+    --row-radius: 10px;
+    --cell-pad: 7px 12px 9px 12px;
+    --label-font: 9px;
+    --value-font: 17px;
+    --age-w: 72px;
+
+    --pill-row-margin: 4px;
+    --pill-margin: 6px;
+    --pill-gap: 5px;
+    --pill-pad: 5px 11px;
+    --pill-font: 11px;
+
+    --how-gap: 10px;
+    --step-size: 18px;
+    --step-font: 11px;
+    --step-text: 14px;
+    --step-sub: 11px;
+
+    --cta-bottom: 36px;
+    --cta-left: 22px;
+    --cta-right: auto;
+    --cta-font: 18px;
+    --cta-pad: 14px 32px;
+  }
+
+  /* 4:5 (1080x1350) */
+  body[data-fmt="45"] {
+    --word-pad: 22px 30px 18px 30px;
+    --word-h: 32px;
+    --word-sub: 12px;
+    --word-sub-margin: 6px;
+
+    --rail-top: 130px;
+    --rail-left: 22px;
+    --rail-width: 280px;
+    --rail-bottom: 90px;
+    --rail-gap: 14px;
+
+    --card-radius: 16px;
+    --card-pad: 12px 14px;
+    --card-gap: 10px;
+
+    --head-gap: 8px;
+    --num-size: 22px;
+    --num-font: 11px;
+    --head-font: 11px;
+
+    --row-gap: 4px;
+    --row-radius: 8px;
+    --cell-pad: 5px 10px 7px 10px;
+    --label-font: 8px;
+    --value-font: 14px;
+    --age-w: 60px;
+
+    --pill-row-margin: 2px;
+    --pill-margin: 4px;
+    --pill-gap: 4px;
+    --pill-pad: 4px 9px;
+    --pill-font: 10px;
+
+    --how-gap: 8px;
+    --step-size: 16px;
+    --step-font: 10px;
+    --step-text: 12px;
+    --step-sub: 10px;
+
+    --cta-bottom: 28px;
+    --cta-left: 22px;
+    --cta-right: auto;
+    --cta-font: 16px;
+    --cta-pad: 12px 28px;
+  }
+
+  /* 1:1 (1080x1080) */
+  body[data-fmt="11"] {
+    --word-pad: 18px 28px 14px 28px;
+    --word-h: 28px;
+    --word-sub: 11px;
+    --word-sub-margin: 5px;
+
+    --rail-top: 90px;
+    --rail-left: 22px;
+    --rail-width: 430px;
+    --rail-bottom: 75px;
+    --rail-gap: 12px;
+
+    --card-radius: 14px;
+    --card-pad: 12px 16px;
+    --card-gap: 10px;
+
+    --head-gap: 10px;
+    --num-size: 24px;
+    --num-font: 12px;
+    --head-font: 12px;
+
+    --row-gap: 5px;
+    --row-radius: 8px;
+    --cell-pad: 5px 12px 7px 12px;
+    --label-font: 9px;
+    --value-font: 15px;
+    --age-w: 80px;
+
+    --pill-row-margin: 4px;
+    --pill-margin: 4px;
+    --pill-gap: 5px;
+    --pill-pad: 4px 10px;
+    --pill-font: 10px;
+
+    --how-gap: 10px;
+    --step-size: 18px;
+    --step-font: 11px;
+    --step-text: 13px;
+    --step-sub: 10px;
+
+    --cta-bottom: 22px;
+    --cta-left: 22px;
+    --cta-right: auto;
+    --cta-font: 16px;
+    --cta-pad: 12px 28px;
+  }
+
+  /* Right pane hole — punched via clip-path on .frame
+     Per-format polygon excludes the rectangle where Home Alone footage shows. */
+  body[data-fmt="916"] .frame {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+      /* Hole: from (322, 200) to (1080, 1640). Coords in % of 1080x1920. */
+      29.81% 10.42%, 29.81% 85.42%, 100% 85.42%, 100% 10.42%, 29.81% 10.42%, 0 0
+    );
+  }
+  body[data-fmt="45"] .frame {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+      /* Hole: from (322, 130) to (1080, 1240). 1080x1350. */
+      29.81% 9.63%, 29.81% 91.85%, 100% 91.85%, 100% 9.63%, 29.81% 9.63%, 0 0
+    );
+  }
+  body[data-fmt="11"] .frame {
+    clip-path: polygon(
+      0 0, 100% 0, 100% 100%, 0 100%, 0 0,
+      /* Hole: from (470, 90) to (1080, 1010). 1080x1080. */
+      43.52% 8.33%, 43.52% 93.52%, 100% 93.52%, 100% 8.33%, 43.52% 8.33%, 0 0
+    );
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <!-- Top wordmark band -->
+  <div class="wordmark">
+    <div class="h"><em>Their</em> name<br>in their <em>story</em>.</div>
+    <div class="sub">Made by hand. By a dad and his son.</div>
+  </div>
+
+  <!-- Left rail -->
+  <div class="rail">
+    <!-- Card 1: WHAT KIND -->
+    <div class="card">
+      <div class="head">
+        <div class="num">1</div>
+        <div class="head-text">What kind?</div>
+      </div>
+      <div class="kind-row">
+        <div class="kind-chip" id="kind-bedtime"><span class="icon">🌙</span>A bedtime story</div>
+        <div class="kind-chip chip-anim" id="kind-adventure"><span class="icon">⭐</span>A bigger adventure</div>
+      </div>
+    </div>
+
+    <!-- Card 2: THE KIDS -->
+    <div class="card">
+      <div class="head">
+        <div class="num">2</div>
+        <div class="head-text">The kids</div>
+      </div>
+      <div class="kid-row row-anim" id="kid-1">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-1-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-1-age"></span></div>
+      </div>
+      <div class="kid-row row-anim" id="kid-2">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-2-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-2-age"></span></div>
+      </div>
+      <div class="kid-row row-anim" id="kid-3">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-3-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-3-age"></span></div>
+      </div>
+      <div>
+        <div class="pill-row-label">Also per kid</div>
+        <div class="pills">
+          <span class="pill">+ best friend</span>
+          <span class="pill">+ fave toy</span>
+          <span class="pill">+ quirk</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: THE WORLD -->
+    <div class="card">
+      <div class="head">
+        <div class="num">3</div>
+        <div class="head-text">The world</div>
+      </div>
+      <div class="world-row row-anim" id="world-1">
+        <div class="label">Place</div>
+        <div class="value" id="world-1-value"></div>
+      </div>
+      <div class="world-row row-anim" id="world-2">
+        <div class="label">Best friend</div>
+        <div class="value" id="world-2-value"></div>
+      </div>
+      <div class="world-row row-anim" id="world-3">
+        <div class="label">Their toy</div>
+        <div class="value" id="world-3-value"></div>
+      </div>
+      <div>
+        <div class="pill-row-label">Optional extras</div>
+        <div class="pills">
+          <span class="pill">+ themes</span>
+          <span class="pill">+ pet</span>
+          <span class="pill">+ a bit only you'd know</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: HOW IT WORKS -->
+    <div class="card glow" id="card-how">
+      <div class="head">
+        <div class="num">4</div>
+        <div class="head-text">How it works</div>
+      </div>
+      <div class="how-row">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-text">Write your kids' story</div>
+          <div class="step-sub">a few quick questions on heartheirname.com</div>
+        </div>
+      </div>
+      <div class="how-row">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-text">Listen to the <em>FREE 2-min</em> preview</div>
+          <div class="step-sub">within 24 hours, by email</div>
+        </div>
+      </div>
+      <div class="how-row">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-text">Buy the full story for £24.99</div>
+          <div class="step-sub">only if it wins you over</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom CTA -->
+  <div class="cta">
+    <span class="cta-pill" id="cta-pill">heartheirname.com</span>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // Animation timeline. Each animated element has a startTime
+  // (seconds) and a fadeDuration. setTime(t) computes opacity for
+  // each, plus typed-out text content (substring of full value).
+  // ============================================================
+
+  const TIMELINE = {
+    'kind-adventure':  { type: 'select',  start: 1.5 },
+    'kid-1':           { type: 'fadeRow', start: 3.5, name: 'Chase',  age: '9' },
+    'kid-2':           { type: 'fadeRow', start: 5.0, name: 'Darcy',  age: '5' },
+    'kid-3':           { type: 'fadeRow', start: 6.5, name: 'Ethan',  age: '3' },
+    'world-1':         { type: 'fadeRow', start: 9.0,  value: "Nanny's House" },
+    'world-2':         { type: 'fadeRow', start: 10.5, value: 'Maya' },
+    'world-3':         { type: 'fadeRow', start: 12.0, value: 'Bear-Bear' },
+    'card-how':        { type: 'glow',    start: 15.0, end: 17.0 },
+    'cta-pill':        { type: 'pulse',   start: 19.0, period: 3.0 },
+  };
+  const FADE_DURATION = 0.5; // seconds
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  // Initialise: hide everything that fades in, set all values empty
+  function init() {
+    for (const id of ['kid-1','kid-2','kid-3','world-1','world-2','world-3']) {
+      const el = document.getElementById(id);
+      if (el) el.style.opacity = '0';
+    }
+    document.getElementById('kid-1-name').textContent = '';
+    document.getElementById('kid-1-age').textContent = '';
+    document.getElementById('kid-2-name').textContent = '';
+    document.getElementById('kid-2-age').textContent = '';
+    document.getElementById('kid-3-name').textContent = '';
+    document.getElementById('kid-3-age').textContent = '';
+    document.getElementById('world-1-value').textContent = '';
+    document.getElementById('world-2-value').textContent = '';
+    document.getElementById('world-3-value').textContent = '';
+    document.getElementById('kind-adventure').classList.remove('selected');
+    document.getElementById('card-how').classList.remove('is-glowing');
+    document.getElementById('cta-pill').classList.remove('is-pulsing');
+  }
+
+  function setTime(t) {
+    init();
+    for (const [id, spec] of Object.entries(TIMELINE)) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+
+      if (spec.type === 'select') {
+        const opacity = clamp((t - spec.start) / FADE_DURATION, 0, 1);
+        if (opacity > 0) el.classList.add('selected');
+        // The select state is binary, no opacity tweening needed; the
+        // border + background change is the visual signal.
+      }
+      else if (spec.type === 'fadeRow') {
+        const localT = t - spec.start;
+        if (localT < 0) { el.style.opacity = '0'; continue; }
+        // Fade the row in, then progressively reveal the typed text
+        const rowFade = clamp(localT / FADE_DURATION, 0, 1);
+        el.style.opacity = String(rowFade);
+
+        // Typing animation: reveal characters over .8s after row fades in
+        const typeDuration = 0.8;
+        const typingProgress = clamp((localT - FADE_DURATION) / typeDuration, 0, 1);
+
+        if (id.startsWith('kid-')) {
+          const fullName = spec.name;
+          const fullAge = spec.age;
+          const charsName = Math.ceil(fullName.length * typingProgress);
+          const charsAge = Math.ceil(fullAge.length * typingProgress);
+          document.getElementById(id + '-name').textContent = fullName.slice(0, charsName);
+          document.getElementById(id + '-age').textContent = fullAge.slice(0, charsAge);
+        } else if (id.startsWith('world-')) {
+          const fullValue = spec.value;
+          const chars = Math.ceil(fullValue.length * typingProgress);
+          document.getElementById(id + '-value').textContent = fullValue.slice(0, chars);
+        }
+      }
+      else if (spec.type === 'glow') {
+        if (t >= spec.start && t <= spec.end) {
+          el.classList.add('is-glowing');
+        }
+      }
+      else if (spec.type === 'pulse') {
+        if (t < spec.start) continue;
+        // Cycle every spec.period seconds, pulse for first half
+        const phase = ((t - spec.start) % spec.period) / spec.period;
+        if (phase < 0.3) el.classList.add('is-pulsing');
+        else el.classList.remove('is-pulsing');
+      }
+    }
+  }
+
+  // Read ?fmt= and ?t= from URL
+  const params = new URLSearchParams(location.search);
+  const fmt = params.get('fmt') || '916';
+  const initialT = parseFloat(params.get('t') || '0');
+  document.body.setAttribute('data-fmt', fmt);
+
+  // Expose to renderer
+  window.setTime = setTime;
+
+  document.fonts.ready.then(() => {
+    setTime(initialT);
+    document.body.setAttribute('data-ready', 'true');
+  });
+</script>
+</body>
+</html>

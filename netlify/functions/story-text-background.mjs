@@ -58,7 +58,7 @@ export const handler = async (event) => {
     }
     console.log('[STORY-TEXT-BG] Brief confidence:', brief.confidence, 'flags:', JSON.stringify(brief.flags || []));
     if (brief.confidence === 'low') {
-      console.warn('[STORY-TEXT-BG] LOW CONFIDENCE BRIEF for', storyId, '— proceeding but review recommended.');
+      console.warn('[STORY-TEXT-BG] LOW CONFIDENCE BRIEF for', storyId, '- proceeding but review recommended.');
     }
     console.log('[STORY-TEXT-BG] Full brief:', JSON.stringify(brief, null, 2));
 

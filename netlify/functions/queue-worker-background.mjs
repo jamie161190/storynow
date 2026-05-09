@@ -69,7 +69,7 @@ export const handler = async (event) => {
     }
 
     // If we exited because of time but queue might still have work, self-retrigger.
-    // Don't release the slot — pass it to the successor. The successor will
+    // Don't release the slot: pass it to the successor. The successor will
     // eventually release it (or pass it on again).
     let passedSlot = false;
     if (Date.now() - startedAt >= MAX_RUNTIME_MS) {

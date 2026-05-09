@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hear Their Name Admin</title>
 <meta name="robots" content="noindex, nofollow">
-<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Quicksand', sans-serif; background: #FEFBF6; color: #2D2844; min-height: 100vh; }
@@ -22,8 +22,12 @@ body { font-family: 'Quicksand', sans-serif; background: #FEFBF6; color: #2D2844
 .admin .sub { color: #999; font-size: 0.82rem; margin-bottom: 1.5rem; }
 
 .tabs { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.tab { padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.82rem; font-weight: 700; cursor: pointer; border: 2px solid #E8E0F0; background: #fff; color: #2D2844; transition: all 0.2s; }
+.tab { padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.82rem; font-weight: 700; cursor: pointer; border: 2px solid #E8E0F0; background: #fff; color: #2D2844; transition: all 0.2s; display:inline-flex; align-items:center; gap:8px; }
 .tab.active { background: #6B2F93; color: #fff; border-color: #6B2F93; }
+.tab.attention-pulse { border-color:#F1753B; color:#F1753B; }
+.tab.attention-pulse.active { background:#F1753B; color:#fff; border-color:#F1753B; }
+.tab-badge { display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 6px; border-radius:999px; background:#F1753B; color:#fff; font-size:0.65rem; font-weight:800; line-height:1; }
+.tab.active .tab-badge { background:rgba(255,255,255,.32); }
 
 .card { background: #fff; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 0.75rem; box-shadow: 0 1px 6px rgba(0,0,0,0.04); border: 1px solid #F0ECF5; }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
@@ -66,6 +70,469 @@ audio { width: 100%; margin-top: 0.5rem; }
 .filter-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
 .filter-pill { padding: 0.35rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 700; cursor: pointer; border: 2px solid #E8E0F0; background: #fff; color: #666; }
 .filter-pill.active { background: #6B2F93; color: #fff; border-color: #6B2F93; }
+
+/* ────────────────────────────────────────────────────────────────────
+   STORY DETAIL OVERLAY
+   Full-screen workbench for one story. Brand-aligned aesthetic
+   (Newsreader serif + Instrument Sans + warm paper) so this surface
+   feels like the customer-facing pages, not a CRUD admin form.
+   ──────────────────────────────────────────────────────────────────── */
+:root {
+  --d-paper: #F4ECDB;
+  --d-paper-2: #EFE4CD;
+  --d-paper-3: #E7D9BA;
+  --d-ink: #1F1B2E;
+  --d-ink-2: #3D2E5A;
+  --d-muted: #5C5240;
+  --d-muted-2: #8A7E64;
+  --d-line: rgba(31, 27, 46, 0.14);
+  --d-line-2: #D6C7A4;
+  --d-plum: #4B2E83;
+  --d-plum-2: #7A55C9;
+  --d-terra: #D87A3E;
+  --d-terra-2: #C46A2E;
+  --d-green: #3A7560;
+  --d-red: #B84D4D;
+  --d-amber: #C68A2C;
+  --d-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --d-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --d-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+.story-detail-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 32, 0.55);
+  backdrop-filter: blur(6px);
+  z-index: 1500;
+  overflow-y: auto;
+}
+.story-detail-backdrop.active { display: block; }
+.story-detail-shell {
+  background: var(--d-paper);
+  color: var(--d-ink);
+  font-family: var(--d-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 100vh;
+  position: relative;
+  background-image: radial-gradient(rgba(80,60,30,.05) 1px,transparent 1px),
+                    radial-gradient(rgba(80,60,30,.04) 1px,transparent 1px);
+  background-size: 3px 3px,7px 7px;
+  background-position: 0 0,1px 2px;
+}
+.detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(244, 236, 219, 0.93);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--d-line);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.detail-header-text { flex: 1; min-width: 0; }
+.detail-eyebrow {
+  font-family: var(--d-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--d-muted-2);
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+.detail-headline {
+  font-family: var(--d-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  color: var(--d-ink);
+  margin: 0;
+}
+.detail-headline em { font-style: italic; color: var(--d-plum); }
+.detail-meta-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 12.5px;
+  color: var(--d-muted);
+}
+.detail-meta-row strong { color: var(--d-ink); font-weight: 600; }
+.detail-nav {
+  display: flex;
+  gap: 4px;
+  font-family: var(--d-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.detail-nav a {
+  color: var(--d-muted);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  transition: background .15s, color .15s, border-color .15s;
+  font-weight: 600;
+}
+.detail-nav a:hover { color: var(--d-ink); background: rgba(31,27,46,0.04); }
+.detail-close {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--d-line);
+  color: var(--d-muted);
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.detail-close:hover { background: rgba(31,27,46,0.06); color: var(--d-ink); border-color: var(--d-ink); }
+.detail-paid-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--d-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+.detail-paid-pill.is-blue { background: rgba(75,46,131,0.10); color: var(--d-plum); border: 1px solid rgba(75,46,131,0.28); }
+.detail-paid-pill.is-amber { background: rgba(198,138,44,0.12); color: var(--d-amber); border: 1px solid rgba(198,138,44,0.36); }
+.detail-paid-pill.is-red { background: rgba(184,77,77,0.12); color: var(--d-red); border: 1px solid rgba(184,77,77,0.42); font-weight: 700; }
+.detail-paid-pill.is-green { background: rgba(58,117,96,0.12); color: var(--d-green); border: 1px solid rgba(58,117,96,0.32); }
+
+.detail-body {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 28px 80px;
+}
+.detail-card {
+  background: rgba(255,253,247,0.7);
+  border: 1px solid var(--d-line);
+  border-radius: 18px;
+  padding: 28px 30px 24px;
+  margin: 0 0 22px;
+  position: relative;
+}
+.detail-card-num {
+  position: absolute;
+  top: -14px;
+  left: 24px;
+  width: 30px; height: 30px;
+  border-radius: 999px;
+  background: var(--d-ink);
+  color: #fff;
+  font-family: var(--d-mono);
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--d-line-2);
+}
+.detail-card-title {
+  font-family: var(--d-serif);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--d-ink);
+  margin: 0;
+}
+.detail-card-meta {
+  font-family: var(--d-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--d-muted-2);
+  font-weight: 600;
+}
+.detail-stale-strip {
+  background: rgba(198,138,44,0.10);
+  border: 1px solid rgba(198,138,44,0.32);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #6E4F1A;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-stale-strip::before {
+  content: "↻";
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--d-amber);
+}
+.detail-field-grid {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 16px 22px;
+  align-items: start;
+}
+.detail-field-grid > .label {
+  font-family: var(--d-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--d-muted-2);
+  font-weight: 600;
+  padding-top: 10px;
+  line-height: 1.4;
+}
+.detail-field-grid > .value {
+  font-size: 15px;
+  color: var(--d-ink);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.detail-input,
+.detail-textarea,
+.detail-select {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--d-sans);
+  font-size: 15px;
+  color: var(--d-ink);
+  background: #fff;
+  border: 1px solid var(--d-line);
+  border-radius: 10px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.detail-textarea {
+  font-family: var(--d-serif);
+  font-size: 16px;
+  line-height: 1.65;
+  resize: vertical;
+  min-height: 90px;
+}
+.detail-input:focus,
+.detail-textarea:focus,
+.detail-select:focus {
+  border-color: var(--d-plum);
+  box-shadow: 0 0 0 3px rgba(75,46,131,0.10);
+}
+.detail-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.detail-toggle {
+  appearance: none;
+  background: var(--d-paper-2);
+  border: 1px solid var(--d-line);
+  color: var(--d-muted);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-family: var(--d-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.detail-toggle.is-on {
+  background: var(--d-plum);
+  color: #fff;
+  border-color: var(--d-plum);
+}
+.detail-children-block { display: flex; flex-direction: column; gap: 18px; }
+.detail-child-card {
+  background: rgba(255,255,255,0.55);
+  border: 1px dashed var(--d-line-2);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.detail-child-card .detail-eyebrow { margin-bottom: 12px; }
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--d-line-2);
+}
+.d-btn {
+  appearance: none;
+  font-family: var(--d-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background .15s, transform .12s, opacity .15s;
+}
+.d-btn:active { transform: scale(.99); }
+.d-btn-primary { background: var(--d-ink); color: #fff; }
+.d-btn-primary:hover { background: var(--d-ink-2); }
+.d-btn-regen { background: var(--d-terra); color: #fff; }
+.d-btn-regen:hover { background: var(--d-terra-2); }
+.d-btn-ghost { background: transparent; border-color: var(--d-line); color: var(--d-ink); }
+.d-btn-ghost:hover { background: rgba(31,27,46,0.04); }
+.d-btn:disabled { opacity: 0.55; cursor: progress; }
+.detail-status {
+  font-size: 13px;
+  color: var(--d-muted);
+  margin-top: 12px;
+  font-style: italic;
+}
+.detail-status.is-ok { color: var(--d-green); font-style: normal; font-weight: 600; }
+.detail-status.is-err { color: var(--d-red); font-style: normal; font-weight: 600; }
+
+/* Customer messages panel */
+.detail-messages-card {
+  background: rgba(216,122,62,0.08);
+  border: 1px solid rgba(216,122,62,0.32);
+  border-radius: 18px;
+  padding: 24px 28px;
+  margin: 0 0 22px;
+}
+.detail-messages-head {
+  font-family: var(--d-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--d-terra-2);
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-messages-head::before { content: "✉"; font-size: 16px; }
+.detail-message {
+  background: #fff;
+  border-left: 3px solid var(--d-terra);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 0 0 12px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--d-ink);
+  white-space: pre-wrap;
+}
+.detail-message:last-child { margin-bottom: 0; }
+.detail-message.is-acknowledged {
+  background: rgba(255,255,255,0.45);
+  border-left-color: var(--d-line-2);
+  color: var(--d-muted);
+}
+.detail-message-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-family: var(--d-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--d-muted-2);
+  font-weight: 600;
+}
+.detail-message-ack-btn {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--d-plum);
+  font-family: var(--d-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.detail-message-ack-btn:hover { color: var(--d-plum-2); }
+
+/* Brief structured form */
+.detail-brief-section {
+  margin-bottom: 22px;
+}
+.detail-brief-section .detail-eyebrow {
+  margin-bottom: 8px;
+}
+.detail-brief-raw-toggle {
+  font-family: var(--d-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--d-plum);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-top: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.detail-brief-raw-toggle:hover { color: var(--d-plum-2); }
+.detail-brief-json {
+  font-family: var(--d-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  background: #fff;
+  border: 1px solid var(--d-line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  width: 100%;
+  min-height: 320px;
+  resize: vertical;
+  outline: none;
+  color: var(--d-ink);
+}
+.detail-brief-json:focus { border-color: var(--d-plum); box-shadow: 0 0 0 3px rgba(75,46,131,0.10); }
+
+/* Audio panel */
+.detail-audio-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--d-line-2);
+}
+.detail-audio-row:last-of-type { border-bottom: 0; }
+.detail-audio-label {
+  font-family: var(--d-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--d-muted-2);
+  font-weight: 600;
+}
+.detail-audio-player audio {
+  width: 360px;
+  max-width: 100%;
+  height: 36px;
+}
+.detail-audio-empty {
+  font-size: 13px;
+  color: var(--d-muted);
+  font-style: italic;
+}
+
+@media (max-width: 720px) {
+  .detail-body { padding: 24px 18px 60px; }
+  .detail-card { padding: 24px 20px 22px; }
+  .detail-field-grid { grid-template-columns: 1fr; gap: 6px 0; }
+  .detail-field-grid > .label { padding-top: 0; }
+  .detail-header { padding: 14px 18px; gap: 14px; flex-wrap: wrap; }
+  .detail-headline { font-size: 19px; }
+  .detail-nav { display: none; }
+}
 </style>
 </head>
 <body>
@@ -86,10 +553,11 @@ audio { width: 100%; margin-top: 0.5rem; }
   <p class="sub" id="statsLine">Loading...</p>
 
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('queue',this)">Queue</div>
-    <div class="tab" onclick="switchTab('delivered',this)">Delivered</div>
-    <div class="tab" onclick="switchTab('rejected',this)">Bad stories</div>
-    <div class="tab" onclick="switchTab('stats',this)">Stats</div>
+    <div class="tab active" onclick="switchTab('attention',this)" id="tab-attention">🔔 Needs your attention <span class="tab-badge" id="attentionBadge" style="display:none"></span></div>
+    <div class="tab" onclick="switchTab('sent',this)" id="tab-sent">🎧 Previews <span class="tab-badge" id="sentBadge" style="display:none"></span></div>
+    <div class="tab" onclick="switchTab('delivered',this)">✅ Delivered</div>
+    <div class="tab" onclick="switchTab('issues',this)" id="tab-issues">⚠️ Issues <span class="tab-badge" id="issuesBadge" style="display:none"></span></div>
+    <div class="tab" onclick="switchTab('stats',this)">📊 Stats</div>
   </div>
 
   <div id="content">
@@ -141,12 +609,67 @@ audio { width: 100%; margin-top: 0.5rem; }
   </div>
 </div>
 
+<!-- Story Detail Overlay (full-screen workbench: inputs / brief / story / audio) -->
+<div class="story-detail-backdrop" id="storyDetailBackdrop">
+  <div class="story-detail-shell" id="storyDetailShell">
+    <header class="detail-header">
+      <button type="button" class="detail-close" id="detailClose" aria-label="Close">×</button>
+      <div class="detail-header-text">
+        <p class="detail-eyebrow" id="detailRef">HTN-XXXXXX</p>
+        <h1 class="detail-headline" id="detailHeadline">Loading…</h1>
+        <div class="detail-meta-row" id="detailMeta"></div>
+      </div>
+      <nav class="detail-nav" aria-label="Sections">
+        <a href="#detail-inputs">Inputs</a>
+        <a href="#detail-brief">Brief</a>
+        <a href="#detail-story">Story</a>
+        <a href="#detail-audio">Audio</a>
+      </nav>
+    </header>
+    <div class="detail-body" id="detailBody">
+      <div class="detail-card">
+        <p style="text-align:center;color:var(--d-muted);padding:40px 0">Loading story…</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 let adminSecret = '';
-let currentTab = 'queue';
+let currentTab = 'attention';
 let regenStoryId = null;
+let focusStoryId = null;
+try { focusStoryId = new URL(window.location.href).searchParams.get('focus') || null; } catch (e) {}
 
 function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Render a gift block for a story card. Returns '' when the row isn't a gift,
+// otherwise returns a coloured panel with: GIFT badge, From/To, optional
+// recipient message, optional Jamie-only delivery note. Reads from dedicated
+// columns first (populated for new rows) and falls back to story_data JSON
+// for older rows that pre-date the dedicated-column persistence.
+function renderGiftBlock(s) {
+  const sd = s.story_data || {};
+  const isGift = !!(s.is_gift || sd.isGift);
+  if (!isGift) return '';
+  const from = s.gift_from || sd.giftFrom || '';
+  const to = s.gift_email || s.gift_recipient_email || sd.giftRecipientEmail || '';
+  const recipientMessage = s.gift_message || sd.giftMessage || '';
+  const jamieNote = s.gift_delivery_preference || sd.giftDeliveryNote || '';
+
+  let html = '<div style="background:#FFF4E6;border:1px solid #F1B45F;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.6">';
+  html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem"><span class="badge" style="background:#F1753B;color:#fff">🎁 GIFT</span></div>';
+  if (from) html += '<div><strong>From:</strong> ' + esc(from) + '</div>';
+  if (to)   html += '<div><strong>Send full story to:</strong> <code style="font-size:0.78rem">' + esc(to) + '</code></div>';
+  if (recipientMessage) {
+    html += '<div style="margin-top:0.45rem;padding:0.5rem 0.65rem;background:rgba(241,180,95,0.18);border-left:3px solid #F1753B;border-radius:6px;font-style:italic;white-space:pre-wrap">"' + esc(recipientMessage) + '"<br><span style="font-style:normal;font-size:0.72rem;color:#8A6A2E;display:inline-block;margin-top:0.15rem">— Message the recipient will see</span></div>';
+  }
+  if (jamieNote) {
+    html += '<div style="margin-top:0.45rem;padding:0.5rem 0.65rem;background:#FFE4D2;border-left:3px solid #B5651D;border-radius:6px;white-space:pre-wrap"><strong>For Jamie\'s eyes:</strong> ' + esc(jamieNote) + '</div>';
+  }
+  html += '</div>';
+  return html;
+}
 
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -163,15 +686,27 @@ function timeAgo(dateStr) {
 function adminLogin() {
   adminSecret = document.getElementById('adminPass').value.trim();
   if (!adminSecret) return;
-  queueApi('list', { status: 'pending' }).then(data => {
+  // Validate password by hitting attention (cheap query). Then load whatever
+  // tab was clicked. Default landing tab is 'attention' (paid orders awaiting
+  // delivery) — that's the highest-signal view for a working session.
+  queueApi('needs-attention').then(data => {
     if (data.error) {
       document.getElementById('loginErr').style.display = 'block';
       adminSecret = '';
     } else {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminPanel').classList.add('active');
-      renderQueue(data.stories || []);
+      renderAttention(data.stories || []);
+      updateAttentionBadge(data.count || 0);
       loadStats();
+      // Background-fetch the previews + issues counts so the badges show on
+      // load even before the admin clicks those tabs.
+      queueApi('previews').then(d => {
+        if (!d.error) updateSentBadge(d.count || 0);
+      }).catch(() => {});
+      queueApi('issues').then(d => {
+        if (!d.error) updateIssuesBadge(d.count || 0);
+      }).catch(() => {});
     }
   });
 }
@@ -202,10 +737,136 @@ function switchTab(tab, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   if (el) el.classList.add('active');
   document.getElementById('content').innerHTML = '<div class="loading">Loading...</div>';
-  if (tab === 'queue') loadQueue('pending');
+  if (tab === 'attention') loadAttention();
+  else if (tab === 'sent') loadSentPreviews();
   else if (tab === 'delivered') loadQueue('delivered');
-  else if (tab === 'rejected') loadRejected();
+  else if (tab === 'issues') loadIssues();
   else if (tab === 'stats') loadStatsTab();
+}
+
+// Per-row music state for the dashboard preview audio.
+const _adminMusicState = {}; // { storyId: { on: bool } }
+function _adminGetEls(id) {
+  return {
+    bg: document.getElementById('previewMusic_' + id),
+    audio: document.getElementById('previewAudio_' + id),
+    btn: document.getElementById('previewMusicBtn_' + id)
+  };
+}
+function adminMusicPlay(id) {
+  const { bg } = _adminGetEls(id);
+  if (!bg) return;
+  const state = _adminMusicState[id] = _adminMusicState[id] || { on: true };
+  if (!state.on) return;
+  bg.play().catch(() => {});
+  bg.volume = 0;
+  let v = 0;
+  const t = setInterval(() => { v += 0.04; if (v >= 0.4) { bg.volume = 0.4; clearInterval(t); } else bg.volume = v; }, 120);
+}
+function adminMusicPause(id) {
+  const { bg } = _adminGetEls(id);
+  if (bg) bg.pause();
+}
+function adminMusicFadeOut(id) {
+  const { bg } = _adminGetEls(id);
+  if (!bg) return;
+  let v = bg.volume;
+  const t = setInterval(() => { v -= 0.04; if (v <= 0) { bg.volume = 0; bg.pause(); clearInterval(t); } else bg.volume = v; }, 120);
+}
+function toggleAdminMusic(id) {
+  const { bg, audio, btn } = _adminGetEls(id);
+  const state = _adminMusicState[id] = _adminMusicState[id] || { on: true };
+  state.on = !state.on;
+  if (btn) btn.textContent = state.on ? '♫ Music on' : '♫ Music off';
+  if (state.on) {
+    if (audio && !audio.paused && bg) { bg.play().catch(() => {}); bg.volume = 0.4; }
+  } else {
+    if (bg) bg.volume = 0;
+  }
+}
+
+// Render the analyst brief in a readable card.
+function renderBrief(b) {
+  if (!b || typeof b !== 'object') return '';
+  function row(label, value) {
+    if (value == null || value === '') return '';
+    if (Array.isArray(value)) {
+      if (!value.length) return '';
+      value = value.map(v => esc(String(v))).join(', ');
+    } else {
+      value = esc(String(value));
+    }
+    return '<div style="margin-bottom:0.5rem"><span style="font-weight:700;color:#3D2A5C">' + esc(label) + ':</span> ' + value + '</div>';
+  }
+  let h = '<div style="background:#FFF8F5;border:1px solid #F0E0D0;border-radius:10px;padding:0.85rem;margin-top:0.4rem;font-size:0.8rem;line-height:1.6;color:#2D2844">';
+
+  // Confidence + flags row
+  const confColor = { high: '#2E7D32', medium: '#EF6C00', low: '#C62828' }[b.confidence] || '#666';
+  h += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.6rem;align-items:center">';
+  if (b.confidence) h += '<span style="font-weight:700;font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;color:' + confColor + '">Confidence: ' + esc(b.confidence) + '</span>';
+  if (Array.isArray(b.flags) && b.flags.length) {
+    for (const f of b.flags) h += '<span class="badge badge-orange" style="font-size:0.65rem">' + esc(f) + '</span>';
+  }
+  h += '</div>';
+
+  if (b.sensitive_notes) {
+    h += '<div style="background:#FFF0F0;border-left:3px solid #C62828;padding:0.6rem 0.75rem;border-radius:6px;margin-bottom:0.7rem;font-size:0.78rem;line-height:1.55"><strong style="color:#C62828">Sensitive:</strong> ' + esc(b.sensitive_notes) + '</div>';
+  }
+
+  if (b.story_world) h += row('Story world', b.story_world);
+
+  if (Array.isArray(b.children) && b.children.length) {
+    h += '<div style="margin-bottom:0.5rem"><span style="font-weight:700;color:#3D2A5C">Children:</span></div>';
+    for (const c of b.children) {
+      h += '<div style="margin:0 0 0.4rem 0.6rem;padding-left:0.5rem;border-left:2px solid #E0D5C0">';
+      h += '<strong>' + esc(c.name || '?') + '</strong>';
+      if (c.age != null) h += ' (' + esc(String(c.age)) + (c.gender ? ', ' + esc(c.gender) : '') + ')';
+      if (c.portrait) h += '<br><span style="color:#5C5240">' + esc(c.portrait) + '</span>';
+      if (c.best_friend) h += '<br><span style="color:#5C5240"><em>Best friend:</em> ' + esc(c.best_friend) + '</span>';
+      if (c.comfort_item) h += '<br><span style="color:#5C5240"><em>Comfort:</em> ' + esc(c.comfort_item) + '</span>';
+      if (c.quirk) h += '<br><span style="color:#5C5240"><em>Quirk' + (c.quirk_type ? ' (' + esc(c.quirk_type) + ')' : '') + ':</em> ' + esc(c.quirk) + '</span>';
+      h += '</div>';
+    }
+  }
+
+  if (b.household) {
+    if (b.household.pet) h += row('Pet', b.household.pet);
+    if (b.household.friend) h += row('Friend', b.household.friend);
+    if (b.household.sidekick) h += row('Sidekick', b.household.sidekick);
+    if (Array.isArray(b.household.family_members) && b.household.family_members.length) {
+      const fg = b.household.family_members.filter(m => m && m.narrative_weight === 'foreground');
+      const bg = b.household.family_members.filter(m => m && m.narrative_weight !== 'foreground');
+      if (fg.length) h += row('Family (foreground)', fg.map(m => m.name + (m.role ? ' / ' + m.role : '')));
+      if (bg.length) h += row('Family (background)', bg.map(m => m.name));
+    }
+  }
+
+  if (b.story_shape) {
+    if (b.story_shape.category) h += row('Category', b.story_shape.category);
+    if (b.story_shape.setting) h += row('Setting', b.story_shape.setting);
+    if (Array.isArray(b.story_shape.themes)) h += row('Themes', b.story_shape.themes);
+    if (b.story_shape.villain) h += row('Villain', b.story_shape.villain);
+    if (Array.isArray(b.story_shape.comfort_items) && b.story_shape.comfort_items.length) {
+      const items = b.story_shape.comfort_items.map(c => (c.child ? c.child + ': ' : '') + (c.item || ''));
+      h += row('Comfort items', items);
+    }
+  }
+
+  if (b.narrative_spine) {
+    h += '<div style="margin:0.6rem 0;padding:0.6rem 0.75rem;background:#F4ECDB;border-radius:6px"><div style="font-weight:700;color:#3D2A5C;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.3rem">Narrative spine</div><div style="font-size:0.82rem;line-height:1.6">' + esc(b.narrative_spine) + '</div></div>';
+  }
+
+  if (b.key_moment) {
+    h += '<div style="margin:0.6rem 0;padding:0.6rem 0.75rem;background:#FFF4E6;border-left:3px solid #D87A3E;border-radius:6px"><div style="font-weight:700;color:#C46A2E;font-size:0.72rem;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.3rem">Key moment (writer\'s target)</div><div style="font-size:0.86rem;line-height:1.55;font-style:italic;color:#2D2844">' + esc(b.key_moment) + '</div></div>';
+  }
+
+  if (b.tone) h += row('Tone', b.tone);
+  if (b.age_guidance) h += row('Age guidance', b.age_guidance);
+  if (Array.isArray(b.character_texture) && b.character_texture.length) h += row('Character texture', b.character_texture);
+  if (b.writer_instructions) h += row('Writer instructions', b.writer_instructions);
+
+  h += '</div>';
+  return h;
 }
 
 // ===== QUEUE =====
@@ -228,7 +889,7 @@ function renderQueue(stories) {
     const isMulti = sd.isMultiChild && sd.children && sd.children.length > 1;
     const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
     const hasFeedback = s.feedback && s.feedback.trim();
-    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || 'Unknown';
+    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || sd.voice || 'Unknown';
     const requesterName = sd.requesterName || '';
 
     html += '<div class="card">';
@@ -242,15 +903,27 @@ function renderQueue(stories) {
     // Status badges
     html += '<div style="margin-bottom:0.5rem">';
     if (isMulti) html += '<span class="badge badge-blue">' + sd.children.length + ' children</span> ';
-    if (s.status === 'generating') html += '<span class="badge badge-orange">Generating...</span> ';
+    if (s.status === 'brief_running') html += '<span class="badge badge-orange">Brief analysing...</span> ';
+    if (s.status === 'brief_ready') html += '<span class="badge badge-green">Brief ready, review then generate preview</span> ';
+    if (s.status === 'brief_failed') html += '<span class="badge badge-red">Brief failed</span> ';
+    if (s.status === 'preview_running') html += '<span class="badge badge-orange">Generating preview...</span> ';
+    if (s.status === 'preview_ready') html += '<span class="badge badge-green">Preview ready, review then send</span> ';
+    if (s.status === 'preview_failed') html += '<span class="badge badge-red">Preview generation failed</span> ';
+    if (s.status === 'preview_sent') html += '<span class="badge badge-blue">Preview sent ' + (sd.preview_sent_at ? timeAgo(sd.preview_sent_at) : '') + '</span> ';
+    if (s.status === 'full_running') html += '<span class="badge badge-orange">Full story generating (paid)...</span> ';
+    if (s.status === 'full_failed') html += '<span class="badge badge-red">Full story failed (paid — retry now)</span> ';
+    if (s.status === 'generating') html += '<span class="badge badge-orange">Generating audio...</span> ';
     if (s.status === 'ready') html += '<span class="badge badge-green">Audio ready</span> ';
-    if (!s.story_text) html += '<span class="badge badge-orange">Needs text</span> ';
+    if (s.status === 'pending' && !s.story_text) html += '<span class="badge badge-orange">Needs text</span> ';
     html += '</div>';
+
+    // Gift block (if applicable) — shown ABOVE buyer info so it lands first
+    html += renderGiftBlock(s);
 
     // Customer info
     html += '<div style="background:#F8F7FA;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.6">';
-    if (requesterName) html += '<strong>From:</strong> ' + esc(requesterName) + '<br>';
-    html += '<strong>Email:</strong> ' + esc(s.email) + '<br>';
+    if (requesterName) html += '<strong>Buyer:</strong> ' + esc(requesterName) + '<br>';
+    html += '<strong>Buyer email:</strong> ' + esc(s.email) + '<br>';
     html += '<strong>Narrator:</strong> ' + esc(voiceName);
     html += '</div>';
 
@@ -262,7 +935,7 @@ function renderQueue(stories) {
     if (isMulti && sd.children) {
       for (const c of sd.children) {
         html += '<strong>' + esc(c.name) + '</strong> (' + esc(c.gender) + ', age ' + esc(c.age) + ')';
-        if (c.about) html += ' — ' + esc(c.about);
+        if (c.about) html += ': ' + esc(c.about);
         html += '<br>';
       }
     } else {
@@ -286,6 +959,36 @@ function renderQueue(stories) {
     html += '</div>';
     html += '<button class="btn btn-outline" style="margin-top:0.4rem" onclick="editStoryData(\'' + esc(s.id) + '\',this)">Edit input</button>';
     html += '</details>';
+
+    // Brief (middle-layer analyst output) — visible once brief_ready or later
+    if (sd.brief && typeof sd.brief === 'object') {
+      const open = (s.status === 'brief_ready' || s.status === 'preview_failed') ? ' open' : '';
+      html += '<details style="margin-bottom:0.75rem"' + open + '>';
+      html += '<summary style="font-size:0.78rem;font-weight:700;color:#6B2F93;cursor:pointer;padding:0.3rem 0">Story brief (analyst)</summary>';
+      html += renderBrief(sd.brief);
+      html += '</details>';
+    }
+
+    // Preview audio + text (visible once preview_ready or later)
+    if (s.preview_url) {
+      const musicSrc = (sd.storyKind === 'adventure') ? '/music/adventure-ambient.mp3?v=7' : '/music/bedtime-ambient.mp3?v=5';
+      const audioId = 'previewAudio_' + esc(s.id);
+      const musicId = 'previewMusic_' + esc(s.id);
+      const toggleId = 'previewMusicBtn_' + esc(s.id);
+      html += '<div style="background:#F0F8FF;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">';
+      html += '<div style="font-size:0.72rem;font-weight:700;color:#3D2A5C;letter-spacing:0.06em;text-transform:uppercase">2-min preview (with music)</div>';
+      html += '<button type="button" id="' + toggleId + '" onclick="toggleAdminMusic(\'' + esc(s.id) + '\')" style="font-size:0.7rem;padding:4px 10px;border-radius:999px;border:1px solid #C4B89D;background:#fff;cursor:pointer">♫ Music on</button>';
+      html += '</div>';
+      html += '<audio id="' + audioId + '" controls preload="none" src="' + esc(s.preview_url) + '" style="width:100%;margin-bottom:0.4rem" onplay="adminMusicPlay(\'' + esc(s.id) + '\')" onpause="adminMusicPause(\'' + esc(s.id) + '\')" onended="adminMusicFadeOut(\'' + esc(s.id) + '\')"></audio>';
+      html += '<audio id="' + musicId + '" preload="none" loop src="' + esc(musicSrc) + '"></audio>';
+      if (s.preview_text) {
+        html += '<details><summary style="font-size:0.74rem;color:#666;cursor:pointer">Preview text</summary>';
+        html += '<div style="font-size:0.78rem;line-height:1.65;color:#333;white-space:pre-wrap;padding:0.5rem;background:#fff;border-radius:6px;margin-top:0.4rem;max-height:280px;overflow-y:auto">' + esc(s.preview_text) + '</div>';
+        html += '</details>';
+      }
+      html += '</div>';
+    }
 
     // Customer feedback (if rewrite request)
     if (hasFeedback) {
@@ -312,20 +1015,34 @@ function renderQueue(stories) {
       html += '<audio controls preload="none" src="' + esc(s.audio_url) + '" style="width:100%;margin:0.5rem 0"></audio>';
     }
 
-    // Actions
+    // Actions: status-aware
     html += '<div class="card-actions">';
-    if (!s.story_text) {
-      html += '<button class="btn btn-purple" onclick="generateStoryText(\'' + esc(s.id) + '\',this)">Generate story</button>';
-    } else {
-      // Text exists: always offer audio generation. Relabel if audio already exists.
-      var audioLabel = s.audio_url ? 'Regenerate audio' : 'Generate audio';
-      html += '<button class="btn btn-purple" onclick="generateTTS(\'' + esc(s.id) + '\',this)">' + audioLabel + '</button>';
-    }
-    if (s.story_text) {
-      html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate text</button>';
-    }
-    if (s.audio_url) {
-      html += '<button class="btn btn-green" onclick="sendStory(\'' + esc(s.id) + '\',this)">Send to customer</button>';
+    if (s.status === 'brief_ready') {
+      html += '<button class="btn btn-purple" onclick="generatePreview(\'' + esc(s.id) + '\',this)">Generate 2-min preview</button>';
+      html += '<button class="btn btn-outline" onclick="regenerateBrief(\'' + esc(s.id) + '\',this)">Regenerate brief</button>';
+    } else if (s.status === 'brief_failed') {
+      html += '<button class="btn btn-orange" onclick="regenerateBrief(\'' + esc(s.id) + '\',this)">Retry brief</button>';
+    } else if (s.status === 'preview_ready') {
+      html += '<button class="btn btn-green" onclick="sendPreview(\'' + esc(s.id) + '\',this)">Send preview to customer</button>';
+      html += '<button class="btn btn-outline" onclick="generatePreview(\'' + esc(s.id) + '\',this)">Regenerate preview</button>';
+    } else if (s.status === 'preview_failed') {
+      html += '<button class="btn btn-orange" onclick="generatePreview(\'' + esc(s.id) + '\',this)">Retry preview generation</button>';
+    } else if (s.status === 'full_failed' || s.status === 'full_running') {
+      html += '<button class="btn btn-orange" onclick="retryFull(\'' + esc(s.id) + '\',this)">' + (s.status === 'full_running' ? 'Re-trigger full worker' : 'Retry full story') + '</button>';
+    } else if (s.status === 'preview_sent' || s.status === 'pending' || s.status === 'generating' || s.status === 'ready') {
+      // Existing full-story flow continues from here.
+      if (!s.story_text) {
+        html += '<button class="btn btn-purple" onclick="generateStoryText(\'' + esc(s.id) + '\',this)">Generate full story</button>';
+      } else {
+        var audioLabel = s.audio_url ? 'Regenerate audio' : 'Generate audio';
+        html += '<button class="btn btn-purple" onclick="generateTTS(\'' + esc(s.id) + '\',this)">' + audioLabel + '</button>';
+      }
+      if (s.story_text) {
+        html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate text</button>';
+      }
+      if (s.audio_url) {
+        html += '<button class="btn btn-green" onclick="sendStory(\'' + esc(s.id) + '\',this)">Send full story to customer</button>';
+      }
     }
     html += '</div></div>';
   }
@@ -354,7 +1071,7 @@ async function renderDelivered(stories) {
   for (const s of stories) {
     const catLabel = { bedtime:'Bedtime', journey:'Adventure', learning:'Learning' }[s.category] || s.category;
     const date = new Date(s.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || '';
+    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || (s.story_data && s.story_data.voice) || '';
     const a = storyAnalytics[s.id] || {};
     const views = a.story_view || 0;
     const plays = a.story_play || 0;
@@ -500,6 +1217,105 @@ async function saveStoryText(id) {
   }
 }
 
+// Trigger the brief analyst (used for both Regenerate brief and Retry brief).
+async function regenerateBrief(id, btn) {
+  if (!confirm('Re-run the brief analyst for this story?')) return;
+  btn.disabled = true;
+  btn.textContent = 'Running...';
+  const res = await queueApi('regenerate-brief', {}, { storyId: id });
+  if (!res.success) {
+    btn.textContent = 'Failed';
+    btn.disabled = false;
+    alert('Brief failed: ' + (res.error || 'Unknown'));
+    return;
+  }
+  // Poll until the brief lands or fails.
+  let pollCount = 0;
+  const poll = setInterval(async () => {
+    pollCount++;
+    btn.textContent = 'Analysing... ' + (pollCount * 5) + 's';
+    if (pollCount > 24) { clearInterval(poll); loadQueue('pending'); return; }
+    const check = await queueApi('get', { id });
+    const st = check?.story?.status;
+    if (st === 'brief_ready' || st === 'brief_failed') {
+      clearInterval(poll);
+      loadQueue('pending');
+    }
+  }, 5000);
+}
+
+// Trigger the preview-worker (writer + ElevenLabs). Requires brief on story.
+async function generatePreview(id, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Starting...';
+  const res = await queueApi('generate-preview', {}, { storyId: id });
+  if (!res.success) {
+    btn.textContent = 'Failed';
+    btn.disabled = false;
+    alert('Preview failed: ' + (res.error || 'Unknown'));
+    return;
+  }
+  let pollCount = 0;
+  const poll = setInterval(async () => {
+    pollCount++;
+    btn.textContent = 'Generating... ' + (pollCount * 10) + 's';
+    if (pollCount > 30) { clearInterval(poll); loadQueue('pending'); return; }
+    const check = await queueApi('get', { id });
+    const st = check?.story?.status;
+    if (st === 'preview_ready' || st === 'preview_failed') {
+      clearInterval(poll);
+      loadQueue('pending');
+    }
+  }, 10000);
+}
+
+// Re-trigger the full-story worker for a paid story (full_failed or stuck full_running).
+async function retryFull(id, btn) {
+  if (!confirm('Re-trigger the full-story worker for this paid story?')) return;
+  btn.disabled = true;
+  btn.textContent = 'Triggering...';
+  const res = await queueApi('retry-full', {}, { storyId: id });
+  if (!res.success) {
+    btn.textContent = 'Failed';
+    btn.disabled = false;
+    alert('Retry failed: ' + (res.error || 'Unknown'));
+    return;
+  }
+  let pollCount = 0;
+  const poll = setInterval(async () => {
+    pollCount++;
+    btn.textContent = 'Working... ' + (pollCount * 15) + 's';
+    if (pollCount > 30) { clearInterval(poll); loadQueue('pending'); return; }
+    const check = await queueApi('get', { id });
+    const st = check?.story?.status;
+    if (st === 'delivered' || st === 'full_failed') {
+      clearInterval(poll);
+      loadQueue('pending');
+    }
+  }, 15000);
+}
+
+// Send the preview-ready email to the customer.
+// Opens the shared sendModal in 'preview' mode so admin can attach an optional
+// personal note (e.g. "if you love it, reply before you buy and I'll fast-track").
+function sendPreview(id, btn) {
+  currentSendId = id;
+  currentSendBtn = btn;
+  currentSendFlow = 'preview';
+  document.getElementById('sendMessage').value = '';
+  document.getElementById('sendStatus').style.display = 'none';
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('sendBtn').textContent = 'Send preview to customer';
+  // Update modal title + helper copy for preview flow
+  const titleEl = document.querySelector('#sendModal h2');
+  if (titleEl) titleEl.textContent = 'Send preview';
+  const helperEl = document.querySelector('#sendModal p');
+  if (helperEl) helperEl.textContent = 'Add an optional personal note. It will appear in the preview email above the listen button. Leave blank for the standard email.';
+  const ph = document.getElementById('sendMessage');
+  if (ph) ph.placeholder = "e.g. Hey, hope you love it! If it's for bedtime tonight, just reply and I'll do my best to fast-track the full version.";
+  document.getElementById('sendModal').classList.add('active');
+}
+
 async function generateStoryText(id, btn) {
   btn.disabled = true;
   btn.textContent = 'Queueing...';
@@ -597,31 +1413,55 @@ async function submitRegen() {
 function sendStory(id, btn) {
   currentSendId = id;
   currentSendBtn = btn;
+  currentSendFlow = 'full';
   document.getElementById('sendMessage').value = '';
   document.getElementById('sendStatus').style.display = 'none';
   document.getElementById('sendBtn').disabled = false;
   document.getElementById('sendBtn').textContent = 'Send to customer';
+  // Reset modal copy for full-story flow
+  const titleEl = document.querySelector('#sendModal h2');
+  if (titleEl) titleEl.textContent = 'Send story';
+  const helperEl = document.querySelector('#sendModal p');
+  if (helperEl) helperEl.textContent = 'Add an optional personal note. It will appear in the delivery email just before the listen button. Leave blank for the standard email.';
+  const ph = document.getElementById('sendMessage');
+  if (ph) ph.placeholder = 'e.g. I loved writing this one. Hope she loves it too.';
   document.getElementById('sendModal').classList.add('active');
 }
 
 let currentSendId = null, currentSendBtn = null;
+let currentSendFlow = 'full'; // 'preview' | 'full'
 
+// When admin clicks the send button in the existing 'send story' flow, this is
+// invoked from openSendModal which sets flow='full'. The preview-send flow sets
+// flow='preview' before opening the same modal. submitSend then routes to the
+// right action.
 async function submitSend() {
-  const customMessage = document.getElementById('sendMessage').value.trim();
+  const noteOrMessage = document.getElementById('sendMessage').value.trim();
   const sendBtnEl = document.getElementById('sendBtn');
   const status = document.getElementById('sendStatus');
   sendBtnEl.disabled = true;
   sendBtnEl.textContent = 'Sending...';
   status.style.display = 'block';
-  status.textContent = 'Sending delivery email...';
-  const data = await queueApi('send', {}, { storyId: currentSendId, customMessage });
+
+  let data;
+  if (currentSendFlow === 'preview') {
+    status.textContent = 'Sending preview email...';
+    data = await queueApi('send-preview', {}, { storyId: currentSendId, jamieNote: noteOrMessage });
+  } else {
+    status.textContent = 'Sending delivery email...';
+    data = await queueApi('send', {}, { storyId: currentSendId, customMessage: noteOrMessage });
+  }
+
   if (data.success) {
     status.textContent = 'Sent.';
-    if (currentSendBtn) { currentSendBtn.textContent = 'Sent!'; currentSendBtn.disabled = true; }
+    if (currentSendBtn) {
+      currentSendBtn.textContent = 'Sent';
+      currentSendBtn.disabled = true;
+    }
     setTimeout(() => { closeModal('sendModal'); loadQueue('pending'); }, 1200);
   } else {
     sendBtnEl.disabled = false;
-    sendBtnEl.textContent = 'Send to customer';
+    sendBtnEl.textContent = currentSendFlow === 'preview' ? 'Send preview to customer' : 'Send to customer';
     status.textContent = 'Failed: ' + (data.error || 'Unknown error');
     status.style.color = '#c00';
   }
@@ -645,7 +1485,7 @@ async function loadRejected() {
   let html = '';
   for (const s of withRejected) {
     const sd = s.story_data || {};
-    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || 'Unknown';
+    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || sd.voice || 'Unknown';
 
     for (let i = 0; i < s.rejected_versions.length; i++) {
       const rv = s.rejected_versions[i];
@@ -679,6 +1519,356 @@ async function loadRejected() {
   document.getElementById('content').innerHTML = html;
 }
 
+// ===== NEEDS ATTENTION (paid orders awaiting delivery) =====
+async function loadAttention() {
+  const data = await queueApi('needs-attention');
+  if (data.error) {
+    document.getElementById('content').innerHTML = '<div class="empty">Could not load: ' + esc(data.error) + '</div>';
+    return;
+  }
+  renderAttention(data.stories || []);
+  updateAttentionBadge(data.count || 0);
+}
+
+function updateAttentionBadge(count) {
+  const badge = document.getElementById('attentionBadge');
+  const tab = document.getElementById('tab-attention');
+  if (!badge || !tab) return;
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'inline-flex';
+    tab.classList.add('attention-pulse');
+  } else {
+    badge.style.display = 'none';
+    tab.classList.remove('attention-pulse');
+  }
+}
+
+// ===== ISSUES (failed states + stuck rows that need triage) =====
+async function loadIssues() {
+  const data = await queueApi('issues');
+  if (data.error) {
+    document.getElementById('content').innerHTML = '<div class="empty">Could not load: ' + esc(data.error) + '</div>';
+    return;
+  }
+  renderIssues(data.stories || []);
+  updateIssuesBadge(data.count || 0);
+}
+
+function updateIssuesBadge(count) {
+  const badge = document.getElementById('issuesBadge');
+  const tab = document.getElementById('tab-issues');
+  if (!badge || !tab) return;
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function renderIssues(stories) {
+  if (!stories.length) {
+    document.getElementById('content').innerHTML = '<div class="empty"><strong>No issues to triage.</strong><br><br>This tab catches anything in a failed state (brief_failed, preview_failed, full_failed) or anything stuck running for over 30 minutes. Empty means everything is flowing.</div>';
+    return;
+  }
+
+  let html = '';
+  for (const s of stories) {
+    const sd = s.story_data || {};
+    const ref = 'HTN-' + (s.id || '').slice(0, 6).toUpperCase();
+    const isFailed = (s.status || '').endsWith('_failed');
+    const ageMs = Date.now() - new Date(s.created_at).getTime();
+    const ageH = Math.floor(ageMs / (60 * 60 * 1000));
+    const ageM = Math.floor(ageMs / 60000);
+
+    const stateLabel = isFailed
+      ? '<span class="badge badge-red">' + esc(s.status) + '</span>'
+      : '<span class="badge badge-orange">Stuck in ' + esc(s.status) + ' for ' + (ageH > 0 ? ageH + 'h' : ageM + 'min') + '</span>';
+
+    html += '<div class="card">';
+    html += '<div class="card-header">';
+    html += '<span class="card-title">' + esc(s.child_name || 'Unknown') + ' <span style="font-weight:500;font-size:0.78rem;color:#999">' + esc(ref) + '</span></span>';
+    html += '<span class="card-meta">' + timeAgo(s.created_at) + '</span>';
+    html += '</div>';
+    html += '<div style="margin-bottom:0.5rem">' + stateLabel + '</div>';
+
+    if (sd.last_error && sd.last_error.error) {
+      html += '<div style="background:#FFEBEE;border-left:3px solid #C62828;border-radius:6px;padding:0.5rem 0.75rem;margin-bottom:0.5rem;font-size:0.75rem;color:#8B1A1A;line-height:1.5"><strong>Last error:</strong> ' + esc(sd.last_error.error) + (sd.last_error.at ? ' <span style="color:#999">(' + timeAgo(sd.last_error.at) + ')</span>' : '') + '</div>';
+    }
+
+    html += '<div style="background:#F8F7FA;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.6">';
+    html += '<strong>Email:</strong> ' + esc(s.email || '(none)') + '<br>';
+    html += '<strong>Paid:</strong> ' + (s.payment_status === 'paid' ? 'yes (' + timeAgo(s.paid_at) + ')' : 'no') + '<br>';
+    html += '<strong>Story ID:</strong> <code style="font-size:0.72rem">' + esc(s.id) + '</code>';
+    html += '</div>';
+
+    html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">';
+    html += '<button class="btn btn-purple" onclick="openDetail(\'' + esc(s.id) + '\')">Open story</button>';
+    if (s.status === 'full_failed' || s.status === 'full_running') {
+      html += '<button class="btn btn-orange" onclick="retryFull(\'' + esc(s.id) + '\', this)">Retry full worker</button>';
+    }
+    if (s.status === 'brief_failed' || s.status === 'preview_failed' || s.status === 'preview_queued' || s.status === 'brief_running' || s.status === 'preview_running') {
+      html += '<button class="btn btn-orange" onclick="regenerateBriefAdmin(\'' + esc(s.id) + '\', this)">Regenerate from brief</button>';
+    }
+    html += '<a class="btn btn-outline" href="/preview/' + esc(s.id) + '?t=' + esc(s.access_token || '') + '" target="_blank" rel="noopener">Customer view</a>';
+    html += '</div>';
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+async function regenerateBriefAdmin(storyId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Triggering…'; }
+  try {
+    const data = await queueApi('regenerate-brief', {}, { storyId });
+    if (data.error) throw new Error(data.error);
+    if (btn) btn.textContent = 'Triggered. Refreshing…';
+    setTimeout(() => loadIssues(), 1500);
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Retry — try again'; }
+    alert('Regenerate failed: ' + (e.message || e));
+  }
+}
+
+// ===== SENT PREVIEWS (customer received preview, awaiting purchase) =====
+async function loadSentPreviews() {
+  const data = await queueApi('sent-previews');
+  if (data.error) {
+    document.getElementById('content').innerHTML = '<div class="empty">Could not load: ' + esc(data.error) + '</div>';
+    return;
+  }
+  renderSentPreviews(data.stories || []);
+  updateSentBadge(data.count || 0);
+}
+
+function updateSentBadge(count) {
+  const badge = document.getElementById('sentBadge');
+  const tab = document.getElementById('tab-sent');
+  if (!badge || !tab) return;
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function renderSentPreviews(stories) {
+  if (!stories.length) {
+    document.getElementById('content').innerHTML = '<div class="empty"><strong>No sent previews awaiting purchase.</strong><br><br>This tab shows stories where you have sent the preview email to the customer but they have not paid yet. When they pay, the row automatically moves to "Needs attention." If they never pay, it stays here.</div>';
+    return;
+  }
+  // Sort newest preview first.
+  stories.sort((a, b) => new Date(b.preview_ready_at || b.created_at) - new Date(a.preview_ready_at || a.created_at));
+
+  let html = '';
+  for (const s of stories) {
+    const sd = s.story_data || {};
+    const requesterName = sd.requesterName || sd.giftFrom || (sd.children && sd.children[0] && sd.children[0].parentName) || '';
+    const ref = 'HTN-' + (s.id || '').slice(0, 6).toUpperCase();
+    const sentAt = s.preview_ready_at || s.created_at;
+    const ageMs = Date.now() - new Date(sentAt).getTime();
+    const ageH = Math.floor(ageMs / (60 * 60 * 1000));
+    const ageD = Math.floor(ageH / 24);
+
+    let stateLabel;
+    if (ageH < 24) stateLabel = '<span class="badge badge-blue">Sent ' + timeAgo(sentAt) + ' · waiting</span>';
+    else if (ageD < 3) stateLabel = '<span class="badge badge-orange">Sent ' + ageD + 'd ago · cooling off</span>';
+    else stateLabel = '<span class="badge badge-red">Sent ' + ageD + 'd ago · likely cold</span>';
+
+    // Preview play tracking: shows engagement at a glance.
+    const playCount = s.preview_play_count || 0;
+    const lastPlayed = s.preview_last_played_at;
+    let playBadge;
+    if (playCount === 0) {
+      playBadge = '<span class="badge badge-orange">🔇 Not played yet</span>';
+    } else if (playCount === 1) {
+      playBadge = '<span class="badge badge-green">▶ Played once · ' + timeAgo(lastPlayed) + '</span>';
+    } else {
+      playBadge = '<span class="badge badge-green">▶ Played ' + playCount + ' times · last ' + timeAgo(lastPlayed) + '</span>';
+    }
+
+    // Preview link the customer would click from email (preview page route)
+    const previewLink = `/preview/${s.id}?t=${encodeURIComponent(s.access_token || '')}`;
+
+    html += '<div class="card" id="sent-' + esc(s.id) + '">';
+    html += '<div class="card-header">';
+    html += '<span class="card-title">' + esc(s.child_name || 'Unknown') + ' <span style="font-weight:500;font-size:0.78rem;color:#999">' + esc(ref) + '</span></span>';
+    html += '<span class="card-meta">preview ready ' + timeAgo(sentAt) + '</span>';
+    html += '</div>';
+    html += '<div style="margin-bottom:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap">' + stateLabel + playBadge + '</div>';
+    html += renderGiftBlock(s);
+    html += '<div style="background:#F8F7FA;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.6">';
+    if (requesterName) html += '<strong>Buyer:</strong> ' + esc(requesterName) + '<br>';
+    html += '<strong>Buyer email:</strong> ' + esc(s.email) + '<br>';
+    html += '<strong>Story ID:</strong> <code style="font-size:0.72rem">' + esc(s.id) + '</code>';
+    html += '</div>';
+    html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">';
+    html += '<button class="btn btn-purple" onclick="openDetail(\'' + esc(s.id) + '\')">Open story</button>';
+    html += '<a class="btn btn-outline" href="' + esc(previewLink) + '" target="_blank" rel="noopener">Customer view ↗</a>';
+    if (s.preview_url) html += '<a class="btn btn-outline" href="' + esc(s.preview_url) + '" target="_blank" rel="noopener">Listen ↗</a>';
+    html += '</div>';
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+}
+
+function renderAttention(stories) {
+  if (!stories.length) {
+    document.getElementById('content').innerHTML = '<div class="empty"><strong>All paid orders delivered.</strong><br><br>This tab shows stories where the customer has paid but you have not shipped yet. Empty means you are clear.</div>';
+    return;
+  }
+  // Sort: stalest first (oldest paid_at) — gives Jamie the rows with the
+  // tightest deadline at the top.
+  stories.sort((a, b) => new Date(a.paid_at || a.created_at) - new Date(b.paid_at || b.created_at));
+
+  let html = '';
+  for (const s of stories) {
+    const sd = s.story_data || {};
+    const voiceName = VOICE_NAMES[s.voice_id] || s.voice_id || sd.voice || 'Unknown';
+    const requesterName = sd.requesterName || sd.giftFrom || (sd.children && sd.children[0] && sd.children[0].parentName) || '';
+    const ref = 'HTN-' + (s.id || '').slice(0, 6).toUpperCase();
+    const paidAt = s.paid_at ? new Date(s.paid_at) : null;
+    const hoursSincePaid = paidAt ? (Date.now() - paidAt.getTime()) / (60 * 60 * 1000) : null;
+    const isManual = sd.delivery_mode === 'manual';
+
+    // Children + ages (numeric ages now) for at-a-glance scan.
+    const children = Array.isArray(sd.children) ? sd.children : [];
+    const childSummary = children.map(c => {
+      const n = c.name ? c.name.trim() : '';
+      const a = parseInt(c.age, 10);
+      return n + (Number.isFinite(a) && a > 0 ? ' (' + a + ')' : '');
+    }).filter(Boolean).join(', ');
+
+    // Story word count + first line for at-a-glance content scan.
+    const storyText = s.story_text || '';
+    const wordCount = storyText.trim() ? storyText.trim().split(/\s+/).length : 0;
+    const firstLine = storyText.trim().split('\n')[0] || '';
+    const firstLineSnippet = firstLine.length > 110 ? firstLine.slice(0, 107) + '…' : firstLine;
+
+    // 24-hour delivery promise → amber after 12h, red after 20h.
+    let timerLabel, timerClass;
+    if (hoursSincePaid == null) {
+      timerLabel = 'just paid'; timerClass = 'badge-blue';
+    } else if (hoursSincePaid < 12) {
+      timerLabel = 'paid ' + timeAgo(s.paid_at) + ' · ' + (24 - Math.floor(hoursSincePaid)) + 'h to deliver';
+      timerClass = 'badge-blue';
+    } else if (hoursSincePaid < 20) {
+      timerLabel = 'paid ' + timeAgo(s.paid_at) + ' · ' + Math.max(0, 24 - Math.floor(hoursSincePaid)) + 'h left';
+      timerClass = 'badge-orange';
+    } else if (hoursSincePaid < 24) {
+      timerLabel = 'paid ' + timeAgo(s.paid_at) + ' · LESS THAN ' + Math.max(1, 24 - Math.floor(hoursSincePaid)) + 'h LEFT';
+      timerClass = 'badge-red';
+    } else {
+      timerLabel = 'paid ' + timeAgo(s.paid_at) + ' · OVERDUE';
+      timerClass = 'badge-red';
+    }
+
+    // Status / severity (auto path only — manual rows just need a "ship" label).
+    let stateLabel = '';
+    if (isManual) {
+      stateLabel = '<span class="badge badge-purple" style="background:#6B2F93;color:#fff">✋ Manual delivery</span>';
+    } else if (s.status === 'full_failed') {
+      stateLabel = '<span class="badge badge-red">Full story FAILED — retry</span>';
+    } else if (s.status === 'full_running') {
+      const minsSincePaid = paidAt ? Math.floor((Date.now() - paidAt.getTime()) / 60000) : 0;
+      stateLabel = minsSincePaid > 20
+        ? '<span class="badge badge-red">Stalled — running for ' + minsSincePaid + ' min</span>'
+        : '<span class="badge badge-orange">Generating full story…</span>';
+    } else if (s.status === 'ready' || s.status === 'generating') {
+      stateLabel = '<span class="badge badge-orange">Audio ready — needs send</span>';
+    }
+
+    // Risk flags: gift, multi-child, manual delivery, jamie_note present.
+    const flags = [];
+    if (sd.isGift || s.is_gift) flags.push('🎁 Gift');
+    if (children.length > 1) flags.push('👨‍👩‍👧 ' + children.length + ' children');
+    if (s.jamie_note) flags.push('📝 Has note');
+
+    const isFocused = focusStoryId && s.id === focusStoryId;
+    const cardStyle = isFocused ? 'border:2px solid #F1753B;box-shadow:0 0 0 4px rgba(241,117,59,0.15)' : '';
+
+    html += '<div class="card" id="att-' + esc(s.id) + '" style="' + cardStyle + '">';
+    html += '<div class="card-header">';
+    html += '<span class="card-title">' + esc(s.child_name || 'Unknown') + ' <span style="font-weight:500;font-size:0.78rem;color:#999">' + esc(ref) + '</span></span>';
+    html += '<span class="badge ' + timerClass + '">' + esc(timerLabel) + '</span>';
+    html += '</div>';
+
+    if (stateLabel) html += '<div style="margin-bottom:0.5rem">' + stateLabel + '</div>';
+
+    if (flags.length) {
+      html += '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem">';
+      flags.forEach(f => { html += '<span class="badge" style="background:#F0EBF5;color:#6B2F93">' + esc(f) + '</span>'; });
+      html += '</div>';
+    }
+
+    // Jamie note: highest-priority context. Always surfaced prominently.
+    if (s.jamie_note) {
+      html += '<div style="background:#FFF4E6;border-left:3px solid #F1753B;border-radius:6px;padding:0.6rem 0.85rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.55;color:#5C3E0A;white-space:pre-wrap"><strong>Note for this story:</strong> ' + esc(s.jamie_note) + '</div>';
+    }
+
+    if (sd.last_error && sd.last_error.error) {
+      html += '<div style="background:#FFEBEE;border-left:3px solid #C62828;border-radius:6px;padding:0.5rem 0.75rem;margin-bottom:0.5rem;font-size:0.75rem;color:#8B1A1A;line-height:1.5"><strong>Last error:</strong> ' + esc(sd.last_error.error) + (sd.last_error.at ? ' <span style="color:#999">(' + timeAgo(sd.last_error.at) + ')</span>' : '') + '</div>';
+    }
+
+    html += renderGiftBlock(s);
+
+    // The fact box: who, what, voice.
+    html += '<div style="background:#F8F7FA;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.6">';
+    if (childSummary) html += '<strong>Children:</strong> ' + esc(childSummary) + '<br>';
+    if (requesterName) html += '<strong>Buyer:</strong> ' + esc(requesterName) + '<br>';
+    html += '<strong>Buyer email:</strong> ' + esc(s.email) + '<br>';
+    html += '<strong>Narrator:</strong> ' + esc(voiceName) + '<br>';
+    html += '<strong>Story ID:</strong> <code style="font-size:0.72rem">' + esc(s.id) + '</code>';
+    html += '</div>';
+
+    // Story preview: word count + first line, so Jamie can scan-judge readiness.
+    if (wordCount > 0) {
+      html += '<div style="background:#F0F4FF;border-left:3px solid #6B2F93;border-radius:6px;padding:0.6rem 0.85rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.5">';
+      html += '<div style="font-size:0.7rem;font-weight:700;color:#6B2F93;margin-bottom:0.25rem;letter-spacing:0.04em;text-transform:uppercase">Draft ready · ' + wordCount + ' words</div>';
+      html += '<div style="font-style:italic;color:#2D2844">"' + esc(firstLineSnippet) + '"</div>';
+      html += '</div>';
+    }
+
+    html += '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">';
+    if (isManual && wordCount > 0) {
+      // Manual path: open the full story workbench.
+      html += '<button class="btn btn-purple" onclick="openDetail(\'' + esc(s.id) + '\')">Open story</button>';
+      html += '<button class="btn btn-orange" onclick="openRegen(\'' + esc(s.id) + '\')">Regenerate</button>';
+      html += '<button class="btn btn-green" onclick="generateTTS(\'' + esc(s.id) + '\', this)">Render audio</button>';
+    } else if (s.status === 'full_failed' || s.status === 'full_running') {
+      html += '<button class="btn btn-orange" onclick="retryFull(\'' + esc(s.id) + '\', this)">' + (s.status === 'full_failed' ? 'Retry full story' : 'Re-trigger worker') + '</button>';
+    } else if (s.status === 'ready' || s.status === 'generating') {
+      html += '<button class="btn btn-green" onclick="sendStory(\'' + esc(s.id) + '\', this)">Send to customer</button>';
+    }
+    html += '<a class="btn btn-outline" href="/preview/' + esc(s.id) + '?t=' + esc(s.access_token || '') + '" target="_blank" rel="noopener">Open customer view</a>';
+    html += '</div>';
+    html += '</div>';
+  }
+  document.getElementById('content').innerHTML = html;
+
+  // If we landed with ?focus=, scroll to the highlighted card and clear the
+  // marker so a manual refresh doesn't keep the highlight forever.
+  if (focusStoryId) {
+    const el = document.getElementById('att-' + focusStoryId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    focusStoryId = null;
+  }
+}
+
+async function retryFull(storyId, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Triggering…'; }
+  const data = await queueApi('retry-full', {}, { storyId });
+  if (data.success) {
+    if (btn) btn.textContent = 'Triggered. Refreshing…';
+    setTimeout(() => loadAttention(), 1200);
+  } else {
+    if (btn) { btn.disabled = false; btn.textContent = 'Retry failed — try again'; }
+    alert('Retry failed: ' + (data.error || 'unknown'));
+  }
+}
+
 // ===== STATS =====
 async function loadStats() {
   try {
@@ -688,6 +1878,755 @@ async function loadStats() {
       (t.delivered || 0) + ' stories delivered (last 30 days)';
   } catch(e) {
     document.getElementById('statsLine').textContent = 'Admin ready';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// STORY DETAIL OVERLAY
+// One stacked page per story: customer messages → inputs → brief →
+// story → audio. Each layer has its own save + regenerate. Auto-renders
+// every field that exists on story_data so nothing falls through silently.
+// ════════════════════════════════════════════════════════════════════
+
+let _detailStoryId = null;
+let _detailStory = null;        // full row from /api/admin-queue?action=get
+let _detailLocalEdits = {};     // pending input-form edits, keyed by field path
+let _detailBriefRawMode = false;
+
+function dEsc(s){ return (s == null ? '' : String(s)).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); }
+function dTimeAgo(iso){ if(!iso) return ''; const d = Date.now() - new Date(iso).getTime(); const m=Math.floor(d/60000); if(m<1) return 'just now'; if(m<60) return m+'m ago'; const h=Math.floor(m/60); if(h<24) return h+'h ago'; return Math.floor(h/24)+'d ago'; }
+
+async function openDetail(storyId){
+  _detailStoryId = storyId;
+  _detailLocalEdits = {};
+  _detailBriefRawMode = false;
+  document.getElementById('storyDetailBackdrop').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('detailBody').innerHTML = '<div class="detail-card"><p style="text-align:center;color:var(--d-muted);padding:40px 0">Loading story…</p></div>';
+  try {
+    const res = await queueApi('get', { id: storyId });
+    if (!res || !res.story) throw new Error('Not found');
+    _detailStory = res.story;
+    renderDetail();
+  } catch (e) {
+    document.getElementById('detailBody').innerHTML = '<div class="detail-card"><p style="text-align:center;color:var(--d-red);padding:40px 0">Could not load story: ' + dEsc(e.message || e) + '</p></div>';
+  }
+}
+
+function closeDetail(){
+  document.getElementById('storyDetailBackdrop').classList.remove('active');
+  document.body.style.overflow = '';
+  _detailStoryId = null;
+  _detailStory = null;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.getElementById('storyDetailBackdrop').classList.contains('active')) closeDetail();
+});
+document.addEventListener('click', (e) => {
+  if (e.target && e.target.id === 'detailClose') closeDetail();
+});
+document.getElementById('storyDetailBackdrop').addEventListener('click', (e) => {
+  if (e.target.id === 'storyDetailBackdrop') closeDetail();
+});
+
+function renderDetail(){
+  const s = _detailStory;
+  const sd = s.story_data || {};
+  const ref = 'HTN-' + (s.id || '').slice(0, 6).toUpperCase();
+  const childList = s.child_name || (Array.isArray(sd.children) ? sd.children.map(c => c.name).filter(Boolean).join(' & ') : 'Unknown');
+
+  document.getElementById('detailRef').textContent = ref;
+  document.getElementById('detailHeadline').innerHTML = 'A story for <em>' + dEsc(childList) + '</em>';
+
+  // Meta row: paid timer + status + delivery mode
+  const metaParts = [];
+  if (s.payment_status === 'paid' && s.paid_at) {
+    const hoursSincePaid = (Date.now() - new Date(s.paid_at).getTime()) / 3600000;
+    let cls = 'is-blue', label = 'paid ' + dTimeAgo(s.paid_at);
+    if (hoursSincePaid > 24) { cls = 'is-red'; label = 'paid ' + dTimeAgo(s.paid_at) + ' · OVERDUE'; }
+    else if (hoursSincePaid > 20) { cls = 'is-red'; label = 'paid ' + dTimeAgo(s.paid_at) + ' · ' + Math.max(1, 24 - Math.floor(hoursSincePaid)) + 'h LEFT'; }
+    else if (hoursSincePaid > 12) { cls = 'is-amber'; label = 'paid ' + dTimeAgo(s.paid_at) + ' · ' + Math.max(0, 24 - Math.floor(hoursSincePaid)) + 'h left'; }
+    metaParts.push('<span class="detail-paid-pill ' + cls + '">' + dEsc(label) + '</span>');
+  } else if (s.status === 'delivered') {
+    metaParts.push('<span class="detail-paid-pill is-green">Delivered ' + dTimeAgo(s.delivered_at || s.paid_at) + '</span>');
+  } else {
+    metaParts.push('<span class="detail-paid-pill is-blue">' + dEsc(s.status || 'in progress') + '</span>');
+  }
+  if (sd.delivery_mode === 'manual') metaParts.push('<span class="detail-paid-pill is-blue" style="background:rgba(75,46,131,0.10)">✋ Manual</span>');
+  metaParts.push('<span><strong>From:</strong> ' + dEsc(s.email || '(no email)') + '</span>');
+  document.getElementById('detailMeta').innerHTML = metaParts.join('');
+
+  // Body
+  let html = '';
+  html += renderDetailMessages(sd.customer_messages || []);
+  html += renderDetailInputs(sd, s);
+  html += renderDetailBrief(sd);
+  html += renderDetailStory(s);
+  html += renderDetailAudio(s);
+  document.getElementById('detailBody').innerHTML = html;
+
+  attachDetailHandlers();
+}
+
+// ─── Customer messages ──────────────────────────────────────────────
+function renderDetailMessages(messages){
+  if (!messages || !messages.length) return '';
+  let html = '<div class="detail-messages-card">';
+  html += '<div class="detail-messages-head">From the customer</div>';
+  // Newest first
+  const sorted = [...messages].sort((a, b) => new Date(b.at) - new Date(a.at));
+  for (const m of sorted) {
+    const ack = !!m.acknowledged_at;
+    html += '<div class="detail-message ' + (ack ? 'is-acknowledged' : '') + '">';
+    html += '<div class="detail-message-meta">';
+    html += '<span>' + dEsc(m.from || 'customer') + ' · ' + dTimeAgo(m.at) + (ack ? ' · ack ' + dTimeAgo(m.acknowledged_at) : '') + '</span>';
+    if (!ack) html += '<button type="button" class="detail-message-ack-btn" data-action="ack-message" data-at="' + dEsc(m.at) + '">Mark resolved</button>';
+    html += '</div>';
+    html += '<div>' + dEsc(m.body || '') + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+// ─── Inputs section: auto-rendered from story_data ──────────────────
+function renderDetailInputs(sd, s){
+  const isStale = sd.brief_generated_at && sd.input_edited_at && new Date(sd.input_edited_at) > new Date(sd.brief_generated_at);
+  const lastEdited = sd.input_edited_at ? 'last edited ' + dTimeAgo(sd.input_edited_at) : 'as submitted';
+
+  let html = '<section class="detail-card" id="detail-inputs">';
+  html += '<span class="detail-card-num">1</span>';
+  html += '<div class="detail-card-head"><h2 class="detail-card-title">What they sent us</h2><span class="detail-card-meta">' + dEsc(lastEdited) + '</span></div>';
+
+  if (isStale) {
+    html += '<div class="detail-stale-strip">Inputs changed since the brief was generated. Regenerate the brief to fold these in.</div>';
+  }
+
+  // Children block (special-cased: array of objects)
+  const children = Array.isArray(sd.children) ? sd.children : [];
+  if (children.length) {
+    html += '<div class="detail-children-block">';
+    children.forEach((c, i) => {
+      html += '<div class="detail-child-card">';
+      html += '<p class="detail-eyebrow">Child ' + (i + 1) + '</p>';
+      html += '<div class="detail-field-grid">';
+      html += renderInputField('Name', 'children.' + i + '.name', c.name, 'text');
+      html += renderInputField('Age', 'children.' + i + '.age', c.age, 'number');
+      html += renderInputField('Pronouns', 'children.' + i + '.pronouns', c.pronouns, 'text');
+      html += renderInputField('Best friend', 'children.' + i + '.bestFriend', c.bestFriend || '', 'text');
+      html += renderInputField('Comfort toy', 'children.' + i + '.toy', c.toy || '', 'text');
+      html += renderInputField('Tiny detail', 'children.' + i + '.quirk', c.quirk || '', 'textarea');
+      html += '</div></div>';
+    });
+    html += '</div>';
+  }
+
+  // Top-level fields (everything in story_data except children, brief, internals)
+  const skip = new Set(['children', 'brief', 'brief_generated_at', 'brief_edited_at', 'input_edited_at', 'customer_messages', 'cliffhanger_judge', 'last_error', 'requestId']);
+  const topKeys = Object.keys(sd).filter(k => !skip.has(k));
+
+  // Order known fields nicely; everything else falls to the end
+  const fieldOrder = ['storyKind', 'voice', 'themes', 'themesOther', 'place', 'placeReal', 'others', 'hasPet', 'petKind', 'petName', 'hasVillain', 'villainName', 'isGift', 'isGiftCard', 'giftFrom', 'giftRecipientEmail', 'giftMessage', 'giftDeliveryNote', 'delivery_mode', 'parentName', 'requesterName'];
+  const ordered = [...fieldOrder.filter(k => topKeys.includes(k)), ...topKeys.filter(k => !fieldOrder.includes(k))];
+
+  if (ordered.length) {
+    html += '<div class="detail-field-grid" style="margin-top:22px">';
+    for (const key of ordered) {
+      html += renderTopLevelField(key, sd[key]);
+    }
+    html += '</div>';
+  }
+
+  const isPaid = s && (s.payment_status === 'paid' || s.paid_at);
+  html += '<div class="detail-actions">';
+  html += '<button type="button" class="d-btn d-btn-primary" data-action="save-inputs">Save inputs</button>';
+  html += '<button type="button" class="d-btn d-btn-regen" data-action="regen-brief">Save & rewrite the brief' + (isPaid ? '' : ' (then preview)') + '</button>';
+  html += '<span class="detail-status" id="inputsStatus"></span>';
+  html += '</div>';
+  html += '</section>';
+  return html;
+}
+
+function renderInputField(label, path, value, type){
+  let control;
+  if (type === 'number') {
+    control = '<input type="number" class="detail-input" data-input-path="' + dEsc(path) + '" value="' + dEsc(value) + '">';
+  } else if (type === 'textarea') {
+    control = '<textarea class="detail-textarea" data-input-path="' + dEsc(path) + '" rows="2">' + dEsc(value) + '</textarea>';
+  } else {
+    control = '<input type="text" class="detail-input" data-input-path="' + dEsc(path) + '" value="' + dEsc(value) + '">';
+  }
+  return '<div class="label">' + dEsc(label) + '</div><div class="value">' + control + '</div>';
+}
+
+function renderTopLevelField(key, value){
+  const label = humanLabel(key);
+  // Booleans → toggle
+  if (typeof value === 'boolean') {
+    return '<div class="label">' + dEsc(label) + '</div><div class="value">'
+      + '<button type="button" class="detail-toggle ' + (value ? 'is-on' : '') + '" data-input-path="' + dEsc(key) + '" data-input-bool="true">' + (value ? 'Yes' : 'No') + '</button>'
+      + '</div>';
+  }
+  // Arrays of strings → comma-separated input
+  if (Array.isArray(value)) {
+    return '<div class="label">' + dEsc(label) + '</div><div class="value">'
+      + '<input type="text" class="detail-input" data-input-path="' + dEsc(key) + '" data-input-array="true" value="' + dEsc(value.join(', ')) + '">'
+      + '<div style="font-size:11.5px;color:var(--d-muted-2);margin-top:4px;font-family:var(--d-mono);letter-spacing:0.04em">comma-separated</div>'
+      + '</div>';
+  }
+  // Long-ish strings → textarea
+  const s = value == null ? '' : String(value);
+  if (s.length > 80 || s.includes('\n')) {
+    return '<div class="label">' + dEsc(label) + '</div><div class="value">'
+      + '<textarea class="detail-textarea" data-input-path="' + dEsc(key) + '" rows="2">' + dEsc(s) + '</textarea>'
+      + '</div>';
+  }
+  return '<div class="label">' + dEsc(label) + '</div><div class="value">'
+    + '<input type="text" class="detail-input" data-input-path="' + dEsc(key) + '" value="' + dEsc(s) + '">'
+    + '</div>';
+}
+
+function humanLabel(key){
+  const map = {
+    storyKind: 'Story kind',
+    themesOther: 'Other theme',
+    placeReal: 'Real place',
+    petKind: 'Pet kind',
+    petName: 'Pet name',
+    hasPet: 'Has pet',
+    hasVillain: 'Has villain',
+    villainName: 'Villain',
+    isGift: 'Is a gift',
+    isGiftCard: 'Gift card',
+    giftFrom: 'Gift from',
+    giftRecipientEmail: 'Gift recipient email',
+    giftMessage: 'Gift message',
+    giftDeliveryNote: 'Gift delivery note',
+    delivery_mode: 'Delivery mode',
+    parentName: 'Parent name',
+    requesterName: 'Requester name',
+    others: 'Other people',
+    place: 'Place'
+  };
+  if (map[key]) return map[key];
+  // CamelCase → human
+  return key.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).replace(/_/g, ' ');
+}
+
+// ─── Brief section ──────────────────────────────────────────────────
+function renderDetailBrief(sd){
+  const brief = sd.brief || null;
+  const briefEditedAt = sd.brief_edited_at;
+  const briefGeneratedAt = sd.brief_generated_at;
+  const lastTouched = briefEditedAt && new Date(briefEditedAt) > new Date(briefGeneratedAt || 0)
+    ? 'edited ' + dTimeAgo(briefEditedAt)
+    : (briefGeneratedAt ? 'generated ' + dTimeAgo(briefGeneratedAt) : 'not generated');
+
+  let html = '<section class="detail-card" id="detail-brief">';
+  html += '<span class="detail-card-num">2</span>';
+  html += '<div class="detail-card-head"><h2 class="detail-card-title">The middle layer</h2><span class="detail-card-meta">' + dEsc(lastTouched) + '</span></div>';
+
+  if (!brief) {
+    html += '<p style="color:var(--d-muted);font-style:italic">No brief generated yet. Save inputs above and click <em>Regenerate brief</em>.</p>';
+    html += '</section>';
+    return html;
+  }
+
+  if (_detailBriefRawMode) {
+    html += '<textarea class="detail-brief-json" id="briefJsonTextarea">' + dEsc(JSON.stringify(brief, null, 2)) + '</textarea>';
+    html += '<button type="button" class="detail-brief-raw-toggle" data-action="brief-form-mode">▾ Back to structured form</button>';
+  } else {
+    html += renderBriefStructured(brief);
+    html += '<button type="button" class="detail-brief-raw-toggle" data-action="brief-raw-mode">▸ View raw JSON</button>';
+  }
+
+  const isPaid = _detailStory && (_detailStory.payment_status === 'paid' || _detailStory.paid_at);
+  html += '<div class="detail-actions">';
+  html += '<button type="button" class="d-btn d-btn-primary" data-action="save-brief">Save brief</button>';
+  html += '<button type="button" class="d-btn d-btn-regen" data-action="regen-story">Save & ' + (isPaid ? 'regenerate the story' : 'rewrite the preview from this brief') + '</button>';
+  html += '<span class="detail-status" id="briefStatus"></span>';
+  html += '</div>';
+  html += '</section>';
+  return html;
+}
+
+function renderBriefStructured(brief){
+  // Render known prose fields as labeled textareas. Anything we don't know
+  // about (custom analyst output) shows up as a generic "extras" block via
+  // the JSON view (escape hatch).
+  let html = '';
+  const proseFields = [
+    ['narrative_spine', 'Narrative spine'],
+    ['key_moment', 'Key moment'],
+    ['age_guidance', 'Age guidance'],
+    ['sensitive_notes', 'Sensitive notes'],
+    ['writer_instructions', 'Writer instructions'],
+    ['siblingDynamics', 'Sibling dynamics'],
+    ['confidence', 'Confidence']
+  ];
+
+  // Character portraits (array of objects)
+  const portraits = brief.character_portraits || brief.characters || [];
+  if (Array.isArray(portraits) && portraits.length) {
+    html += '<div class="detail-brief-section"><p class="detail-eyebrow">Character portraits</p>';
+    portraits.forEach((p, i) => {
+      const name = p.name || ('Character ' + (i + 1));
+      html += '<div class="detail-child-card" style="margin-bottom:12px">';
+      html += '<p class="detail-eyebrow">' + dEsc(name) + '</p>';
+      const portraitText = typeof p === 'string' ? p : (p.portrait || p.description || JSON.stringify(p, null, 2));
+      html += '<textarea class="detail-textarea" data-brief-path="character_portraits.' + i + '.portrait" rows="3">' + dEsc(portraitText) + '</textarea>';
+      html += '</div>';
+    });
+    html += '</div>';
+  }
+
+  // Beats (array)
+  if (Array.isArray(brief.beats) && brief.beats.length) {
+    html += '<div class="detail-brief-section"><p class="detail-eyebrow">Story beats</p>';
+    brief.beats.forEach((b, i) => {
+      const beatText = typeof b === 'string' ? b : (b.beat || b.description || JSON.stringify(b, null, 2));
+      html += '<textarea class="detail-textarea" data-brief-path="beats.' + i + '" rows="2" style="margin-bottom:8px" placeholder="Beat ' + (i + 1) + '">' + dEsc(beatText) + '</textarea>';
+    });
+    html += '</div>';
+  }
+
+  // Prose textareas for the known fields
+  for (const [key, label] of proseFields) {
+    if (brief[key] != null) {
+      html += '<div class="detail-brief-section"><p class="detail-eyebrow">' + dEsc(label) + '</p>';
+      html += '<textarea class="detail-textarea" data-brief-path="' + dEsc(key) + '" rows="3">' + dEsc(typeof brief[key] === 'string' ? brief[key] : JSON.stringify(brief[key], null, 2)) + '</textarea>';
+      html += '</div>';
+    }
+  }
+
+  // Flags array
+  if (Array.isArray(brief.flags) && brief.flags.length) {
+    html += '<div class="detail-brief-section"><p class="detail-eyebrow">Flags</p>';
+    html += '<input type="text" class="detail-input" data-brief-path="flags" data-brief-array="true" value="' + dEsc(brief.flags.join(', ')) + '">';
+    html += '</div>';
+  }
+
+  return html;
+}
+
+// ─── Story section ──────────────────────────────────────────────────
+function renderDetailStory(s){
+  const text = s.story_text || '';
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const sd = s.story_data || {};
+  const isPaid = s && (s.payment_status === 'paid' || s.paid_at);
+  const isStale = sd.brief_edited_at && s.story_text && (!sd.story_text_at || new Date(sd.brief_edited_at) > new Date(sd.story_text_at));
+
+  // Pre-payment, the prose isn't shown to the customer yet — only the first
+  // ~290 words become the preview. The full text matters more once they've
+  // paid. We still surface it pre-payment as a sanity check, but with quieter
+  // language so it doesn't feel like the main event.
+  const cardTitle = isPaid ? 'The full story' : 'Behind the preview · the full draft';
+  const cardSub = isPaid ? '' : 'The customer hears the first ~290 words as the preview. The rest is here as a sanity check before they buy.';
+
+  let html = '<section class="detail-card" id="detail-story">';
+  html += '<span class="detail-card-num">3</span>';
+  html += '<div class="detail-card-head"><h2 class="detail-card-title">' + dEsc(cardTitle) + '</h2><span class="detail-card-meta">' + (wordCount > 0 ? wordCount + ' words' : 'not written yet') + '</span></div>';
+
+  if (cardSub) {
+    html += '<p style="color:var(--d-muted);font-size:13.5px;margin:0 0 16px;line-height:1.55">' + dEsc(cardSub) + '</p>';
+  }
+
+  if (isStale) {
+    html += '<div class="detail-stale-strip">Brief edited since this draft was written. Use <em>Save &amp; rewrite the preview</em> on the brief above to refresh.</div>';
+  }
+
+  if (wordCount === 0) {
+    html += '<p style="color:var(--d-muted);font-style:italic">No draft yet. Save the brief above and click <em>rewrite the preview</em>.</p>';
+  } else {
+    html += '<textarea class="detail-textarea" id="storyTextEditor" rows="22" style="min-height:520px;font-size:17px;line-height:1.7">' + dEsc(text) + '</textarea>';
+  }
+
+  html += '<div class="detail-actions">';
+  if (wordCount > 0) {
+    html += '<button type="button" class="d-btn d-btn-primary" data-action="save-story">Save text</button>';
+    if (isPaid) {
+      // Only post-payment: rendering the full audio is the "ship" moment.
+      html += '<button type="button" class="d-btn d-btn-regen" data-action="render-audio">Render full audio</button>';
+    }
+  } else {
+    html += '<button type="button" class="d-btn d-btn-regen" data-action="regen-story">' + (isPaid ? 'Generate the story' : 'Generate the preview') + '</button>';
+  }
+  html += '<span class="detail-status" id="storyStatus"></span>';
+  html += '</div>';
+  html += '</section>';
+  return html;
+}
+
+// ─── Audio section ──────────────────────────────────────────────────
+function renderDetailAudio(s){
+  const isPaid = s && (s.payment_status === 'paid' || s.paid_at);
+  let html = '<section class="detail-card" id="detail-audio">';
+  html += '<span class="detail-card-num">4</span>';
+  html += '<div class="detail-card-head"><h2 class="detail-card-title">' + (isPaid ? 'Audio' : 'The preview') + '</h2><span class="detail-card-meta">' + (s.audio_url ? 'full rendered' : (s.preview_url ? 'preview ready' : 'none yet')) + '</span></div>';
+
+  // Preview audio (always shown — this is the asset the customer hears now)
+  html += '<div class="detail-audio-row">';
+  html += '<span class="detail-audio-label">Preview · 2 min</span>';
+  if (s.preview_url) {
+    html += '<div class="detail-audio-player"><audio controls src="' + dEsc(s.preview_url) + '"></audio></div>';
+  } else {
+    html += '<span class="detail-audio-empty">Not generated</span>';
+  }
+  html += '</div>';
+
+  // Full audio: only show post-payment. Pre-payment, this isn't a thing yet
+  // and surfaces noise.
+  if (isPaid) {
+    html += '<div class="detail-audio-row">';
+    html += '<span class="detail-audio-label">Full · 15 min</span>';
+    if (s.audio_url) {
+      html += '<div class="detail-audio-player"><audio controls src="' + dEsc(s.audio_url) + '"></audio></div>';
+    } else {
+      html += '<span class="detail-audio-empty">Not rendered</span>';
+    }
+    html += '</div>';
+  }
+
+  html += '<div class="detail-actions">';
+  // Full-audio render + send buttons are post-payment only.
+  if (isPaid && s.story_text && !s.audio_url) {
+    html += '<button type="button" class="d-btn d-btn-regen" data-action="render-audio">Render full audio</button>';
+  }
+  if (isPaid && s.audio_url) {
+    html += '<button type="button" class="d-btn d-btn-primary" data-action="send-customer">Send to customer</button>';
+    html += '<a class="d-btn d-btn-ghost" href="/listen/' + dEsc(s.id) + '?t=' + dEsc(s.access_token || '') + '" target="_blank" rel="noopener">Open listen page</a>';
+  }
+  html += '<a class="d-btn d-btn-ghost" href="/preview/' + dEsc(s.id) + '?t=' + dEsc(s.access_token || '') + '" target="_blank" rel="noopener">Open customer view</a>';
+  html += '<span class="detail-status" id="audioStatus"></span>';
+  html += '</div>';
+  html += '</section>';
+  return html;
+}
+
+// ─── Handlers ───────────────────────────────────────────────────────
+function attachDetailHandlers(){
+  const body = document.getElementById('detailBody');
+  // Bool toggles
+  body.querySelectorAll('[data-input-bool]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isOn = btn.classList.toggle('is-on');
+      btn.textContent = isOn ? 'Yes' : 'No';
+    });
+  });
+  // Action buttons (event delegation)
+  body.addEventListener('click', (e) => {
+    const t = e.target.closest('[data-action]');
+    if (!t) return;
+    const action = t.dataset.action;
+    if (action === 'ack-message') ackMessage(t.dataset.at, t);
+    else if (action === 'save-inputs') saveInputs(t);
+    else if (action === 'regen-brief') saveInputsThenRegenBrief(t);
+    else if (action === 'save-brief') saveBrief(t);
+    else if (action === 'regen-story') saveBriefThenRegenStory(t);
+    else if (action === 'save-story') saveStory(t);
+    else if (action === 'render-audio') renderAudio(t);
+    else if (action === 'send-customer') sendToCustomer(t);
+    else if (action === 'brief-raw-mode') { _detailBriefRawMode = true; renderDetail(); }
+    else if (action === 'brief-form-mode') { _detailBriefRawMode = false; renderDetail(); }
+  });
+}
+
+// Collects every form input under #detail-inputs into a nested updates object.
+// Handles dot-paths (children.0.name → { children: [{ name: ... }] }) and
+// arrays (comma-split fields).
+function collectInputUpdates(){
+  const updates = {};
+  const setPath = (path, val) => {
+    const parts = path.split('.');
+    let cur = updates;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const key = parts[i];
+      const nextKey = parts[i + 1];
+      const isArrayNext = /^\d+$/.test(nextKey);
+      if (cur[key] == null) cur[key] = isArrayNext ? [] : {};
+      cur = cur[key];
+    }
+    const lastKey = parts[parts.length - 1];
+    cur[/^\d+$/.test(lastKey) ? Number(lastKey) : lastKey] = val;
+  };
+  document.querySelectorAll('#detail-inputs [data-input-path]').forEach(el => {
+    const path = el.dataset.inputPath;
+    if (el.dataset.inputBool) {
+      setPath(path, el.classList.contains('is-on'));
+    } else if (el.dataset.inputArray) {
+      const arr = (el.value || '').split(',').map(x => x.trim()).filter(Boolean);
+      setPath(path, arr);
+    } else if (el.type === 'number') {
+      const n = parseInt(el.value, 10);
+      setPath(path, Number.isFinite(n) ? n : el.value);
+    } else {
+      setPath(path, el.value);
+    }
+  });
+  return updates;
+}
+
+function setStatus(id, text, kind){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text || '';
+  el.classList.remove('is-ok', 'is-err');
+  if (kind === 'ok') el.classList.add('is-ok');
+  if (kind === 'err') el.classList.add('is-err');
+}
+
+async function saveInputs(btn){
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  setStatus('inputsStatus', 'Saving…');
+  try {
+    const updates = collectInputUpdates();
+    updates.input_edited_at = new Date().toISOString();
+    const data = await queueApi('update-data', {}, { storyId: _detailStoryId, updates });
+    if (data.error) throw new Error(data.error);
+    setStatus('inputsStatus', 'Saved', 'ok');
+    // Refresh local copy
+    const fresh = await queueApi('get', { id: _detailStoryId });
+    if (fresh && fresh.story) _detailStory = fresh.story;
+  } catch (e) {
+    setStatus('inputsStatus', 'Failed: ' + (e.message || e), 'err');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Save inputs'; }
+}
+
+async function saveInputsThenRegenBrief(btn){
+  const isPaid = _detailStory && (_detailStory.payment_status === 'paid' || _detailStory.paid_at);
+  const tail = isPaid ? '' : ' The preview will then re-render automatically.';
+  if (!confirm('Rewrite the brief from these inputs?' + tail + ' This overwrites the current brief.')) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Working…'; }
+  setStatus('inputsStatus', 'Saving inputs…');
+  const beforeBriefAt = _detailStory?.story_data?.brief_generated_at || '';
+  try {
+    const updates = collectInputUpdates();
+    updates.input_edited_at = new Date().toISOString();
+    let data = await queueApi('update-data', {}, { storyId: _detailStoryId, updates });
+    if (data.error) throw new Error(data.error);
+    setStatus('inputsStatus', 'Brief rewriting…');
+    data = await queueApi('regenerate-brief', {}, { storyId: _detailStoryId });
+    if (data.error) throw new Error(data.error);
+    pollUntilFresh({
+      beforeBriefAt,
+      statusEl: 'inputsStatus',
+      buttonEl: btn,
+      buttonText: 'Save & rewrite the brief',
+      waitForPreview: !isPaid,
+      stages: isPaid
+        ? ['Brief rewriting…', 'Brief rewriting…', 'Brief rewriting…', 'Brief rewriting…']
+        : ['Brief rewriting…', 'Brief done. Preview writing…', 'Preview writing…', 'Preview recording…']
+    });
+  } catch (e) {
+    setStatus('inputsStatus', 'Failed: ' + (e.message || e), 'err');
+    if (btn) { btn.disabled = false; btn.textContent = 'Save & rewrite the brief'; }
+  }
+}
+
+// Poll every 5s for up to 2 minutes, watching for the brief_generated_at
+// timestamp to change. When the brief lands, optionally keep polling for
+// status='preview_ready' (or 'preview_failed') to catch the chained
+// preview-worker. UI re-renders after every successful poll so progress is
+// visible. Stops polling on success, failure, or timeout.
+async function pollUntilFresh({ beforeBriefAt, statusEl, buttonEl, buttonText, waitForPreview, stages }){
+  const stagesArr = Array.isArray(stages) ? stages : [];
+  const maxAttempts = 30; // 30 × 5s = 2min 30s — enough for brief + writer + TTS
+  let briefDone = false;
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 5000));
+    if (stagesArr[Math.min(i, stagesArr.length - 1)]) setStatus(statusEl, stagesArr[Math.min(i, stagesArr.length - 1)]);
+    let fresh;
+    try { fresh = await queueApi('get', { id: _detailStoryId }); } catch (_) { continue; }
+    if (!fresh || !fresh.story) continue;
+    const newBriefAt = fresh.story.story_data?.brief_generated_at || '';
+    const status = fresh.story.status;
+    const previewSettled = status === 'preview_ready' || status === 'preview_sent' || status === 'preview_failed';
+    const briefJustLanded = newBriefAt && newBriefAt !== beforeBriefAt;
+
+    // Re-render whenever the row meaningfully changes (brief landed, or status flipped)
+    if (briefJustLanded || previewSettled) {
+      _detailStory = fresh.story;
+      renderDetail();
+      if (briefJustLanded) briefDone = true;
+    }
+
+    // Stop conditions
+    if (status === 'preview_failed' || status === 'brief_failed') {
+      setStatus(statusEl, 'Failed at ' + status + '. Check Issues tab.', 'err');
+      if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = buttonText; }
+      return;
+    }
+    if (waitForPreview && previewSettled && briefDone) {
+      setStatus(statusEl, 'Done — preview re-rendered.', 'ok');
+      if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = buttonText; }
+      return;
+    }
+    if (!waitForPreview && briefJustLanded) {
+      setStatus(statusEl, 'Brief done.', 'ok');
+      if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = buttonText; }
+      return;
+    }
+  }
+  // Timeout fallback
+  setStatus(statusEl, 'Still running in the background. Refresh in a minute to see the result.', 'err');
+  if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = buttonText; }
+}
+
+function collectBriefUpdates(){
+  if (_detailBriefRawMode) {
+    const ta = document.getElementById('briefJsonTextarea');
+    return ta ? ta.value : null;
+  }
+  const brief = JSON.parse(JSON.stringify(_detailStory.story_data?.brief || {}));
+  document.querySelectorAll('#detail-brief [data-brief-path]').forEach(el => {
+    const path = el.dataset.briefPath;
+    let val = el.value;
+    if (el.dataset.briefArray) val = val.split(',').map(x => x.trim()).filter(Boolean);
+    const parts = path.split('.');
+    let cur = brief;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const key = parts[i];
+      const nextKey = parts[i + 1];
+      const isArrayNext = /^\d+$/.test(nextKey);
+      if (cur[key] == null) cur[key] = isArrayNext ? [] : {};
+      cur = cur[key];
+    }
+    const lastKey = parts[parts.length - 1];
+    cur[/^\d+$/.test(lastKey) ? Number(lastKey) : lastKey] = val;
+  });
+  return brief;
+}
+
+async function saveBrief(btn){
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  setStatus('briefStatus', 'Saving…');
+  try {
+    const brief = collectBriefUpdates();
+    const data = await queueApi('update-brief', {}, { storyId: _detailStoryId, brief });
+    if (data.error) throw new Error(data.error);
+    setStatus('briefStatus', 'Saved', 'ok');
+    const fresh = await queueApi('get', { id: _detailStoryId });
+    if (fresh && fresh.story) _detailStory = fresh.story;
+  } catch (e) {
+    setStatus('briefStatus', 'Failed: ' + (e.message || e), 'err');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Save brief'; }
+}
+
+async function saveBriefThenRegenStory(btn){
+  const isPaid = _detailStory && (_detailStory.payment_status === 'paid' || _detailStory.paid_at);
+  const noun = isPaid ? 'story' : 'preview';
+  const hasStoryEdits = !!(_detailStory?.story_text);
+  const msg = hasStoryEdits
+    ? 'Rewrite the ' + noun + ' from this brief? This overwrites the current draft.'
+    : 'Rewrite the ' + noun + ' from this brief?';
+  if (!confirm(msg)) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Working…'; }
+  setStatus('briefStatus', 'Saving brief…');
+  const beforePreviewAt = _detailStory?.preview_ready_at || '';
+  try {
+    const brief = collectBriefUpdates();
+    let data = await queueApi('update-brief', {}, { storyId: _detailStoryId, brief });
+    if (data.error) throw new Error(data.error);
+    setStatus('briefStatus', 'Rewriting…');
+    data = await queueApi('generate-preview', {}, { storyId: _detailStoryId });
+    if (data.error) throw new Error(data.error);
+    pollPreviewSettled({
+      beforePreviewAt,
+      statusEl: 'briefStatus',
+      buttonEl: btn,
+      buttonText: 'Save & rewrite',
+      stages: ['Writing…', 'Writing…', 'Writing…', 'Recording…', 'Recording…', 'Almost there…']
+    });
+  } catch (e) {
+    setStatus('briefStatus', 'Failed: ' + (e.message || e), 'err');
+    if (btn) { btn.disabled = false; btn.textContent = 'Save & rewrite'; }
+  }
+}
+
+// Poll every 5s for up to 2 minutes, watching for status to flip to
+// preview_ready/preview_sent/preview_failed and preview_ready_at to bump.
+// Re-renders the detail view as soon as the new content lands.
+async function pollPreviewSettled({ beforePreviewAt, statusEl, buttonEl, buttonText, stages }){
+  const stagesArr = Array.isArray(stages) ? stages : [];
+  const maxAttempts = 30;
+  for (let i = 0; i < maxAttempts; i++) {
+    await new Promise(r => setTimeout(r, 5000));
+    if (stagesArr[Math.min(i, stagesArr.length - 1)]) setStatus(statusEl, stagesArr[Math.min(i, stagesArr.length - 1)]);
+    let fresh;
+    try { fresh = await queueApi('get', { id: _detailStoryId }); } catch (_) { continue; }
+    if (!fresh || !fresh.story) continue;
+    const status = fresh.story.status;
+    const newPreviewAt = fresh.story.preview_ready_at || '';
+    const settled = status === 'preview_ready' || status === 'preview_sent';
+    const failed = status === 'preview_failed';
+
+    if (settled && newPreviewAt && newPreviewAt !== beforePreviewAt) {
+      _detailStory = fresh.story;
+      renderDetail();
+      setStatus(statusEl, 'Done — new preview ready.', 'ok');
+      if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = buttonText; }
+      return;
+    }
+    if (failed) {
+      setStatus(statusEl, 'Preview write failed. Check Issues tab.', 'err');
+      if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = buttonText; }
+      return;
+    }
+  }
+  setStatus(statusEl, 'Still running in the background. Refresh in a minute.', 'err');
+  if (buttonEl) { buttonEl.disabled = false; buttonEl.textContent = buttonText; }
+}
+
+async function saveStory(btn){
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  setStatus('storyStatus', 'Saving…');
+  try {
+    const ta = document.getElementById('storyTextEditor');
+    const text = ta ? ta.value : '';
+    const data = await queueApi('update-text', {}, { storyId: _detailStoryId, storyText: text });
+    if (data.error) throw new Error(data.error);
+    setStatus('storyStatus', 'Saved', 'ok');
+    const fresh = await queueApi('get', { id: _detailStoryId });
+    if (fresh && fresh.story) _detailStory = fresh.story;
+  } catch (e) {
+    setStatus('storyStatus', 'Failed: ' + (e.message || e), 'err');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Save story'; }
+}
+
+async function renderAudio(btn){
+  if (!confirm('Render audio from the current story text? Takes about a minute.')) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Rendering…'; }
+  setStatus('audioStatus', 'Rendering audio…');
+  try {
+    const data = await queueApi('generate-tts', {}, { storyId: _detailStoryId });
+    if (data.error) throw new Error(data.error);
+    setStatus('audioStatus', 'Rendering. Refresh in 30–60 seconds to see the audio.', 'ok');
+  } catch (e) {
+    setStatus('audioStatus', 'Failed: ' + (e.message || e), 'err');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Render audio from story'; }
+}
+
+async function sendToCustomer(btn){
+  closeDetail();
+  sendStory(_detailStoryId, btn);
+}
+
+async function ackMessage(at, btn){
+  if (btn) { btn.disabled = true; btn.textContent = 'Marking…'; }
+  try {
+    const data = await queueApi('ack-customer-message', {}, { storyId: _detailStoryId, at });
+    if (data.error) throw new Error(data.error);
+    const fresh = await queueApi('get', { id: _detailStoryId });
+    if (fresh && fresh.story) { _detailStory = fresh.story; renderDetail(); }
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Mark resolved'; }
+    alert('Could not acknowledge: ' + (e.message || e));
   }
 }
 

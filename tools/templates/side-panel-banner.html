@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Form-card overlay (v7 revised)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* v7 (revised) — form-style card overlay in plum + terracotta.
+     Mirrors the v2-02b "/start mid-fill" mockup but in our brand
+     colours, not cream paper. The card cycles through states like
+     v6, but each state is rendered as if it's a real form step
+     (step counter, big serif heading, input fields, Continue button)
+     so the viewer recognises it as the page they're about to see. */
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: transparent; }
+
+  :root {
+    --plum-deep: #1F1A2E;
+    --plum-card: #2F283A;
+    --plum-card-border: rgba(216, 122, 62, .35);
+    --plum-row: #3E3845;
+    --plum-row-border: rgba(255,255,255,.05);
+    --terra: #D87A3E;
+    --terra-soft: rgba(216, 122, 62, .85);
+    --gold-label: #C8B385;
+    --paper-italic: #EFE3CB;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--paper-italic);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .frame { position: relative; width: 100%; height: 100%; }
+
+  /* Top wordmark (kept from v6) */
+  .wordmark {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 130px;
+    background: var(--plum-deep);
+    padding: 22px 36px 18px 36px;
+    z-index: 2;
+  }
+  .wordmark .h {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 32px;
+    line-height: 1.05;
+    color: #fff;
+  }
+  .wordmark .h em { color: var(--terra); font-style: italic; }
+  .wordmark .sub {
+    margin-top: 6px;
+    font-style: normal;
+    font-size: 12px;
+    color: rgba(255,255,255,.55);
+    font-weight: 400;
+  }
+
+  /* The form-style card — sits over the footage, looks like a real
+     /start step rendered in our plum theme */
+  .card {
+    position: absolute;
+    top: 460px;
+    left: 50px;
+    right: 50px;
+    background: var(--plum-card);
+    border: 1.5px solid var(--plum-card-border);
+    border-radius: 24px;
+    padding: 32px 36px 28px 36px;
+    box-shadow: 0 24px 60px -20px rgba(0,0,0,.7);
+    z-index: 3;
+  }
+
+  .step-counter {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold-label);
+    margin-bottom: 14px;
+  }
+
+  .heading {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 500;
+    font-size: 36px;
+    line-height: 1.1;
+    color: #fff;
+    margin: 0 0 22px 0;
+    letter-spacing: -.005em;
+  }
+  .heading em { font-style: italic; color: var(--terra); }
+
+  /* Hide all states by default; show the active one */
+  .state { display: none; }
+  .state.is-active { display: block; }
+
+  /* State 1 — WHAT KIND? + gift toggle */
+  .kind-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .chip-card {
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: 14px;
+    padding: 22px 20px;
+    text-align: left;
+  }
+  .chip-card.is-selected {
+    background: rgba(216, 122, 62, .14);
+    border-color: var(--terra);
+  }
+  .chip-card .chip-icon {
+    font-size: 26px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .chip-card .chip-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 20px;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .chip-card .chip-sub {
+    font-size: 12.5px;
+    color: rgba(255,255,255,.55);
+    line-height: 1.35;
+  }
+
+  .and-divider {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--gold-label);
+    margin: 22px 0 8px 0;
+  }
+  .gift-question {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: 22px;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .gift-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .gift-chip {
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14.5px;
+    color: var(--paper-italic);
+  }
+  .gift-chip.is-selected {
+    background: rgba(216, 122, 62, .14);
+    border-color: var(--terra);
+    color: #fff;
+  }
+  .gift-chip .gift-icon { font-size: 16px; }
+
+  /* State 2 — THE COUSINS (per-child name + age rows) */
+  .kid-row {
+    display: flex;
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .kid-row .name-cell {
+    flex: 1 1 auto;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--paper-italic);
+  }
+  .kid-row .name-cell .label,
+  .kid-row .age-cell .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-style: normal;
+    font-size: 10px;
+    color: var(--gold-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .kid-row .age-cell {
+    flex: 0 0 110px;
+    padding: 14px 16px;
+    background: rgba(0,0,0,.18);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--paper-italic);
+  }
+
+  /* State 3 — THE WORLD (label-above-value rows) */
+  .world-row {
+    background: var(--plum-row);
+    border: 1px solid var(--plum-row-border);
+    border-radius: 12px;
+    padding: 12px 18px 14px 18px;
+    margin-bottom: 8px;
+  }
+  .world-row .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 10px;
+    color: var(--gold-label);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .world-row .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--paper-italic);
+    margin-top: 2px;
+    line-height: 1.15;
+  }
+
+  /* Continue button (always visible at the bottom of each state) */
+  .continue-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+  }
+  .continue-btn {
+    background: var(--terra);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 14px 26px;
+    border-radius: 999px;
+    letter-spacing: .005em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Bottom CTA — same as v6 */
+  .cta {
+    position: absolute;
+    bottom: 50px;
+    left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .cta-pill {
+    background: var(--terra);
+    color: #fff;
+    padding: 20px 42px 18px 42px;
+    border-radius: 28px;
+    text-align: center;
+    line-height: 1.18;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    transition: opacity .3s ease;
+  }
+  .cta-pill .cta-primary { font-weight: 700; font-size: 30px; letter-spacing: .005em; }
+  .cta-pill .cta-secondary { font-weight: 500; font-size: 19px; opacity: .9; letter-spacing: .015em; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="wordmark">
+    <div class="h"><em>Their</em> name in their <em>story</em>.</div>
+    <div class="sub">Made by hand. By a dad and his son.</div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="step-counter" id="step-counter">STEP 1 OF 11</div>
+    <h2 class="heading" id="heading">What kind of story?</h2>
+
+    <!-- State 1: kind + gift -->
+    <div class="state" id="state-1">
+      <div class="kind-row">
+        <div class="chip-card" id="kind-bedtime">
+          <span class="chip-icon">🌙</span>
+          <div class="chip-title">A bedtime story</div>
+          <div class="chip-sub">Calm, warm, a soft landing into sleep.</div>
+        </div>
+        <div class="chip-card" id="kind-adventure">
+          <span class="chip-icon">⭐</span>
+          <div class="chip-title">A bigger adventure</div>
+          <div class="chip-sub">More excitement, for daytime, trips, treats.</div>
+        </div>
+      </div>
+      <div class="and-divider">AND</div>
+      <div class="gift-question">Is this a gift?</div>
+      <div class="gift-row">
+        <div class="gift-chip is-selected"><span class="gift-icon">🏠</span><span>For my own family</span></div>
+        <div class="gift-chip"><span class="gift-icon">🎁</span><span>It's a gift</span></div>
+      </div>
+    </div>
+
+    <!-- State 2: cousins -->
+    <div class="state" id="state-2">
+      <div class="kid-row" id="kid-1">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-1-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-1-age"></span></div>
+      </div>
+      <div class="kid-row" id="kid-2">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-2-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-2-age"></span></div>
+      </div>
+      <div class="kid-row" id="kid-3">
+        <div class="name-cell"><span class="label">Name</span><span id="kid-3-name"></span></div>
+        <div class="age-cell"><span class="label">Age</span><span id="kid-3-age"></span></div>
+      </div>
+    </div>
+
+    <!-- State 3: the world -->
+    <div class="state" id="state-3">
+      <div class="world-row" id="world-1">
+        <div class="label">Place</div>
+        <div class="value" id="world-1-value"></div>
+      </div>
+      <div class="world-row" id="world-2">
+        <div class="label">What they love</div>
+        <div class="value" id="world-2-value"></div>
+      </div>
+      <div class="world-row" id="world-3">
+        <div class="label">Other people</div>
+        <div class="value" id="world-3-value"></div>
+      </div>
+      <div class="world-row" id="world-4">
+        <div class="label">About Chase</div>
+        <div class="value" id="world-4-value"></div>
+      </div>
+    </div>
+
+    <div class="continue-row">
+      <span class="continue-btn">Continue <span style="font-size:18px;line-height:1">→</span></span>
+    </div>
+  </div>
+
+  <div class="cta">
+    <span class="cta-pill" id="cta-pill">
+      <span class="cta-primary">Make a story for the kids you love</span>
+      <span class="cta-secondary">free 2-min preview</span>
+    </span>
+  </div>
+</div>
+
+<script>
+  // Cycler timeline. The card morphs between three form states:
+  //   1) Step 1 — what kind? + gift
+  //   2) Step 2 — the cousins (kids fill in one by one)
+  //   3) Step 5 — the world (place / themes / others / quirk fill in)
+  // Continue button stays present in every state so the visual cue
+  // "this is a real form" is consistent.
+
+  const STATES = [
+    {
+      id: 'state-1', counter: 'STEP 1 OF 11', title: 'What kind of story?',
+      start: 1.5, end: 6.5,
+      onTime: (t, local) => {
+        if (local >= 1.0) document.getElementById('kind-adventure').classList.add('is-selected');
+        else document.getElementById('kind-adventure').classList.remove('is-selected');
+      }
+    },
+    {
+      id: 'state-2', counter: 'STEP 2 OF 11', title: "Who's the story for?",
+      start: 7.0, end: 13.5,
+      kids: [
+        { name: 'Chase', age: '9', start: 0.4 },
+        { name: 'Darcy', age: '5', start: 1.7 },
+        { name: 'Ethan', age: '3', start: 3.0 },
+      ],
+      onTime: (t, local, spec) => {
+        for (let i = 0; i < spec.kids.length; i++) {
+          const k = spec.kids[i];
+          const row = document.getElementById(`kid-${i+1}`);
+          if (local < k.start) {
+            row.style.opacity = '0';
+            document.getElementById(`kid-${i+1}-name`).textContent = '';
+            document.getElementById(`kid-${i+1}-age`).textContent = '';
+            continue;
+          }
+          row.style.opacity = '1';
+          const localK = local - k.start;
+          const fade = Math.min(1, localK / 0.4);
+          row.style.opacity = String(fade);
+          const typeProgress = Math.min(1, (localK - 0.3) / 0.6);
+          if (typeProgress > 0) {
+            const charsName = Math.ceil(k.name.length * typeProgress);
+            const charsAge = Math.ceil(k.age.length * typeProgress);
+            document.getElementById(`kid-${i+1}-name`).textContent = k.name.slice(0, charsName);
+            document.getElementById(`kid-${i+1}-age`).textContent = k.age.slice(0, charsAge);
+          }
+        }
+      }
+    },
+    {
+      id: 'state-3', counter: 'STEP 5 OF 11', title: 'The world',
+      start: 14.0, end: 21.0,
+      worlds: [
+        { value: "Nanny's House",            start: 0.4 },
+        { value: 'Home Alone',                start: 1.7 },
+        { value: 'Nanny',                     start: 2.9 },
+        { value: 'always has his shoes on',   start: 4.0 },
+      ],
+      onTime: (t, local, spec) => {
+        for (let i = 0; i < spec.worlds.length; i++) {
+          const w = spec.worlds[i];
+          const row = document.getElementById(`world-${i+1}`);
+          if (local < w.start) {
+            row.style.opacity = '0';
+            document.getElementById(`world-${i+1}-value`).textContent = '';
+            continue;
+          }
+          const localK = local - w.start;
+          const fade = Math.min(1, localK / 0.4);
+          row.style.opacity = String(fade);
+          const typeProgress = Math.min(1, (localK - 0.3) / 0.7);
+          if (typeProgress > 0) {
+            const chars = Math.ceil(w.value.length * typeProgress);
+            document.getElementById(`world-${i+1}-value`).textContent = w.value.slice(0, chars);
+          }
+        }
+      }
+    }
+  ];
+
+  const SOURCE_CHIP_START = 16.5;
+  const SOURCE_CHIP_END = 23.5;
+  const CARD_HIDE_AFTER = 21.5;
+
+  function clearAll() {
+    for (const s of STATES) {
+      document.getElementById(s.id).classList.remove('is-active');
+    }
+  }
+
+  function setTime(t) {
+    clearAll();
+    const card = document.getElementById('card');
+    const ctaPill = document.getElementById('cta-pill');
+
+    if (t >= SOURCE_CHIP_START && t <= SOURCE_CHIP_END) ctaPill.style.opacity = '0';
+    else ctaPill.style.opacity = '1';
+
+    if (t >= CARD_HIDE_AFTER) {
+      card.style.opacity = '0';
+      return;
+    }
+    card.style.opacity = '1';
+
+    let active = STATES[0];
+    for (const s of STATES) { if (t >= s.start) active = s; }
+
+    if (t < STATES[0].start) {
+      document.getElementById('step-counter').textContent = STATES[0].counter;
+      document.getElementById('heading').textContent = STATES[0].title;
+      return;
+    }
+
+    document.getElementById('step-counter').textContent = active.counter;
+    document.getElementById('heading').textContent = active.title;
+    document.getElementById(active.id).classList.add('is-active');
+    if (active.onTime) active.onTime(t, t - active.start, active);
+  }
+
+  const params = new URLSearchParams(location.search);
+  const initialT = parseFloat(params.get('t') || '0');
+  window.setTime = setTime;
+  document.fonts.ready.then(() => {
+    setTime(initialT);
+    document.body.setAttribute('data-ready', 'true');
+  });
+</script>
+</body>
+</html>

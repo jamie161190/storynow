@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tell us about them — HearTheirName</title>
-<meta name="description" content="Eight quick questions, a free 2-minute preview lands in your inbox within 24 hours.">
+<title>Tell us about them · HearTheirName</title>
+<meta name="description" content="Eight quick questions, then a free 2-minute preview ready to play in your browser in about 3 minutes.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="posthog-key" content="">
@@ -87,6 +87,21 @@ textarea.txt{resize:vertical}
 .field{margin-bottom:14px}
 .field-label{font-family:var(--mono);color:var(--muted-2);margin-bottom:6px;font-size:11px;letter-spacing:.06em;text-transform:uppercase}
 .field-hint{font-size:12px;color:var(--muted-2);margin-top:6px;line-height:1.5}
+.email-suggestion{margin-top:10px;font-size:13.5px;color:var(--ink);background:rgba(75,46,131,.06);border:1px solid rgba(75,46,131,.22);border-radius:10px;padding:10px 14px;line-height:1.4;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.email-suggestion strong{font-weight:600;color:var(--plum)}
+.email-suggestion .suggest-accept{appearance:none;background:var(--plum);color:#fff;border:0;border-radius:6px;padding:5px 12px;font-family:var(--sans);font-size:12.5px;font-weight:600;cursor:pointer;line-height:1;letter-spacing:.01em}
+.email-suggestion .suggest-accept:hover{opacity:.9}
+.email-suggestion .suggest-dismiss{appearance:none;background:transparent;color:var(--muted-2);border:0;font-family:var(--sans);font-size:12px;cursor:pointer;padding:4px 6px;text-decoration:underline}
+.review-stack{display:flex;flex-direction:column;gap:12px}
+.review-card{background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.review-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px}
+.review-card-head .kicker{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2);font-weight:600}
+.review-edit{appearance:none;background:transparent;border:1px solid var(--line);color:var(--plum);font-family:var(--sans);font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;cursor:pointer;letter-spacing:.02em}
+.review-edit:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+.review-card-body{display:flex;flex-direction:column;gap:6px}
+.review-line{font-size:14.5px;color:var(--ink);line-height:1.5}
+.review-line strong{font-weight:600}
+.review-line em{color:var(--muted)}
 
 /* Toggle */
 .toggle{appearance:none;border:0;background:transparent;display:inline-flex;align-items:center;gap:12px;cursor:pointer;padding:0}
@@ -178,35 +193,49 @@ const PETS = [
   ['🐠','Fish'],['🦎','Reptile'],['🐴','Horse'],['🦜','Other']
 ];
 const VOICES = [
-  'British (warm)','British (gentle)','Irish (lilting)',
+  'British (gentle)','Irish (lilting)',
   'American (cosy)','Scottish (kind)','Australian (bright)'
 ];
-const AGE_BANDS = ['2-3','4-5','6-7','8+'];
+// Numeric age now (was banded). The writer needs an actual number to pitch the
+// reading age right — a 13-year-old should not get the same prose as a 7-year-old.
+function ageNum(v){ const n = parseInt(v, 10); return Number.isFinite(n) && n >= 0 && n <= 17 ? n : null; }
 const PRONOUNS = ['She / her','He / him','They / them'];
 
-function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'' }; }
+function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'' }; }
+
+// If the customer typed their child's name on the homepage cover-tryon
+// before clicking through, the homepage appended ?name=Chase so the funnel
+// can pre-fill it. Read once at boot and use to seed the first child.
+function _firstChildFromUrl(){
+  try {
+    const n = (new URLSearchParams(window.location.search).get('name') || '').trim().slice(0, 24);
+    if (!n) return newChild();
+    return { ...newChild(), name: n };
+  } catch (_) { return newChild(); }
+}
 
 const state = {
   step: 0,
   data: {
-    children: [newChild()],
+    children: [_firstChildFromUrl()],
     storyKind: '',
     bestFriend: '', others: '',
     hasPet: false, petKind:'', petName:'',
     toy: '',
+    hasVillain: false, villainName: '',
     themes: [], themesOther: '',
     place: '', placeReal: '',
     quirk: '',
     voice: '',
     isGift: STARTS_AS_GIFT || STARTS_AS_GIFTCARD,
     isGiftCard: STARTS_AS_GIFTCARD,
-    giftFrom: '', giftMessage: '',
+    giftFrom: '', giftMessage: '', giftDeliveryNote: '',
     email: '',
     requestId: null,
   }
 };
 
-const TOTAL_STEPS = 11; // 8 questionnaire + email + confirm-inbox + ordered
+const TOTAL_STEPS = 10; // 7 questionnaire (kind, children, themes, place, casting, quirks, voice) + email + confirm-inbox + ordered. Adventure stories add a villain step (11 total). Variable is informational only — actual count uses STEPS.length at runtime.
 
 const STEPS = [
   { key:'kind', title:"What kind of story?", sub:"This shapes the pace, voice and where it ends.",
@@ -215,7 +244,7 @@ const STEPS = [
       <div class="grid-2">
         ${[
           {v:'bedtime',e:'🌙',t:'A bedtime story',d:"Calm, warm, a soft landing into sleep."},
-          {v:'adventure',e:'⭐',t:'A bigger adventure',d:"More excitement, for daytime, journeys, treats."}
+          {v:'adventure',e:'⭐',t:'A bigger adventure',d:"More excitement, for daytime, trips, treats."}
         ].map(o => `
           <button class="chip-card" data-on="${state.data.storyKind === o.v}" data-action="setKind" data-value="${o.v}" type="button">
             <div style="font-size:32px">${o.e}</div>
@@ -226,7 +255,7 @@ const STEPS = [
       </div>` },
 
   { key:'children', title:"Who's the story for?", sub:"You can add a sibling or two. They'll share the adventure.",
-    valid: () => state.data.children.length > 0 && state.data.children.every(c => c.name.trim() && c.age && c.pronouns),
+    valid: () => state.data.children.length > 0 && state.data.children.every(c => c.name.trim() && ageNum(c.age) !== null && c.pronouns),
     render: () => `
       <div style="display:flex;flex-direction:column;gap:14px">
         ${state.data.children.map((c, i) => `
@@ -236,8 +265,14 @@ const STEPS = [
               ${state.data.children.length > 1 ? `<button type="button" class="child-card-remove" data-action="removeChild" data-i="${i}">Remove</button>` : ''}
             </div>
             <input class="txt" placeholder="Their name" value="${esc(c.name)}" data-action="updateChild" data-i="${i}" data-k="name" style="margin-bottom:10px">
-            <div class="grid-4" style="margin-bottom:10px">
-              ${AGE_BANDS.map(a => `<button type="button" class="chip" data-on="${c.age === a}" data-action="updateChild" data-i="${i}" data-k="age" data-v="${a}" style="padding:10px 8px;font-size:13px">${a}</button>`).join('')}
+            <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
+              <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:4px">
+                <input class="txt" type="number" inputmode="numeric" min="0" max="17" placeholder="Age" value="${esc(c.age)}" data-action="updateChild" data-i="${i}" data-k="age" style="width:110px;text-align:center;font-size:18px;padding:12px 10px">
+                <div class="field-hint" style="margin:0;text-align:center;font-size:11px">years old</div>
+              </div>
+              <div class="field-hint" style="flex:1;margin:0;padding-top:6px;line-height:1.5">
+                Helps us pitch the reading level just right. A 4-year-old gets simpler words and shorter sentences; a 12-year-old gets richer ones.
+              </div>
             </div>
             <div class="grid-3">
               ${PRONOUNS.map(p => `<button type="button" class="chip" data-on="${c.pronouns === p}" data-action="updateChild" data-i="${i}" data-k="pronouns" data-v="${esc(p)}" style="padding:10px 6px;font-size:12px">${p}</button>`).join('')}
@@ -275,22 +310,41 @@ const STEPS = [
       <div class="kicker" style="margin-top:18px;margin-bottom:6px">OR A REAL PLACE THEY LOVE</div>
       <input class="txt" placeholder="e.g. Grandma's garden, the park on Elm Street" value="${esc(state.data.placeReal)}" data-action="setPlaceReal">` },
 
-  { key:'casting', title:"Who's in the story with them?", sub:"This is the casting. Real names, real roles.",
+  { key:'casting', title:"Who's in the story with them?", sub:"Each child can have their own best friend and comfort toy. All optional, all woven into the right scenes.",
     valid: () => true,
-    render: () => `
-      <div style="display:flex;flex-direction:column;gap:14px">
+    render: () => {
+      const childPossessive = (c, i) => (c.name && c.name.trim()) ? `${c.name.trim()}'s` : `Child ${i + 1}'s`;
+      const childWord = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
+      return `
+      <div style="display:flex;flex-direction:column;gap:18px">
         <div>
-          <div class="field-label">BEST FRIEND OR FAVOURITE PERSON</div>
-          <input class="txt" placeholder="e.g. Mira" value="${esc(state.data.bestFriend)}" data-action="setBestFriend">
-          <div class="field-hint">They go on the adventure together. Don't know? Type a name and we'll make it work.</div>
+          <div class="field-label">BEST FRIEND (ONE PER CHILD, ALL OPTIONAL)</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+            ${state.data.children.map((c, i) => `
+              <input class="txt" placeholder="${esc(childPossessive(c, i))} best friend (optional)" value="${esc(c.bestFriend || '')}" data-action="updateChild" data-i="${i}" data-k="bestFriend">
+            `).join('')}
+          </div>
+          <div class="field-hint">e.g. Mira. They'll get real dialogue and a moment in scenes featuring ${state.data.children.length > 1 ? 'that child' : childWord(state.data.children[0] || {}, 0)}. Don't know? Type a name and we'll make it work. Leave any blank if there's no specific friend.</div>
         </div>
+
         <div>
-          <div class="field-label">OTHER PEOPLE (OPTIONAL)</div>
+          <div class="field-label">COMFORT TOY OR ITEM (ONE PER CHILD, ALL OPTIONAL)</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+            ${state.data.children.map((c, i) => `
+              <input class="txt" placeholder="${esc(childPossessive(c, i))} comfort toy (optional)" value="${esc(c.toy || '')}" data-action="updateChild" data-i="${i}" data-k="toy">
+            `).join('')}
+          </div>
+          <div class="field-hint">e.g. a small white bunny called Mr Flopsy, a green dinosaur called Steve. It will appear in the story exactly as you describe it.</div>
+        </div>
+
+        <div>
+          <div class="field-label">OTHER PEOPLE IN THE STORY (OPTIONAL)</div>
           <textarea class="txt" rows="2" placeholder="e.g. Mum, Dad, Nanny Rose, sister Isla, Mrs Taylor" data-action="setOthers">${esc(state.data.others)}</textarea>
           <div class="field-hint">Family, teachers, anyone you like. They'll each get a real role, not just a mention.</div>
         </div>
+
         <div>
-          <div class="field-label">A PET</div>
+          <div class="field-label">A PET (OPTIONAL)</div>
           <button type="button" class="toggle" data-on="${state.data.hasPet}" data-action="togglePet">
             <span class="toggle-track"></span>
             <span class="toggle-label">They have a pet</span>
@@ -303,19 +357,43 @@ const STEPS = [
               <input class="txt" placeholder="Pet's name" value="${esc(state.data.petName)}" data-action="setPetName">
             </div>` : ''}
         </div>
-        <div>
-          <div class="field-label">FAVOURITE TOY OR COMFORT ITEM (OPTIONAL)</div>
-          <input class="txt" placeholder="e.g. a small white bunny called Mr Flopsy" value="${esc(state.data.toy)}" data-action="setToy">
-          <div class="field-hint">It will appear in the story exactly as you describe it.</div>
-        </div>
+      </div>`;
+    } },
+
+  { key:'villain', title:"Want a baddie in it?", sub:"Optional. Adventures hit harder when there's someone cheeky to outsmart.",
+    valid: () => true,
+    showIf: () => state.data.storyKind === 'adventure',
+    render: () => `
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <button type="button" class="toggle" data-on="${state.data.hasVillain}" data-action="toggleVillain">
+          <span class="toggle-track"></span>
+          <span class="toggle-label">Add a cheeky villain</span>
+        </button>
+        ${state.data.hasVillain ? `
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+            <div class="field-label">WHO IS THE BADDIE?</div>
+            <input class="txt" placeholder="e.g. The Tickle Monster, Captain Stinkbeard, big sister Mia" value="${esc(state.data.villainName)}" data-action="setVillainName">
+            <div class="field-hint">Anyone you like: a silly monster, a sneaky pirate, a teacher, even Daddy. They cause trouble. Your child always saves the day.</div>
+          </div>` : ''}
       </div>` },
 
-  { key:'quirk', title:"A tiny detail only you'd know.", sub:"This is the bit that makes them gasp.",
+  { key:'quirks', title:"A tiny detail only you'd know.", sub:"For each child, the bit that makes them gasp when they hear it. All optional.",
     valid: () => true,
-    render: () => `
-      <textarea class="txt" rows="4" placeholder='e.g. She calls spaghetti "pasketti", and won&apos;t sleep without her green dinosaur called Steve.' data-action="setQuirk">${esc(state.data.quirk)}</textarea>` },
+    render: () => {
+      const childPossessive = (c, i) => (c.name && c.name.trim()) ? `${c.name.trim()}` : `child ${i + 1}`;
+      return `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${state.data.children.map((c, i) => `
+          <div>
+            <div class="field-label">SOMETHING SPECIAL ABOUT ${esc(childPossessive(c, i).toUpperCase())} (OPTIONAL)</div>
+            <textarea class="txt" rows="2" placeholder='e.g. calls spaghetti "pasketti", will only sleep with the green dinosaur called Steve, has a soft lisp on words with s' data-action="updateChild" data-i="${i}" data-k="quirk">${esc(c.quirk || '')}</textarea>
+          </div>
+        `).join('')}
+        <div class="field-hint">A quirk, a catchphrase, a habit, a way of speaking. Whatever you write here gets woven naturally into that child's scenes. Skip any you don't have.</div>
+      </div>`;
+    } },
 
-  { key:'voice', title:"Choose a storyteller.", sub:"Six warm voices, all human-toned.",
+  { key:'voice', title:"Choose a storyteller.", sub:"Five warm voices, all human-toned.",
     valid: () => !!state.data.voice,
     render: () => `
       <div class="grid-2">
@@ -328,7 +406,14 @@ const STEPS = [
       </div>` },
 
   { key:'gift', title:"Is this a gift?", sub:"",
-    valid: () => true,
+    valid: () => {
+      // If they ticked "It's a gift", we need a recipient email so we can
+      // actually deliver it. Otherwise the gift goes nowhere and the giver
+      // wonders why their auntie never received the link.
+      if (!state.data.isGift) return true;
+      const e = (state.data.giftRecipientEmail || '').trim();
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    },
     render: () => `
       <div style="display:flex;flex-direction:column;gap:12px">
         <div class="grid-2">
@@ -340,10 +425,32 @@ const STEPS = [
           `).join('')}
         </div>
         ${state.data.isGift ? `
-          <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
-            <input class="txt" placeholder="From (your name)" value="${esc(state.data.giftFrom)}" data-action="setGiftFrom">
-            <input class="txt" type="email" placeholder="Recipient's email (so we can send it to them too)" value="${esc(state.data.giftRecipientEmail || '')}" data-action="setGiftRecipientEmail">
-            <textarea class="txt" rows="3" placeholder="A short message to include with the story" data-action="setGiftMessage">${esc(state.data.giftMessage)}</textarea>
+          <div style="margin-top:18px;padding:16px 18px;background:rgba(255,253,247,0.7);border:1px solid var(--line);border-radius:14px;font-size:14px;line-height:1.55;color:var(--ink)">
+            <div style="font-family:var(--serif);font-size:17px;font-weight:500;margin-bottom:8px">Got it. Here&rsquo;s what happens:</div>
+            <ul style="margin:0;padding-left:18px;color:var(--muted)">
+              <li>You&rsquo;ll hear the 2-minute preview right here in your browser first, so you can approve before paying.</li>
+              <li>After payment, the full 15-minute story is ready in about 10 minutes. Listen to it yourself first if you&rsquo;d like.</li>
+              <li>When you&rsquo;re ready, we send it on to your recipient with your note. They get a clean link to the story, never the price.</li>
+            </ul>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-top:14px">
+            <div>
+              <div class="field-label">Who&rsquo;s the gift from?</div>
+              <input class="txt" placeholder="Your name (so we can sign your message)" value="${esc(state.data.giftFrom)}" data-action="setGiftFrom">
+            </div>
+            <div>
+              <div class="field-label">Who&rsquo;s the gift for?</div>
+              <input class="txt" type="email" placeholder="Where should we send the final story? (their email)" value="${esc(state.data.giftRecipientEmail || '')}" data-action="setGiftRecipientEmail">
+            </div>
+            <div>
+              <div class="field-label">A note for them (optional)</div>
+              <textarea class="txt" rows="3" placeholder="They&rsquo;ll see this when the story arrives." data-action="setGiftMessage">${esc(state.data.giftMessage)}</textarea>
+            </div>
+            <div>
+              <div class="field-label">Anything we should know? (optional)</div>
+              <textarea class="txt" rows="2" placeholder="e.g. &lsquo;Please send it on her birthday, 12 May&rsquo;, or any special timing or note for Jamie." data-action="setGiftDeliveryNote">${esc(state.data.giftDeliveryNote || '')}</textarea>
+              <div class="field-hint">For Jamie&rsquo;s eyes only. Use this if you want it delivered on a specific date, or anything else we should know.</div>
+            </div>
           </div>` : ''}
       </div>` }
 ];
@@ -361,9 +468,15 @@ function renderQuestionStep(){
   const cur = STEPS[state.step];
   const host = document.getElementById('stepHost');
   host.classList.remove('wide','narrow');
+  // Match the global counter: visible questions + email + confirm + ordered
+  // = total flow length. Keeping inner and outer in sync so the user
+  // doesn't see "STEP 2 OF 6" next to "2 / 9".
+  const visibleQuestionCount = STEPS.reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0);
+  const totalShown = visibleQuestionCount + 3;
+  const visibleStepNumber = STEPS.slice(0, state.step + 1).reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0);
   host.innerHTML = `
     <div class="step-head">
-      <div class="kicker">STEP ${state.step + 1} OF ${STEPS.length}</div>
+      <div class="kicker">STEP ${visibleStepNumber} OF ${totalShown}</div>
       <h2 style="margin-top:10px">${cur.title}</h2>
       ${cur.sub ? `<p class="sub">${cur.sub}</p>` : ''}
     </div>
@@ -377,6 +490,134 @@ function renderQuestionStep(){
   document.getElementById('continueBtn').addEventListener('click', next);
 }
 
+// ── Email typo detection ──────────────────────────────────────────
+// Pure-JS, zero-dependency, zero-quota. Catches common consumer typos
+// (gmial.com, hotmial.co.uk, yaho.com, etc.) by comparing the typed
+// domain against a whitelist of popular providers via Levenshtein
+// distance. Only suggests when the edit distance is 1-2 chars and the
+// lengths are close, so we don't false-positive on real corporate domains.
+const POPULAR_EMAIL_DOMAINS = [
+  'gmail.com','googlemail.com','hotmail.com','hotmail.co.uk','outlook.com','outlook.co.uk',
+  'live.com','live.co.uk','yahoo.com','yahoo.co.uk','icloud.com','me.com','mac.com',
+  'aol.com','msn.com','btinternet.com','sky.com','virginmedia.com','ntlworld.com',
+  'protonmail.com','proton.me','tutanota.com','zoho.com','mail.com','gmx.com','fastmail.com'
+];
+function levenshtein(a, b){
+  if (a === b) return 0;
+  if (!a) return b.length;
+  if (!b) return a.length;
+  const dp = Array.from({length: b.length + 1}, (_, i) => [i]);
+  for (let j = 0; j <= a.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= b.length; i++){
+    for (let j = 1; j <= a.length; j++){
+      dp[i][j] = b[i-1] === a[j-1]
+        ? dp[i-1][j-1]
+        : Math.min(dp[i-1][j-1] + 1, dp[i][j-1] + 1, dp[i-1][j] + 1);
+    }
+  }
+  return dp[b.length][a.length];
+}
+function suggestEmailFix(email){
+  const e = (email || '').trim().toLowerCase();
+  const at = e.lastIndexOf('@');
+  if (at < 1 || at === e.length - 1) return null;
+  const local = e.slice(0, at);
+  const domain = e.slice(at + 1);
+  if (POPULAR_EMAIL_DOMAINS.includes(domain)) return null;
+  let best = null, bestDist = 99;
+  for (const d of POPULAR_EMAIL_DOMAINS){
+    const dist = levenshtein(domain, d);
+    if (dist < bestDist){ bestDist = dist; best = d; }
+  }
+  // 1-2 char edit distance + similar length = almost certainly a typo
+  if (best && bestDist >= 1 && bestDist <= 2 && Math.abs(domain.length - best.length) <= 2){
+    return local + '@' + best;
+  }
+  return null;
+}
+
+function goToStep(key){
+  const idx = STEPS.findIndex(s => s.key === key);
+  if (idx < 0) return;
+  state.step = idx;
+  pushHistory();
+  render();
+}
+
+function buildReviewCards(){
+  const d = state.data;
+  const stepIdx = (key) => STEPS.findIndex(s => s.key === key);
+  const card = (title, key, items) => {
+    const filtered = items.filter(Boolean);
+    if (!filtered.length) return '';
+    return `
+      <div class="review-card">
+        <div class="review-card-head">
+          <div class="kicker">${esc(title)}</div>
+          <button type="button" class="review-edit" data-action="goToStep" data-key="${esc(key)}">Edit</button>
+        </div>
+        <div class="review-card-body">${filtered.map(line => `<div class="review-line">${line}</div>`).join('')}</div>
+      </div>`;
+  };
+
+  const kindLabel = d.storyKind === 'bedtime' ? '🌙 Bedtime story' : d.storyKind === 'adventure' ? '⭐ Bigger adventure' : '';
+
+  const childrenLines = d.children.filter(c => c.name && c.name.trim()).map(c => {
+    const bits = [`<strong>${esc(c.name.trim())}</strong>`];
+    const n = ageNum(c.age);
+    if (n !== null) bits.push(n + (n === 1 ? ' year old' : ' years old'));
+    else if (c.age) bits.push(esc(c.age));
+    if (c.pronouns) bits.push(esc(c.pronouns));
+    return bits.join(' · ');
+  });
+
+  const themeBits = [...d.themes];
+  if (d.themesOther && d.themesOther.trim()) themeBits.push(d.themesOther.trim());
+
+  const placeBits = [];
+  if (d.place) placeBits.push(d.place);
+  if (d.placeReal && d.placeReal.trim()) placeBits.push(d.placeReal.trim());
+
+  const castingLines = [];
+  d.children.forEach(c => {
+    if (c.bestFriend && c.bestFriend.trim()) castingLines.push(`Best friend of ${esc((c.name || '').trim() || 'them')}: <strong>${esc(c.bestFriend.trim())}</strong>`);
+    if (c.toy && c.toy.trim()) castingLines.push(`Comfort toy of ${esc((c.name || '').trim() || 'them')}: <strong>${esc(c.toy.trim())}</strong>`);
+  });
+  if (d.others && d.others.trim()) castingLines.push(`Others: ${esc(d.others.trim())}`);
+  if (d.hasPet && (d.petKind || d.petName)) castingLines.push(`Pet: <strong>${esc([d.petName, d.petKind].filter(Boolean).join(' the '))}</strong>`);
+
+  const villainLine = (d.storyKind === 'adventure' && d.hasVillain && d.villainName) ? `Baddie: <strong>${esc(d.villainName.trim())}</strong>` : '';
+
+  const quirkLines = d.children
+    .filter(c => c.quirk && c.quirk.trim())
+    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.quirk.trim())}`);
+
+  const voiceLine = d.voice ? `🎙 <strong>${esc(d.voice)}</strong>` : '';
+
+  const giftLines = [];
+  if (d.isGift){
+    giftLines.push(`🎁 <strong>This is a gift</strong>`);
+    if (d.giftFrom && d.giftFrom.trim()) giftLines.push(`From: ${esc(d.giftFrom.trim())}`);
+    if (d.giftRecipientEmail && d.giftRecipientEmail.trim()) giftLines.push(`To: ${esc(d.giftRecipientEmail.trim())}`);
+    if (d.giftMessage && d.giftMessage.trim()) giftLines.push(`Note: <em>"${esc(d.giftMessage.trim())}"</em>`);
+    if (d.giftDeliveryNote && d.giftDeliveryNote.trim()) giftLines.push(`For Jamie: ${esc(d.giftDeliveryNote.trim())}`);
+  } else {
+    giftLines.push('🏠 For your own family');
+  }
+
+  return [
+    card('Story type', 'kind', [kindLabel]),
+    card('Who it’s for', 'children', childrenLines),
+    card('What it’s about', 'themes', themeBits.map(t => esc(t))),
+    card('Where it takes place', 'place', placeBits.map(t => esc(t))),
+    card('Who’s in it', 'casting', castingLines),
+    villainLine ? card('The baddie', 'villain', [villainLine]) : '',
+    card('Tiny details', 'quirks', quirkLines),
+    card('Storyteller', 'voice', [voiceLine]),
+    card('Gift', 'gift', giftLines)
+  ].filter(Boolean).join('');
+}
+
 function renderEmailStep(){
   const childList = state.data.children.map(c => c.name).filter(Boolean).join(' & ') || 'them';
   const host = document.getElementById('stepHost');
@@ -384,40 +625,33 @@ function renderEmailStep(){
   host.classList.remove('wide');
   host.innerHTML = `
     <div class="step-head">
-      <div class="kicker">ALMOST THERE</div>
-      <h2 style="margin-top:10px;font-size:clamp(28px,3.8vw,40px)">Where shall we send <span class="italic-plum">${esc(childList)}'s</span> preview?</h2>
-      <p class="sub" style="max-width:460px;margin-left:auto;margin-right:auto">We'll write a 2-minute taste of their story and send it within 24 hours. <strong style="color:var(--ink)">Free.</strong> If you love it, the full 15-minute version is £24.99.</p>
+      <div class="kicker">REVIEW</div>
+      <h2 style="margin-top:10px;font-size:clamp(28px,3.8vw,40px)">One last look before we write <span class="italic-plum">${esc(childList)}'s</span> story.</h2>
+      <p class="sub" style="max-width:480px;margin-left:auto;margin-right:auto">Take a moment. Tap <em>Edit</em> on anything that&rsquo;s off. The more accurate this is, the more it&rsquo;ll sound like them.</p>
     </div>
-    <div style="background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,3vw,28px)">
-      <div class="field-label">YOUR EMAIL</div>
-      <input class="txt" id="emailInput" type="email" autofocus value="${esc(state.data.email)}" placeholder="you@example.com">
-      <div class="field-hint">We'll only email about this story. No newsletters, no spam.</div>
-      <ul style="list-style:none;padding:0;margin:22px 0 0;display:flex;flex-direction:column;gap:10px">
+
+    <div class="review-stack">${buildReviewCards()}</div>
+
+    <div style="margin-top:22px;padding:18px 20px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px">
+      <div class="kicker" style="margin-bottom:10px">WHAT HAPPENS WHEN YOU CLICK GENERATE</div>
+      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
         ${[
-          ['🎧',"A 2-minute audio preview of your child's story"],
-          ['⏱️','Delivered within 24 hours, written by hand, not on a server'],
-          ['💷','Full 15-minute version available for £24.99, only if you love the preview'],
-          ['🚫','No card details now. No subscription. Ever.']
+          ['🎧',"A 2-minute audio preview is written and recorded right here in your browser"],
+          ['⚡','Ready in three to four minutes. Play games while you wait'],
+          ['💷','Full 15-minute version <span data-price>£24.99</span>, in your inbox within 24 hours'],
+          ['💛','Share it with your loved ones. No login necessary']
         ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.5">${t}</span></li>`).join('')}
       </ul>
     </div>
+
     <div class="cta-row">
-      <button class="btn" id="submitBtn" type="button" disabled>
-        Get my free preview
+      <button class="btn" id="submitBtn" type="button">
+        Generate ${esc(childList)}'s story
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
-    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">One more tiny step after this. We promise it's important.</div>`;
-  const emailInput = document.getElementById('emailInput');
-  const submitBtn = document.getElementById('submitBtn');
-  function checkValid(){
-    const v = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
-    submitBtn.disabled = !v;
-  }
-  emailInput.addEventListener('input', () => { state.data.email = emailInput.value.trim(); checkValid(); });
-  emailInput.addEventListener('keydown', e => { if (e.key === 'Enter' && !submitBtn.disabled) submitRequest(); });
-  submitBtn.addEventListener('click', submitRequest);
-  checkValid();
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">You&rsquo;ll hear it on the next page in about 3 minutes.</div>`;
+  document.getElementById('submitBtn').addEventListener('click', submitRequest);
 }
 
 function renderConfirmInboxStep(){
@@ -429,25 +663,21 @@ function renderConfirmInboxStep(){
       <div style="width:64px;height:64px;border-radius:18px;background:var(--paper-2);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto">✉️</div>
       <div class="kicker" style="margin-top:18px">ONE QUICK CONFIRMATION</div>
       <h2 style="margin-top:10px">Pop over to your inbox<br>and tap the link from us.</h2>
-      <p class="sub" style="max-width:480px;margin-left:auto;margin-right:auto;line-height:1.65">We've just sent a quick "is this really you?" email to <strong style="color:var(--ink)">${esc(state.data.email || 'your inbox')}</strong>. Tapping the link inside tells your inbox we're a real person, not a robot — so the actual preview lands where you'll find it, <em>not</em> in your spam folder.</p>
+      <p class="sub" style="max-width:480px;margin-left:auto;margin-right:auto;line-height:1.65">We've just sent a quick "is this really you?" email to <strong style="color:var(--ink)">${esc(state.data.email || 'your inbox')}</strong>. Tapping the link inside tells your inbox we're a real person, not a robot. That way the actual preview lands where you'll find it, <em>not</em> in your spam folder.</p>
     </div>
     <div style="background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,3vw,26px)">
       <div class="kicker" style="margin-bottom:14px">WHY WE ASK</div>
       <div style="display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.6;color:var(--muted)">
-        <p style="margin:0"><strong style="color:var(--ink)">Bedtime stories shouldn't get lost in spam.</strong> About one in three of our previews ended up in junk folders before we started doing this.</p>
+        <p style="margin:0"><strong style="color:var(--ink)">Stories shouldn't get lost in spam.</strong> About one in three of our previews ended up in junk folders before we started doing this.</p>
         <p style="margin:0">The link tells Gmail, Outlook and Apple Mail that you actually want to hear from us. After you tap it, the preview email lands cleanly in your main inbox.</p>
         <p style="margin:0">That's it. We don't store the link, sell your email, or ever email you about anything else. <span style="color:var(--ink);font-weight:500">It's a one-time hello.</span></p>
       </div>
     </div>
     <div style="margin-top:18px;padding:16px;border-radius:14px;background:var(--paper-2);border:1px dashed var(--line);display:flex;gap:14px;align-items:flex-start">
       <div style="font-size:18px;margin-top:1px">🔍</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6"><strong style="color:var(--ink)">Can't find it?</strong> Check Promotions, Updates, or your Spam folder. Search for <em>"hello@heartheirname.com"</em>. Drag the email into your main inbox if you can — it'll keep our future emails out of junk too.</div>
-    </div>
-    <div class="cta-row">
-      <button class="btn btn--ghost" type="button" id="resendBtn">Resend verification email</button>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6"><strong style="color:var(--ink)">Can't find it?</strong> Check Promotions, Updates, or your Spam folder. Search for <em>"hello@heartheirname.com"</em>. Drag the email into your main inbox if you can. That'll keep our future emails out of junk too.</div>
     </div>
     <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted-2)">Once you tap the link, your preview generation starts automatically.</div>`;
-  document.getElementById('resendBtn').addEventListener('click', resendVerify);
 }
 
 function renderOrderedStep(){
@@ -462,15 +692,15 @@ function renderOrderedStep(){
       </div>
       <div class="kicker" style="margin-top:18px">YOU'RE ALL SET</div>
       <h2 class="serif" style="font-size:clamp(28px,4vw,42px);margin:10px 0 0;font-weight:500;line-height:1.2">We're writing <span class="italic-plum">${esc(list)}'s</span> preview now.</h2>
-      <p style="color:var(--muted);font-size:15px;max-width:500px;margin:16px auto 0;line-height:1.65">It'll land at <strong style="color:var(--ink)">${esc(state.data.email || 'your inbox')}</strong> within 24 hours. Two minutes of audio, made by hand. If it gives you the feeling we hope it does, the full 15-minute story is one click away.</p>
+      <p style="color:var(--muted);font-size:15px;max-width:500px;margin:16px auto 0;line-height:1.65">It plays in your browser in about 3 minutes, no inbox check needed. We've also sent a backup link to <strong style="color:var(--ink)">${esc(state.data.email || 'your inbox')}</strong> in case you close the page.</p>
     </div>
     <div style="margin:30px auto 0;max-width:520px;padding:22px;border-radius:18px;background:rgba(255,253,247,.7);border:1px solid var(--line);text-align:left">
       <div class="kicker" style="margin-bottom:14px">WHAT HAPPENS NEXT</div>
       <ul class="timeline">
-        <li><span class="when">TODAY</span><span class="what">We read what you sent us. Properly. We talk about your child for a few minutes. What would make them gasp?</span></li>
-        <li><span class="when">TONIGHT</span><span class="what">We write a 2-minute opening. The kind that makes them sit up and listen.</span></li>
-        <li><span class="when">TOMORROW</span><span class="what">A storyteller records it in the voice you chose. Mixed and mastered by us.</span></li>
-        <li><span class="when">WITHIN 24H</span><span class="what">It lands in your inbox. Listen with them. If you love it, the full story is one tap away.</span></li>
+        <li><span class="when">RIGHT NOW</span><span class="what">We read what you sent us. Properly. We think about your child for a few minutes. What would make them gasp?</span></li>
+        <li><span class="when">IN A MINUTE</span><span class="what">We write a 2-minute opening. The kind that makes them sit up and listen.</span></li>
+        <li><span class="when">NEXT</span><span class="what">A storyteller records it in the voice you chose. Mixed and mastered by us.</span></li>
+        <li><span class="when">IN ABOUT 3 MIN</span><span class="what">It plays in your browser. Listen with them. If you love it, the full story is one tap away.</span></li>
       </ul>
     </div>
     <div class="cta-row">
@@ -486,10 +716,16 @@ function render(){
   const isConfirm = state.step === STEPS.length + 1;
   const isOrdered = state.step === STEPS.length + 2;
 
-  const totalShown = STEPS.length + 3;
+  // Effective step counter — skips conditionally hidden steps (e.g. villain on bedtime)
+  const visibleQuestionCount = STEPS.reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0);
+  const visibleStepNumber = isQuestion
+    ? STEPS.slice(0, state.step + 1).reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0)
+    : visibleQuestionCount + (isEmail ? 1 : isConfirm ? 2 : 3);
+  const totalShown = visibleQuestionCount + 3;
+
   const counter = document.getElementById('stepCounter');
-  counter.textContent = isOrdered ? 'DONE' : `${state.step + 1} / ${totalShown}`;
-  document.getElementById('progressFill').style.width = `${((state.step + 1) / totalShown) * 100}%`;
+  counter.textContent = isOrdered ? 'DONE' : `${visibleStepNumber} / ${totalShown}`;
+  document.getElementById('progressFill').style.width = `${(visibleStepNumber / totalShown) * 100}%`;
 
   if (isQuestion) renderQuestionStep();
   else if (isEmail) renderEmailStep();
@@ -541,12 +777,16 @@ function handleAction(action, el, e){
     case 'setPetKind': state.data.petKind = v; render(); break;
     case 'setPetName': state.data.petName = el.value; break;
     case 'setToy': state.data.toy = el.value; break;
+    case 'toggleVillain': state.data.hasVillain = !state.data.hasVillain; render(); break;
+    case 'setVillainName': state.data.villainName = el.value; break;
     case 'setQuirk': state.data.quirk = el.value; break;
     case 'setVoice': state.data.voice = v; render(); break;
     case 'setIsGift': state.data.isGift = (v === 'true'); render(); break;
     case 'setGiftFrom': state.data.giftFrom = el.value; break;
     case 'setGiftMessage': state.data.giftMessage = el.value; break;
     case 'setGiftRecipientEmail': state.data.giftRecipientEmail = el.value; break;
+    case 'setGiftDeliveryNote': state.data.giftDeliveryNote = el.value; break;
+    case 'goToStep': goToStep(el.dataset.key); break;
   }
 }
 
@@ -557,22 +797,58 @@ function updateContinueState(){
   if (btn) btn.disabled = !cur.valid();
 }
 
+// Conditional steps: villain only shown for adventure stories
+function isStepShown(idx){
+  const s = STEPS[idx];
+  if (!s) return true;
+  if (typeof s.showIf === 'function') return s.showIf();
+  return true;
+}
+
 function next(){
   if (state.step < STEPS.length){
     if (!STEPS[state.step].valid()) return;
   }
   state.step++;
+  while (state.step < STEPS.length && !isStepShown(state.step)) state.step++;
+  pushHistory();
   render();
 }
 
 function back(){
-  if (state.step === 0){ window.location.href = '/'; return; }
   if (state.step === STEPS.length + 2) return; // can't go back from "ordered"
-  state.step--;
-  render();
+  // Use the browser's history. This way both the on-screen back button and
+  // the device/browser back button take the user one step back instead of
+  // jumping all the way to the homepage. popstate handles the actual state
+  // restore + re-render.
+  history.back();
 }
 
 document.getElementById('backBtn').addEventListener('click', back);
+
+// ─── History wiring (browser back button = previous step) ───
+// We push a new history entry on every forward step. The browser/device
+// back button then naturally returns to the previous step via popstate.
+// At step 0, pressing back leaves /start entirely (typically to /).
+function pushHistory() {
+  try {
+    history.pushState({ step: state.step }, '', '#s' + state.step);
+  } catch (_) { /* ignore — non-fatal if pushState unavailable */ }
+}
+
+window.addEventListener('popstate', (e) => {
+  const newStep = (e.state && typeof e.state.step === 'number') ? e.state.step : 0;
+  // Only honour valid step indices: questions, email, confirm, ordered.
+  if (newStep < 0 || newStep > STEPS.length + 2) return;
+  state.step = newStep;
+  // Skip past any hidden conditional steps (e.g. villain on bedtime)
+  while (state.step > 0 && state.step < STEPS.length && !isStepShown(state.step)) state.step--;
+  render();
+});
+
+// Mark the initial /start entry with state so popstate behaves predictably
+// when the user goes forward then back to the very first step.
+try { history.replaceState({ step: 0 }, '', window.location.href); } catch (_) {}
 
 // ─────────────────────────────────────────────────────────────────────────
 // API
@@ -591,30 +867,55 @@ async function submitRequest(){
     if (!res.ok){ throw new Error('Request failed'); }
     const data = await res.json();
     state.data.requestId = data.requestId;
+
+    // ── Meta Pixel: Lead + CompleteRegistration ──
+    // Fire BOTH events at form submission so Meta has matching volume to optimise
+    // for either event. CompleteRegistration also fires later from /verify with
+    // the SAME event_id (`register_<id>`) so Meta dedupes — one registration
+    // per actual registration, with the verify-side fire as a fallback if the
+    // browser pixel here got blocked.
+    try {
+      if (window.htnPixel) {
+        const leadEventId = 'lead_' + data.requestId;
+        const registerEventId = 'register_' + data.requestId;
+        window.htnPixel.track('Lead', { content_name: 'preview-request' }, {
+          eventId: leadEventId,
+          email: state.data.email
+        });
+        window.htnPixel.track('CompleteRegistration', { content_name: 'preview-request' }, {
+          eventId: registerEventId,
+          email: state.data.email
+        });
+        // Tell the server which event_ids to use for CAPI mirrors.
+        fetch('/api/track-lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            requestId: data.requestId,
+            leadEventId,
+            registerEventId,
+            fbp: window.htnPixel.fbp(),
+            fbc: window.htnPixel.fbc()
+          })
+        }).catch(() => {});
+      }
+    } catch(e){}
+
+    // No more email-verify step. Redirect customer straight to the in-browser
+    // wait page where the preview generates and plays in the same session.
+    if (data.accessToken) {
+      window.location.href = '/preview/' + encodeURIComponent(data.requestId) + '?t=' + encodeURIComponent(data.accessToken);
+      return;
+    }
+
+    // Fallback if accessToken missing for any reason: keep the old step flow.
     state.step++;
+    pushHistory();
     render();
   } catch(err){
     alert("Something went wrong. Please try again or email hello@heartheirname.com");
     btn.disabled = false;
-    btn.innerHTML = 'Get my free preview';
-  }
-}
-
-async function resendVerify(){
-  const btn = document.getElementById('resendBtn');
-  btn.disabled = true;
-  btn.textContent = 'Sending…';
-  try {
-    await fetch('/api/resend-verify', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ email: state.data.email, requestId: state.data.requestId })
-    });
-    btn.textContent = 'Sent! Check your inbox.';
-    setTimeout(() => { btn.disabled = false; btn.textContent = 'Resend verification email'; }, 4000);
-  } catch(err){
-    btn.disabled = false;
-    btn.textContent = 'Try again';
+    btn.innerHTML = 'Generate story';
   }
 }
 
@@ -623,6 +924,26 @@ async function resendVerify(){
 // ─────────────────────────────────────────────────────────────────────────
 
 render();
+</script>
+<script>
+// Localised pricing — fetches /api/get-pricing and swaps every [data-price]
+// span. Polls a few times so dynamically-rendered review/CTA blocks get the
+// right text once they mount. Falls back to inline £24.99 if the call fails.
+(async function localisePrice(){
+  let display = '£24.99';
+  try {
+    const r = await fetch('/api/get-pricing', { credentials:'omit' });
+    if (r.ok) {
+      const p = await r.json();
+      if (p && p.display) display = p.display;
+    }
+  } catch (e) {}
+  const apply = () => document.querySelectorAll('[data-price]').forEach(el => { el.textContent = display; });
+  apply();
+  // Re-apply after later renders (the review-summary block builds its DOM in JS).
+  setTimeout(apply, 300);
+  setTimeout(apply, 1200);
+})();
 </script>
 </body>
 </html>

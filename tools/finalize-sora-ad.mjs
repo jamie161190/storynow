@@ -103,6 +103,25 @@ h1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:84px;line-he
 <script>document.fonts.ready.then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.dataset.ready='true')));</script>
 </body></html>`, {w:W,h:H}, endCardImg, false);
 
+// Spoken captions — TikTok-style word/phrase pop-ups timed to the voiceover.
+const spokenCaps = brief.spoken_captions || [];
+const spokenPngs = [];
+for (let i = 0; i < spokenCaps.length; i++) {
+  const c = spokenCaps[i];
+  const out = join(TMP, `spoken-${i}.png`);
+  const isHi = !!c.highlight;
+  const fontSize = isHi ? 120 : 70;
+  const color = isHi ? '#E8A34A' : '#F4ECDB';
+  const styleAccent = isHi ? 'font-style:italic;letter-spacing:-.01em' : '';
+  const html = `<!doctype html><html><head><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Inter:wght@800;900&display=swap" rel="stylesheet"><style>
+*{margin:0;padding:0;box-sizing:border-box}html,body{width:${W}px;height:${H}px;background:transparent;font-family:Inter,sans-serif;display:flex;align-items:flex-end;justify-content:center;padding:0 60px 380px;overflow:hidden}
+.cap{font-size:${fontSize}px;font-weight:${isHi ? 600 : 900};color:${color};text-align:center;line-height:1.05;${isHi ? "font-family:'Cormorant Garamond',serif;" : ''}letter-spacing:-.005em;${isHi ? '' : 'text-transform:uppercase;'}text-shadow:0 4px 24px rgba(0,0,0,.7),0 0 12px rgba(0,0,0,.85);max-width:960px;${styleAccent}}
+</style></head><body><div class="cap">${esc(c.text)}</div>
+<script>document.fonts.ready.then(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.dataset.ready='true')));</script></body></html>`;
+  await renderPng(html, {w:W,h:H}, out, true);
+  spokenPngs.push({ path: out, start: c.start, end: c.end, highlight: isHi });
+}
+
 await browser.close();
 
 const endCardClip = join(TMP, 'endcard.mp4');
@@ -110,12 +129,43 @@ ffmpeg(['-y', '-loop', '1', '-i', endCardImg, '-t', String(endCardDur),
   '-r', String(FPS), '-vf', 'format=yuv420p',
   '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', endCardClip]);
 
-// 4. Overlay hook + pill on the conformed sora clip
+// 4. Overlay pill + spoken captions on the conformed sora clip.
+// Hook caption is suppressed when spoken_captions are present (the spoken
+// caps already act as the verbal hook + narration).
 const captioned = join(TMP, 'captioned.mp4');
-ffmpeg(['-y', '-i', conformed, '-i', hookPng, '-i', playingPng,
-  '-filter_complex',
-  `[0:v][1:v]overlay=enable='between(t,0.0,${HOOK_END})':x=0:y=0[v1];[v1][2:v]overlay=enable='gte(t,${HOOK_END})':x=0:y=0[out]`,
-  '-map', '[out]', '-r', String(FPS), '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', captioned]);
+{
+  const useHook = spokenPngs.length === 0;
+  const args = ['-y', '-i', conformed];
+  if (useHook) args.push('-i', hookPng);
+  args.push('-i', playingPng);
+  spokenPngs.forEach(s => args.push('-i', s.path));
+
+  let fc = '';
+  let prev = '0:v';
+  let inIdx = 1;
+  if (useHook) {
+    fc += `[${prev}][${inIdx}:v]overlay=enable='between(t,0.0,${HOOK_END})':x=0:y=0[v${inIdx}];`;
+    prev = `v${inIdx}`;
+    inIdx++;
+  }
+  // Pill: visible from HOOK_END (or 0 if no hook) onwards
+  const pillStart = useHook ? HOOK_END : 0;
+  fc += `[${prev}][${inIdx}:v]overlay=enable='gte(t,${pillStart})':x=0:y=0[v${inIdx}];`;
+  prev = `v${inIdx}`;
+  inIdx++;
+  // Spoken captions
+  spokenPngs.forEach((s) => {
+    const out = `c${inIdx}`;
+    fc += `[${prev}][${inIdx}:v]overlay=enable='between(t,${s.start},${s.end})':x=0:y=0[${out}];`;
+    prev = out;
+    inIdx++;
+  });
+  fc = fc.replace(/;$/, '');
+
+  args.push('-filter_complex', fc, '-map', `[${prev}]`,
+            '-r', String(FPS), '-c:v', 'libx264', '-preset', 'medium', '-crf', '20', captioned);
+  ffmpeg(args);
+}
 
 // 5. Voiceover
 const voPath = join(TMP, 'voiceover.mp3');

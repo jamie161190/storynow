@@ -1,0 +1,21 @@
+{
+  "name": "maya-v1-sceptic",
+  "child_name": "Maya",
+  "voice": "British (warm)",
+  "music": "public/music/bedtime-ambient.mp3",
+  "music_volume": 0.10,
+  "walkthrough_hook": "I DIDN'T THINK THIS WOULD WORK",
+  "walkthrough_voiceover": "I'll be honest. I thought it'd be naff. I filled in the form anyway. Five questions. About a minute. Then she heard her own name. Tonight's story is hers. Hers alone. The hero is... Maya.",
+  "spoken_captions": [
+    { "text": "Tonight's story is hers.", "start": 0.0, "end": 1.7 },
+    { "text": "Hers alone.",               "start": 1.7, "end": 2.7 },
+    { "text": "The hero is...",            "start": 2.8, "end": 4.0 },
+    { "text": "Maya.",                     "start": 4.1, "end": 6.5, "highlight": true }
+  ],
+  "end_card": {
+    "duration": 3,
+    "eyebrow": "HEARTHEIRNAME.COM",
+    "headline": "A story that knows their name.",
+    "subline": "Free 2-min preview · £24.99"
+  }
+}

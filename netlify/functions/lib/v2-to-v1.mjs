@@ -1,14 +1,16 @@
 // Converts the v2 funnel's storyData shape into the v1 shape that the existing
 // middle-layer prompt + brief-analyst expects. The production pipeline does not
-// change — only the field names from the new funnel are mapped.
+// change: only the field names from the new funnel are mapped.
 
 const KIND_TO_CATEGORY = { bedtime: 'bedtime', adventure: 'journey' };
 
-// Convert age band ("4-5") to a midpoint integer (4)
+// Convert age band ("4-5") to a midpoint integer (4). Tolerates raw numbers too.
 function ageBandToInt(band) {
-  if (!band) return null;
-  if (band === '8+') return 8;
-  const m = band.match(/^(\d+)/);
+  if (band == null || band === '') return null;
+  if (typeof band === 'number') return Number.isFinite(band) ? Math.floor(band) : null;
+  const s = String(band);
+  if (s === '8+') return 8;
+  const m = s.match(/^(\d+)/);
   return m ? parseInt(m[1], 10) : null;
 }
 
@@ -22,7 +24,14 @@ export function v2ToV1(v2) {
     age: ageBandToInt(c.age) || c.age,
     gender: c.pronouns ? (c.pronouns.toLowerCase().includes('she') ? 'girl' : c.pronouns.toLowerCase().includes('he') ? 'boy' : 'they') : 'they',
     pronouns: c.pronouns,
-    favTeddy: ''
+    // Per-child fields (all optional — empty string when the parent didn't
+    // fill in). The brief analyst is instructed to prefer per-child values
+    // over the shared top-level fallbacks (favTeddy / extraDetails / friendName)
+    // and to surface them in each child's portrait so the writer can use
+    // them in scenes featuring that child.
+    favTeddy: (c.toy || '').trim(),         // per-child comfort item
+    bestFriend: (c.bestFriend || '').trim(), // per-child main friend
+    quirk: (c.quirk || '').trim()            // per-child personality detail
   }));
 
   const childCount = children.length;
@@ -36,7 +45,15 @@ export function v2ToV1(v2) {
     gender: firstChild.gender,
     isMultiChild,
     children,
-    siblingDynamics: '',
+    // Sibling dynamics: free-text describing relationships, age order,
+    // protective dynamics, etc. The brief writer uses this as the
+    // authoritative source for who's older, who's protective, who follows
+    // whom. Falls back to empty string when not supplied.
+    siblingDynamics: v2.sibling_dynamics || v2.siblingDynamics || v2.siblingNote || '',
+    // Extras: free-text notes that don't fit any other field. Often
+    // arrives via post-purchase corrections or admin-side updates. The
+    // brief writer treats this as additional authoritative context.
+    extras: v2.extras || '',
 
     // Category mapping
     category: KIND_TO_CATEGORY[v2.storyKind] || 'bedtime',
@@ -52,11 +69,11 @@ export function v2ToV1(v2) {
     petName: v2.petName || '',
     petType: v2.petKind || '',
 
-    // Villain (none in v2 yet — adventures don't have villain switch)
-    villainToggle: '',
-    villainName: '',
-    villainSection: '',
-    hasVillain: false,
+    // Villain (v2 villain step is shown only for adventure stories)
+    villainToggle: v2.hasVillain ? 'on' : '',
+    villainName: v2.villainName || '',
+    villainSection: v2.hasVillain && v2.villainName ? `Villain: ${v2.villainName}` : '',
+    hasVillain: !!(v2.hasVillain && v2.villainName),
 
     // Comfort item
     favTeddy: v2.toy || '',

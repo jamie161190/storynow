@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>HearTheirName — A story with their name woven through it</title>
-<meta name="description" content="A 15-minute audio bedtime or adventure story made by hand for one child. Their name, their friends, their pet, the toy they sleep with. Free 2-minute preview within 24 hours. £24.99 for the full story, only if you love it.">
-<meta property="og:title" content="HearTheirName — A story with their name woven through it">
-<meta property="og:description" content="A 15-minute audio story made by hand for one child. Free 2-minute preview within 24 hours.">
+<title>HearTheirName · A story with their name woven through it</title>
+<meta name="description" content="A 15-minute audio bedtime or adventure story created for one child, or for siblings together, by a dad and his son. Their name, their friends, their pet, the toy they sleep with. Free 2-minute preview in 3 to 4 minutes, right in your browser. If you love it, the full story is yours within 24 hours, usually much sooner. £24.99, perfected until you love it.">
+<meta property="og:title" content="HearTheirName · A story with their name woven through it">
+<meta property="og:description" content="A 15-minute audio story created for one child, or for siblings together, by a dad and his son. Free 2-minute preview in 3 to 4 minutes. Full story within 24 hours if you love it. £24.99.">
 <meta property="og:image" content="/og-image.png">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://heartheirname.com/">
@@ -97,37 +97,72 @@ h1.hero-h{font-family:var(--serif);font-size:clamp(38px,5.6vw,76px);line-height:
 .hero-sub{font-size:clamp(16px,1.6vw,19px);color:var(--muted);max-width:520px;margin-top:clamp(28px,4.5vw,40px);margin-bottom:0;line-height:1.6}
 
 .hero-cta-row{display:flex;align-items:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+.siblings-chip{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 12px;border-radius:999px;background:rgba(75,46,131,.10);border:1px solid rgba(75,46,131,.16);color:var(--plum);font-size:12.5px;font-weight:600}
+.siblings-chip .e{font-size:14px;line-height:1}
 .risk-pills{margin-top:18px;display:inline-flex;align-items:center;gap:14px;padding:10px 16px;border-radius:12px;background:rgba(255,253,247,.65);border:1px solid var(--line);flex-wrap:wrap}
 .risk-pills .sep{width:1px;height:14px;background:var(--line)}
 .risk-pill{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink)}
 .hero-fineprint{margin-top:14px;font-size:13px;color:var(--muted-2);max-width:480px}
 
-.trust-row{display:flex;flex-wrap:wrap;gap:24px;margin-top:24px}
+.trust-row{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;margin-top:24px;max-width:560px}
 .trust-item{display:flex;align-items:flex-start;gap:10px}
 .trust-icon-wrap{width:28px;height:28px;border-radius:999px;background:rgba(75,46,131,.1);color:var(--plum);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
 .trust-item-text{display:flex;flex-direction:column}
 .trust-item-label{font-weight:600;font-size:13px;color:var(--ink)}
 .trust-item-sub{font-size:12px;color:var(--muted-2)}
 
-/* Hero book illustration */
+/* Hero book illustration. On mobile we drop the fixed aspect ratio so the
+   cover grows tall enough for the 7 meta rows + CTA without clipping. */
 .book{position:relative;aspect-ratio:4 / 5;width:100%;max-width:520px;margin:0 auto}
 .book-cover{position:absolute;inset:0;background:linear-gradient(160deg,#3D2E5A 0%,#1F1B2E 60%,#0F0B20 100%);border-radius:18px 24px 24px 18px;box-shadow:-2px 0 0 rgba(255,255,255,.05) inset, 0 40px 80px -30px rgba(31,27,46,.6);overflow:hidden}
 .book-spine{position:absolute;left:0;top:0;bottom:0;width:14px;background:linear-gradient(90deg,rgba(0,0,0,.5),transparent)}
 .book-glow{position:absolute;inset:-30%;background:radial-gradient(circle at 60% 40%,rgba(216,122,62,.35),transparent 55%);pointer-events:none}
-.book-content{position:absolute;inset:30px 30px 30px 40px;display:flex;flex-direction:column;justify-content:space-between;color:#F4ECDB}
-.book-volume{font-family:var(--mono);font-size:11px;letter-spacing:.15em;color:rgba(244,236,219,.6)}
+.book-content{position:absolute;inset:30px 30px 30px 40px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;color:#F4ECDB}
+@media(max-width:540px){
+  .book{aspect-ratio:auto}
+  .book-cover{position:relative;inset:auto}
+  .book-content{position:relative;inset:auto;padding:24px 22px 22px 28px;gap:12px}
+}
 .book-storyfor{font-family:var(--serif);font-style:italic;font-size:14px;color:rgba(244,236,219,.7);margin-top:8px}
 .book-name{font-family:var(--serif);font-size:clamp(56px,12vw,88px);line-height:.95;font-weight:500;margin-top:6px;letter-spacing:-.01em;color:#F4ECDB;text-shadow:0 2px 0 rgba(0,0,0,.2);word-break:break-word}
 .book-title-row{display:flex;align-items:center;gap:10px;margin-top:14px}
 .book-title-rule{width:36px;height:1px;background:var(--rose);flex-shrink:0}
-.book-title{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--rose)}
+.book-title{font-family:var(--serif);font-style:italic;font-size:16px;color:var(--rose);transition:opacity .25s ease}
+
+/* Seven rotating detail rows so the cover shows "what's woven in" concretely.
+   Each row rotates on its own offset rhythm — the cover reads as alive. */
+.book-meta{margin-top:16px;padding-top:12px;border-top:1px solid rgba(244,236,219,.10);display:flex;flex-direction:column;gap:6px}
+.book-meta-row{display:flex;align-items:baseline;gap:10px;line-height:1.25}
+.book-meta-eye{font-family:var(--mono);font-size:8.5px;letter-spacing:.15em;color:rgba(244,236,219,.42);font-weight:600;flex:0 0 100px;text-transform:uppercase}
+.book-meta-val{font-family:var(--serif);font-style:italic;font-size:14px;font-weight:500;color:rgba(244,236,219,.92);letter-spacing:-.003em;transition:opacity .3s ease;min-height:1.25em;flex:1;min-width:0}
+@media(max-width:540px){
+  /* Stack eye-label above value on mobile so long labels like "A LITTLE THING"
+     don't overflow the column and visibly overlap the rotating value text. */
+  .book-meta{margin-top:12px;padding-top:10px;gap:9px}
+  .book-meta-row{flex-direction:column;align-items:flex-start;gap:1px;line-height:1.2}
+  .book-meta-eye{flex:0 0 auto;font-size:8.5px}
+  .book-meta-val{font-size:13.5px;line-height:1.25}
+  .book-name{font-size:clamp(40px,11vw,64px)}
+  .book-cta{margin-top:14px;padding-top:10px}
+  .book-cta-eye{font-size:9px;margin-bottom:4px}
+  .book-cta-line{font-size:13px;line-height:1.35}
+  .book-modes{margin-bottom:10px}
+}
 .book-bottom{display:flex;align-items:center;justify-content:space-between}
 .book-hand{font-family:var(--hand);font-size:24px;color:rgba(244,236,219,.7)}
-.book-stamp{position:absolute;top:-14px;right:-14px;width:96px;height:96px;border-radius:999px;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;transform:rotate(8deg);box-shadow:0 12px 30px -10px rgba(216,122,62,.6), 0 0 0 6px rgba(216,122,62,.2)}
-.book-stamp-1{font-family:var(--serif);font-style:italic;font-size:14px;line-height:1}
-.book-stamp-2{font-family:var(--serif);font-weight:600;font-size:16px;line-height:1.1;margin-top:2px}
-.book-stamp-rule{width:24px;height:1px;background:rgba(255,255,255,.5);margin:4px 0}
-.book-stamp-3{font-family:var(--mono);font-size:8px;letter-spacing:.1em}
+
+.book-name{transition:opacity .25s ease,font-size .25s ease}
+
+/* Mode tabs at top of cover (Bedtime / Adventure). */
+.book-modes{display:inline-flex;gap:4px;padding:4px;background:rgba(244,236,219,.07);border:1px solid rgba(244,236,219,.14);border-radius:999px;margin-bottom:14px}
+.book-mode{appearance:none;background:transparent;border:0;padding:6px 14px;font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.005em;color:rgba(244,236,219,.55);border-radius:999px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.book-mode:hover{color:rgba(244,236,219,.85)}
+.book-mode[data-on="true"]{background:var(--paper);color:var(--ink)}
+
+/* CTA line at the bottom of the cover. */
+.book-cta{margin-top:18px;padding-top:14px;border-top:1px solid rgba(244,236,219,.10)}
+.book-cta-eye{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--rose);font-weight:700;margin-bottom:5px}
+.book-cta-line{font-family:var(--serif);font-style:italic;font-size:14px;color:rgba(244,236,219,.85);line-height:1.4;letter-spacing:-.003em}
 
 /* Section heading */
 .section-head{text-align:center;max-width:720px;margin:0 auto}
@@ -203,6 +238,25 @@ section.inside{padding:clamp(50px,6vw,80px) 0}
 .inside-includes-k{font-family:var(--mono);color:rgba(244,236,219,.55);font-size:10px}
 .inside-includes-v{font-family:var(--serif);font-size:18px;margin-top:4px}
 @media(max-width:900px){.inside-grid{grid-template-columns:1fr;gap:36px}}
+
+/* For the whole brood (multi-child) section */
+section.brood{padding:clamp(40px,5vw,64px) 0;background:var(--paper-2)}
+.brood-card{padding:clamp(28px,4vw,44px);border-radius:20px;background:rgba(255,253,247,.7);border:1px solid var(--line);text-align:center;max-width:920px;margin:0 auto}
+.brood-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--terra-2);margin-bottom:16px}
+.brood-h{font-family:var(--serif);font-size:clamp(28px,4vw,44px);font-weight:500;line-height:1.08;letter-spacing:-.01em;margin:0 0 16px}
+.brood-h em{font-style:italic;color:var(--plum)}
+.brood-sub{font-size:clamp(15px,1.4vw,17px);color:var(--muted);max-width:46ch;margin:0 auto 26px;line-height:1.55}
+.brood-rolodex{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 auto 26px;max-width:560px}
+.brood-name{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;border:1px solid var(--line);font-family:var(--serif);font-size:18px;font-weight:500;color:var(--ink);box-shadow:0 4px 14px rgba(31,27,46,.06)}
+.brood-name .dot{width:8px;height:8px;border-radius:50%}
+.brood-name.n1 .dot{background:#D87A3E}
+.brood-name.n2 .dot{background:#7A55C9}
+.brood-name.n3 .dot{background:#6F8A4F}
+.brood-name.n4 .dot{background:#B85D8A}
+.brood-cta{display:inline-flex;align-items:center;gap:8px;padding:14px 24px;border-radius:999px;background:var(--ink);color:var(--paper);text-decoration:none;font-weight:600;font-size:14.5px}
+.brood-cta:hover{background:#2c2545}
+.brood-foot{margin-top:14px;font-size:12.5px;color:var(--muted-2)}
+@media(max-width:540px){.brood-name{font-size:16px;padding:8px 14px}}
 
 /* Pricing section */
 section.pricing{padding:clamp(50px,6vw,80px) 0}
@@ -334,84 +388,74 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
           <span class="tp-pill-suffix">· <span id="reviewCount">14</span> parents</span>
         </div>
 
-        <h1 class="hero-h">A story with <span class="italic-plum">their name</span> woven through&nbsp;it.</h1>
+        <h1 class="hero-h">A story with <span class="italic-plum">their name and the things they love</span> woven through&nbsp;it.</h1>
 
-        <p class="hero-sub">A 15-minute audio story made by hand, with their name, their friends, their pet, the toy they sleep with. Bedtime calm, or a bigger adventure. Delivered the same day.</p>
+        <p class="hero-sub">A 15-minute audio story for one child or for siblings and cousins together. Bedtime calm, or a bigger adventure. Free 2-minute preview created in 3 to 4 minutes, right in your browser, with the full 15-minute version delivered to your inbox within 24 hours.</p>
 
         <div class="hero-cta-row">
           <a class="btn" href="/start">Get a free 2-min preview</a>
-          <button class="btn btn--ghost" onclick="scrollToId('sample')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5L7 4.5z"/></svg>
-            Listen to a real one first
-          </button>
         </div>
-
-        <div class="risk-pills">
-          <span class="risk-pill">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            No card today
-          </span>
-          <span class="sep"></span>
-          <span class="risk-pill">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            No subscription
-          </span>
-          <span class="sep"></span>
-          <span class="risk-pill">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Money-back if it isn't right
-          </span>
-        </div>
-
-        <div class="hero-fineprint">Free preview within 24h. Full 15-min story for £24.99, only if it wins you over.</div>
 
         <div class="trust-row">
           <div class="trust-item">
-            <span class="trust-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-            <span class="trust-item-text"><span class="trust-item-label">Same-day delivery</span><span class="trust-item-sub">Made and sent today</span></span>
+            <span class="trust-icon-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></span>
+            <span class="trust-item-text"><span class="trust-item-label">Unlimited edits</span></span>
           </div>
           <div class="trust-item">
-            <span class="trust-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l9.84 9.84 9.84-9.84a5.5 5.5 0 0 0-0-7.78z"/></svg></span>
-            <span class="trust-item-text"><span class="trust-item-label">Loved or refunded</span><span class="trust-item-sub">Yours forever, no expiry</span></span>
+            <span class="trust-icon-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="1.5"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5c1.8 0 3 1.5 4.5 5C13.5 4.5 14.7 3 16.5 3a2.5 2.5 0 0 1 0 5"/></svg></span>
+            <span class="trust-item-text"><span class="trust-item-label">The perfect gift</span></span>
           </div>
           <div class="trust-item">
-            <span class="trust-icon-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
-            <span class="trust-item-text"><span class="trust-item-label">Made by humans</span><span class="trust-item-sub">One story at a time</span></span>
+            <span class="trust-icon-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg></span>
+            <span class="trust-item-text"><span class="trust-item-label">No subscription</span></span>
+          </div>
+          <div class="trust-item">
+            <span class="trust-icon-wrap"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v3a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-3"/><line x1="3" y1="3" x2="21" y2="21"/><path d="M7.5 11.5L12 16l1.5-1.5"/></svg></span>
+            <span class="trust-item-text"><span class="trust-item-label">No downloads</span></span>
           </div>
         </div>
       </div>
 
       <div class="hero-art">
-        <div class="book">
+        <div class="book" style="position:relative">
           <div class="book-cover">
             <div class="book-spine"></div>
             <div class="book-glow"></div>
             <div class="book-content">
               <div>
-                <div class="book-volume">VOLUME I</div>
+                <!-- Mode toggle (Bedtime / Adventure) — replaces the old VOLUME I kicker.
+                     Switching mode swaps the bundle pool the cover cycles through. -->
+                <div class="book-modes" role="tablist" aria-label="Story type">
+                  <button type="button" class="book-mode" id="bookModeBedtime" data-mode="bedtime" data-on="true" role="tab" aria-selected="true">🌙 Bedtime</button>
+                  <button type="button" class="book-mode" id="bookModeAdventure" data-mode="adventure" data-on="false" role="tab" aria-selected="false">⭐ Adventure</button>
+                </div>
                 <div class="book-storyfor">a story for</div>
                 <div class="book-name" id="bookName">Oliver</div>
                 <div class="book-title-row">
                   <span class="book-title-rule"></span>
                   <span class="book-title" id="bookTitle">and the Fox Who Was Waiting</span>
                 </div>
+                <div class="book-meta">
+                  <div class="book-meta-row"><span class="book-meta-eye">FEATURING</span><span class="book-meta-val" id="bookFeaturing">their best friend Mira</span></div>
+                  <div class="book-meta-row"><span class="book-meta-eye">THEIR PET</span><span class="book-meta-val" id="bookPet">Charlie the family Labrador</span></div>
+                  <div class="book-meta-row"><span class="book-meta-eye">WHERE</span><span class="book-meta-val" id="bookWhere">their grandma's kitchen</span></div>
+                  <div class="book-meta-row"><span class="book-meta-eye">THE BADDIE</span><span class="book-meta-val" id="bookBaddie">the Tickle Monster</span></div>
+                  <div class="book-meta-row"><span class="book-meta-eye">A LITTLE THING</span><span class="book-meta-val" id="bookQuirk">the way they call spaghetti pasketti</span></div>
+                  <div class="book-meta-row"><span class="book-meta-eye">AS A GIFT</span><span class="book-meta-val" id="bookGift">Just for them</span></div>
+                  <div class="book-meta-row"><span class="book-meta-eye">READ BY</span><span class="book-meta-val" id="bookVoice">Mira · British, gentle</span></div>
+                </div>
               </div>
               <div class="book-bottom">
                 <div class="book-hand">made for them</div>
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-                  <circle cx="20" cy="20" r="14" stroke="rgba(244,236,219,.3)" stroke-width="1"/>
-                  <path d="M20 8v24M8 20h24" stroke="rgba(244,236,219,.3)" stroke-width="1"/>
-                </svg>
+              </div>
+              <div class="book-cta">
+                <div class="book-cta-eye">FREE PREVIEW IN MINUTES</div>
+                <div class="book-cta-line">Then <span data-price>£24.99</span> for the full story, perfected until you love it.</div>
               </div>
             </div>
           </div>
-          <div class="book-stamp">
-            <div class="book-stamp-1">made by</div>
-            <div class="book-stamp-2">hand</div>
-            <div class="book-stamp-rule"></div>
-            <div class="book-stamp-3">SAME DAY</div>
-          </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -422,8 +466,8 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
   <div class="container" style="max-width:920px">
     <div class="section-head">
       <div class="kicker">HEAR THE QUALITY</div>
-      <h2 style="margin-top:14px">Listen to a real story we made.</h2>
-      <p class="sub">Three short samples from real stories we wrote for real children. Yours will be nothing like these, it'll be theirs alone.</p>
+      <h2 style="margin-top:14px">Listen to a real one first.</h2>
+      <p class="sub">Three short samples from stories created for real children. One for one child, one for an only-child adventure, one for siblings together. Yours will be nothing like these, it'll be theirs alone.</p>
     </div>
 
     <div class="sample-tabs-row">
@@ -431,7 +475,7 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
       <div class="sample-tabs" role="tablist" aria-label="Sample stories">
         <button class="sample-tab" data-on="true" data-i="0" data-name="Oliver" data-age="5" data-kind="bedtime" data-voice="British (warm)" data-title="and the Fox Who Was Waiting"><span>Oliver</span><span style="font-size:10px;opacity:.6">🌙</span></button>
         <button class="sample-tab" data-on="false" data-i="1" data-name="Maya" data-age="6" data-kind="adventure" data-voice="Irish (lilting)" data-title="and the Map Inside the Drawer"><span>Maya</span><span style="font-size:10px;opacity:.6">⭐</span></button>
-        <button class="sample-tab" data-on="false" data-i="2" data-name="Arlo" data-age="4" data-kind="bedtime" data-voice="Scottish (kind)" data-title="and the Night the Stars Came Down"><span>Arlo</span><span style="font-size:10px;opacity:.6">🌙</span></button>
+        <button class="sample-tab" data-on="false" data-i="2" data-name="Isla & Oliver" data-age="5 + 3" data-kind="adventure" data-voice="British (warm)" data-title="and the Forest at the End of the Garden"><span>Isla &amp; Oliver</span><span style="font-size:10px;opacity:.6">👫</span></button>
       </div>
     </div>
     <div class="sample-meta" id="sampleMeta">A bedtime story · for Oliver, age 5 · told in a british (warm) voice</div>
@@ -472,7 +516,7 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
     <div class="sample-cta-row">
       <a class="btn" href="/start">Get a free 2-min preview <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
-    <div class="sample-cta-fineprint">Made by hand within 24h. £24.99 for the full 15-min story, only if you love it.</div>
+    <div class="sample-cta-fineprint">Free 2-min preview in 3 to 4 minutes. Full 15-min story within 24 hours if you love the preview. <span data-price>£24.99</span>.</div>
 
     <div class="mini-reviews">
       <div class="mini-review">
@@ -482,7 +526,7 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
       </div>
       <div class="mini-review">
         <span class="stars">★★★★★</span>
-        <p>"From the very beginning, he was completely captivated. The whole adventure felt incredibly personal and magical."</p>
+        <p>"From the very beginning, he was completely captivated. The whole adventure felt incredibly personal and unforgettable."</p>
         <div class="who">Maxine · United Kingdom</div>
       </div>
       <div class="mini-review">
@@ -500,12 +544,12 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
   <div class="container">
     <div class="section-head">
       <div class="kicker">HOW IT WORKS</div>
-      <h2 style="margin-top:14px">Four small steps. Then their story arrives.</h2>
+      <h2 style="margin-top:14px">Four small steps. Then their story plays.</h2>
     </div>
     <div class="how-grid">
       <div class="how-card"><div class="how-num">01</div><div class="how-t">Tell us about them</div><div class="how-d">Their name, who they love, the toy they won't go to bed without. About five minutes.</div></div>
-      <div class="how-card"><div class="how-num">02</div><div class="how-t">We craft their story</div><div class="how-d">Written and recorded for one child only. Every story is one of a kind.</div></div>
-      <div class="how-card"><div class="how-num">03</div><div class="how-t">Same-day delivery</div><div class="how-d">Sent to your inbox as a 15-minute audio file, ready to play tonight.</div></div>
+      <div class="how-card"><div class="how-num">02</div><div class="how-t">Their story comes together</div><div class="how-d">Built for one child, or up to four together (siblings, cousins, the whole brood). Every story is one of a kind.</div></div>
+      <div class="how-card"><div class="how-num">03</div><div class="how-t">Hear the preview in minutes</div><div class="how-d">A free 2-min preview is written, recorded, and ready to play in your browser in 3 to 4 minutes. No inbox check, no waiting. If you love it, the full story is yours within 24 hours, usually much sooner.</div></div>
       <div class="how-card"><div class="how-num">04</div><div class="how-t">Theirs forever</div><div class="how-d">Keep it, replay it, gift it. No subscription, no expiry, no fuss.</div></div>
     </div>
   </div>
@@ -521,18 +565,37 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
         <h2>Their world,<br>woven into one story.</h2>
         <ul class="inside-list">
           <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>Their name</strong><span style="color:var(--muted)">. spoken back to them, the way they recognise it</span></span></li>
-          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>Their best friend, cousin, pet</strong><span style="color:var(--muted)">. real people they know, given a real role</span></span></li>
+          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>Their sibling, cousin, best friend, pet</strong><span style="color:var(--muted)">. real people they know, with real roles. Or up to four kids sharing the adventure together.</span></span></li>
           <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>Their favourite thing</strong><span style="color:var(--muted)">. dinosaurs, ballet, trains, the toy they sleep with</span></span></li>
-          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>A storyteller you choose</strong><span style="color:var(--muted)">. British, Irish, American, six warm voices</span></span></li>
+          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>A storyteller you choose</strong><span style="color:var(--muted)">. British, Irish, American, Scottish, Australian, five warm voices</span></span></li>
           <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>The little quirks</strong><span style="color:var(--muted)">. the bit only you know, calls spaghetti "pasketti"</span></span></li>
         </ul>
         <div class="inside-includes">
           <div style="flex:1">
             <div class="inside-includes-k">EVERY STORY INCLUDES</div>
-            <div class="inside-includes-v">~15 mins of audio · MP3 + browser player · printable cover</div>
+            <div class="inside-includes-v">~15 mins of audio · MP3 + browser player · no login, instantly shareable · yours to keep forever</div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- For the whole brood (multi-child) -->
+<section class="brood">
+  <div class="container">
+    <div class="brood-card">
+      <div class="brood-eyebrow">FOR SIBLINGS, COUSINS, THE WHOLE BROOD</div>
+      <h2 class="brood-h">One story. <em>Every name woven in.</em></h2>
+      <p class="brood-sub">Add up to four kids and they'll all share the adventure together. Same story, same voice, same evening.</p>
+      <div class="brood-rolodex">
+        <span class="brood-name n1"><span class="dot"></span>Chase</span>
+        <span class="brood-name n2"><span class="dot"></span>Ethan</span>
+        <span class="brood-name n3"><span class="dot"></span>Darcy</span>
+        <span class="brood-name n4"><span class="dot"></span>+ one more</span>
+      </div>
+      <a class="brood-cta" href="/start">Make their story →</a>
+      <div class="brood-foot">One purchase. One shared adventure.</div>
     </div>
   </div>
 </section>
@@ -544,14 +607,13 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
     <h2 class="serif" style="font-size:clamp(32px,4.5vw,52px);margin:14px 0 0;font-weight:500;line-height:1.1">One story. One price.<br>No catches.</h2>
     <div class="pricing-card">
       <div class="pricing-num">
-        <span class="price">£24.99</span>
+        <span class="price" data-price>£24.99</span>
         <span class="suffix">one-off</span>
       </div>
       <div class="pricing-tagline">for the full 15-minute story</div>
       <ul class="pricing-list">
-        <li><span class="inside-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Same-day delivery to your inbox</span></li>
-        <li><span class="inside-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>MP3 + browser player you can save to home screen</span></li>
-        <li><span class="inside-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Printable cover art included</span></li>
+        <li><span class="inside-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Free 2-min preview in minutes, full story within 24 hours</span></li>
+        <li><span class="inside-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>MP3 + browser player you can save to home screen, no login needed, share with anyone</span></li>
         <li><span class="inside-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Yours forever. No subscription, no expiry</span></li>
         <li><span class="inside-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span>Money-back if it isn't right</span></li>
       </ul>
@@ -577,12 +639,10 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
         <ul class="gift-list">
           <li><span class="e">📅</span><span>Pick the day it arrives. Birthday morning, Christmas Eve, whenever you choose.</span></li>
           <li><span class="e">✍️</span><span>Add a personal note from you. We include it with the story.</span></li>
-          <li><span class="e">🎁</span><span>Don't know the details? Send a gift card. The parent fills in the rest.</span></li>
           <li><span class="e">👪</span><span>Bundle siblings or cousins into one shared adventure.</span></li>
         </ul>
         <div class="gift-cta-row">
           <a class="btn" href="/start?gift=1">Send it as a gift</a>
-          <a class="btn btn--ghost" href="/start?giftcard=1">Or buy a gift card</a>
         </div>
       </div>
       <div><div class="gift-img" role="img" aria-label="Grandparent and grandchild listening together"></div></div>
@@ -602,7 +662,7 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
           <span class="founder-name">Jamie</span>
           <span class="founder-role">founder, dad</span>
         </div>
-        <p class="founder-bio">HearTheirName started with one bedtime story for my son. Now my family helps me make them for yours. One at a time, with as much care as we can fit into them.</p>
+        <p class="founder-bio">HearTheirName started with one bedtime story I created for my son. Now we create them for yours, with the same warmth and the same care.</p>
       </div>
     </div>
   </div>
@@ -650,11 +710,11 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
       <div class="final-inner">
         <div class="scarcity-badge" id="scarcityBadge">
           <span class="scarcity-dot"></span>
-          <span class="scarcity-text" id="scarcityText">BOOKING NOW · 7 STORIES LEFT THIS WEEK</span>
+          <span class="scarcity-text" id="scarcityText">BOOKING NOW</span>
         </div>
         <div class="final-kicker">READY?</div>
-        <h2 class="final-h">Let's make a story<br>only they could star in.</h2>
-        <p class="final-sub">Free 2-min preview within 24 hours. £24.99 for the full story, only if it wins you over.</p>
+        <h2 class="final-h">Let's make a story<br>only they (and their crew) could star in.</h2>
+        <p class="final-sub">Free 2-min preview in 3 to 4 minutes, played right in your browser. Full story within 24 hours, perfected until you love it. <span data-price>£24.99</span>.</p>
         <div class="final-cta-row">
           <a class="btn" href="/start">Get my free preview</a>
         </div>
@@ -678,7 +738,7 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
       </svg>
       <span class="logo-text" style="font-size:16px">Hear<em>Their</em>Name</span>
     </a>
-    <div class="footer-text">© HearTheirName · Made by a dad and his son · hello@heartheirname.com</div>
+    <div class="footer-text">© HearTheirName · Created by a dad and his son · hello@heartheirname.com</div>
     <div class="footer-links">
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
@@ -699,7 +759,7 @@ function scrollToId(id){
   window.scrollTo({ top: y, behavior: 'smooth' });
 }
 
-// Sample tabs — real audio playback
+// Sample tabs: real audio playback
 const SAMPLES = [
   { name:'Oliver', age:5, kind:'bedtime', voice:'British (warm)', title:'and the Fox Who Was Waiting', src:'/audio/samples/oliver.mp3',
     lines:[
@@ -725,16 +785,16 @@ const SAMPLES = [
       "{N} smiled. \"Then we'd better go, hadn't we?\""
     ]
   },
-  { name:'Arlo', age:4, kind:'bedtime', voice:'Scottish (kind)', title:'and the Night the Stars Came Down', src:'/audio/samples/arlo.mp3',
+  { name:'Isla & Oliver', age:'5 + 3', kind:'adventure', voice:'British (warm)', title:'and the Forest at the End of the Garden', src:'/audio/samples/siblings.mp3',
     lines:[
-      "It was the quietest night {N} had ever known.",
-      "Outside the window, the trees stood still as paintings.",
-      "Then a small star, the smallest of them all, leaned forward,",
-      "and tumbled gently into {N}'s garden.",
-      "\"Excuse me,\" said the star, in a voice like a soft bell.",
-      "\"I've come a very long way, {N}, and I'd like to listen to your story.\"",
-      "{N} thought about it. \"You can,\" he said. \"But only if you stay until I fall asleep.\"",
-      "And so the little star did, just that."
+      "Isla saw it first.",
+      "A flash of grey. A flick of tail. Pepper the cat shot past her feet,",
+      "right into the big, tall forest at the bottom of the garden.",
+      "Oliver was sitting in the mud, holding Digby tight.",
+      "\"Where Pepper gone?\" Oliver asked.",
+      "\"Into the forest,\" Isla said. \"We have to go in. We have to find her.\"",
+      "Oliver stood up. \"Okay,\" he said. \"Digby come too.\"",
+      "And into the forest they went, together."
     ]
   }
 ];
@@ -797,7 +857,10 @@ function setSample(i){
   currentSample = i;
   const s = SAMPLES[i];
   document.querySelectorAll('.sample-tab').forEach((tab, idx) => tab.dataset.on = (idx === i) ? 'true' : 'false');
-  document.getElementById('sampleMeta').textContent = `${s.kind === 'adventure' ? 'An adventure' : 'A bedtime'} story · for ${s.name}, age ${s.age} · told in a ${s.voice.toLowerCase()} voice`;
+  // Multi-child samples (name with "&") use "ages X & Y" plural; single child stays "age X".
+  const isMulti = s.name.includes('&') || s.name.includes(' and ');
+  const ageLabel = isMulti ? `ages ${s.age}` : `age ${s.age}`;
+  document.getElementById('sampleMeta').textContent = `${s.kind === 'adventure' ? 'An adventure' : 'A bedtime'} story · for ${s.name}, ${ageLabel} · told in a ${s.voice.toLowerCase()} voice`;
   document.getElementById('playerCoverName').textContent = s.name;
   document.getElementById('playerTitle').textContent = s.title.replace(/^and /, '');
   document.getElementById('playerTitleName').textContent = s.name;
@@ -863,7 +926,7 @@ const REVIEWS = [
   { name:'Angelina M.', loc:'Canada', days:'4 days ago', title:'My 5-year-old absolutely loved this',
     body:"He lit up every time the story mentioned his name, then his favourite toy, his bestie, like he was surprised each time. We listened to it 3 times within 2 hours. He even asked to listen again before school." },
   { name:'Maxine', loc:'United Kingdom', days:'2 weeks ago', title:'My grandson absolutely loved this',
-    body:"From the very beginning, he was completely captivated. Hearing his own name woven into the story, alongside his friends, family and the family pet, made the whole adventure feel incredibly personal and magical." },
+    body:"From the very beginning, he was completely captivated. Hearing his own name woven into the story, alongside his friends, family and the family pet, made the whole adventure feel incredibly personal and unforgettable." },
   { name:'Robin M.', loc:'Canada', days:'2 days ago', title:"Wow! Nephew's birthday",
     body:"We had a story made for my nephew's birthday and got the family together to listen. The grandparents had giggles and happy tears. When the kids heard their names, eyes got WIDE, like total shock." },
   { name:'Kelsey', loc:'Canada', days:'1 week ago', title:'I loved every bit of this',
@@ -897,12 +960,11 @@ document.addEventListener('DOMContentLoaded', renderReviews);
 
 // FAQ
 const FAQS = [
-  { q:'Is this really made by hand?', a:'Yes, and we know that word gets thrown around. What we mean: every story is written and recorded for one specific child, using the details you sent us. We use modern tools to help us write and produce, but the people, places, voice direction and final shape of each story are decided by us. We won\'t pretend it\'s quill-and-ink, but it isn\'t a template either.' },
   { q:'How long is the full story?', a:'Around 15 minutes. Long enough to be a proper bedtime ritual, short enough to listen in one sitting. You can replay it as many times as you like.' },
-  { q:'How long does delivery take?', a:'Same day if you order before 6pm UK time. We\'ll email you the audio file plus a browser player you can save to your phone\'s home screen.' },
+  { q:'How long does delivery take?', a:'After you fill in the form, the free 2-minute preview is written and recorded for you in 3 to 4 minutes, right in your browser. No inbox check, no waiting. You hear the opening, decide if you love it. If you do, the full 15-minute story is yours within 24 hours, usually much sooner. We email a permanent link the moment it is ready so you can play it any time, anywhere.' },
   { q:'What ages does it work for?', a:'Roughly 2 to 9. We tune the language, pace and complexity to the age you give us, so a story for a 3-year-old is different from one for a 7-year-old.' },
   { q:'Can I add multiple children?', a:'Yes. You can add up to four children (siblings, cousins, friends) and they\'ll all be woven into the same story together. One purchase, one shared adventure.' },
-  { q:'Can I give this as a gift?', a:'Absolutely. You can switch on Gift mode during checkout, add a note from yourself, choose the day it arrives, and (if you don\'t have the child\'s details) send a gift card so the parent can fill them in.' },
+  { q:'Can I give this as a gift?', a:'Absolutely. You can switch on Gift mode during checkout, add a note from yourself, and choose how the recipient gets it. Send it to their email straight away, or hold it in your account and share the link yourself when the time is right.' },
   { q:'Can they listen more than once?', a:'Yes. The audio is yours forever. Replay, share with grandparents, copy it to a Yoto card, whatever you like. No subscription, no expiry.' },
   { q:'What if it isn\'t right?', a:'We\'ll fix it or refund you. If a name\'s pronounced wrong, a detail\'s off, or it just doesn\'t feel right, write to us and we\'ll either re-record the bit or give your money back. No drama.' }
 ];
@@ -917,7 +979,7 @@ function renderFaq(){
 }
 document.addEventListener('DOMContentLoaded', renderFaq);
 
-// Scarcity badge — wired to live weekly count via API
+// Scarcity badge: wired to live weekly count via API
 async function updateScarcity(){
   try {
     const res = await fetch('/api/weekly-count');
@@ -937,6 +999,377 @@ document.addEventListener('DOMContentLoaded', updateScarcity);
 
 // Review count from Trustpilot (best-effort, falls back to default 14)
 // Wire to /api/trustpilot-count if you build it later.
+
+// ─── Hero book cover: name rotation + auto-rotating bundles + mode pills ──
+// The cover's name (#bookName) cycles through example solo + sibling-group
+// names. Below it, eight rows (title + 7 meta) cycle as coherent BUNDLES.
+// Default behaviour interleaves bedtime + adventure bundles so the cover
+// auto-flips between modes; the pill at the top auto-updates to match
+// each bundle. Clicking either pill locks the rotation to that mode;
+// clicking the locked pill again unlocks back to auto.
+(function setupHeroBook(){
+  // Names mix solo + sibling pairs + trios + the occasional quad so the
+  // cover demonstrates "this works for one OR for the whole brood".
+  const ROTATING_NAMES = [
+    'Oliver',
+    'Maya',
+    'Chase & Maya',
+    'Tilly',
+    'Oliver & Sophie',
+    'Arlo',
+    'Noah & Aiden',
+    'Sophie',
+    'Chase, Sophie & Arlo',
+    'Tilly & Arlo',
+    'Noah',
+    'Oliver, Maya & Tilly',
+    'Aiden',
+    'Kayden, Reagan, Savannah & Amelia'
+  ];
+  // Two pools of coherent story bundles, one per mode. Each bundle has a
+  // `mode` field so the pill at the top of the cover auto-updates as the
+  // cover transforms. Default behaviour interleaves both pools (auto mode).
+  // Clicking either pill locks the rotation to that pool.
+  const BUNDLES_BEDTIME = [
+    {
+      mode: 'bedtime',
+      title: 'and the Fox Who Was Waiting',
+      featuring: 'a kind fox who has been waiting',
+      pet: 'Otis the basset hound, already asleep',
+      where: 'Sycamore Lane, by moonlight',
+      baddie: 'no baddie · a gentle bedtime',
+      quirk: 'a blanket the colour of moonlight',
+      gift: 'Just for them',
+      voice: 'Dorothy · British, warm'
+    },
+    {
+      mode: 'bedtime',
+      title: 'and the Whisper Behind the Curtains',
+      featuring: 'their grandma Pat',
+      pet: 'Whiskers the cat, watching from the bed',
+      where: "their grandma's kitchen on a Sunday",
+      baddie: 'no baddie · just gentle wonder',
+      quirk: 'the song their mum hums while cooking',
+      gift: 'A gift from Grandma Pat',
+      voice: 'Mira · British, gentle'
+    },
+    {
+      mode: 'bedtime',
+      title: 'and the Garden That Knew Their Name',
+      featuring: 'the green dragon called Steve',
+      pet: 'Coco the rabbit who lives in the kitchen',
+      where: 'the corner of their bedroom they love',
+      baddie: 'no baddie · soft bedtime magic',
+      quirk: "the way they go quiet when they're thinking",
+      gift: 'A gift from Uncle Tom',
+      voice: 'Callum · Scottish, kind'
+    },
+    {
+      mode: 'bedtime',
+      title: 'and the Light That Came Home',
+      featuring: "their dad's voice from the kitchen",
+      pet: 'Bella the rescue greyhound, by the fire',
+      where: 'the village they go to every summer',
+      baddie: 'no baddie · a quiet evening',
+      quirk: 'the lisp on words with an s',
+      gift: 'A gift from Daddy, with love',
+      voice: 'Dorothy · British, warm'
+    },
+    {
+      mode: 'bedtime',
+      title: 'and the Stars That Hummed Their Name',
+      featuring: 'their big sister Maya',
+      pet: 'Mr Squeaks the hamster, sleepy in his wheel',
+      where: 'the soft hush of their bedroom at midnight',
+      baddie: 'no baddie · a slow drift to sleep',
+      quirk: 'the soft worn corner of their blanket',
+      gift: 'Just for them',
+      voice: 'Mira · British, gentle'
+    }
+  ];
+
+  const BUNDLES_ADVENTURE = [
+    {
+      mode: 'adventure',
+      title: 'and the Path Through the Trees',
+      featuring: 'their cousin Leo from down the road',
+      pet: 'Charlie the family Labrador',
+      where: 'the woods at the end of the lane',
+      baddie: 'the Sock-Stealing Bandit',
+      quirk: "the way they bounce when they're excited",
+      gift: 'Just for them',
+      voice: 'Eric · Irish, lilting'
+    },
+    {
+      mode: 'adventure',
+      title: 'and the Boat Made of Paper',
+      featuring: 'their best friend Mira',
+      pet: 'no pet · just brave kids',
+      where: 'a small island only they know about',
+      baddie: 'Captain Stinkbeard',
+      quirk: 'the way they whistle when nervous',
+      gift: 'Just for them',
+      voice: 'Ethan · American, cosy'
+    },
+    {
+      mode: 'adventure',
+      title: 'and the Map Inside the Drawer',
+      featuring: 'their auntie Rose',
+      pet: 'two cats called Salt and Pepper',
+      where: 'the park behind the school',
+      baddie: 'the Pancake Pirate',
+      quirk: 'the day they learned to ride their bike',
+      gift: 'A birthday gift from Grandad',
+      voice: 'Mira · British, gentle'
+    },
+    {
+      mode: 'adventure',
+      title: 'and the Door at the Top of the Hill',
+      featuring: 'their cousin Leo from down the road',
+      pet: 'Bella the rescue greyhound, leading the way',
+      where: 'the long path home from the beach',
+      baddie: 'the Burglar of Biscuits',
+      quirk: 'the way they bellow when they win',
+      gift: 'A gift from Auntie Rose',
+      voice: 'Eric · Irish, lilting'
+    },
+    {
+      mode: 'adventure',
+      title: 'and the Treasure Beneath the Bridge',
+      featuring: 'their big sister Maya',
+      pet: 'Charlie the Labrador, sniffing every clue',
+      where: 'an attic full of hiding places',
+      baddie: 'Lord Yawn, who hates fun',
+      quirk: "the way they bounce when they're excited",
+      gift: 'A gift from Daddy, with love',
+      voice: 'Callum · Scottish, kind'
+    }
+  ];
+
+  // Auto mode: alternate one bedtime, one adventure, one bedtime, etc.
+  // The customer sees the cover flip between the two modes naturally,
+  // and the pill auto-updates to match each bundle.
+  const ALL_BUNDLES = [];
+  const _maxLen = Math.max(BUNDLES_BEDTIME.length, BUNDLES_ADVENTURE.length);
+  for (let i = 0; i < _maxLen; i++){
+    if (BUNDLES_BEDTIME[i]) ALL_BUNDLES.push(BUNDLES_BEDTIME[i]);
+    if (BUNDLES_ADVENTURE[i]) ALL_BUNDLES.push(BUNDLES_ADVENTURE[i]);
+  }
+
+  // Default: auto mode (interleaved). Pill click locks to a single mode.
+  let currentBundles = ALL_BUNDLES;
+  let currentMode = 'auto';
+  const ROTATION_MS = 3500;
+  const FADE_MS = 220;
+  const bookName = document.getElementById('bookName');
+  const bookTitle = document.getElementById('bookTitle');
+  const bookFeaturing = document.getElementById('bookFeaturing');
+  const bookPet = document.getElementById('bookPet');
+  const bookWhere = document.getElementById('bookWhere');
+  const bookBaddie = document.getElementById('bookBaddie');
+  const bookQuirk = document.getElementById('bookQuirk');
+  const bookGift = document.getElementById('bookGift');
+  const bookVoice = document.getElementById('bookVoice');
+  const modeBedtime = document.getElementById('bookModeBedtime');
+  const modeAdventure = document.getElementById('bookModeAdventure');
+  if (!bookName || !modeBedtime || !modeAdventure) return;
+
+  // Auto-fit the name's font-size so multi-child strings still fit cleanly
+  // within the cover. The big single "Oliver" gets the full ~88px treatment;
+  // a four-name quad gets ~32px so it reads on a single line.
+  function fitNameSize(name){
+    const len = (name || '').length;
+    if (len <= 8)  return 'clamp(56px, 12vw, 88px)';
+    if (len <= 14) return 'clamp(44px, 9vw, 64px)';
+    if (len <= 22) return 'clamp(32px, 6vw, 44px)';
+    if (len <= 34) return 'clamp(24px, 4.5vw, 32px)';
+    return 'clamp(20px, 3.5vw, 26px)';
+  }
+
+  // ── Name + title + featuring rotation, with inline name edit ──
+  // Three independent rotations so the cover feels alive — name (the big
+  // word), title (the "and the X" subtitle), and featuring (the personal
+  // detail under the title). Name rotation freezes when the customer types
+  // their child's name. Title + featuring keep rotating so the customer
+  // sees the range of stories possible. All three pause and lock while
+  // audio is playing so what's on screen matches what they're hearing.
+  // Name rotates independently (it's the customer's child's name + sibling
+  // examples). Everything else rotates as a coherent bundle so the title
+  // genuinely matches the featuring/pet/where/baddie/etc.
+  let nameIdx = 0;
+  let bundleIdx = 0;
+  let nameTimer = null;
+  let bundleTimer = null;
+  const BUNDLE_INTERVAL_MS = 5400; // bundle changes every ~5.4s
+  const CASCADE_STEP_MS = 90;       // delay between row fade-outs / fade-ins
+
+  function fade(el, text){
+    if (!el) return;
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.textContent = text;
+      el.style.opacity = '1';
+    }, FADE_MS);
+  }
+  function fadeName(text){
+    if (!bookName) return;
+    bookName.style.opacity = '0';
+    setTimeout(() => {
+      bookName.textContent = text;
+      bookName.style.fontSize = fitNameSize(text);
+      bookName.style.opacity = '1';
+    }, FADE_MS);
+  }
+  // Bundle-row mapping: which DOM element gets which key from a bundle.
+  // Order in this array == cascade order (top-to-bottom on the cover).
+  const BUNDLE_ROWS = [
+    { el: bookTitle, key: 'title' },
+    { el: bookFeaturing, key: 'featuring' },
+    { el: bookPet, key: 'pet' },
+    { el: bookWhere, key: 'where' },
+    { el: bookBaddie, key: 'baddie' },
+    { el: bookQuirk, key: 'quirk' },
+    { el: bookGift, key: 'gift' },
+    { el: bookVoice, key: 'voice' }
+  ];
+
+  function applyBundle(bundle, animate){
+    if (!bundle) return;
+    if (!animate) {
+      // Immediate apply (used on first paint and on audio-lock).
+      BUNDLE_ROWS.forEach(({ el, key }) => {
+        if (el) { el.textContent = bundle[key] || ''; el.style.opacity = '1'; }
+      });
+      return;
+    }
+    // Cascade fade out → fade in. Each row fades 90ms after the previous,
+    // so the cover transforms top-to-bottom like a curtain falling and
+    // rising. Total transition: ~1.5s.
+    const total = BUNDLE_ROWS.length;
+    BUNDLE_ROWS.forEach(({ el }, i) => {
+      if (!el) return;
+      setTimeout(() => { el.style.opacity = '0'; }, i * CASCADE_STEP_MS);
+    });
+    // Once all rows have faded out (last row finished + transition time),
+    // begin the fade-in cascade with the new bundle's values.
+    const fadeInStart = total * CASCADE_STEP_MS + 320;
+    BUNDLE_ROWS.forEach(({ el, key }, i) => {
+      if (!el) return;
+      setTimeout(() => {
+        el.textContent = bundle[key] || '';
+        el.style.opacity = '1';
+      }, fadeInStart + i * CASCADE_STEP_MS);
+    });
+  }
+
+  function startNameRotation(){
+    if (nameTimer) return;
+    nameTimer = setInterval(() => {
+      nameIdx = (nameIdx + 1) % ROTATING_NAMES.length;
+      fadeName(ROTATING_NAMES[nameIdx]);
+    }, ROTATION_MS);
+  }
+  function startBundleRotation(){
+    if (bundleTimer) return;
+    bundleTimer = setInterval(() => {
+      bundleIdx = (bundleIdx + 1) % currentBundles.length;
+      applyBundle(currentBundles[bundleIdx], true);
+    }, BUNDLE_INTERVAL_MS);
+  }
+  function startRotation(){
+    startNameRotation();
+    startBundleRotation();
+  }
+  function stopRotation(){
+    if (nameTimer) { clearInterval(nameTimer); nameTimer = null; }
+    if (bundleTimer) { clearInterval(bundleTimer); bundleTimer = null; }
+  }
+  // Sync the pill UI with whichever mode the cover is currently showing.
+  function setActivePill(mode){
+    [modeBedtime, modeAdventure].forEach(b => {
+      const isOn = b.dataset.mode === mode;
+      b.dataset.on = String(isOn);
+      b.setAttribute('aria-selected', String(isOn));
+    });
+  }
+
+  // Wrap applyBundle so the pill auto-updates when the bundle changes.
+  const _applyBundleRaw = applyBundle;
+  applyBundle = function(bundle, animate){
+    if (bundle && bundle.mode) setActivePill(bundle.mode);
+    _applyBundleRaw(bundle, animate);
+  };
+
+  // Paint the first bundle immediately so the cover boots with coherent
+  // values rather than the static HTML defaults.
+  applyBundle(currentBundles[0], false);
+  startRotation();
+
+  // Mode pill click: lock the rotation to that mode (only that pool cycles).
+  // Clicking the already-locked pill unlocks and returns to the auto pool
+  // that interleaves both modes.
+  function lockMode(mode){
+    currentMode = mode;
+    currentBundles = mode === 'adventure' ? BUNDLES_ADVENTURE : BUNDLES_BEDTIME;
+    bundleIdx = 0;
+    if (bundleTimer) { clearInterval(bundleTimer); bundleTimer = null; }
+    applyBundle(currentBundles[0], true);
+    startBundleRotation();
+  }
+  function unlockMode(){
+    currentMode = 'auto';
+    currentBundles = ALL_BUNDLES;
+    if (bundleTimer) { clearInterval(bundleTimer); bundleTimer = null; }
+    // Don't snap on unlock — let the next rotation pick up naturally.
+    startBundleRotation();
+  }
+  modeBedtime.addEventListener('click', () => {
+    if (currentMode === 'bedtime') unlockMode();
+    else lockMode('bedtime');
+  });
+  modeAdventure.addEventListener('click', () => {
+    if (currentMode === 'adventure') unlockMode();
+    else lockMode('adventure');
+  });
+})();
+</script>
+<script>
+// Continuous colour-wheel animation on the book cover
+(function bookColourLoop(){
+  const cover = document.querySelector('.book-cover');
+  const glow  = document.querySelector('.book-glow');
+  if (!cover || !glow) return;
+  const start = performance.now();
+  function frame(now) {
+    const t     = (now - start) / 1000;
+    const hue   = (t * 18) % 360;
+    const pulse = (Math.sin(t * 2.618) + 1) / 2;
+    const h2    = (hue + 25) % 360;
+    const h3    = (hue + 50) % 360;
+    const sat   = 72 + pulse * 22;
+    const l1    = 16 + pulse * 24;
+    const l2    = 10 + pulse * 16;
+    const l3    = 5  + pulse * 9;
+    cover.style.background = `linear-gradient(160deg,hsl(${hue|0},${sat|0}%,${l1|0}%) 0%,hsl(${h2|0},${(sat*.88)|0}%,${l2|0}%) 60%,hsl(${h3|0},${(sat*.65)|0}%,${l3|0}%) 100%)`;
+    const ga = (.22 + pulse * .30).toFixed(2);
+    glow.style.background = `radial-gradient(circle at 60% 40%,hsla(${(hue+40)|0},90%,65%,${ga}),transparent 55%)`;
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+// Localised pricing — fetches /api/get-pricing and swaps every [data-price]
+// span on the page. Falls back to the inline £24.99 default if the call fails.
+(async function localisePrice(){
+  try {
+    const r = await fetch('/api/get-pricing', { credentials:'omit' });
+    if (!r.ok) return;
+    const p = await r.json();
+    if (!p || !p.display) return;
+    document.querySelectorAll('[data-price]').forEach(el => { el.textContent = p.display; });
+  } catch (e) {}
+})();
 </script>
 </body>
 </html>

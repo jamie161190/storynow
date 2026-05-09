@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Action — HearTheirName</title>
+<title>Action · HearTheirName</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,8 +32,11 @@ html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-famil
 <body>
 <div class="container" id="root"><p>Loading…</p></div>
 <script>
-const path = window.location.pathname; // e.g. /account/story/{id}/re-record OR /account/story/{id}/refund
-const m = path.match(/\/account\/story\/([^/]+)\/(re-record|refund)/);
+// /account/story/{id}/refund used to live here as a self-serve auto-refund
+// flow. That's been retired — refund decisions now go through Jamie. Only
+// the re-record path remains.
+const path = window.location.pathname; // e.g. /account/story/{id}/re-record
+const m = path.match(/\/account\/story\/([^/]+)\/(re-record)/);
 if (!m){ document.getElementById('root').innerHTML = '<p>Not found.</p>'; }
 else {
   const [, storyId, action] = m;
@@ -68,36 +71,11 @@ else {
       try {
         await fetch('/api/rerecord-request', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
           body: JSON.stringify({ storyId, accessToken, reasonTag: tag, body: document.getElementById('bodyInput').value }) });
-        document.getElementById('root').innerHTML = `<div class="success"><div style="font-size:40px;margin-bottom:8px">✓</div><h2 class="serif" style="font-size:24px;margin:0 0 6px">Sent to Jamie.</h2><p style="color:var(--muted);margin:0 0 18px">I'll fix it and send the new version within 24 hours.</p><a class="btn" href="/account">Back to my stories</a></div>`;
+        document.getElementById('root').innerHTML = `<div class="success"><div style="font-size:40px;margin-bottom:8px">✓</div><h2 class="serif" style="font-size:24px;margin:0 0 6px">Sent to Jamie.</h2><p style="color:var(--muted);margin:0 0 18px">I'll fix it and send the new version within 24 hours.</p></div>`;
       } catch(e){ btn.disabled=false; btn.textContent='Try again'; }
     });
   }
 
-  if (action === 'refund'){
-    document.getElementById('root').innerHTML = `
-      <button class="back" onclick="history.back()">← Back to story</button>
-      <div class="kicker">REFUND REQUEST</div>
-      <h1 class="serif" style="font-size:28px;font-weight:500;margin:8px 0 12px">Refund this story.</h1>
-      <p style="color:var(--muted);margin:0 0 20px">No drama. £24.99 back to your card within 5 working days. The story stays in your account in case you change your mind.</p>
-      <div style="padding:22px;background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:12px">
-        <div class="warn">Sometimes a re-record fixes it for free. <a href="${path.replace('/refund','/re-record')}${window.location.search}">Try a re-record first?</a></div>
-        <div class="kicker" style="margin-bottom:8px">REASON (OPTIONAL, HELPS ME)</div>
-        <textarea class="txt" id="reasonInput" rows="4" placeholder="Anything you want to share."></textarea>
-        <button class="btn btn--ghost" id="submitBtn" style="margin-top:18px">Refund my £24.99</button>
-        <div style="text-align:center;margin-top:10px;font-size:12px;color:var(--muted-2)">Within 14 days of delivery. No questions asked.</div>
-      </div>`;
-    document.getElementById('submitBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('submitBtn');
-      btn.disabled = true; btn.textContent = 'Processing…';
-      try {
-        const res = await fetch('/api/refund-request', { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-          body: JSON.stringify({ storyId, accessToken, reason: document.getElementById('reasonInput').value }) });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Failed');
-        document.getElementById('root').innerHTML = `<div class="success"><div style="font-size:40px;margin-bottom:8px">${data.refunded?'✓':'⏳'}</div><h2 class="serif" style="font-size:24px;margin:0 0 6px">${data.refunded?'Refunded.':'Sent to Jamie.'}</h2><p style="color:var(--muted);margin:0 0 18px">${data.refunded?'£24.99 back to your card within 5 working days.':'I\\'ll process this manually within 24 hours.'}</p><a class="btn" href="/account">Back to my stories</a></div>`;
-      } catch(e){ btn.disabled=false; btn.textContent='Try again'; alert(e.message || "Couldn't refund. Email hello@heartheirname.com"); }
-    });
-  }
 }
 </script>
 </body>

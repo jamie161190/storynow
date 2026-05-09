@@ -1,0 +1,20 @@
+{
+  "name": "maya-v5-snack",
+  "child_name": "Maya",
+  "voice": "British (warm)",
+  "music": "public/music/bedtime-ambient.mp3",
+  "music_volume": 0.10,
+  "walkthrough_hook": "TYPE HER NAME. WATCH HER FACE.",
+  "walkthrough_voiceover": "Type her name. Watch her face. Tonight's story is hers. The hero is... Maya.",
+  "spoken_captions": [
+    { "text": "Tonight's story is hers.", "start": 0.0, "end": 1.5 },
+    { "text": "The hero is...",            "start": 1.5, "end": 2.6 },
+    { "text": "Maya.",                     "start": 2.7, "end": 5.0, "highlight": true }
+  ],
+  "end_card": {
+    "duration": 2,
+    "eyebrow": "HEARTHEIRNAME.COM",
+    "headline": "Free 2-min preview.",
+    "subline": "£24.99 · No card today"
+  }
+}
