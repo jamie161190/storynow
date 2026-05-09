@@ -623,51 +623,6 @@ header.site {
 .inbox-prime-copy:hover .inbox-prime-copy-tip,
 .inbox-prime-copy.is-copied .inbox-prime-copy-tip { opacity: 1; }
 
-/* ─── Story title card ─── */
-.story-card {
-  width: var(--container); margin: 28px auto 0;
-  border-radius: 20px; overflow: hidden; position: relative;
-  padding: 28px 28px 24px;
-  box-shadow: 0 20px 60px -16px rgba(20,10,40,.45), 0 4px 16px -4px rgba(20,10,40,.25);
-}
-.story-card::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
-  background: linear-gradient(180deg, rgba(217,168,154,.6), rgba(217,168,154,.15));
-  border-radius: 20px 0 0 20px;
-}
-.story-card-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--sans); font-size: 11px; font-weight: 600;
-  letter-spacing: .13em; text-transform: uppercase;
-  background: rgba(244,236,219,.10); border: 1px solid rgba(244,236,219,.18);
-  color: rgba(244,236,219,.65); border-radius: 999px; padding: 4px 12px;
-  margin-bottom: 20px;
-}
-.story-card-for {
-  font-family: var(--serif); font-style: italic;
-  font-size: 16px; color: rgba(244,236,219,.55); margin-bottom: 6px;
-}
-.story-card-name {
-  font-family: var(--serif); font-weight: 500;
-  font-size: 24px; color: #F4ECDB; letter-spacing: -.01em; line-height: 1.1;
-  margin-bottom: 16px;
-}
-.story-card-rule { width: 40px; height: 1px; background: #D9A89A; margin-bottom: 14px; }
-.story-card-title {
-  font-family: var(--serif); font-style: italic; font-weight: 500;
-  font-size: 22px; line-height: 1.28; color: rgba(244,236,219,.90); letter-spacing: -.004em;
-  min-height: 1.28em;
-}
-.story-card-bottom {
-  display: flex; align-items: center; justify-content: center; gap: 14px;
-  margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(244,236,219,.09);
-}
-.story-card-hr { flex: 1; height: 1px; background: rgba(217,168,154,.30); }
-.story-card-hero {
-  font-family: var(--sans); font-weight: 600;
-  font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #D9A89A;
-}
-
 /* ─── Hero ─── */
 .hero { padding: 36px 0 8px; }
 .hero-eye {
@@ -2769,26 +2724,7 @@ function renderReady(data){
       <p>${esc(r.body)}</p>
     </div>`).join('');
 
-  const storyKind = data.storyData?.storyKind || '';
-  const storyTitle = data.title || '';
-  const badgeEmoji = storyKind === 'adventure' ? '⭐' : storyKind === 'bedtime' ? '🌙' : '✨';
-  const badgeLabel = storyKind === 'adventure' ? 'Adventure' : storyKind === 'bedtime' ? 'Bedtime' : 'Story';
-
   document.getElementById('root').innerHTML = `
-
-    <!-- STORY TITLE CARD -->
-    <div class="story-card" id="storyCard">
-      <div class="story-card-badge">${badgeEmoji} ${badgeLabel}</div>
-      <div class="story-card-for">a story for</div>
-      <div class="story-card-name">${esc(childName)}</div>
-      <div class="story-card-rule"></div>
-      <div class="story-card-title">${storyTitle ? esc(storyTitle) : ''}</div>
-      <div class="story-card-bottom">
-        <div class="story-card-hr"></div>
-        <div class="story-card-hero">They're the hero</div>
-        <div class="story-card-hr"></div>
-      </div>
-    </div>
 
     <!-- HERO + PLAYER -->
     <div class="wrap hero">
@@ -3341,27 +3277,6 @@ async function startCheckout(){
 }
 
 load();
-
-// Colour-wheel animation on the story title card
-(function(){
-  const start = performance.now();
-  function frame(now){
-    const card = document.getElementById('storyCard');
-    if (!card) { requestAnimationFrame(frame); return; }
-    const t     = (now - start) / 1000;
-    const hue   = (t * 18) % 360;
-    const pulse = (Math.sin(t * 2.618) + 1) / 2;
-    const h2    = (hue + 25) % 360;
-    const h3    = (hue + 50) % 360;
-    const sat   = 72 + pulse * 22;
-    const l1    = 16 + pulse * 24;
-    const l2    = 10 + pulse * 16;
-    const l3    = 5  + pulse * 9;
-    card.style.background = `linear-gradient(160deg,hsl(${hue|0},${sat|0}%,${l1|0}%) 0%,hsl(${h2|0},${(sat*.88)|0}%,${l2|0}%) 55%,hsl(${h3|0},${(sat*.65)|0}%,${l3|0}%) 100%)`;
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-})();
 </script>
 
 </body>
