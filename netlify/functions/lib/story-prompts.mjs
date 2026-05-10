@@ -21,7 +21,7 @@ export function sanitiseStoryData(d) {
   const s = { ...d };
   const textFields = ['childName', 'friendName', 'sidekickName', 'petName', 'petType', 'favTeddy',
     'villainName', 'familyMembers', 'teacherName', 'interest', 'themeDetail', 'setting',
-    'extraDetails', 'personalMessage', 'customTheme', 'customWhere', 'bedtimeRitual'];
+    'extraDetails', 'personalMessage', 'customTheme', 'customWhere'];
   for (const f of textFields) {
     if (s[f]) s[f] = sanitiseInput(s[f]);
   }
@@ -35,7 +35,8 @@ export function sanitiseStoryData(d) {
       favTeddy: c.favTeddy ? sanitiseInput(c.favTeddy) : c.favTeddy,
       quirk: c.quirk ? sanitiseInput(c.quirk) : c.quirk,
       intoNow: c.intoNow ? sanitiseInput(c.intoNow) : c.intoNow,
-      nickname: c.nickname ? sanitiseInput(c.nickname) : c.nickname
+      nickname: c.nickname ? sanitiseInput(c.nickname) : c.nickname,
+      foodNo: c.foodNo ? sanitiseInput(c.foodNo) : c.foodNo
     }));
   }
   return s;
@@ -129,7 +130,7 @@ The brief has the following structure, and here is how each field should be trea
 - children[i].comfort_item (optional): THIS child's comfort toy/item. When present, weave it naturally into scenes with this child — it travels with them, sits beside them, gets noticed in a quiet moment. Do not invent details (colour, size, breed) the brief did not give. Different children have different items: honour each one separately, never substitute one child's item for another.
 - children[i].core_interest (optional but LOAD-BEARING when present): the thing THIS child is really into right now (a club, sport, hobby, obsession). When present, this is the SPINE of the story for that child — not a passing mention. If core_interest is "football on Saturday mornings", the story should pivot on a football moment (a championship, a save, a missed kick that becomes a found kick). If "gymnastics class", a vault or routine carries the climax. If "building Lego", a Lego creation can come alive or be the thing that solves the moment. Preserve the parent's specificity verbatim — do not generalise "football on Saturday mornings" into just "football". When MULTIPLE children each have a core_interest, weave the spine so both interests carry weight (e.g. football + ballet → a talent show with two acts; scooter + Lego → a Lego ramp the scooter rides). Never sideline one child's interest in favour of another's.
 - children[i].nickname (optional, EMOTIONAL GOLD when present): the family pet name for THIS child (Bug, Olly, Monkey, Sunshine, etc). Use it ONCE in the entire story, never more. Drop it at a moment of warmth: a parent voice from another room, a hand on the back during a quiet beat, a cuddle. The first listen, the child will gasp and look at the parent. That's the whole point. Two uses dilutes it; three or more breaks the spell. If the brief gives a nickname for one child but not the others, only that child gets theirs — do not invent nicknames for siblings. Preserve exact spelling.
-- bedtime_ritual (optional, BEDTIME CLOSING SCENE when present): the parent's described nightly ritual ("I sing You Are My Sunshine", "we do three breaths together", "she says goodnight to the moon"). Bedtime stories only. The story should END settling into a beat that echoes this ritual, so the audio finishes on the same feeling as the real bedtime. Don't quote the parent's words verbatim if it's a song or phrase — instead, frame an in-story echo (the wind hummed something soft, the moon said its quiet goodnight, three slow breaths and the world stilled). Preserve the texture, not the exact words.
+- children[i].food_dislike (optional, COMEDY BEAT when present): the food THIS child refuses to eat ("broccoli", "anything green", "the bits in soup", "tomatoes"). Pure comedy material. Build ONE beat into the story where this food becomes a small obstacle the protagonist navigates: the magic stew has it in, the wise old creature offers it as a reward, the villain bribes them with it. The protagonist outwits the moment in character (negotiates a swap, picks the bits out, holds their nose and powers through, is rescued by a friend who eats it for them). Never moralise about eating veg, never frame this as the child being naughty for refusing. The joke is the universal childhood truth that some foods are just NOT happening, and the story honours that. If multiple children have a food_dislike, give each their own moment — never combine into a generic "the kids hate vegetables" beat.
 - children[i].quirk + children[i].quirk_type (optional): THIS child's specific quirk. Belongs to that child only — do not give it to a sibling. The quirk_type tells you HOW to weight it:
   - **catchphrase**: land it once or twice in the story for impact. More than three times and it stops being charming.
   - **pattern**: a way of speaking. It must appear in EVERY line of dialogue from this child — that is how they sound. Do not narrate it ("she lisped"); render it (give them lisping dialogue).

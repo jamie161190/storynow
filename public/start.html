@@ -204,7 +204,7 @@ const VILLAINS = [
   ['🌙','The Bedtime Bandit']
 ];
 
-function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'' }; }
+function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'', foodNo:'' }; }
 
 // If the customer typed their child's name on the homepage cover-tryon
 // before clicking through, the homepage appended ?name=Chase so the funnel
@@ -229,7 +229,6 @@ const state = {
     themes: [], themesOther: '',
     place: '', placeReal: '',
     quirk: '',
-    bedtimeRitual: '',
     voice: '',
     isGift: STARTS_AS_GIFT || STARTS_AS_GIFTCARD,
     isGiftCard: STARTS_AS_GIFTCARD,
@@ -284,50 +283,57 @@ const STEPS = [
         </div>
       </div>` },
 
-  { key:'themes', title:"What's the story about?", sub:"Pick as many as you like. These shape the whole story.",
-    valid: () => state.data.themes.length > 0 || state.data.themesOther.trim().length > 0,
+  { key:'world', title:"Their world.", sub:"What it's about, where it lives, and what they're into. Pick as many as you like.",
+    valid: () => (state.data.themes.length > 0 || state.data.themesOther.trim().length > 0) && (!!state.data.place || !!state.data.placeReal.trim()),
     render: () => {
       const childLabel = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
       const multi = state.data.children.length > 1;
       return `
-      <div class="grid-3">
-        ${THEMES.map(([e,t]) => `
-          <button type="button" class="chip" data-on="${state.data.themes.includes(t)}" data-action="toggleTheme" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:14px 8px;min-height:80px;display:flex">
-            <span style="font-size:24px">${e}</span>
-            <span style="font-size:12px">${t}</span>
-          </button>
-        `).join('')}
-      </div>
-      <div class="kicker" style="margin-top:18px;margin-bottom:6px">OR TELL US SOMETHING ELSE</div>
-      <input class="txt" placeholder="e.g. Minecraft, ballet, cooking, classic cars" value="${esc(state.data.themesOther)}" data-action="setThemesOther">
+      <div style="display:flex;flex-direction:column;gap:28px">
 
-      <div style="margin-top:28px;padding-top:24px;border-top:1px dashed var(--line)">
-        <div class="kicker" style="margin-bottom:6px">${multi ? "WHAT'S EACH OF THEM REALLY INTO RIGHT NOW? (OPTIONAL)" : "WHAT'S SOMETHING THEY'RE REALLY INTO RIGHT NOW? (OPTIONAL)"}</div>
-        <div class="field-hint" style="margin:0 0 14px;line-height:1.55">A club they go to, a sport, a hobby, the thing they can't stop talking about. We'll weave it right into the story so they recognise themselves straight away.</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          ${state.data.children.map((c, i) => `
-            <div>
-              ${multi ? `<div class="field-label" style="margin-bottom:6px">FOR ${esc(childLabel(c, i).toUpperCase())}</div>` : ''}
-              <input class="txt" placeholder="e.g. football on Saturday mornings, gymnastics class, building Lego, riding their scooter to school" value="${esc(c.intoNow || '')}" data-action="updateChild" data-i="${i}" data-k="intoNow">
-            </div>
-          `).join('')}
+        <div>
+          <div class="kicker" style="margin-bottom:10px">WHAT'S THE STORY ABOUT?</div>
+          <div class="grid-3">
+            ${THEMES.map(([e,t]) => `
+              <button type="button" class="chip" data-on="${state.data.themes.includes(t)}" data-action="toggleTheme" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:14px 8px;min-height:80px;display:flex">
+                <span style="font-size:24px">${e}</span>
+                <span style="font-size:12px">${t}</span>
+              </button>
+            `).join('')}
+          </div>
+          <div class="kicker" style="margin-top:14px;margin-bottom:6px">OR TELL US SOMETHING ELSE</div>
+          <input class="txt" placeholder="e.g. Minecraft, ballet, cooking, classic cars" value="${esc(state.data.themesOther)}" data-action="setThemesOther">
         </div>
+
+        <div style="padding-top:22px;border-top:1px dashed var(--line)">
+          <div class="kicker" style="margin-bottom:10px">WHERE DOES IT TAKE PLACE?</div>
+          <div class="grid-3">
+            ${PLACES.map(([e,t]) => `
+              <button type="button" class="chip" data-on="${state.data.place === t}" data-action="setPlace" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:16px 8px;min-height:88px;display:flex">
+                <span style="font-size:24px">${e}</span>
+                <span style="font-size:12px">${t}</span>
+              </button>
+            `).join('')}
+          </div>
+          <div class="kicker" style="margin-top:14px;margin-bottom:6px">OR A REAL PLACE THEY LOVE</div>
+          <input class="txt" placeholder="e.g. Grandma's garden, the park on Elm Street" value="${esc(state.data.placeReal)}" data-action="setPlaceReal">
+        </div>
+
+        <div style="padding-top:22px;border-top:1px dashed var(--line)">
+          <div class="kicker" style="margin-bottom:6px">${multi ? "WHAT'S EACH OF THEM REALLY INTO RIGHT NOW? (OPTIONAL)" : "WHAT'S SOMETHING THEY'RE REALLY INTO RIGHT NOW? (OPTIONAL)"}</div>
+          <div class="field-hint" style="margin:0 0 14px;line-height:1.55">A club they go to, a sport, a hobby, the thing they can't stop talking about. We'll weave it right into the story so they recognise themselves straight away.</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            ${state.data.children.map((c, i) => `
+              <div>
+                ${multi ? `<div class="field-label" style="margin-bottom:6px">FOR ${esc(childLabel(c, i).toUpperCase())}</div>` : ''}
+                <input class="txt" placeholder="e.g. football on Saturday mornings, gymnastics class, building Lego, riding their scooter to school" value="${esc(c.intoNow || '')}" data-action="updateChild" data-i="${i}" data-k="intoNow">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
       </div>`;
     } },
-
-  { key:'place', title:"Where does it take place?", sub:"",
-    valid: () => !!state.data.place || !!state.data.placeReal.trim(),
-    render: () => `
-      <div class="grid-3">
-        ${PLACES.map(([e,t]) => `
-          <button type="button" class="chip" data-on="${state.data.place === t}" data-action="setPlace" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:16px 8px;min-height:88px;display:flex">
-            <span style="font-size:24px">${e}</span>
-            <span style="font-size:12px">${t}</span>
-          </button>
-        `).join('')}
-      </div>
-      <div class="kicker" style="margin-top:18px;margin-bottom:6px">OR A REAL PLACE THEY LOVE</div>
-      <input class="txt" placeholder="e.g. Grandma's garden, the park on Elm Street" value="${esc(state.data.placeReal)}" data-action="setPlaceReal">` },
 
   { key:'casting', title:"Who's in the story with them?", sub:"Each child can have their own best friend and comfort toy. All optional, all woven into the right scenes.",
     valid: () => true,
@@ -379,77 +385,78 @@ const STEPS = [
       </div>`;
     } },
 
-  { key:'little-things', title:"The little things only you'd notice.", sub:"All optional. The more you tell us, the more it'll sound like them.",
+  { key:'bits', title:"The bits that make it theirs.", sub:"The little extras we'll weave in. All optional.",
     valid: () => true,
     render: () => {
       const childLabel = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
-      const isBedtime = state.data.storyKind === 'bedtime';
-      const childPiece = (c, i, k, kicker, hint, ph) => `
-        <div>
-          <div class="field-label">${kicker}</div>
-          <input class="txt" placeholder="${esc(ph)}" value="${esc(c[k] || '')}" data-action="updateChild" data-i="${i}" data-k="${esc(k)}">
-          ${hint ? `<div class="field-hint" style="margin-top:6px;line-height:1.55">${hint}</div>` : ''}
-        </div>`;
+      const isAdventure = state.data.storyKind === 'adventure';
       return `
-      <div style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;flex-direction:column;gap:26px">
 
         <div>
           <div class="kicker" style="margin-bottom:4px">WHAT DO YOU CALL THEM? (OPTIONAL)</div>
           <div class="field-hint" style="margin:0 0 12px;line-height:1.55">The little name only you (and maybe Granny) use. We'll have the narrator slip it in once for a stop-everything moment. Leave blank if there isn't one.</div>
           <div style="display:flex;flex-direction:column;gap:8px">
-            ${state.data.children.map((c, i) => childPiece(c, i, 'nickname', `WHAT DO YOU CALL ${esc(childLabel(c, i).toUpperCase())}? (OPTIONAL)`, '', 'e.g. Olly, Bug, Monkey, Mate, Sunshine')).join('')}
+            ${state.data.children.map((c, i) => `
+              <div>
+                <div class="field-label">WHAT DO YOU CALL ${esc(childLabel(c, i).toUpperCase())}? (OPTIONAL)</div>
+                <input class="txt" placeholder="e.g. Olly, Bug, Monkey, Mate, Sunshine" value="${esc(c.nickname || '')}" data-action="updateChild" data-i="${i}" data-k="nickname">
+              </div>
+            `).join('')}
           </div>
         </div>
 
-        ${isBedtime ? `
-        <div>
-          <div class="field-label">YOUR BEDTIME RITUAL (OPTIONAL)</div>
-          <textarea class="txt" rows="2" placeholder="e.g. I sing You Are My Sunshine, we do three breaths together, she says goodnight to the moon, three kisses then the cuddle toy" data-action="setBedtimeRitual">${esc(state.data.bedtimeRitual || '')}</textarea>
-          <div class="field-hint" style="margin-top:6px;line-height:1.55">The thing you do every night. The story can settle into it as the closing scene.</div>
+        <div style="padding-top:22px;border-top:1px dashed var(--line)">
+          <div class="kicker" style="margin-bottom:4px">WHAT FOOD WON'T THEY TOUCH? (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">Doesn't have to be a deal-breaker, just the thing they pull a face at. Anyone who's eaten a meal with them knows. We'll work it in for a laugh.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${state.data.children.map((c, i) => `
+              <div>
+                <div class="field-label">${esc(childLabel(c, i).toUpperCase())} WON'T TOUCH (OPTIONAL)</div>
+                <input class="txt" placeholder="e.g. broccoli, anything green, mushrooms, tomatoes, the bits in soup" value="${esc(c.foodNo || '')}" data-action="updateChild" data-i="${i}" data-k="foodNo">
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div style="padding-top:22px;border-top:1px dashed var(--line)">
+          <div class="kicker" style="margin-bottom:4px">SOMETHING SPECIAL ABOUT THEM (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">A quirk, a catchphrase, a habit, a way of speaking. Whatever you write here gets woven naturally into that child's scenes. Skip any you don't have.</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            ${state.data.children.map((c, i) => `
+              <div>
+                <div class="field-label">SOMETHING SPECIAL ABOUT ${esc(childLabel(c, i).toUpperCase())} (OPTIONAL)</div>
+                <textarea class="txt" rows="2" placeholder='e.g. calls spaghetti "pasketti", will only sleep with the green dinosaur called Steve, has a soft lisp on words with s' data-action="updateChild" data-i="${i}" data-k="quirk">${esc(c.quirk || '')}</textarea>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        ${isAdventure ? `
+        <div style="padding-top:22px;border-top:1px dashed var(--line)">
+          <div class="kicker" style="margin-bottom:6px">WANT A BADDIE IN IT?</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">Adventures hit harder when there's someone cheeky to outsmart, like the Tickle Monster, the Sock Stealer, or Dad pretending to be a grumpy giant.</div>
+          <button type="button" class="toggle" data-on="${state.data.hasVillain}" data-action="toggleVillain" style="margin-bottom:14px">
+            <span class="toggle-track"></span>
+            <span class="toggle-label">Add a cheeky villain</span>
+          </button>
+          ${state.data.hasVillain ? `
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="field-label">PICK A FAMILY FAVOURITE</div>
+              <div class="grid-2">
+                ${VILLAINS.map(([e,t]) => `
+                  <button type="button" class="chip" data-on="${state.data.villainName === t}" data-action="pickVillain" data-v="${esc(t)}" style="flex-direction:column;gap:6px;padding:14px 8px;min-height:80px;display:flex">
+                    <span style="font-size:24px">${e}</span>
+                    <span style="font-size:12px">${t}</span>
+                  </button>
+                `).join('')}
+              </div>
+              <div class="kicker" style="margin-top:6px;margin-bottom:0">OR INVENT YOUR OWN</div>
+              <input class="txt" placeholder="e.g. Captain Stinkfeet, big sister Mia in boss mode, the Broccoli Beast, Granny&rsquo;s spider-hand" value="${esc(VILLAINS.some(([,t]) => t === state.data.villainName) ? '' : state.data.villainName)}" data-action="setVillainName">
+              <div class="field-hint">Pick one above or type your own. The family in-jokes work brilliantly. They cause cheeky trouble. Your child always saves the day.</div>
+            </div>` : ''}
         </div>` : ''}
 
-      </div>`;
-    } },
-
-  { key:'villain', title:"Want a baddie in it?", sub:"Optional. Adventures hit harder when there's someone cheeky to outsmart, like the Tickle Monster, the Sock Stealer, or Dad pretending to be a grumpy giant.",
-    valid: () => true,
-    showIf: () => state.data.storyKind === 'adventure',
-    render: () => `
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <button type="button" class="toggle" data-on="${state.data.hasVillain}" data-action="toggleVillain">
-          <span class="toggle-track"></span>
-          <span class="toggle-label">Add a cheeky villain</span>
-        </button>
-        ${state.data.hasVillain ? `
-          <div style="display:flex;flex-direction:column;gap:14px;margin-top:6px">
-            <div class="field-label">PICK A FAMILY FAVOURITE</div>
-            <div class="grid-2">
-              ${VILLAINS.map(([e,t]) => `
-                <button type="button" class="chip" data-on="${state.data.villainName === t}" data-action="pickVillain" data-v="${esc(t)}" style="flex-direction:column;gap:6px;padding:14px 8px;min-height:80px;display:flex">
-                  <span style="font-size:24px">${e}</span>
-                  <span style="font-size:12px">${t}</span>
-                </button>
-              `).join('')}
-            </div>
-            <div class="kicker" style="margin-top:6px;margin-bottom:0">OR INVENT YOUR OWN</div>
-            <input class="txt" placeholder="e.g. Captain Stinkfeet, big sister Mia in boss mode, the Broccoli Beast, Granny&rsquo;s spider-hand" value="${esc(VILLAINS.some(([,t]) => t === state.data.villainName) ? '' : state.data.villainName)}" data-action="setVillainName">
-            <div class="field-hint">Pick one above or type your own. The family in-jokes work brilliantly. They cause cheeky trouble. Your child always saves the day.</div>
-          </div>` : ''}
-      </div>` },
-
-  { key:'quirks', title:"A tiny detail only you'd know.", sub:"For each child, the bit that makes them gasp when they hear it. All optional.",
-    valid: () => true,
-    render: () => {
-      const childPossessive = (c, i) => (c.name && c.name.trim()) ? `${c.name.trim()}` : `child ${i + 1}`;
-      return `
-      <div style="display:flex;flex-direction:column;gap:12px">
-        ${state.data.children.map((c, i) => `
-          <div>
-            <div class="field-label">SOMETHING SPECIAL ABOUT ${esc(childPossessive(c, i).toUpperCase())} (OPTIONAL)</div>
-            <textarea class="txt" rows="2" placeholder='e.g. calls spaghetti "pasketti", will only sleep with the green dinosaur called Steve, has a soft lisp on words with s' data-action="updateChild" data-i="${i}" data-k="quirk">${esc(c.quirk || '')}</textarea>
-          </div>
-        `).join('')}
-        <div class="field-hint">A quirk, a catchphrase, a habit, a way of speaking. Whatever you write here gets woven naturally into that child's scenes. Skip any you don't have.</div>
       </div>`;
     } },
 
@@ -660,7 +667,9 @@ function buildReviewCards(){
     .filter(c => c.nickname && c.nickname.trim())
     .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.nickname.trim())}`);
 
-  const bedtimeRitualLine = (d.bedtimeRitual && d.bedtimeRitual.trim()) ? esc(d.bedtimeRitual.trim()) : '';
+  const foodNoLines = d.children
+    .filter(c => c.foodNo && c.foodNo.trim())
+    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.foodNo.trim())}`);
 
   const voiceLine = d.voice ? `🎙 <strong>${esc(d.voice)}</strong>` : '';
 
@@ -678,14 +687,14 @@ function buildReviewCards(){
   return [
     card('Story type', 'kind', [kindLabel]),
     card('Who it’s for', 'children', childrenLines),
-    card('What it’s about', 'themes', themeBits.map(t => esc(t))),
-    intoNowLines.length ? card('Really into right now', 'themes', intoNowLines) : '',
-    card('Where it takes place', 'place', placeBits.map(t => esc(t))),
+    card('What it’s about', 'world', themeBits.map(t => esc(t))),
+    card('Where it takes place', 'world', placeBits.map(t => esc(t))),
+    intoNowLines.length ? card('Really into right now', 'world', intoNowLines) : '',
     card('Who’s in it', 'casting', castingLines),
-    nicknameLines.length ? card('What you call them', 'little-things', nicknameLines) : '',
-    bedtimeRitualLine ? card('Your bedtime ritual', 'little-things', [bedtimeRitualLine]) : '',
-    villainLine ? card('The baddie', 'villain', [villainLine]) : '',
-    card('Tiny details', 'quirks', quirkLines),
+    nicknameLines.length ? card('What you call them', 'bits', nicknameLines) : '',
+    foodNoLines.length ? card('Won’t touch', 'bits', foodNoLines) : '',
+    quirkLines.length ? card('Tiny details', 'bits', quirkLines) : '',
+    villainLine ? card('The baddie', 'bits', [villainLine]) : '',
     card('Storyteller', 'voice', [voiceLine]),
     card('Gift', 'gift', giftLines)
   ].filter(Boolean).join('');
@@ -854,7 +863,6 @@ function handleAction(action, el, e){
     case 'setVillainName': state.data.villainName = el.value; break;
     case 'pickVillain': state.data.villainName = v; render(); break;
     case 'setQuirk': state.data.quirk = el.value; break;
-    case 'setBedtimeRitual': state.data.bedtimeRitual = el.value; break;
     case 'setVoice': state.data.voice = v; render(); break;
     case 'setIsGift': state.data.isGift = (v === 'true'); render(); break;
     case 'setGiftFrom': state.data.giftFrom = el.value; break;

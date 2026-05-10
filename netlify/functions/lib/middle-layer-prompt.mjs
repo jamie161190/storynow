@@ -129,13 +129,11 @@ When MULTIPLE children each have an intoNow, the spine should bring their intere
 
 If intoNow is empty for a child, fall back to the standard interpretation of \`themes\` and \`themesOther\`.
 
-**ONE FURTHER per-child input from "the little things only you'd notice" step:**
+**TWO FURTHER per-child inputs from "the bits that make it theirs" step:**
 
-- \`children[i].nickname\` — the family pet name for this child (e.g. "Bug", "Olly", "Monkey", "Sunshine"). When present, this is gold. Use it ONCE in the story for a stop-everything emotional hit, ideally at a moment of warmth (a cuddle, a hand on the back, a parent voice from another room). Never overuse: more than once and the magic dies. Surface it in the child's \`portrait\` and in the new \`children[i].nickname\` output field. The writer's job is to know WHEN to drop it.
+- \`children[i].nickname\` — the family pet name for this child (e.g. "Bug", "Olly", "Monkey", "Sunshine"). When present, this is gold. Use it ONCE in the story for a stop-everything emotional hit, ideally at a moment of warmth (a cuddle, a hand on the back, a parent voice from another room). Never overuse: more than once and the magic dies. Surface it in the child's \`portrait\` and in the \`children[i].nickname\` output field. The writer's job is to know WHEN to drop it.
 
-**ONE further top-level input:**
-
-- \`bedtimeRitual\` — what the parent does every night with the child (e.g. "I sing You Are My Sunshine", "we do three breaths together", "she says goodnight to the moon"). Bedtime stories only. Treat as the CLOSING SCENE: the story ends settling into a beat that echoes this ritual, so the audio finish lands on the same feeling as the real bedtime. Preserve the parent's specifics. Surface in new top-level \`bedtime_ritual\` output field for the writer.
+- \`children[i].foodNo\` — the food this child refuses to eat (e.g. "broccoli", "anything green", "tomatoes", "the bits in soup"). Pure comedy material. The writer builds ONE beat into the story where this food becomes a small obstacle the protagonist navigates in character (negotiates a swap with a wise creature, picks the bits out of magic stew, refuses the villain's bribe of it). Never moralise about eating veg, never frame the child as naughty for refusing — the joke is the universal childhood truth that some foods are just not happening. Surface in \`portrait\` and in the new \`children[i].food_dislike\` output field.
 
 **Resolution rule:** Per-child \`quirk\` (when present) belongs to that specific child and should be woven into THEIR portrait and their scenes. Top-level \`extraDetails\` may apply to one child, multiple, or all — read carefully and attribute correctly.
 
@@ -274,7 +272,8 @@ Return ONLY valid JSON, no preamble, no explanation, no markdown fences.
       "quirk": "string or null: THIS child's specific quirk, drawn from per-child quirk (preferred) or the correctly attributed slice of top-level extraDetails. Null if neither input mentions one.",
       "quirk_type": "string or null: one of 'catchphrase' | 'pattern' | 'habit', classifying the quirk above so the writer knows how to weight it. Null if quirk is null.",
       "core_interest": "string or null: THIS child's intoNow value (the thing they're really into right now — a club, sport, hobby, obsession). LOAD-BEARING: when present, the writer should treat this as the spine of the story for this child. Preserve the parent's specificity (e.g. 'football on Saturday mornings' not just 'football'). Null only if the parent left intoNow empty for this child.",
-      "nickname": "string or null: THIS child's family pet name from per-child nickname input. Used ONCE in the story for a stop-everything emotional moment. Null if no nickname provided. Preserve exact spelling and capitalisation."
+      "nickname": "string or null: THIS child's family pet name from per-child nickname input. Used ONCE in the story for a stop-everything emotional moment. Null if no nickname provided. Preserve exact spelling and capitalisation.",
+      "food_dislike": "string or null: THIS child's refused food from per-child foodNo input. Writer should build ONE in-story comedy beat where this food becomes a small obstacle the protagonist navigates in character. Never moralise about veg. Null if no foodNo provided. Preserve the parent's specificity (e.g. 'the bits in soup' not just 'soup')."
     }
   ],
   "household": {
@@ -308,7 +307,6 @@ Return ONLY valid JSON, no preamble, no explanation, no markdown fences.
     "beat": "1-2 sentences DESCRIBING the single concrete unresolved moment that lands at the ~290-word mark. Image-led, physical, specific. NOT a story-voice line — describe the beat as a director would describe a shot. The writer will construct the prose.",
     "archetype": "One of: 'threshold' | 'naming' | 'object_that_shouldnt_be' | 'glimpse' | 'choice' | 'voice_that_knows'"
   },
-  "bedtime_ritual": "string or null: the parent's described bedtime ritual from top-level bedtimeRitual input. Bedtime stories only. The CLOSING SCENE of the story should settle into a beat that echoes this ritual so the audio ends on the same feeling as their real bedtime. Preserve the parent's specifics. Null for adventure stories or if no bedtimeRitual provided.",
   "tone": "One sentence: what the story should feel like emotionally (e.g. 'gentle and rhythmic, winding toward sleep', 'fast and funny with warmth underneath').",
   "age_guidance": "One sentence on pacing, vocabulary, and sentence structure for this age range.",
   "character_texture": ["Array of specific quirks, habits, catchphrases, or likes from extras that should appear naturally in the story"],

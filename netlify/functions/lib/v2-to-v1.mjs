@@ -33,7 +33,8 @@ export function v2ToV1(v2) {
     bestFriend: (c.bestFriend || '').trim(), // per-child main friend
     quirk: (c.quirk || '').trim(),           // per-child personality detail
     intoNow: (c.intoNow || '').trim(),       // per-child current passion (story spine input)
-    nickname: (c.nickname || '').trim()      // per-child pet name (slip in once for emotional hit)
+    nickname: (c.nickname || '').trim(),     // per-child pet name (slip in once for emotional hit)
+    foodNo: (c.foodNo || '').trim()          // per-child food they refuse (comedy beat)
   }));
 
   const childCount = children.length;
