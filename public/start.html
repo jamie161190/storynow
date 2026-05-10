@@ -1154,10 +1154,10 @@ async function mountEmbeddedCheckout({ clientSecret, publishableKey }){
       </div>
     </div>
     <div id="procCheckout" style="min-height:420px"></div>`;
-  // Insert after the queue card (find it by its class), or append.
-  const queueCard = wrap.querySelector('.proc-queue');
-  if (queueCard && queueCard.nextSibling) {
-    wrap.insertBefore(checkoutCard, queueCard.nextSibling);
+  // Insert after the Jamie note card (find it by its class), or append.
+  const jamieCard = wrap.querySelector('.proc-jamie');
+  if (jamieCard && jamieCard.nextSibling) {
+    wrap.insertBefore(checkoutCard, jamieCard.nextSibling);
   } else {
     wrap.appendChild(checkoutCard);
   }
@@ -1211,13 +1211,14 @@ function showProcessingOverlay(){
       .proc-card{background:rgba(255,255,255,.85);border:1px solid rgba(75,46,131,.1);
         border-radius:18px;padding:22px;box-shadow:0 18px 40px -28px rgba(75,46,131,.35);
         backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-      .proc-queue{text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.92) 0%,rgba(255,243,221,.92) 100%);
-        border:1.5px solid rgba(184,145,73,.25)}
-      .proc-queue-eye{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.18em;
-        text-transform:uppercase;color:rgba(184,145,73,.85);margin-bottom:10px}
-      .proc-queue-num{font-family:var(--serif);font-size:64px;font-weight:500;line-height:1;
-        color:var(--plum);letter-spacing:-.02em;margin:2px 0 6px}
-      .proc-queue-sub{font-size:13px;color:rgba(31,27,46,.62);line-height:1.5}
+      .proc-jamie{background:linear-gradient(160deg,rgba(255,255,255,.92) 0%,rgba(255,243,221,.92) 100%);
+        border:1.5px solid rgba(184,145,73,.25);position:relative;padding:26px 24px 22px}
+      .proc-jamie-eye{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.18em;
+        text-transform:uppercase;color:rgba(184,145,73,.85);margin-bottom:14px}
+      .proc-jamie-body{font-family:var(--serif);font-size:18px;line-height:1.55;color:var(--plum);
+        font-style:italic;letter-spacing:-.005em}
+      .proc-jamie-sig{font-family:var(--hand);font-size:30px;color:var(--terra);line-height:1;
+        margin-top:14px;text-align:right}
       .proc-review{position:relative}
       .proc-review-tp{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
       .proc-review-stars{color:#00B67A;letter-spacing:.08em;font-size:18px;line-height:1}
@@ -1280,10 +1281,10 @@ function showProcessingOverlay(){
         <div class="proc-pct" id="procPct">0%</div>
       </div>
 
-      <div class="proc-card proc-queue">
-        <div class="proc-queue-eye">Your spot in this week's queue</div>
-        <div class="proc-queue-num" id="procQueueNum">7</div>
-        <div class="proc-queue-sub">Jamie writes and records each one by hand. Yours lands in your inbox within 24 hours.</div>
+      <div class="proc-card proc-jamie">
+        <div class="proc-jamie-eye">A note from Jamie</div>
+        <div class="proc-jamie-body">"If it's not 100% right when you hear it, just tell me. I'll change it. And then change it again if I need to. I keep going until you love it. That's the promise."</div>
+        <div class="proc-jamie-sig">Jamie</div>
       </div>
 
       <div class="proc-card proc-review" id="procReview">
@@ -1301,8 +1302,6 @@ function showProcessingOverlay(){
     </div>`;
   document.body.appendChild(overlay);
   document.body.style.overflow = 'hidden';
-  // Random queue number 4–9 — feels personal, no API hit needed.
-  document.getElementById('procQueueNum').textContent = String(4 + Math.floor(Math.random() * 6));
   initProcessingReviews();
   initProcessingGame();
 }
@@ -1352,6 +1351,8 @@ function runProcessingTimeline(isReadyFn, doneFn, startTs){
 function initProcessingReviews(){
   const node = document.getElementById('procReview');
   if (!node) return;
+  // Siobhan (index 0) is the headline review and stays visible for the first
+  // 15 seconds. After that, rotate through the others every 7.5 seconds.
   let i = 0;
   const paint = () => {
     const r = PROCESSING_REVIEWS[i % PROCESSING_REVIEWS.length];
@@ -1368,8 +1369,11 @@ function initProcessingReviews(){
     node.classList.add('proc-review-fade');
     i++;
   };
-  paint();
-  setInterval(paint, 7500);
+  paint(); // Siobhan shows immediately
+  setTimeout(() => {
+    paint(); // first rotation at 15s → Angelina
+    setInterval(paint, 7500); // then every 7.5s
+  }, 15000);
 }
 
 function initProcessingGame(){
