@@ -110,9 +110,17 @@ Some parents combine the setting and a description: "School (A School but it loo
 
 **7. HOW TO READ EXTRA DETAILS**
 
-There are TWO sources of "extras" input now:
-- The TOP-LEVEL \`extraDetails\` field: shared, free-text. Contains anything the parent wrote on the extras step. May reference any/all children.
-- Each child in \`children\` may have their own \`quirk\` field: this is THIS child's personality detail, set on the per-child step.
+There are THREE sources of "extras" input now:
+
+- The TOP-LEVEL \`heartOut\` field: a free-text "pour your heart out" textarea on the review screen. **THIS IS THE HIGHEST-VALUE TEXTUAL INPUT THE PARENT GIVES YOU.** It exists specifically because the structured fields can't capture life context. Read it slowly. It will often contain:
+  - Bereavement, illness, anxiety, family transitions ("their grandpa died last week", "she starts at a new school Monday and is terrified", "we're recording this for him to listen to when he's older")
+  - Texture the parent forgot to put elsewhere ("she always counts in Spanish", "he calls everyone Boss")
+  - Pure emotional pleas without specific information ("please make this magic, they really need it")
+  Treat this field as both a source of \`character_texture\` AND of \`sensitive_notes\` depending on what's in it. Bereavement, illness, neurodivergence, anxiety: route to \`sensitive_notes\` (the writer must NEVER name these in the story but tone must honour them). Habits, catchphrases, language quirks: route to \`character_texture\`. When the parent has only said "make it magic", route a tone instruction into \`writer_instructions\` (e.g. "Parent has communicated emotional weight without specifics — bring extra warmth to this story's overall feel").
+
+- The TOP-LEVEL \`extraDetails\` field: legacy free-text, shared. Read in tandem with heartOut; if heartOut is non-empty, it carries the same content (we map heartOut → extraDetails). If only extraDetails is present, treat as you would heartOut.
+
+- Each child in \`children\` may have their own \`quirk\` field: this is THIS child's personality detail (catchphrases, lisps, habits), set on the per-child step. Lower stakes than heartOut. Belongs to that specific child only.
 
 **A SEPARATE per-child input — \`children[i].intoNow\`** — captures what the child is really into RIGHT NOW. A club they go to, a sport, a hobby, the thing they can't stop talking about. This is the highest-leverage single input the parent gives you. Treat it as the SPINE of the story for that child whenever it is present:
 - If a child has \`intoNow = "football on Saturday mornings"\`, the story should be set in/around football, OR pivot on a football moment.

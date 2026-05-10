@@ -21,7 +21,7 @@ export function sanitiseStoryData(d) {
   const s = { ...d };
   const textFields = ['childName', 'friendName', 'sidekickName', 'petName', 'petType', 'favTeddy',
     'villainName', 'familyMembers', 'teacherName', 'interest', 'themeDetail', 'setting',
-    'extraDetails', 'personalMessage', 'customTheme', 'customWhere'];
+    'extraDetails', 'personalMessage', 'customTheme', 'customWhere', 'heartOut'];
   for (const f of textFields) {
     if (s[f]) s[f] = sanitiseInput(s[f]);
   }

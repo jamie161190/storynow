@@ -229,6 +229,7 @@ const state = {
     themes: [], themesOther: '',
     place: '', placeReal: '',
     quirk: '',
+    heartOut: '',
     voice: '',
     isGift: STARTS_AS_GIFT || STARTS_AS_GIFTCARD,
     isGiftCard: STARTS_AS_GIFTCARD,
@@ -733,6 +734,14 @@ function renderEmailStep(){
 
     <div class="review-stack">${buildReviewCards()}</div>
 
+    <div style="margin-top:28px;padding:24px 22px;background:rgba(255,253,247,.85);border:1.5px solid var(--rose);border-radius:18px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-12px;right:18px;font-size:48px;opacity:.18;line-height:1;transform:rotate(8deg)">✍️</div>
+      <div style="font-family:var(--hand);font-size:34px;color:var(--plum);line-height:1;margin-bottom:8px">Pour your heart out.</div>
+      <div style="font-size:14.5px;color:var(--muted);margin-bottom:14px;line-height:1.55;max-width:420px">Anything else we should know about them, or about why this story matters. The little things that don&rsquo;t fit a question. The big things you wish we knew. The honest stuff goes the furthest.</div>
+      <textarea class="txt" rows="5" placeholder="e.g. &lsquo;Her grandpa passed last week and we want this to feel like a hug from him.&rsquo; Or &lsquo;He starts at a new school Monday and is terrified.&rsquo; Or &lsquo;She always counts in Spanish even though we&rsquo;re English.&rsquo; Or just &lsquo;please make this magic, they really need it.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
+      <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">Optional, but where the magic often comes from.</div>
+    </div>
+
     <div style="margin-top:22px;padding:18px 20px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px">
       <div class="kicker" style="margin-bottom:10px">WHAT HAPPENS NEXT</div>
       <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
@@ -882,6 +891,7 @@ function handleAction(action, el, e){
     case 'setVillainName': state.data.villainName = el.value; break;
     case 'pickVillain': state.data.villainName = v; render(); break;
     case 'setQuirk': state.data.quirk = el.value; break;
+    case 'setHeartOut': state.data.heartOut = el.value; break;
     case 'setVoice': state.data.voice = v; render(); break;
     case 'setIsGift': state.data.isGift = (v === 'true'); render(); break;
     case 'setGiftFrom': state.data.giftFrom = el.value; break;

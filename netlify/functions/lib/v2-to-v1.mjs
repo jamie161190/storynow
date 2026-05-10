@@ -37,6 +37,11 @@ export function v2ToV1(v2) {
     foodNo: (c.foodNo || '').trim()          // per-child food they refuse (comedy beat)
   }));
 
+  // "Pour your heart out" textarea on the review screen — top-level free
+  // text. Use it as the new primary source for extraDetails, falling back
+  // to the (now unused) top-level quirk field for any legacy rows.
+  const heartOut = (v2.heartOut || '').trim();
+
   const childCount = children.length;
   const isMultiChild = childCount > 1;
   const firstChild = children[0] || {};
@@ -90,8 +95,10 @@ export function v2ToV1(v2) {
     setting: v2.place || '',
     customWhere: v2.placeReal || '',
 
-    // Quirk → goes into extraDetails (the field analysers look at)
-    extraDetails: v2.quirk || '',
+    // "Pour your heart out" review-screen textarea is the primary source
+    // for extraDetails. The top-level quirk field is legacy fallback only.
+    extraDetails: heartOut || v2.quirk || '',
+    heartOut,
 
     // Voice
     voice: v2.voice || '',
