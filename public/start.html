@@ -232,7 +232,7 @@ const state = {
     voice: '',
     isGift: STARTS_AS_GIFT || STARTS_AS_GIFTCARD,
     isGiftCard: STARTS_AS_GIFTCARD,
-    giftFrom: '', giftMessage: '', giftDeliveryNote: '',
+    giftFrom: '', giftMessage: '', giftDeliveryNote: '', giftSendAt: '',
     email: '',
     requestId: null,
   }
@@ -491,34 +491,46 @@ const STEPS = [
             </button>
           `).join('')}
         </div>
-        ${state.data.isGift ? `
+        ${state.data.isGift ? (() => {
+          const today = new Date();
+          today.setHours(0,0,0,0);
+          const minDate = today.toISOString().slice(0,10);
+          const max = new Date(today); max.setDate(max.getDate() + 365);
+          const maxDate = max.toISOString().slice(0,10);
+          return `
           <div style="margin-top:18px;padding:16px 18px;background:rgba(255,253,247,0.7);border:1px solid var(--line);border-radius:14px;font-size:14px;line-height:1.55;color:var(--ink)">
             <div style="font-family:var(--serif);font-size:17px;font-weight:500;margin-bottom:8px">Got it. Here&rsquo;s what happens:</div>
             <ul style="margin:0;padding-left:18px;color:var(--muted)">
-              <li>You&rsquo;ll hear the 2-minute preview right here in your browser first, so you can approve before paying.</li>
-              <li>After payment, the full 15-minute story is ready in about 10 minutes. Listen to it yourself first if you&rsquo;d like.</li>
-              <li>When you&rsquo;re ready, we send it on to your recipient with your note. They get a clean link to the story, never the price.</li>
+              <li>Once you pay, we write and record the story by hand. It&rsquo;s ready within 24 hours, often much sooner.</li>
+              <li>We email it to you first so you can listen if you&rsquo;d like, or just trust us.</li>
+              <li>On the date you pick below, we send a clean link to your recipient with your note. They never see the price.</li>
             </ul>
           </div>
           <div style="display:flex;flex-direction:column;gap:14px;margin-top:14px">
             <div>
               <div class="field-label">Who&rsquo;s the gift from?</div>
-              <input class="txt" placeholder="Your name (so we can sign your message)" value="${esc(state.data.giftFrom)}" data-action="setGiftFrom">
+              <input class="txt" placeholder="Your name, so we can sign your message" value="${esc(state.data.giftFrom)}" data-action="setGiftFrom">
             </div>
             <div>
-              <div class="field-label">Who&rsquo;s the gift for?</div>
-              <input class="txt" type="email" placeholder="Where should we send the final story? (their email)" value="${esc(state.data.giftRecipientEmail || '')}" data-action="setGiftRecipientEmail">
+              <div class="field-label">Recipient&rsquo;s email</div>
+              <input class="txt" type="email" placeholder="Where we&rsquo;ll send the story when the day comes" value="${esc(state.data.giftRecipientEmail || '')}" data-action="setGiftRecipientEmail">
+            </div>
+            <div>
+              <div class="field-label">When should we send it?</div>
+              <input class="txt" type="date" min="${minDate}" max="${maxDate}" value="${esc(state.data.giftSendAt || '')}" data-action="setGiftSendAt">
+              <div class="field-hint">Leave blank to send as soon as the story is ready. Otherwise pick a date and we&rsquo;ll hold it until that morning.</div>
             </div>
             <div>
               <div class="field-label">A note for them (optional)</div>
               <textarea class="txt" rows="3" placeholder="They&rsquo;ll see this when the story arrives." data-action="setGiftMessage">${esc(state.data.giftMessage)}</textarea>
             </div>
             <div>
-              <div class="field-label">Anything we should know? (optional)</div>
-              <textarea class="txt" rows="2" placeholder="e.g. &lsquo;Please send it on her birthday, 12 May&rsquo;, or any special timing or note for Jamie." data-action="setGiftDeliveryNote">${esc(state.data.giftDeliveryNote || '')}</textarea>
-              <div class="field-hint">For Jamie&rsquo;s eyes only. Use this if you want it delivered on a specific date, or anything else we should know.</div>
+              <div class="field-label">Anything else we should know? (optional)</div>
+              <textarea class="txt" rows="2" placeholder="e.g. it&rsquo;s for her first day at school, please address them as Granny not Grandma, send before 10am their time" data-action="setGiftDeliveryNote">${esc(state.data.giftDeliveryNote || '')}</textarea>
+              <div class="field-hint">For Jamie&rsquo;s eyes only. Anything that&rsquo;s not a date or recipient detail.</div>
             </div>
-          </div>` : ''}
+          </div>`;
+        })() : ''}
       </div>` }
 ];
 
@@ -678,6 +690,13 @@ function buildReviewCards(){
     giftLines.push(`🎁 <strong>This is a gift</strong>`);
     if (d.giftFrom && d.giftFrom.trim()) giftLines.push(`From: ${esc(d.giftFrom.trim())}`);
     if (d.giftRecipientEmail && d.giftRecipientEmail.trim()) giftLines.push(`To: ${esc(d.giftRecipientEmail.trim())}`);
+    if (d.giftSendAt && d.giftSendAt.trim()) {
+      const dt = new Date(d.giftSendAt + 'T00:00:00');
+      const formatted = isNaN(dt) ? d.giftSendAt : dt.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      giftLines.push(`Send on: <strong>${esc(formatted)}</strong>`);
+    } else {
+      giftLines.push(`Send on: <strong>as soon as it&rsquo;s ready</strong>`);
+    }
     if (d.giftMessage && d.giftMessage.trim()) giftLines.push(`Note: <em>"${esc(d.giftMessage.trim())}"</em>`);
     if (d.giftDeliveryNote && d.giftDeliveryNote.trim()) giftLines.push(`For Jamie: ${esc(d.giftDeliveryNote.trim())}`);
   } else {
@@ -869,6 +888,7 @@ function handleAction(action, el, e){
     case 'setGiftMessage': state.data.giftMessage = el.value; break;
     case 'setGiftRecipientEmail': state.data.giftRecipientEmail = el.value; break;
     case 'setGiftDeliveryNote': state.data.giftDeliveryNote = el.value; break;
+    case 'setGiftSendAt': state.data.giftSendAt = el.value; break;
     case 'goToStep': goToStep(el.dataset.key); break;
   }
 }
