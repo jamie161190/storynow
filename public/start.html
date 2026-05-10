@@ -766,8 +766,8 @@ function renderEmailStep(){
       <div class="kicker" style="margin-bottom:10px">WHAT HAPPENS NEXT</div>
       <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
         ${[
-          ['🔒',"You'll be taken to a secure Stripe page to pay <span data-price>£24.99</span>"],
-          ['✍️','We get to work writing and recording your full 15-minute story'],
+          ['🔒',"A secure payment form opens right here, in this page. Pay <span data-price>£24.99</span> without going anywhere"],
+          ['✍️','Jamie gets to work writing and recording your full 15-minute story by hand'],
           ['📬','Story lands in your inbox within 24 hours, often much sooner'],
           ['💛','Share it with your loved ones. No login necessary']
         ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.5">${t}</span></li>`).join('')}
@@ -780,7 +780,7 @@ function renderEmailStep(){
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
-    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">Secure payment via Stripe. Your story arrives in your inbox within 24 hours.</div>`;
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">You stay right here. Secured by Stripe. Story arrives in your inbox within 24 hours.</div>`;
   document.getElementById('submitBtn').addEventListener('click', submitRequest);
 }
 
