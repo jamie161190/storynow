@@ -339,7 +339,7 @@ const STEPS = [
       </div>`;
     } },
 
-  { key:'casting', title:"Who's in the story with them?", sub:"Each child can have their own best friend and comfort toy. All optional, all woven into the right scenes.",
+  { key:'casting', title:"Who's in the story with them?", sub:"Each child can have their own sidekick and comfort toy. All optional, all woven into the right scenes.",
     valid: () => true,
     render: () => {
       const childPossessive = (c, i) => (c.name && c.name.trim()) ? `${c.name.trim()}'s` : `Child ${i + 1}'s`;
@@ -347,13 +347,13 @@ const STEPS = [
       return `
       <div style="display:flex;flex-direction:column;gap:18px">
         <div>
-          <div class="field-label">BEST FRIEND (ONE PER CHILD, ALL OPTIONAL)</div>
+          <div class="field-label">SIDEKICK (ONE PER CHILD, ALL OPTIONAL)</div>
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
             ${state.data.children.map((c, i) => `
-              <input class="txt" placeholder="${esc(childPossessive(c, i))} best friend (optional)" value="${esc(c.bestFriend || '')}" data-action="updateChild" data-i="${i}" data-k="bestFriend">
+              <input class="txt" placeholder="${esc(childPossessive(c, i))} sidekick (optional)" value="${esc(c.bestFriend || '')}" data-action="updateChild" data-i="${i}" data-k="bestFriend">
             `).join('')}
           </div>
-          <div class="field-hint">Doesn't have to be another child. A sibling, cousin, grandparent, neighbour, anyone they're close to works. Whoever you name gets a proper role in the story alongside ${state.data.children.length > 1 ? 'that child' : childWord(state.data.children[0] || {}, 0)}, with real dialogue and a moment that's just theirs. Leave blank if no one springs to mind.</div>
+          <div class="field-hint">Not a <del style="color:rgba(31,27,46,.4);text-decoration-thickness:1.5px">best friend</del>. A sidekick. Sibling, cousin, granny, neighbour, anyone close. They'll get a real role and dialogue in the story.</div>
         </div>
 
         <div>
@@ -673,7 +673,7 @@ function buildReviewCards(){
 
   const castingLines = [];
   d.children.forEach(c => {
-    if (c.bestFriend && c.bestFriend.trim()) castingLines.push(`Best friend of ${esc((c.name || '').trim() || 'them')}: <strong>${esc(c.bestFriend.trim())}</strong>`);
+    if (c.bestFriend && c.bestFriend.trim()) castingLines.push(`Sidekick of ${esc((c.name || '').trim() || 'them')}: <strong>${esc(c.bestFriend.trim())}</strong>`);
     if (c.toy && c.toy.trim()) castingLines.push(`Comfort toy of ${esc((c.name || '').trim() || 'them')}: <strong>${esc(c.toy.trim())}</strong>`);
   });
   if (d.others && d.others.trim()) castingLines.push(`Others: ${esc(d.others.trim())}`);
