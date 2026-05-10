@@ -337,7 +337,7 @@ const STEPS = [
               <input class="txt" placeholder="${esc(childPossessive(c, i))} best friend (optional)" value="${esc(c.bestFriend || '')}" data-action="updateChild" data-i="${i}" data-k="bestFriend">
             `).join('')}
           </div>
-          <div class="field-hint">e.g. Mira. They'll get real dialogue and a moment in scenes featuring ${state.data.children.length > 1 ? 'that child' : childWord(state.data.children[0] || {}, 0)}. Don't know? Type a name and we'll make it work. Leave any blank if there's no specific friend.</div>
+          <div class="field-hint">Doesn't have to be another child. A sibling, cousin, grandparent, neighbour, anyone they're close to works. Whoever you name gets a proper role in the story alongside ${state.data.children.length > 1 ? 'that child' : childWord(state.data.children[0] || {}, 0)}, with real dialogue and a moment that's just theirs. Leave blank if no one springs to mind.</div>
         </div>
 
         <div>
