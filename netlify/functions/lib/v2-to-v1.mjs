@@ -72,10 +72,24 @@ export function v2ToV1(v2) {
     familyMembers: v2.others || '',
     teacherName: '',
 
-    // Pet
-    petToggle: v2.hasPet ? 'on' : '',
-    petName: v2.petName || '',
-    petType: v2.petKind || '',
+    // Pets — multi-pet support. Form submits an array; we flatten for the
+    // legacy v1 prompt (which expects single petName/petType strings).
+    petToggle: (v2.hasPet && (Array.isArray(v2.pets) ? v2.pets.some(p => p.name || p.kind) : (v2.petName || v2.petKind))) ? 'on' : '',
+    petName: (() => {
+      const arr = Array.isArray(v2.pets) ? v2.pets.filter(p => p.name || p.kind) : [];
+      if (arr.length === 0 && (v2.petName || v2.petKind)) return v2.petName || '';
+      return arr.map(p => [p.name, p.kind].filter(Boolean).join(' the ')).filter(Boolean).join(', ');
+    })(),
+    petType: (() => {
+      const arr = Array.isArray(v2.pets) ? v2.pets.filter(p => p.kind) : [];
+      if (arr.length === 0 && v2.petKind) return v2.petKind;
+      return arr.map(p => p.kind).filter(Boolean).join(', ');
+    })(),
+    pets: (() => {
+      const arr = Array.isArray(v2.pets) ? v2.pets.filter(p => p.name || p.kind) : [];
+      if (arr.length === 0 && (v2.petName || v2.petKind)) return [{ name: v2.petName || '', kind: v2.petKind || '' }];
+      return arr.map(p => ({ name: (p.name || '').trim(), kind: (p.kind || '').trim() }));
+    })(),
 
     // Villain (v2 villain step is shown only for adventure stories)
     villainToggle: v2.hasVillain ? 'on' : '',

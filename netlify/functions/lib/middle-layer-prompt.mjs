@@ -36,13 +36,15 @@ If a sibling dynamic is described in plain terms (e.g. "Ava bosses Liam around b
 
 **2. HOW TO READ PETS**
 
-The pet is part of the household. If the parent wrote "Golden retriever" or "Bernaise mountain" or "Border Collie" in the pet_type field, this is context for you, not copy for the story. Unless the breed's actual behaviour matters to the narrative (a working dog herds, a spaniel sniffs, a cat is aloof), the breed should NOT be mentioned by name in the story.
+The form now collects pets as an ARRAY. Read \`pets\` first — it is an array of \`{name, kind}\` objects, one per pet, in the order the parent added them. Legacy rows may still have flat \`petName\` and \`petKind\` strings instead; treat those as a single-pet array.
 
-In your output, give the pet a one-line character sketch: name, species, what they're *like*. E.g. "Nova, a dog who watches over everyone." Not "Nova, a border collie."
+Each pet is part of the household. If the parent wrote "Golden retriever" or "Bernaise mountain" or "Border Collie" in the kind field, this is context for you, not copy for the story. Unless the breed's actual behaviour matters to the narrative (a working dog herds, a spaniel sniffs, a cat is aloof), the breed should NOT be mentioned by name in the story.
 
-If the pet_type is something unusual that DOES matter to the plot (e.g. "chicken", "lizard", "snake"), flag that for the writer.
+In your output (\`household.pets\`), give EACH pet its own one-line character sketch: name, species, what they're *like*. E.g. "Nova, a dog who watches over everyone." Not "Nova, a border collie." Multiple pets each get their own sketch — never merge them into a generic "the pets".
 
-If the parent listed multiple pets in one field (e.g. "Loki and Ferg: farm dogs"), treat them as a pair. Farm dogs means they're working dogs with energy; that's a useful narrative hint. Mention it once to the writer, but the story shouldn't keep repeating "the farm dogs."
+If a pet's kind is something unusual that DOES matter to the plot (e.g. "chicken", "lizard", "snake"), flag that for the writer.
+
+When MULTIPLE pets are present, treat the household as a richer ecosystem. The dog and the cat have different energies and the writer should give each their own moment in the story. Don't let one pet upstage the other; don't merge them into a faceless group.
 
 ---
 
@@ -285,7 +287,8 @@ Return ONLY valid JSON, no preamble, no explanation, no markdown fences.
     }
   ],
   "household": {
-    "pet": "string or null: name and one-line character sketch, no breed unless behaviourally essential",
+    "pet": "string or null: LEGACY single-pet field, kept for back-compat. Populate from pets[0] when only one pet exists; otherwise null and use pets[] below.",
+    "pets": "array of objects, each {name, sketch}: ONE entry per pet from the input pets array, in order. sketch is a one-line character note (what they're like, what they do), no breed unless behaviourally essential. Empty array if no pets. Each pet should get its own moment in the story; do not merge into a generic 'the pets'.",
     "friend": "string or null: who the main companion is and their relationship",
     "sidekick": "string or null",
     "family_members": [

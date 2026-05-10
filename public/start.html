@@ -205,6 +205,7 @@ const VILLAINS = [
 ];
 
 function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'', foodNo:'' }; }
+function newPet(){ return { kind:'', name:'' }; }
 
 // If the customer typed their child's name on the homepage cover-tryon
 // before clicking through, the homepage appended ?name=Chase so the funnel
@@ -223,7 +224,7 @@ const state = {
     children: [_firstChildFromUrl()],
     storyKind: '',
     bestFriend: '', others: '',
-    hasPet: false, petKind:'', petName:'',
+    hasPet: false, pets: [], petKind:'', petName:'',
     toy: '',
     hasVillain: true, villainName: '',
     themes: [], themesOther: '',
@@ -370,17 +371,27 @@ const STEPS = [
         </div>
 
         <div>
-          <div class="field-label">A PET (OPTIONAL)</div>
+          <div class="field-label">PETS (OPTIONAL)</div>
           <button type="button" class="toggle" data-on="${state.data.hasPet}" data-action="togglePet">
             <span class="toggle-track"></span>
-            <span class="toggle-label">They have a pet</span>
+            <span class="toggle-label">They have ${state.data.pets.length > 1 ? 'pets' : 'a pet'}</span>
           </button>
           ${state.data.hasPet ? `
-            <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
-              <div class="grid-4">
-                ${PETS.map(([e,t]) => `<button type="button" class="chip" data-on="${state.data.petKind === t}" data-action="setPetKind" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:10px 6px;display:flex"><span style="font-size:18px">${e}</span><span style="font-size:11px">${t}</span></button>`).join('')}
-              </div>
-              <input class="txt" placeholder="Pet's name" value="${esc(state.data.petName)}" data-action="setPetName">
+            <div style="margin-top:14px;display:flex;flex-direction:column;gap:14px">
+              ${state.data.pets.map((p, pi) => `
+                <div style="display:flex;flex-direction:column;gap:10px;${pi > 0 ? 'padding-top:14px;border-top:1px dashed var(--line);' : ''}">
+                  ${state.data.pets.length > 1 ? `
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                      <div class="field-label" style="margin:0">PET ${pi + 1}</div>
+                      <button type="button" class="child-card-remove" data-action="removePet" data-i="${pi}">Remove</button>
+                    </div>` : ''}
+                  <div class="grid-4">
+                    ${PETS.map(([e,t]) => `<button type="button" class="chip" data-on="${p.kind === t}" data-action="setPetKindAt" data-i="${pi}" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:10px 6px;display:flex"><span style="font-size:18px">${e}</span><span style="font-size:11px">${t}</span></button>`).join('')}
+                  </div>
+                  <input class="txt" placeholder="Pet's name" value="${esc(p.name)}" data-action="setPetNameAt" data-i="${pi}">
+                </div>
+              `).join('')}
+              ${state.data.pets.length < 6 ? `<button type="button" class="btn btn--ghost btn--sm" data-action="addPet" style="align-self:flex-start">＋ Add another pet</button>` : ''}
             </div>` : ''}
         </div>
       </div>`;
@@ -664,7 +675,16 @@ function buildReviewCards(){
     if (c.toy && c.toy.trim()) castingLines.push(`Comfort toy of ${esc((c.name || '').trim() || 'them')}: <strong>${esc(c.toy.trim())}</strong>`);
   });
   if (d.others && d.others.trim()) castingLines.push(`Others: ${esc(d.others.trim())}`);
-  if (d.hasPet && (d.petKind || d.petName)) castingLines.push(`Pet: <strong>${esc([d.petName, d.petKind].filter(Boolean).join(' the '))}</strong>`);
+  if (d.hasPet) {
+    const petList = (Array.isArray(d.pets) ? d.pets : []).filter(p => (p.name && p.name.trim()) || (p.kind && p.kind.trim()));
+    if (petList.length === 0 && (d.petName || d.petKind)) {
+      petList.push({ name: d.petName || '', kind: d.petKind || '' });
+    }
+    petList.forEach(p => {
+      const desc = [p.name, p.kind].map(s => (s || '').trim()).filter(Boolean).join(' the ');
+      if (desc) castingLines.push(`Pet: <strong>${esc(desc)}</strong>`);
+    });
+  }
 
   const villainLine = (d.storyKind === 'adventure' && d.hasVillain && d.villainName) ? `Baddie: <strong>${esc(d.villainName.trim())}</strong>` : '';
 
@@ -739,7 +759,7 @@ function renderEmailStep(){
       <div style="font-family:var(--hand);font-size:34px;color:var(--plum);line-height:1;margin-bottom:8px">Pour your heart out.</div>
       <div style="font-size:14.5px;color:var(--muted);margin-bottom:14px;line-height:1.55;max-width:420px">Anything else we should know about them, or about why this story matters. The little things that don&rsquo;t fit a question. The big things you wish we knew. The honest stuff goes the furthest.</div>
       <textarea class="txt" rows="5" placeholder="e.g. &lsquo;Her grandpa passed last week and we want this to feel like a hug from him.&rsquo; Or &lsquo;He starts at a new school Monday and is terrified.&rsquo; Or &lsquo;She always counts in Spanish even though we&rsquo;re English.&rsquo; Or just &lsquo;please make this magic, they really need it.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
-      <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">Optional, but where the magic often comes from.</div>
+      <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">Optional.</div>
     </div>
 
     <div style="margin-top:22px;padding:18px 20px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px">
@@ -883,9 +903,27 @@ function handleAction(action, el, e){
     case 'setPlaceReal': state.data.placeReal = el.value; updateContinueState(); break;
     case 'setBestFriend': state.data.bestFriend = el.value; break;
     case 'setOthers': state.data.others = el.value; break;
-    case 'togglePet': state.data.hasPet = !state.data.hasPet; render(); break;
-    case 'setPetKind': state.data.petKind = v; render(); break;
-    case 'setPetName': state.data.petName = el.value; break;
+    case 'togglePet':
+      state.data.hasPet = !state.data.hasPet;
+      if (state.data.hasPet && state.data.pets.length === 0) {
+        // Migrate any legacy single-pet data, otherwise seed with one empty entry.
+        if (state.data.petName || state.data.petKind) {
+          state.data.pets = [{ name: state.data.petName || '', kind: state.data.petKind || '' }];
+          state.data.petName = ''; state.data.petKind = '';
+        } else {
+          state.data.pets = [newPet()];
+        }
+      }
+      render();
+      break;
+    case 'addPet': state.data.pets.push(newPet()); render(); break;
+    case 'removePet':
+      state.data.pets.splice(i, 1);
+      if (state.data.pets.length === 0) state.data.hasPet = false;
+      render();
+      break;
+    case 'setPetKindAt': state.data.pets[i].kind = v; render(); break;
+    case 'setPetNameAt': state.data.pets[i].name = el.value; break;
     case 'setToy': state.data.toy = el.value; break;
     case 'toggleVillain': state.data.hasVillain = !state.data.hasVillain; render(); break;
     case 'setVillainName': state.data.villainName = el.value; break;
