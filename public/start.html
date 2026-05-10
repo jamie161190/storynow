@@ -409,12 +409,12 @@ const STEPS = [
       <div style="display:flex;flex-direction:column;gap:26px">
 
         <div>
-          <div class="kicker" style="margin-bottom:4px">WHAT DO YOU CALL THEM? (OPTIONAL)</div>
+          <div class="kicker" style="margin-bottom:4px">DO THEY HAVE A NICKNAME? (OPTIONAL)</div>
           <div class="field-hint" style="margin:0 0 12px;line-height:1.55">The little name only you (and maybe Granny) use. We'll have the narrator slip it in once for a stop-everything moment. Leave blank if there isn't one.</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             ${state.data.children.map((c, i) => `
               <div>
-                <div class="field-label">WHAT DO YOU CALL ${esc(childLabel(c, i).toUpperCase())}? (OPTIONAL)</div>
+                <div class="field-label">${esc(childLabel(c, i).toUpperCase())}</div>
                 <input class="txt" placeholder="e.g. Olly, Bug, Monkey, Mate, Sunshine" value="${esc(c.nickname || '')}" data-action="updateChild" data-i="${i}" data-k="nickname">
               </div>
             `).join('')}
@@ -1047,9 +1047,9 @@ const PROCESSING_REVIEWS = [
     ]
   }
 ];
-const PROCESSING_TOTAL_MS = 45000;
-const PROCESSING_CHECKOUT_FIRE_AT = 38000;
-const PROCESSING_HARD_CAP_MS = 57000;
+const PROCESSING_TOTAL_MS = 60000;
+const PROCESSING_CHECKOUT_FIRE_AT = 53000;
+const PROCESSING_HARD_CAP_MS = 72000;
 
 async function submitRequest(){
   const btn = document.getElementById('submitBtn');
@@ -1449,9 +1449,9 @@ function initProcessingReviews(){
   };
   paint(); // Siobhan shows immediately
   setTimeout(() => {
-    paint(); // first rotation at 15s
+    paint(); // first rotation at 30s
     setInterval(paint, 9000); // then every 9 seconds (some reviews are long)
-  }, 15000);
+  }, 30000);
 }
 
 function initProcessingGame(){
