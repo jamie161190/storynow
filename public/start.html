@@ -353,7 +353,7 @@ const STEPS = [
               <input class="txt" placeholder="${esc(childPossessive(c, i))} sidekick (optional)" value="${esc(c.bestFriend || '')}" data-action="updateChild" data-i="${i}" data-k="bestFriend">
             `).join('')}
           </div>
-          <div class="field-hint">Not a <del style="color:rgba(31,27,46,.4);text-decoration-thickness:1.5px">best friend</del>. A sidekick. Sibling, cousin, granny, neighbour, anyone close. They'll get a real role and dialogue in the story.</div>
+          <div class="field-hint">Can be a best friend, a sibling, you, a granny, a pet, anyone close to them. Whoever you put here gets a prominent role in the story, with real dialogue and a moment that's just theirs.</div>
         </div>
 
         <div>
@@ -374,6 +374,7 @@ const STEPS = [
 
         <div>
           <div class="field-label">PETS (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 8px">If you've already named your pet as a sidekick above, you can skip this.</div>
           <button type="button" class="toggle" data-on="${state.data.hasPet}" data-action="togglePet">
             <span class="toggle-track"></span>
             <span class="toggle-label">They have ${state.data.pets.length > 1 ? 'pets' : 'a pet'}</span>
@@ -740,21 +741,22 @@ function renderEmailStep(){
 
     <div style="margin-top:28px;padding:24px 22px;background:rgba(255,253,247,.85);border:1.5px solid var(--rose);border-radius:18px;position:relative;overflow:hidden">
       <div style="position:absolute;top:-12px;right:18px;font-size:48px;opacity:.18;line-height:1;transform:rotate(8deg)">✍️</div>
-      <div style="font-family:var(--hand);font-size:34px;color:var(--plum);line-height:1;margin-bottom:8px">Pour your heart out.</div>
-      <div style="font-size:14.5px;color:var(--muted);margin-bottom:14px;line-height:1.55;max-width:420px">Anything else we should know about them, or about why this story matters. The little things that don&rsquo;t fit a question. The big things you wish we knew. The honest stuff goes the furthest.</div>
-      <textarea class="txt" rows="5" placeholder="e.g. &lsquo;She calls spaghetti pasketti and only sleeps with a green dinosaur called Steve.&rsquo; Or &lsquo;Her grandpa passed last week and we want this to feel like a hug from him.&rsquo; Or &lsquo;He starts at a new school Monday and is terrified.&rsquo; Or just &lsquo;please make this magic, they really need it.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
+      <div style="font-family:var(--hand);font-size:34px;color:var(--plum);line-height:1;margin-bottom:8px">In your own words.</div>
+      <div style="font-size:14.5px;color:var(--muted);margin-bottom:14px;line-height:1.55;max-width:440px">Tell us about them. The personality, the dynamics with their siblings, the funny things they do, the in-jokes. Anything that helps us write the story you want them to hear.</div>
+      <textarea class="txt" rows="5" placeholder="e.g. &lsquo;Chase bosses his little cousin around but he&rsquo;s ridiculously thoughtful and caring with his sister.&rsquo; Or &lsquo;She calls spaghetti pasketti and only sleeps with a green dinosaur called Steve.&rsquo; Or &lsquo;Her grandpa passed last week and we want this to feel like a hug from him.&rsquo; Or just &lsquo;please make this magic, they really need it.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
       <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">Optional.</div>
     </div>
 
-    <div style="margin-top:22px;padding:18px 20px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px">
-      <div class="kicker" style="margin-bottom:10px">WHAT HAPPENS NEXT</div>
-      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
+    <div style="margin-top:22px;padding:20px 22px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px">
+      <div class="kicker" style="margin-bottom:12px">FROM HERE</div>
+      <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px">
         ${[
-          ['🔒',"A secure payment form opens right here, in this page. Pay <span data-price>£24.99</span> without going anywhere"],
-          ['✍️','Jamie gets to work writing and recording your full 15-minute story by hand'],
-          ['📬','Story lands in your inbox within 24 hours, often much sooner'],
-          ['💛','Share it with your loved ones. No login necessary']
-        ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.5">${t}</span></li>`).join('')}
+          ['☕',"In a moment, you&rsquo;ll be paying right here on this page (no redirects, no faff)."],
+          ['✍️','Jamie sits at his desk and writes your story by hand. He listens it back before it goes anywhere.'],
+          ['📬','It lands in your inbox within 24 hours, often much sooner.'],
+          ['💛','If anything isn&rsquo;t quite right when you hear it, just tell Jamie. He&rsquo;ll tweak that exact bit until it&rsquo;s perfect. Not the whole thing. Just the bit.'],
+          ['🌙','Then it&rsquo;s theirs forever. Replay it, share it with grandparents, treasure it.']
+        ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.55">${t}</span></li>`).join('')}
       </ul>
     </div>
 
@@ -1048,7 +1050,11 @@ const PROCESSING_HARD_CAP_MS = 42000;
 
 async function submitRequest(){
   const btn = document.getElementById('submitBtn');
-  if (btn) { btn.disabled = true; btn.innerHTML = 'Saving&hellip;'; }
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Just a moment&hellip;'; }
+  // Small breathing pause so the transition into the processing overlay
+  // doesn't feel like another form-button click. Lets the buyer feel the
+  // shift from "filling a form" to "something's happening for me".
+  await new Promise(r => setTimeout(r, 950));
   showProcessingOverlay();
   const procStart = Date.now();
   let requestId = null, accessToken = null, checkoutData = null, fatalError = null;
