@@ -1059,9 +1059,9 @@ const PROCESSING_REVIEWS = [
     ]
   }
 ];
-const PROCESSING_TOTAL_MS = 20000;
-const PROCESSING_CHECKOUT_FIRE_AT = 13000;
-const PROCESSING_HARD_CAP_MS = 32000;
+const PROCESSING_TOTAL_MS = 30000;
+const PROCESSING_CHECKOUT_FIRE_AT = 23000;
+const PROCESSING_HARD_CAP_MS = 42000;
 
 async function submitRequest(){
   const btn = document.getElementById('submitBtn');
@@ -1257,6 +1257,11 @@ function showProcessingOverlay(){
         font-style:italic;letter-spacing:-.005em}
       .proc-jamie-sig{font-family:var(--hand);font-size:30px;color:var(--terra);line-height:1;
         margin-top:14px;text-align:right}
+      .proc-jamie-ps{margin-top:18px;padding-top:14px;border-top:1px dashed rgba(184,145,73,.3);
+        font-family:var(--sans);font-size:13px;font-style:italic;color:rgba(75,46,131,.7);line-height:1.5}
+      .proc-jamie-ps a{color:var(--terra);text-decoration:underline;text-underline-offset:3px;
+        font-weight:600;cursor:pointer;font-style:normal}
+      .proc-jamie-ps a:hover{color:var(--terra-2)}
       .proc-review{position:relative;padding:0;background:#fff;border:1px solid rgba(31,27,46,.08);box-shadow:0 12px 32px -22px rgba(31,27,46,.3);overflow:hidden}
       .proc-tp-brand{display:flex;align-items:center;gap:8px;padding:12px 18px;background:#fff;border-bottom:1px solid rgba(31,27,46,.08)}
       .proc-tp-brand-name{font-family:var(--sans);font-size:15px;font-weight:700;color:#191919;letter-spacing:-.01em}
@@ -1331,13 +1336,14 @@ function showProcessingOverlay(){
         <div class="proc-jamie-eye">A note from Jamie</div>
         <div class="proc-jamie-body">"If it's not 100% right when you hear it, just tell me. I'll change it. And then change it again if I need to. I keep going until you love it. That's the promise."</div>
         <div class="proc-jamie-sig">Jamie</div>
+        <div class="proc-jamie-ps">P.S. Fancy a quick game of tic-tac-toe while you wait? <a href="#procGameCard" id="procPsLink">It's just below ↓</a></div>
       </div>
 
       <div class="proc-card proc-review" id="procReview">
         <!-- populated by JS -->
       </div>
 
-      <div class="proc-card">
+      <div class="proc-card" id="procGameCard">
         <div class="proc-game-head">Got a minute?</div>
         <div class="proc-game-sub">Beat the computer while we wait. You're X.</div>
         <div class="proc-board" id="procBoard">
@@ -1350,6 +1356,18 @@ function showProcessingOverlay(){
   document.body.style.overflow = 'hidden';
   initProcessingReviews();
   initProcessingGame();
+  // P.S. link in Jamie's note → smooth scroll inside the overlay to the game.
+  const psLink = document.getElementById('procPsLink');
+  if (psLink) {
+    psLink.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.getElementById('procGameCard');
+      const ov = document.getElementById('processingOverlay');
+      if (target && ov) {
+        ov.scrollTo({ top: target.offsetTop - 24, behavior: 'smooth' });
+      }
+    });
+  }
 }
 
 function hideProcessingOverlay(){
