@@ -204,7 +204,7 @@ const VILLAINS = [
   ['🌙','The Bedtime Bandit']
 ];
 
-function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'', foodNo:'' }; }
+function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', intoNow:'', nickname:'', foodNo:'' }; }
 function newPet(){ return { kind:'', name:'' }; }
 
 // If the customer typed their child's name on the homepage cover-tryon
@@ -428,19 +428,6 @@ const STEPS = [
               <div>
                 <div class="field-label">${esc(childLabel(c, i).toUpperCase())} WON'T TOUCH (OPTIONAL)</div>
                 <input class="txt" placeholder="e.g. broccoli, anything green, mushrooms, tomatoes, the bits in soup" value="${esc(c.foodNo || '')}" data-action="updateChild" data-i="${i}" data-k="foodNo">
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <div style="padding-top:22px;border-top:1px dashed var(--line)">
-          <div class="kicker" style="margin-bottom:4px">SOMETHING SPECIAL ABOUT THEM (OPTIONAL)</div>
-          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">A quirk, a catchphrase, a habit, a way of speaking. Whatever you write here gets woven naturally into that child's scenes. Skip any you don't have.</div>
-          <div style="display:flex;flex-direction:column;gap:10px">
-            ${state.data.children.map((c, i) => `
-              <div>
-                <div class="field-label">SOMETHING SPECIAL ABOUT ${esc(childLabel(c, i).toUpperCase())} (OPTIONAL)</div>
-                <textarea class="txt" rows="2" placeholder='e.g. calls spaghetti "pasketti", will only sleep with the green dinosaur called Steve, has a soft lisp on words with s' data-action="updateChild" data-i="${i}" data-k="quirk">${esc(c.quirk || '')}</textarea>
               </div>
             `).join('')}
           </div>
@@ -690,10 +677,6 @@ function buildReviewCards(){
 
   const villainLine = (d.storyKind === 'adventure' && d.hasVillain && d.villainName) ? `Baddie: <strong>${esc(d.villainName.trim())}</strong>` : '';
 
-  const quirkLines = d.children
-    .filter(c => c.quirk && c.quirk.trim())
-    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.quirk.trim())}`);
-
   const intoNowLines = d.children
     .filter(c => c.intoNow && c.intoNow.trim())
     .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.intoNow.trim())}`);
@@ -735,7 +718,6 @@ function buildReviewCards(){
     card('Who’s in it', 'casting', castingLines),
     nicknameLines.length ? card('What you call them', 'bits', nicknameLines) : '',
     foodNoLines.length ? card('Won’t touch', 'bits', foodNoLines) : '',
-    quirkLines.length ? card('Tiny details', 'bits', quirkLines) : '',
     villainLine ? card('The baddie', 'bits', [villainLine]) : '',
     card('Storyteller', 'voice', [voiceLine]),
     card('Gift', 'gift', giftLines)
@@ -760,7 +742,7 @@ function renderEmailStep(){
       <div style="position:absolute;top:-12px;right:18px;font-size:48px;opacity:.18;line-height:1;transform:rotate(8deg)">✍️</div>
       <div style="font-family:var(--hand);font-size:34px;color:var(--plum);line-height:1;margin-bottom:8px">Pour your heart out.</div>
       <div style="font-size:14.5px;color:var(--muted);margin-bottom:14px;line-height:1.55;max-width:420px">Anything else we should know about them, or about why this story matters. The little things that don&rsquo;t fit a question. The big things you wish we knew. The honest stuff goes the furthest.</div>
-      <textarea class="txt" rows="5" placeholder="e.g. &lsquo;Her grandpa passed last week and we want this to feel like a hug from him.&rsquo; Or &lsquo;He starts at a new school Monday and is terrified.&rsquo; Or &lsquo;She always counts in Spanish even though we&rsquo;re English.&rsquo; Or just &lsquo;please make this magic, they really need it.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
+      <textarea class="txt" rows="5" placeholder="e.g. &lsquo;She calls spaghetti pasketti and only sleeps with a green dinosaur called Steve.&rsquo; Or &lsquo;Her grandpa passed last week and we want this to feel like a hug from him.&rsquo; Or &lsquo;He starts at a new school Monday and is terrified.&rsquo; Or just &lsquo;please make this magic, they really need it.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
       <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">Optional.</div>
     </div>
 
@@ -930,7 +912,6 @@ function handleAction(action, el, e){
     case 'toggleVillain': state.data.hasVillain = !state.data.hasVillain; render(); break;
     case 'setVillainName': state.data.villainName = el.value; break;
     case 'pickVillain': state.data.villainName = v; render(); break;
-    case 'setQuirk': state.data.quirk = el.value; break;
     case 'setHeartOut': state.data.heartOut = el.value; break;
     case 'setVoice': state.data.voice = v; render(); break;
     case 'setIsGift': state.data.isGift = (v === 'true'); render(); break;
