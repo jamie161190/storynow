@@ -31,7 +31,8 @@ export function v2ToV1(v2) {
     // them in scenes featuring that child.
     favTeddy: (c.toy || '').trim(),         // per-child comfort item
     bestFriend: (c.bestFriend || '').trim(), // per-child main friend
-    quirk: (c.quirk || '').trim()            // per-child personality detail
+    quirk: (c.quirk || '').trim(),           // per-child personality detail
+    intoNow: (c.intoNow || '').trim()        // per-child current passion (story spine input)
   }));
 
   const childCount = children.length;

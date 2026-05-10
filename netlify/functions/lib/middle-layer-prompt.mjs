@@ -105,6 +105,21 @@ There are TWO sources of "extras" input now:
 - The TOP-LEVEL \`extraDetails\` field: shared, free-text. Contains anything the parent wrote on the extras step. May reference any/all children.
 - Each child in \`children\` may have their own \`quirk\` field: this is THIS child's personality detail, set on the per-child step.
 
+**A SEPARATE per-child input — \`children[i].intoNow\`** — captures what the child is really into RIGHT NOW. A club they go to, a sport, a hobby, the thing they can't stop talking about. This is the highest-leverage single input the parent gives you. Treat it as the SPINE of the story for that child whenever it is present:
+- If a child has \`intoNow = "football on Saturday mornings"\`, the story should be set in/around football, OR pivot on a football moment.
+- If \`intoNow = "gymnastics class"\`, the climax can happen on a vault, or the protagonist's gymnastics skill solves the moment.
+- If \`intoNow = "building Lego"\`, a Lego creation can come alive, or be the thing that saves the day.
+- If \`intoNow = "her scooter to school"\`, the scooter is her vehicle through the whole story.
+
+Surface intoNow in THREE places in the output:
+- In the relevant child's \`portrait\` (so the writer reads it as part of who that child is).
+- In the new \`children[i].core_interest\` field (a clean string naming the interest, so the writer knows it's load-bearing).
+- In \`narrative_spine\` when it shapes the whole arc, and in \`story_shape.themes\` so it's not lost.
+
+When MULTIPLE children each have an intoNow, the spine should bring their interests together (e.g. football + ballet → a talent show with two acts, or a championship that needs both). Don't favour one child's interest over another's.
+
+If intoNow is empty for a child, fall back to the standard interpretation of \`themes\` and \`themesOther\`.
+
 **Resolution rule:** Per-child \`quirk\` (when present) belongs to that specific child and should be woven into THEIR portrait and their scenes. Top-level \`extraDetails\` may apply to one child, multiple, or all — read carefully and attribute correctly.
 
 **QUIRK TYPE CLASSIFICATION:** Quirks come in three textures, and they want different narrative weighting from the writer. When you populate \`children[i].quirk\` and \`character_texture\`, label each quirk with its type so the writer knows how to handle it:
@@ -240,7 +255,8 @@ Return ONLY valid JSON, no preamble, no explanation, no markdown fences.
       "best_friend": "string or null: this child's personal best friend if the parent provided one (from the per-child bestFriend input), otherwise null. Distinct from household.friend (which is the shared/main companion). When present, the writer should give this friend real dialogue and presence in scenes featuring this child.",
       "comfort_item": "string or null: THIS child's comfort toy/item, drawn from per-child favTeddy (preferred) or correctly attributed slice of top-level favTeddy. Preserve specificity. Null if neither input mentions one for this child.",
       "quirk": "string or null: THIS child's specific quirk, drawn from per-child quirk (preferred) or the correctly attributed slice of top-level extraDetails. Null if neither input mentions one.",
-      "quirk_type": "string or null: one of 'catchphrase' | 'pattern' | 'habit', classifying the quirk above so the writer knows how to weight it. Null if quirk is null."
+      "quirk_type": "string or null: one of 'catchphrase' | 'pattern' | 'habit', classifying the quirk above so the writer knows how to weight it. Null if quirk is null.",
+      "core_interest": "string or null: THIS child's intoNow value (the thing they're really into right now — a club, sport, hobby, obsession). LOAD-BEARING: when present, the writer should treat this as the spine of the story for this child. Preserve the parent's specificity (e.g. 'football on Saturday mornings' not just 'football'). Null only if the parent left intoNow empty for this child."
     }
   ],
   "household": {

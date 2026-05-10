@@ -176,12 +176,10 @@ const STARTS_AS_GIFT = PARAMS.get('gift') === '1';
 const STARTS_AS_GIFTCARD = PARAMS.get('giftcard') === '1';
 
 const THEMES = [
-  ['🦖','Dinosaurs'],['🚀','Space'],['⚽','Football'],
-  ['🦄','Unicorns'],['👸','Princesses'],['🐶','Animals'],
-  ['🚗','Cars'],['🎮','Gaming'],['🧜','Mermaids'],
-  ['🏴‍☠️','Pirates'],['🦸','Superheroes'],['🚂','Trains'],
-  ['🤖','Robots'],['🎵','Music'],['🌳','Nature'],
-  ['🧸','Toys'],['👗','Fashion'],['✈️','Aeroplanes']
+  ['🦖','Dinosaurs'],['🚀','Space'],['🦄','Unicorns'],
+  ['👸','Princesses'],['🐶','Animals'],['🚗','Cars'],
+  ['🎮','Gaming'],['🧜','Mermaids'],['🦸','Superheroes'],
+  ['🤖','Robots'],['👗','Fashion'],['✈️','Aeroplanes']
 ];
 const PLACES = [
   ['🛏️','Bedroom'],['🌲','Magic forest'],['🌌','Outer space'],
@@ -201,7 +199,7 @@ const VOICES = [
 function ageNum(v){ const n = parseInt(v, 10); return Number.isFinite(n) && n >= 0 && n <= 17 ? n : null; }
 const PRONOUNS = ['She / her','He / him','They / them'];
 
-function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'' }; }
+function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'' }; }
 
 // If the customer typed their child's name on the homepage cover-tryon
 // before clicking through, the homepage appended ?name=Chase so the funnel
@@ -282,7 +280,10 @@ const STEPS = [
 
   { key:'themes', title:"What's the story about?", sub:"Pick as many as you like. These shape the whole story.",
     valid: () => state.data.themes.length > 0 || state.data.themesOther.trim().length > 0,
-    render: () => `
+    render: () => {
+      const childLabel = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
+      const multi = state.data.children.length > 1;
+      return `
       <div class="grid-3">
         ${THEMES.map(([e,t]) => `
           <button type="button" class="chip" data-on="${state.data.themes.includes(t)}" data-action="toggleTheme" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:14px 8px;min-height:80px;display:flex">
@@ -292,7 +293,21 @@ const STEPS = [
         `).join('')}
       </div>
       <div class="kicker" style="margin-top:18px;margin-bottom:6px">OR TELL US SOMETHING ELSE</div>
-      <input class="txt" placeholder="e.g. Minecraft, ballet, cooking, classic cars" value="${esc(state.data.themesOther)}" data-action="setThemesOther">` },
+      <input class="txt" placeholder="e.g. Minecraft, ballet, cooking, classic cars" value="${esc(state.data.themesOther)}" data-action="setThemesOther">
+
+      <div style="margin-top:28px;padding-top:24px;border-top:1px dashed var(--line)">
+        <div class="kicker" style="margin-bottom:6px">${multi ? "WHAT'S EACH OF THEM REALLY INTO RIGHT NOW?" : "WHAT'S SOMETHING THEY'RE REALLY INTO RIGHT NOW?"}</div>
+        <div class="field-hint" style="margin:0 0 14px;line-height:1.55">A club they go to, a sport, a hobby, the thing they can't stop talking about. We'll weave it right into the story so they recognise themselves straight away.</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${state.data.children.map((c, i) => `
+            <div>
+              ${multi ? `<div class="field-label" style="margin-bottom:6px">FOR ${esc(childLabel(c, i).toUpperCase())}</div>` : ''}
+              <input class="txt" placeholder="e.g. football on Saturday mornings, gymnastics class, building Lego, riding their scooter to school" value="${esc(c.intoNow || '')}" data-action="updateChild" data-i="${i}" data-k="intoNow">
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    } },
 
   { key:'place', title:"Where does it take place?", sub:"",
     valid: () => !!state.data.place || !!state.data.placeReal.trim(),
@@ -590,6 +605,10 @@ function buildReviewCards(){
     .filter(c => c.quirk && c.quirk.trim())
     .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.quirk.trim())}`);
 
+  const intoNowLines = d.children
+    .filter(c => c.intoNow && c.intoNow.trim())
+    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.intoNow.trim())}`);
+
   const voiceLine = d.voice ? `🎙 <strong>${esc(d.voice)}</strong>` : '';
 
   const giftLines = [];
@@ -607,6 +626,7 @@ function buildReviewCards(){
     card('Story type', 'kind', [kindLabel]),
     card('Who it’s for', 'children', childrenLines),
     card('What it’s about', 'themes', themeBits.map(t => esc(t))),
+    intoNowLines.length ? card('Really into right now', 'themes', intoNowLines) : '',
     card('Where it takes place', 'place', placeBits.map(t => esc(t))),
     card('Who’s in it', 'casting', castingLines),
     villainLine ? card('The baddie', 'villain', [villainLine]) : '',
