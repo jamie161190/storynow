@@ -1030,7 +1030,7 @@ async function submitRequest(){
   if (btn) { btn.disabled = true; btn.innerHTML = 'Saving&hellip;'; }
   showProcessingOverlay();
   const procStart = Date.now();
-  let requestId = null, accessToken = null, checkoutUrl = null, fatalError = null;
+  let requestId = null, accessToken = null, checkoutData = null, fatalError = null;
 
   // Background: save the row right away so the Stripe call later has a real story.
   const savePromise = (async () => {
@@ -1076,13 +1076,13 @@ async function submitRequest(){
       });
       if (!coRes.ok) throw new Error('checkout failed');
       const co = await coRes.json();
-      if (co.url) checkoutUrl = co.url; else throw new Error('no url');
+      if (co.clientSecret && co.publishableKey) checkoutData = co; else throw new Error('no client secret');
     } catch (e) { fatalError = e; }
   }, PROCESSING_CHECKOUT_FIRE_AT);
 
-  // Visual timeline + final redirect.
-  runProcessingTimeline(() => !!checkoutUrl || !!fatalError, () => {
-    if (fatalError && !checkoutUrl) {
+  // Visual timeline → mount embedded checkout in-page.
+  runProcessingTimeline(() => !!checkoutData || !!fatalError, async () => {
+    if (fatalError && !checkoutData) {
       if (requestId && accessToken) {
         window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
       } else {
@@ -1092,16 +1092,82 @@ async function submitRequest(){
       }
       return;
     }
-    if (checkoutUrl) window.location.href = checkoutUrl;
+    if (checkoutData) {
+      try {
+        await mountEmbeddedCheckout(checkoutData);
+      } catch (e) {
+        if (requestId && accessToken) {
+          window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
+        }
+      }
+    }
   }, procStart);
 
   // Hard cap — never trap the user.
   setTimeout(() => {
-    if (checkoutUrl) { window.location.href = checkoutUrl; }
-    else if (requestId && accessToken) {
+    if (checkoutData || document.getElementById('procCheckout')) return;
+    if (requestId && accessToken) {
       window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
     }
   }, PROCESSING_HARD_CAP_MS);
+}
+
+let _stripeJsLoading = null;
+function loadStripeJs(){
+  if (window.Stripe) return Promise.resolve();
+  if (_stripeJsLoading) return _stripeJsLoading;
+  _stripeJsLoading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://js.stripe.com/v3/';
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('stripe.js failed to load'));
+    document.head.appendChild(s);
+  });
+  return _stripeJsLoading;
+}
+
+async function mountEmbeddedCheckout({ clientSecret, publishableKey }){
+  // Swap the tic-tac-toe card for the embedded checkout card. Queue + review
+  // stay so trust signals are visible right next to the card form.
+  const wrap = document.querySelector('#processingOverlay .proc-wrap');
+  if (!wrap) return;
+  const head = wrap.querySelector('.proc-head .proc-head-h');
+  const headEye = wrap.querySelector('.proc-head .proc-head-eye');
+  if (head) head.textContent = 'Your secure checkout, right here.';
+  if (headEye) headEye.textContent = 'Ready when you are';
+  // Remove the game card.
+  const cards = wrap.querySelectorAll('.proc-card');
+  if (cards.length) {
+    const last = cards[cards.length - 1];
+    if (last && last.querySelector('#procBoard')) last.remove();
+  }
+  // Insert the checkout card just below the queue card.
+  const checkoutCard = document.createElement('div');
+  checkoutCard.className = 'proc-card proc-checkout-card';
+  checkoutCard.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <div style="font-family:var(--serif);font-size:18px;font-weight:500;color:var(--plum)">Pay <span data-price>£24.99</span></div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.06em;color:rgba(75,46,131,.6);text-transform:uppercase">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secured by Stripe
+      </div>
+    </div>
+    <div id="procCheckout" style="min-height:420px"></div>`;
+  // Insert after the queue card (find it by its class), or append.
+  const queueCard = wrap.querySelector('.proc-queue');
+  if (queueCard && queueCard.nextSibling) {
+    wrap.insertBefore(checkoutCard, queueCard.nextSibling);
+  } else {
+    wrap.appendChild(checkoutCard);
+  }
+  await loadStripeJs();
+  if (!window.Stripe) throw new Error('stripe unavailable');
+  const stripe = window.Stripe(publishableKey);
+  const checkout = await stripe.initEmbeddedCheckout({ clientSecret });
+  checkout.mount('#procCheckout');
+  // Re-localise the price token we just injected.
+  if (typeof localisePrice === 'function') localisePrice();
 }
 
 function showProcessingOverlay(){

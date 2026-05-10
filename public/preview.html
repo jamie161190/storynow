@@ -316,8 +316,28 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       });
       if (!res.ok) throw new Error('Checkout failed');
       const data = await res.json();
-      if (data.url) { window.location.href = data.url; return; }
-      throw new Error('No URL');
+      if (!data.clientSecret || !data.publishableKey) throw new Error('No checkout');
+      // Embedded checkout — mount in-page so the buyer never leaves the order
+      // review. Replace the order summary card area with the Stripe form.
+      await loadStripeJs();
+      if (!window.Stripe) throw new Error('stripe unavailable');
+      const main = document.querySelector('main .wrap');
+      if (main) {
+        const checkoutHost = document.createElement('div');
+        checkoutHost.innerHTML = `
+          <div class="card">
+            <div class="card-head">Your secure checkout</div>
+            <div id="embeddedCheckout" style="min-height:420px"></div>
+          </div>`;
+        // Hide the buy button + footer help; keep the order summary above visible.
+        document.getElementById('buyBtn').remove();
+        const sub = document.querySelector('.btn-sub'); if (sub) sub.remove();
+        main.appendChild(checkoutHost);
+      }
+      const stripe = window.Stripe(data.publishableKey);
+      const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+      checkout.mount('#embeddedCheckout');
+      return;
     } catch (e) {
       btn.disabled = false;
       btn.innerHTML = 'Try again';
@@ -325,6 +345,21 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       inFlight = false;
     }
   });
+
+  let _stripeJsLoading = null;
+  function loadStripeJs(){
+    if (window.Stripe) return Promise.resolve();
+    if (_stripeJsLoading) return _stripeJsLoading;
+    _stripeJsLoading = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://js.stripe.com/v3/';
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('stripe.js failed to load'));
+      document.head.appendChild(s);
+    });
+    return _stripeJsLoading;
+  }
 })();
 </script>
 

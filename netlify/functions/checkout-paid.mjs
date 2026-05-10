@@ -100,11 +100,14 @@ export default async (req) => {
       fbc: fbc || '',
       user_agent: req.headers.get('user-agent') || ''
     },
-    // {CHECKOUT_SESSION_ID} is filled in by Stripe. The order-confirmed page
-    // fires a client-side Purchase pixel with the same event_id as the CAPI
-    // event (`purchase_<session.id>`) so Meta dedups them.
-    success_url: `${appUrl}/order-confirmed/${s.id}?t=${s.access_token}&paid=1&cs={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/preview/${s.id}?t=${s.access_token}&cancelled=1`,
+    // Embedded checkout: the buyer never leaves our page. Stripe mounts the
+    // payment form inside the processing overlay so the brand vibe carries
+    // through to payment. After success Stripe redirects to return_url with
+    // {CHECKOUT_SESSION_ID} substituted; the order-confirmed page fires the
+    // Meta Purchase pixel using that id so it dedupes with the server-side
+    // CAPI event (`purchase_<session.id>`).
+    ui_mode: 'embedded',
+    return_url: `${appUrl}/order-confirmed/${s.id}?t=${s.access_token}&paid=1&cs={CHECKOUT_SESSION_ID}`,
     allow_promotion_codes: true
   };
   // Pre-fill email when we already have it (gift senders, returning users via
@@ -141,7 +144,11 @@ export default async (req) => {
     body: JSON.stringify({ stripe_session_id_v2: sess.id })
   });
 
-  return json({ url: sess.url });
+  return json({
+    clientSecret: sess.client_secret,
+    sessionId: sess.id,
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || ''
+  });
 };
 
 function json(obj, status = 200) { return new Response(JSON.stringify(obj), { status, headers: { 'Content-Type': 'application/json' } }); }
