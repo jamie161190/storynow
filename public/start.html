@@ -374,7 +374,7 @@ const STEPS = [
 
         <div>
           <div class="field-label">PETS (OPTIONAL)</div>
-          <div class="field-hint" style="margin:0 0 8px">If you've already named your pet as a sidekick above, you can skip this.</div>
+          <div class="field-hint" style="margin:0 0 8px">If you've already named your pet as a sidekick above, you can leave them out of this.</div>
           <button type="button" class="toggle" data-on="${state.data.hasPet}" data-action="togglePet">
             <span class="toggle-track"></span>
             <span class="toggle-label">They have ${state.data.pets.length > 1 ? 'pets' : 'a pet'}</span>
@@ -752,8 +752,8 @@ function renderEmailStep(){
         ${[
           ['☕',"In a moment, you&rsquo;ll be paying right here on this page (no redirects, no faff)."],
           ['✍️',"We&rsquo;ll take everything you&rsquo;ve told us, every name, every detail, every little moment, and weave it all into a story that&rsquo;s only theirs."],
-          ['📬','It lands in your inbox within 24 hours, often much sooner.'],
-          ['💛','If anything isn&rsquo;t quite right when you hear it, just let us know. We&rsquo;ll tweak those exact bits. Not the whole thing. Just the bits.'],
+          ['📬','It lands in your inbox within 24 hours.'],
+          ['💛','If anything isn&rsquo;t quite right when you hear it, just let us know. We&rsquo;ll tweak it until everything&rsquo;s absolutely perfect.'],
           ['🌙','Then it&rsquo;s theirs forever. Replay it, share it with grandparents, treasure it.']
         ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.55">${t}</span></li>`).join('')}
       </ul>
@@ -948,6 +948,10 @@ function next(){
   while (state.step < STEPS.length && !isStepShown(state.step)) state.step++;
   pushHistory();
   render();
+  // Land at the top of the new step instead of wherever the previous one
+  // left the scroll. Long steps (like "the bits that make it theirs")
+  // otherwise open scrolled to the bottom.
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function back(){
@@ -1043,9 +1047,9 @@ const PROCESSING_REVIEWS = [
     ]
   }
 ];
-const PROCESSING_TOTAL_MS = 30000;
-const PROCESSING_CHECKOUT_FIRE_AT = 23000;
-const PROCESSING_HARD_CAP_MS = 42000;
+const PROCESSING_TOTAL_MS = 45000;
+const PROCESSING_CHECKOUT_FIRE_AT = 38000;
+const PROCESSING_HARD_CAP_MS = 57000;
 
 async function submitRequest(){
   const btn = document.getElementById('submitBtn');
@@ -1241,10 +1245,12 @@ function showProcessingOverlay(){
         border-radius:18px;padding:22px;box-shadow:0 18px 40px -28px rgba(75,46,131,.35);
         backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
       .proc-jamie{background:linear-gradient(160deg,rgba(255,255,255,.92) 0%,rgba(255,243,221,.92) 100%);
-        border:1.5px solid rgba(184,145,73,.25);position:relative;padding:26px 24px 22px}
+        border:1.5px solid rgba(184,145,73,.25);position:relative;padding:0;overflow:hidden}
+      .proc-jamie-photo{display:block;width:100%;aspect-ratio:5/2;object-fit:cover;background:rgba(184,145,73,.08)}
+      .proc-jamie-content{padding:22px 24px 22px}
       .proc-jamie-eye{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.18em;
         text-transform:uppercase;color:rgba(184,145,73,.85);margin-bottom:14px}
-      .proc-jamie-body{font-family:var(--serif);font-size:18px;line-height:1.55;color:var(--plum);
+      .proc-jamie-body{font-family:var(--serif);font-size:17px;line-height:1.55;color:var(--plum);
         font-style:italic;letter-spacing:-.005em}
       .proc-jamie-sig{font-family:var(--hand);font-size:30px;color:var(--terra);line-height:1;
         margin-top:14px;text-align:right}
@@ -1324,10 +1330,13 @@ function showProcessingOverlay(){
       </div>
 
       <div class="proc-card proc-jamie">
-        <div class="proc-jamie-eye">A note from Jamie</div>
-        <div class="proc-jamie-body">"I write every story myself. I don't send it until I've listened back through it and it sits right with me. And if there's ever a tiny thing you'd love a touch different (a name said another way, a small detail you'd word differently), just tell me what, and I'll fix that exact bit. Not the whole thing, just the bit. As many times as we need."</div>
-        <div class="proc-jamie-sig">Jamie</div>
-        <div class="proc-jamie-ps">P.S. Fancy a quick game of tic-tac-toe while you wait? <a href="#procGameCard" id="procPsLink">It's just below ↓</a></div>
+        <img class="proc-jamie-photo" src="/jamie-chase.jpg" alt="Jamie and his son Chase">
+        <div class="proc-jamie-content">
+          <div class="proc-jamie-eye">A note from the makers</div>
+          <div class="proc-jamie-body">"Thanks for making it this far. I&rsquo;ve no doubt you&rsquo;re going to love your story. And if anything&rsquo;s not quite right when you hear it, there&rsquo;ll be a little box on the listening page where you can type what you&rsquo;d like changed. It comes straight to me, and I&rsquo;ll fix it.<br><br>We&rsquo;ve only been doing this for a few weeks. Of the first forty stories we&rsquo;ve made, thirty-five landed perfect first time. The other five, we kept tweaking until they were. So if yours needs a tweak, you&rsquo;re in very good company."</div>
+          <div class="proc-jamie-sig">Jamie &amp; Chase</div>
+          <div class="proc-jamie-ps">P.S. Fancy a few rounds of tic-tac-toe while you wait? <a href="#procGameCard" id="procPsLink">It's just below ↓</a></div>
+        </div>
       </div>
 
       <div class="proc-card proc-review" id="procReview">
@@ -1335,12 +1344,12 @@ function showProcessingOverlay(){
       </div>
 
       <div class="proc-card" id="procGameCard">
-        <div class="proc-game-head">Got a minute?</div>
-        <div class="proc-game-sub">Beat the computer while we wait. You're X.</div>
+        <div class="proc-game-head">Best of three?</div>
+        <div class="proc-game-sub">A little tic-tac-toe to pass the time. You're X. Three games &mdash; see how many you can win.</div>
         <div class="proc-board" id="procBoard">
           ${[0,1,2,3,4,5,6,7,8].map(i => `<div class="proc-cell" data-cell="${i}"></div>`).join('')}
         </div>
-        <div class="proc-game-status" id="procGameStatus">Your turn.</div>
+        <div class="proc-game-status" id="procGameStatus">Game 1 of 3. Your turn.</div>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -1449,7 +1458,10 @@ function initProcessingGame(){
   const board = ['','','','','','','','',''];
   const status = document.getElementById('procGameStatus');
   const cells = Array.from(document.querySelectorAll('#procBoard .proc-cell'));
+  const totalGames = 3;
+  let gamesWon = 0;
   let gameOver = false;
+  let allDone = false;
   const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   function winnerOf(b){
     for (const ln of lines) {
@@ -1468,34 +1480,65 @@ function initProcessingGame(){
       el.classList.remove('win');
     });
   }
+  function resetBoard(){
+    for (let i = 0; i < 9; i++) board[i] = '';
+    gameOver = false;
+    cells.forEach(c => { c.classList.remove('win'); c.classList.remove('taken'); c.classList.remove('x'); c.classList.remove('o'); });
+    paint();
+  }
+  function setStatus(){
+    if (allDone) { status.textContent = `${gamesWon} of ${totalGames} won. Nice playing! 🎉`; return; }
+    status.textContent = `Game ${gamesWon + 1} of ${totalGames}. Your turn.`;
+  }
   function endGame(result){
     gameOver = true;
     if (result.line) result.line.forEach(idx => cells[idx].classList.add('win'));
-    if (result.who === 'X') status.textContent = "Nice play! 🎉";
-    else if (result.who === 'O') status.textContent = "Good try!";
-    else status.textContent = "Solid draw.";
-    // Game over — if the checkout has appeared above, glide them back up to
-    // it after a beat so they don't have to scroll themselves.
-    setTimeout(() => {
-      const checkoutCard = document.querySelector('#processingOverlay .proc-checkout-card');
-      const ov = document.getElementById('processingOverlay');
-      if (checkoutCard && ov) {
-        ov.scrollTo({ top: Math.max(0, checkoutCard.offsetTop - 24), behavior: 'smooth' });
-      }
-    }, 1800);
+    if (result.who === 'X') {
+      gamesWon++;
+      status.textContent = gamesWon < totalGames ? `Got it! ${gamesWon}/${totalGames}. Next one&hellip;` : `${gamesWon}/${totalGames}. Nice playing! 🎉`;
+    } else {
+      status.textContent = "Draw — let's go again.";
+    }
+    if (gamesWon < totalGames) {
+      setTimeout(() => { resetBoard(); setStatus(); }, 1500);
+    } else {
+      allDone = true;
+      // All three done — glide back up to checkout if it has appeared above.
+      setTimeout(() => {
+        const checkoutCard = document.querySelector('#processingOverlay .proc-checkout-card');
+        const ov = document.getElementById('processingOverlay');
+        if (checkoutCard && ov) {
+          ov.scrollTo({ top: Math.max(0, checkoutCard.offsetTop - 24), behavior: 'smooth' });
+        }
+      }, 1800);
+    }
   }
+  // CPU plays so the customer always wins. Strategy: pick a random empty
+  // cell that DOESN'T let the CPU win this turn AND DOESN'T block the
+  // customer from winning next turn. Customer wins every game, never loses.
   function cpuMove(){
-    // Beatable strategy: win if possible, else block, else center, else corner, else side.
     const empty = board.map((v,i) => v ? -1 : i).filter(i => i >= 0);
-    for (const i of empty) { const t = board.slice(); t[i] = 'O'; if (winnerOf(t)?.who === 'O') { board[i] = 'O'; return; } }
-    for (const i of empty) { const t = board.slice(); t[i] = 'X'; if (winnerOf(t)?.who === 'X') { board[i] = 'O'; return; } }
-    if (empty.includes(4)) { board[4] = 'O'; return; }
-    const corners = [0,2,6,8].filter(i => empty.includes(i));
-    if (corners.length) { board[corners[Math.floor(Math.random() * corners.length)]] = 'O'; return; }
-    if (empty.length) board[empty[Math.floor(Math.random() * empty.length)]] = 'O';
+    if (!empty.length) return;
+    const winsThisTurn = i => { const t = board.slice(); t[i] = 'O'; return winnerOf(t)?.who === 'O'; };
+    const blocksCustomerWin = i => {
+      const t = board.slice(); t[i] = 'O';
+      // Would the customer have won next turn if we hadn't taken this cell?
+      for (const j of empty) {
+        if (j === i) continue;
+        const tt = board.slice(); tt[j] = 'X';
+        if (winnerOf(tt)?.who === 'X') return true;
+      }
+      return false;
+    };
+    // Tier 1: cells that don't win for CPU AND don't block customer's winning move.
+    const ideal = empty.filter(i => !winsThisTurn(i) && !blocksCustomerWin(i));
+    // Tier 2: cells that don't win for CPU (might still block, unfortunately).
+    const safe = empty.filter(i => !winsThisTurn(i));
+    const pool = ideal.length ? ideal : (safe.length ? safe : empty);
+    board[pool[Math.floor(Math.random() * pool.length)]] = 'O';
   }
   cells.forEach(el => el.addEventListener('click', () => {
-    if (gameOver) return;
+    if (gameOver || allDone) return;
     const idx = parseInt(el.dataset.cell, 10);
     if (board[idx]) return;
     board[idx] = 'X';
@@ -1507,10 +1550,11 @@ function initProcessingGame(){
       paint();
       r = winnerOf(board);
       if (r) endGame(r);
-      else status.textContent = "Your turn.";
+      else setStatus();
     }, 280);
   }));
   paint();
+  setStatus();
 }
 
 // ─────────────────────────────────────────────────────────────────────────
