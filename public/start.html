@@ -1014,12 +1014,50 @@ try { history.replaceState({ step: 0 }, '', window.location.href); } catch (_) {
 // ─────────────────────────────────────────────────────────────────────────
 
 const PROCESSING_REVIEWS = [
-  { name:'Siobhan H.', loc:'Ireland', title:'I cried listening to this',
-    body:"I had a story made for my four grandchildren and their dog. From the moment it began, their faces lit up with pure joy. When I listened to the finished story, I actually cried. The care and personal attention were beyond anything I expected." },
-  { name:'Angelina M.', loc:'Canada', title:'My 5-year-old absolutely loved this',
-    body:"He lit up every time the story mentioned his name, his favourite toy, his bestie, like he was surprised each time. We listened to it 3 times within 2 hours. He even asked to listen again before school." },
-  { name:'Robin M.', loc:'Canada', title:"Wow! Nephew's birthday",
-    body:"We had a story made for my nephew's birthday and got the family together to listen. The grandparents had giggles and happy tears. When the kids heard their names, eyes got WIDE, like total shock." }
+  {
+    initials:'SH', avatarColor:'#D87A3E', name:'Siobhan Holmes', loc:'IE', count:'15 reviews', date:'A day ago',
+    title:'"I Cried Listening to This… Absolutely Magical 💛"',
+    paras:[
+      "I cannot recommend Heartheirname highly enough!",
+      "I recently had a personalised story created featuring my four grandchildren and their beloved dog, Gucci, as the main characters, and I was completely blown away. From the moment the story began and the children heard their own names woven throughout the adventure, their faces lit up with pure excitement and joy. It was absolutely magical.",
+      "What made the experience even more special was Jamie, the owner. His customer service was exceptional from start to finish. He stayed in constant contact, checked in regularly, and genuinely wanted to make sure every detail was perfect. Nothing was too much trouble. If I wanted anything changed or added, he did it willingly and with such kindness.",
+      "When I listened to the finished story, I actually cried. It was that beautiful. The care, creativity, and personal attention that went into it were beyond anything I expected.",
+      "If you're looking for a truly meaningful, unique gift that children (and grandparents!) will treasure, this is it. Heartheirname has created something really special, and I sincerely hope this business thrives because talent and customer care like this deserve every success."
+    ]
+  },
+  {
+    initials:'RM', avatarColor:'#6F8A4F', name:'Robin Mryglod', loc:'CA', count:'1 review', date:'Apr 25, 2026',
+    title:"Wow! Nephew's Birthday",
+    paras:[
+      "Had a story created for my nephews birthday. We got all of our family together for it. All of the kids absolutely loved it. The teenagers want to make them for their friend groups. The grandparents had giggles and even some happy tears in eyes. When kids heard their names eyes got WIDE-like total shock. Amazing idea! Thank you so much! Haha probably going to create more!"
+    ]
+  },
+  {
+    initials:'AM', avatarColor:'#B89149', name:'Angelina McInnis', loc:'CA', count:'1 review', date:'Apr 23, 2026',
+    title:'My 5 year old absolutely loved this',
+    paras:[
+      "My 5 year old absolutely loved this. He lit up every time the story mentioned his name, then his favorite toy, his bestie, it was like he was surprised each time. We listened to it 3 times within 2 hours.",
+      "We did the adventure one, but our story ended with him going to bed, which helped me put him to sleep as well.",
+      "10/10 would recommend. He even asked to listen to it again before school this morning so I know what we will be doing once he is home 😊"
+    ]
+  },
+  {
+    initials:'KE', avatarColor:'#4B2E83', name:'Kelsey', loc:'CA', count:'1 review', date:'Apr 21, 2026',
+    title:'I loved every bit of this',
+    paras:[
+      "I loved every bit of this, it brought me to tears listening to the story come to life. Thank you for making my boys feel just that much more special. The story that was made me my family couldn't of been more perfect, and I'm looking forward to playing it for my boys and waiting to see how they will react hearing a story about them and their dog. Thank you for everything you and your son do."
+    ]
+  },
+  {
+    initials:'MA', avatarColor:'#E0B7A0', name:'Maxine', loc:'GB', count:'12 reviews', date:'Apr 14, 2026',
+    title:'My grandson absolutely loved this',
+    paras:[
+      "My grandson absolutely loved this. From the very beginning, he was completely captivated. Hearing his own name woven into the story, alongside his friends, family members, and even the family pet, made the whole adventure feel incredibly personal and magical for him.",
+      "The look on his face when he realised the story was about him was just priceless. He was smiling, laughing, and fully engaged the entire time, which is something you can't always guarantee with him. It really held his attention and sparked his imagination in such a lovely way.",
+      "What made it even more special was how excited he was to hear familiar names pop up throughout the story it made him feel like the hero of his own little world. It's such a unique concept and so thoughtfully put together.",
+      "For me, just watching his joy and hearing his laughter made it completely worthwhile. It's not just a story, it's an experience and a memory we'll treasure. I would highly recommend this to anyone looking for something a little bit different and truly special for a child."
+    ]
+  }
 ];
 const PROCESSING_TOTAL_MS = 20000;
 const PROCESSING_CHECKOUT_FIRE_AT = 13000;
@@ -1219,15 +1257,20 @@ function showProcessingOverlay(){
         font-style:italic;letter-spacing:-.005em}
       .proc-jamie-sig{font-family:var(--hand);font-size:30px;color:var(--terra);line-height:1;
         margin-top:14px;text-align:right}
-      .proc-review{position:relative}
-      .proc-review-tp{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-      .proc-review-stars{color:#00B67A;letter-spacing:.08em;font-size:18px;line-height:1}
-      .proc-review-tp-label{font-size:11px;font-weight:600;letter-spacing:.05em;color:rgba(31,27,46,.55);
-        text-transform:uppercase}
-      .proc-review-title{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--plum);
-        margin-bottom:8px;line-height:1.3}
-      .proc-review-body{font-size:14.5px;line-height:1.6;color:rgba(31,27,46,.78);font-style:italic}
-      .proc-review-author{margin-top:12px;font-size:13px;color:rgba(31,27,46,.6);font-weight:500}
+      .proc-review{position:relative;padding:22px 22px 18px;background:#fff;border:1px solid rgba(31,27,46,.08);box-shadow:0 12px 32px -22px rgba(31,27,46,.3)}
+      .proc-tp-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+      .proc-tp-avatar{flex:0 0 44px;width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--sans);font-size:14px;font-weight:700;letter-spacing:.04em}
+      .proc-tp-meta{flex:1;min-width:0}
+      .proc-tp-name{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--ink);line-height:1.2}
+      .proc-tp-sub{font-family:var(--sans);font-size:12px;color:rgba(31,27,46,.55);margin-top:2px}
+      .proc-tp-date{font-family:var(--sans);font-size:12px;color:rgba(31,27,46,.5);flex-shrink:0;align-self:flex-start;padding-top:3px}
+      .proc-tp-stars{display:flex;gap:3px;margin-bottom:10px}
+      .tp-star{display:block}
+      .proc-tp-title{font-family:var(--sans);font-size:15.5px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.35}
+      .proc-tp-body{font-family:var(--sans);font-size:14px;line-height:1.65;color:rgba(31,27,46,.82)}
+      .proc-tp-body p{margin:0 0 10px}
+      .proc-tp-body p:last-child{margin-bottom:0}
+      .proc-tp-verified{display:inline-flex;align-items:center;gap:5px;margin-top:14px;font-size:11px;font-weight:600;letter-spacing:.04em;color:#00B67A;text-transform:uppercase}
       .proc-review-fade{animation:reviewFade .55s ease-out}
       @keyframes reviewFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
       .proc-game-head{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--plum);
@@ -1352,27 +1395,38 @@ function initProcessingReviews(){
   const node = document.getElementById('procReview');
   if (!node) return;
   // Siobhan (index 0) is the headline review and stays visible for the first
-  // 15 seconds. After that, rotate through the others every 7.5 seconds.
+  // 15 seconds. After that, rotate through the others every 9 seconds.
   let i = 0;
+  const star = `<svg class="tp-star" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="2" fill="#00B67A"/><path d="M12 4.5l2.06 4.46 4.91.5-3.7 3.32 1.06 4.82L12 14.95 7.67 17.6l1.06-4.82-3.7-3.32 4.91-.5L12 4.5z" fill="#fff"/></svg>`;
+  const stars = `<div class="proc-tp-stars" aria-label="5 out of 5 stars">${star.repeat(5)}</div>`;
   const paint = () => {
     const r = PROCESSING_REVIEWS[i % PROCESSING_REVIEWS.length];
     node.classList.remove('proc-review-fade');
     void node.offsetWidth;
+    const body = r.paras.map(p => `<p>${esc(p)}</p>`).join('');
     node.innerHTML = `
-      <div class="proc-review-tp">
-        <span class="proc-review-stars">★★★★★</span>
-        <span class="proc-review-tp-label">Verified Trustpilot review</span>
+      <div class="proc-tp-head">
+        <div class="proc-tp-avatar" style="background:${esc(r.avatarColor)}">${esc(r.initials)}</div>
+        <div class="proc-tp-meta">
+          <div class="proc-tp-name">${esc(r.name)}</div>
+          <div class="proc-tp-sub">${esc(r.loc)} &middot; ${esc(r.count)}</div>
+        </div>
+        <div class="proc-tp-date">${esc(r.date)}</div>
       </div>
-      <div class="proc-review-title">${esc(r.title)}</div>
-      <div class="proc-review-body">"${esc(r.body)}"</div>
-      <div class="proc-review-author">— ${esc(r.name)}, ${esc(r.loc)}</div>`;
+      ${stars}
+      <div class="proc-tp-title">${esc(r.title)}</div>
+      <div class="proc-tp-body">${body}</div>
+      <div class="proc-tp-verified">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        Verified Trustpilot review
+      </div>`;
     node.classList.add('proc-review-fade');
     i++;
   };
   paint(); // Siobhan shows immediately
   setTimeout(() => {
-    paint(); // first rotation at 15s → Angelina
-    setInterval(paint, 7500); // then every 7.5s
+    paint(); // first rotation at 15s
+    setInterval(paint, 9000); // then every 9 seconds (some reviews are long)
   }, 15000);
 }
 
