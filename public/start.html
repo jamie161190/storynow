@@ -1174,12 +1174,15 @@ async function mountEmbeddedCheckout({ clientSecret, publishableKey }){
   const headEye = wrap.querySelector('.proc-head .proc-head-eye');
   if (head) head.textContent = 'Your secure checkout, right here.';
   if (headEye) headEye.textContent = 'Ready when you are';
-  // Remove the game card.
+  // Remove the game card. The P.S. in Jamie's note pointed at it, so kill
+  // that line too — no orphan link to a card that no longer exists.
   const cards = wrap.querySelectorAll('.proc-card');
   if (cards.length) {
     const last = cards[cards.length - 1];
     if (last && last.querySelector('#procBoard')) last.remove();
   }
+  const ps = wrap.querySelector('.proc-jamie-ps');
+  if (ps) ps.remove();
   // Insert the checkout card just below the queue card.
   const checkoutCard = document.createElement('div');
   checkoutCard.className = 'proc-card proc-checkout-card';
@@ -1483,6 +1486,15 @@ function initProcessingGame(){
     if (result.who === 'X') status.textContent = "Nice play! 🎉";
     else if (result.who === 'O') status.textContent = "Good try!";
     else status.textContent = "Solid draw.";
+    // Game over — if the checkout has appeared above, glide them back up to
+    // it after a beat so they don't have to scroll themselves.
+    setTimeout(() => {
+      const checkoutCard = document.querySelector('#processingOverlay .proc-checkout-card');
+      const ov = document.getElementById('processingOverlay');
+      if (checkoutCard && ov) {
+        ov.scrollTo({ top: Math.max(0, checkoutCard.offsetTop - 24), behavior: 'smooth' });
+      }
+    }, 1800);
   }
   function cpuMove(){
     // Beatable strategy: win if possible, else block, else center, else corner, else side.
