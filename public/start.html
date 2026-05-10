@@ -265,14 +265,9 @@ const STEPS = [
               ${state.data.children.length > 1 ? `<button type="button" class="child-card-remove" data-action="removeChild" data-i="${i}">Remove</button>` : ''}
             </div>
             <input class="txt" placeholder="Their name" value="${esc(c.name)}" data-action="updateChild" data-i="${i}" data-k="name" style="margin-bottom:10px">
-            <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px">
-              <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:4px">
-                <input class="txt" type="number" inputmode="numeric" min="0" max="17" placeholder="Age" value="${esc(c.age)}" data-action="updateChild" data-i="${i}" data-k="age" style="width:110px;text-align:center;font-size:18px;padding:12px 10px">
-                <div class="field-hint" style="margin:0;text-align:center;font-size:11px">years old</div>
-              </div>
-              <div class="field-hint" style="flex:1;margin:0;padding-top:6px;line-height:1.5">
-                Helps us pitch the reading level just right. A 4-year-old gets simpler words and shorter sentences; a 12-year-old gets richer ones.
-              </div>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+              <input class="txt" type="number" inputmode="numeric" min="0" max="17" placeholder="Age" value="${esc(c.age)}" data-action="updateChild" data-i="${i}" data-k="age" style="width:110px;text-align:center;font-size:18px;padding:12px 10px">
+              <div class="field-hint" style="margin:0;font-size:13px">years old</div>
             </div>
             <div class="grid-3">
               ${PRONOUNS.map(p => `<button type="button" class="chip" data-on="${c.pronouns === p}" data-action="updateChild" data-i="${i}" data-k="pronouns" data-v="${esc(p)}" style="padding:10px 6px;font-size:12px">${p}</button>`).join('')}
@@ -280,6 +275,9 @@ const STEPS = [
           </div>
         `).join('')}
         ${state.data.children.length < 4 ? `<button type="button" class="btn btn--ghost btn--sm" data-action="addChild" style="align-self:center">＋ Add another child</button>` : ''}
+        <div class="field-hint" style="text-align:center;max-width:480px;margin:6px auto 0;line-height:1.55;font-size:13px">
+          We'll adapt the story to each child's age. Younger ones get simpler words and shorter sentences, older ones get richer language. With more than one child, we pitch it so it works for all of them.
+        </div>
       </div>` },
 
   { key:'themes', title:"What's the story about?", sub:"Pick as many as you like. These shape the whole story.",
