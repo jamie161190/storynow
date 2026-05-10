@@ -285,7 +285,7 @@ const STEPS = [
         </div>
       </div>` },
 
-  { key:'world', title:"Their world.", sub:"All optional. Tap anything that fits, or leave it blank and Jamie will choose based on everything else you've told us.",
+  { key:'world', title:"Their world.", sub:"All optional. Tap anything that fits, or leave it blank and we'll choose based on everything else you've told us.",
     valid: () => true,
     render: () => {
       const childLabel = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
@@ -353,7 +353,7 @@ const STEPS = [
               <input class="txt" placeholder="${esc(childPossessive(c, i))} sidekick (optional)" value="${esc(c.bestFriend || '')}" data-action="updateChild" data-i="${i}" data-k="bestFriend">
             `).join('')}
           </div>
-          <div class="field-hint">Can be a best friend, a sibling, you, a granny, a pet, anyone close to them. Whoever you put here gets a prominent role in the story, with real dialogue and a moment that's just theirs.</div>
+          <div class="field-hint">Can be a best friend, a sibling, you, a granny, a pet, anyone close to them. Whoever you put here gets a prominent role in the story.</div>
         </div>
 
         <div>
@@ -455,7 +455,6 @@ const STEPS = [
               </div>
               <div class="kicker" style="margin-top:6px;margin-bottom:0">OR INVENT YOUR OWN</div>
               <input class="txt" placeholder="e.g. Captain Stinkfeet, big sister Mia in boss mode, the Broccoli Beast, Granny&rsquo;s spider-hand" value="${esc(VILLAINS.some(([,t]) => t === state.data.villainName) ? '' : state.data.villainName)}" data-action="setVillainName">
-              <div class="field-hint">Pick one above or type your own. The family in-jokes work brilliantly. They cause cheeky trouble. Your child always saves the day.</div>
             </div>` : ''}
         </div>` : ''}
 
@@ -752,9 +751,9 @@ function renderEmailStep(){
       <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px">
         ${[
           ['☕',"In a moment, you&rsquo;ll be paying right here on this page (no redirects, no faff)."],
-          ['✍️','Jamie sits at his desk and writes your story by hand. He listens it back before it goes anywhere.'],
+          ['✍️',"We&rsquo;ll take everything you&rsquo;ve told us, every name, every detail, every little moment, and weave it all into a story that&rsquo;s only theirs."],
           ['📬','It lands in your inbox within 24 hours, often much sooner.'],
-          ['💛','If anything isn&rsquo;t quite right when you hear it, just tell Jamie. He&rsquo;ll tweak that exact bit until it&rsquo;s perfect. Not the whole thing. Just the bit.'],
+          ['💛','If anything isn&rsquo;t quite right when you hear it, just let us know. We&rsquo;ll tweak those exact bits. Not the whole thing. Just the bits.'],
           ['🌙','Then it&rsquo;s theirs forever. Replay it, share it with grandparents, treasure it.']
         ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.55">${t}</span></li>`).join('')}
       </ul>
