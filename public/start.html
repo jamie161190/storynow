@@ -198,7 +198,7 @@ const VOICES = [
 function ageNum(v){ const n = parseInt(v, 10); return Number.isFinite(n) && n >= 0 && n <= 17 ? n : null; }
 const PRONOUNS = ['She / her','He / him','They / them'];
 
-function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'' }; }
+function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'', proudOf:'', wantToBe:'' }; }
 
 // If the customer typed their child's name on the homepage cover-tryon
 // before clicking through, the homepage appended ?name=Chase so the funnel
@@ -223,6 +223,7 @@ const state = {
     themes: [], themesOther: '',
     place: '', placeReal: '',
     quirk: '',
+    bedtimeRitual: '',
     voice: '',
     isGift: STARTS_AS_GIFT || STARTS_AS_GIFTCARD,
     isGiftCard: STARTS_AS_GIFTCARD,
@@ -295,7 +296,7 @@ const STEPS = [
       <input class="txt" placeholder="e.g. Minecraft, ballet, cooking, classic cars" value="${esc(state.data.themesOther)}" data-action="setThemesOther">
 
       <div style="margin-top:28px;padding-top:24px;border-top:1px dashed var(--line)">
-        <div class="kicker" style="margin-bottom:6px">${multi ? "WHAT'S EACH OF THEM REALLY INTO RIGHT NOW?" : "WHAT'S SOMETHING THEY'RE REALLY INTO RIGHT NOW?"}</div>
+        <div class="kicker" style="margin-bottom:6px">${multi ? "WHAT'S EACH OF THEM REALLY INTO RIGHT NOW? (OPTIONAL)" : "WHAT'S SOMETHING THEY'RE REALLY INTO RIGHT NOW? (OPTIONAL)"}</div>
         <div class="field-hint" style="margin:0 0 14px;line-height:1.55">A club they go to, a sport, a hobby, the thing they can't stop talking about. We'll weave it right into the story so they recognise themselves straight away.</div>
         <div style="display:flex;flex-direction:column;gap:10px">
           ${state.data.children.map((c, i) => `
@@ -369,6 +370,56 @@ const STEPS = [
               <input class="txt" placeholder="Pet's name" value="${esc(state.data.petName)}" data-action="setPetName">
             </div>` : ''}
         </div>
+      </div>`;
+    } },
+
+  { key:'little-things', title:"The little things only you'd notice.", sub:"All optional. The more you tell us, the more it'll sound like them.",
+    valid: () => true,
+    render: () => {
+      const childLabel = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
+      const isAdventure = state.data.storyKind === 'adventure';
+      const isBedtime = state.data.storyKind === 'bedtime';
+      const childPiece = (c, i, k, kicker, hint, ph) => `
+        <div>
+          <div class="field-label">${kicker}</div>
+          <input class="txt" placeholder="${esc(ph)}" value="${esc(c[k] || '')}" data-action="updateChild" data-i="${i}" data-k="${esc(k)}">
+          ${hint ? `<div class="field-hint" style="margin-top:6px;line-height:1.55">${hint}</div>` : ''}
+        </div>`;
+      return `
+      <div style="display:flex;flex-direction:column;gap:22px">
+
+        <div>
+          <div class="kicker" style="margin-bottom:4px">WHAT DO YOU CALL THEM? (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">The little name only you (and maybe Granny) use. We'll have the narrator slip it in once for a stop-everything moment. Leave blank if there isn't one.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${state.data.children.map((c, i) => childPiece(c, i, 'nickname', `WHAT DO YOU CALL ${esc(childLabel(c, i).toUpperCase())}? (OPTIONAL)`, '', 'e.g. Olly, Bug, Monkey, Mate, Sunshine')).join('')}
+          </div>
+        </div>
+
+        <div>
+          <div class="kicker" style="margin-bottom:4px">A SMALL THING THEY'RE PROUD OF RIGHT NOW (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">A new skill, a small win, something they figured out lately. The story can quietly mirror it as a moment of pride for them.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${state.data.children.map((c, i) => childPiece(c, i, 'proudOf', `WHAT ${esc(childLabel(c, i).toUpperCase())} IS PROUD OF (OPTIONAL)`, '', 'e.g. learning to ride without stabilisers, can write her name, just got moved up at swimming')).join('')}
+          </div>
+        </div>
+
+        ${isAdventure ? `
+        <div>
+          <div class="kicker" style="margin-bottom:4px">WHAT DO THEY WANT TO BE WHEN THEY GROW UP? (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">Whatever they say right now. The story can give them a glimpse of it.</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${state.data.children.map((c, i) => childPiece(c, i, 'wantToBe', `${esc(childLabel(c, i).toUpperCase())} WANTS TO BE (OPTIONAL)`, '', 'e.g. firefighter, vet, professional Lego builder, mermaid')).join('')}
+          </div>
+        </div>` : ''}
+
+        ${isBedtime ? `
+        <div>
+          <div class="field-label">YOUR BEDTIME RITUAL (OPTIONAL)</div>
+          <textarea class="txt" rows="2" placeholder="e.g. I sing You Are My Sunshine, we do three breaths together, she says goodnight to the moon, three kisses then the cuddle toy" data-action="setBedtimeRitual">${esc(state.data.bedtimeRitual || '')}</textarea>
+          <div class="field-hint" style="margin-top:6px;line-height:1.55">The thing you do every night. The story can settle into it as the closing scene.</div>
+        </div>` : ''}
+
       </div>`;
     } },
 
@@ -608,6 +659,20 @@ function buildReviewCards(){
     .filter(c => c.intoNow && c.intoNow.trim())
     .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.intoNow.trim())}`);
 
+  const nicknameLines = d.children
+    .filter(c => c.nickname && c.nickname.trim())
+    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.nickname.trim())}`);
+
+  const proudOfLines = d.children
+    .filter(c => c.proudOf && c.proudOf.trim())
+    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.proudOf.trim())}`);
+
+  const wantToBeLines = d.children
+    .filter(c => c.wantToBe && c.wantToBe.trim())
+    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.wantToBe.trim())}`);
+
+  const bedtimeRitualLine = (d.bedtimeRitual && d.bedtimeRitual.trim()) ? esc(d.bedtimeRitual.trim()) : '';
+
   const voiceLine = d.voice ? `🎙 <strong>${esc(d.voice)}</strong>` : '';
 
   const giftLines = [];
@@ -628,6 +693,10 @@ function buildReviewCards(){
     intoNowLines.length ? card('Really into right now', 'themes', intoNowLines) : '',
     card('Where it takes place', 'place', placeBits.map(t => esc(t))),
     card('Who’s in it', 'casting', castingLines),
+    nicknameLines.length ? card('What you call them', 'little-things', nicknameLines) : '',
+    proudOfLines.length ? card('Proud of right now', 'little-things', proudOfLines) : '',
+    wantToBeLines.length ? card('Wants to be', 'little-things', wantToBeLines) : '',
+    bedtimeRitualLine ? card('Your bedtime ritual', 'little-things', [bedtimeRitualLine]) : '',
     villainLine ? card('The baddie', 'villain', [villainLine]) : '',
     card('Tiny details', 'quirks', quirkLines),
     card('Storyteller', 'voice', [voiceLine]),
@@ -797,6 +866,7 @@ function handleAction(action, el, e){
     case 'toggleVillain': state.data.hasVillain = !state.data.hasVillain; render(); break;
     case 'setVillainName': state.data.villainName = el.value; break;
     case 'setQuirk': state.data.quirk = el.value; break;
+    case 'setBedtimeRitual': state.data.bedtimeRitual = el.value; break;
     case 'setVoice': state.data.voice = v; render(); break;
     case 'setIsGift': state.data.isGift = (v === 'true'); render(); break;
     case 'setGiftFrom': state.data.giftFrom = el.value; break;

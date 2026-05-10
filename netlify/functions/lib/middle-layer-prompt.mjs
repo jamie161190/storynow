@@ -120,6 +120,18 @@ When MULTIPLE children each have an intoNow, the spine should bring their intere
 
 If intoNow is empty for a child, fall back to the standard interpretation of \`themes\` and \`themesOther\`.
 
+**THREE FURTHER per-child inputs from "the little things only you'd notice" step:**
+
+- \`children[i].nickname\` — the family pet name for this child (e.g. "Bug", "Olly", "Monkey", "Sunshine"). When present, this is gold. Use it ONCE in the story for a stop-everything emotional hit, ideally at a moment of warmth (a cuddle, a hand on the back, a parent voice from another room). Never overuse: more than once and the magic dies. Surface it in the child's \`portrait\` and in the new \`children[i].nickname\` output field. The writer's job is to know WHEN to drop it.
+
+- \`children[i].proudOf\` — a real recent breakthrough or small win for this child (e.g. "learning to ride without stabilisers", "can write her name", "just got moved up at swimming"). Treat as the EMOTIONAL TARGET of the story arc for this child: the protagonist should have a moment in the story that mirrors this real-life pride. Never name the real-life thing literally in prose — instead, build a parallel beat inside the story (the child does something brave, masters something, reaches a milestone) that lands the same feeling. Surface in \`portrait\` and in new \`children[i].proud_moment\` output field.
+
+- \`children[i].wantToBe\` — what the child currently says they want to be when they grow up (e.g. "firefighter", "vet", "mermaid"). Adventure stories only (this field will be empty for bedtime). When present, the climax can give the child a glimpse of being that thing already, inside the story (the firefighter saves the day, the vet calms a frightened animal, the mermaid breathes underwater). Surface in \`portrait\` and in new \`children[i].future_self\` output field.
+
+**ONE further top-level input:**
+
+- \`bedtimeRitual\` — what the parent does every night with the child (e.g. "I sing You Are My Sunshine", "we do three breaths together", "she says goodnight to the moon"). Bedtime stories only. Treat as the CLOSING SCENE: the story ends settling into a beat that echoes this ritual, so the audio finish lands on the same feeling as the real bedtime. Preserve the parent's specifics. Surface in new top-level \`bedtime_ritual\` output field for the writer.
+
 **Resolution rule:** Per-child \`quirk\` (when present) belongs to that specific child and should be woven into THEIR portrait and their scenes. Top-level \`extraDetails\` may apply to one child, multiple, or all — read carefully and attribute correctly.
 
 **QUIRK TYPE CLASSIFICATION:** Quirks come in three textures, and they want different narrative weighting from the writer. When you populate \`children[i].quirk\` and \`character_texture\`, label each quirk with its type so the writer knows how to handle it:
@@ -256,7 +268,10 @@ Return ONLY valid JSON, no preamble, no explanation, no markdown fences.
       "comfort_item": "string or null: THIS child's comfort toy/item, drawn from per-child favTeddy (preferred) or correctly attributed slice of top-level favTeddy. Preserve specificity. Null if neither input mentions one for this child.",
       "quirk": "string or null: THIS child's specific quirk, drawn from per-child quirk (preferred) or the correctly attributed slice of top-level extraDetails. Null if neither input mentions one.",
       "quirk_type": "string or null: one of 'catchphrase' | 'pattern' | 'habit', classifying the quirk above so the writer knows how to weight it. Null if quirk is null.",
-      "core_interest": "string or null: THIS child's intoNow value (the thing they're really into right now — a club, sport, hobby, obsession). LOAD-BEARING: when present, the writer should treat this as the spine of the story for this child. Preserve the parent's specificity (e.g. 'football on Saturday mornings' not just 'football'). Null only if the parent left intoNow empty for this child."
+      "core_interest": "string or null: THIS child's intoNow value (the thing they're really into right now — a club, sport, hobby, obsession). LOAD-BEARING: when present, the writer should treat this as the spine of the story for this child. Preserve the parent's specificity (e.g. 'football on Saturday mornings' not just 'football'). Null only if the parent left intoNow empty for this child.",
+      "nickname": "string or null: THIS child's family pet name from per-child nickname input. Used ONCE in the story for a stop-everything emotional moment. Null if no nickname provided. Preserve exact spelling and capitalisation.",
+      "proud_moment": "string or null: a recent real-life breakthrough this child is proud of, from per-child proudOf input. NOT to be named literally in the story — instead, the writer constructs a parallel in-story beat that mirrors the same feeling of pride. Null if no proudOf provided.",
+      "future_self": "string or null: what THIS child currently wants to be when they grow up, from per-child wantToBe input. Adventure stories: the climax can give them a glimpse of being that thing already inside the story. Null for bedtime stories or if no wantToBe provided."
     }
   ],
   "household": {
@@ -290,6 +305,7 @@ Return ONLY valid JSON, no preamble, no explanation, no markdown fences.
     "beat": "1-2 sentences DESCRIBING the single concrete unresolved moment that lands at the ~290-word mark. Image-led, physical, specific. NOT a story-voice line — describe the beat as a director would describe a shot. The writer will construct the prose.",
     "archetype": "One of: 'threshold' | 'naming' | 'object_that_shouldnt_be' | 'glimpse' | 'choice' | 'voice_that_knows'"
   },
+  "bedtime_ritual": "string or null: the parent's described bedtime ritual from top-level bedtimeRitual input. Bedtime stories only. The CLOSING SCENE of the story should settle into a beat that echoes this ritual so the audio ends on the same feeling as their real bedtime. Preserve the parent's specifics. Null for adventure stories or if no bedtimeRitual provided.",
   "tone": "One sentence: what the story should feel like emotionally (e.g. 'gentle and rhythmic, winding toward sleep', 'fast and funny with warmth underneath').",
   "age_guidance": "One sentence on pacing, vocabulary, and sentence structure for this age range.",
   "character_texture": ["Array of specific quirks, habits, catchphrases, or likes from extras that should appear naturally in the story"],

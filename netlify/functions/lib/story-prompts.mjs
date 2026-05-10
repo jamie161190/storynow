@@ -21,7 +21,7 @@ export function sanitiseStoryData(d) {
   const s = { ...d };
   const textFields = ['childName', 'friendName', 'sidekickName', 'petName', 'petType', 'favTeddy',
     'villainName', 'familyMembers', 'teacherName', 'interest', 'themeDetail', 'setting',
-    'extraDetails', 'personalMessage', 'customTheme', 'customWhere'];
+    'extraDetails', 'personalMessage', 'customTheme', 'customWhere', 'bedtimeRitual'];
   for (const f of textFields) {
     if (s[f]) s[f] = sanitiseInput(s[f]);
   }
@@ -34,7 +34,10 @@ export function sanitiseStoryData(d) {
       bestFriend: c.bestFriend ? sanitiseInput(c.bestFriend) : c.bestFriend,
       favTeddy: c.favTeddy ? sanitiseInput(c.favTeddy) : c.favTeddy,
       quirk: c.quirk ? sanitiseInput(c.quirk) : c.quirk,
-      intoNow: c.intoNow ? sanitiseInput(c.intoNow) : c.intoNow
+      intoNow: c.intoNow ? sanitiseInput(c.intoNow) : c.intoNow,
+      nickname: c.nickname ? sanitiseInput(c.nickname) : c.nickname,
+      proudOf: c.proudOf ? sanitiseInput(c.proudOf) : c.proudOf,
+      wantToBe: c.wantToBe ? sanitiseInput(c.wantToBe) : c.wantToBe
     }));
   }
   return s;
@@ -127,6 +130,10 @@ The brief has the following structure, and here is how each field should be trea
   **HARD RULE — per-child best friends must arrive on stage at least once.** If a child has a per-child best_friend named in the brief, that friend MUST appear with at least one line of dialogue OR at least one specific action of their own (handing something over, pulling at a sleeve, laughing at something) somewhere in the story. Naming them in passing or only in memory does not count as arriving. Arriving in the final paragraph is fine if they were planted earlier. Skipping a per-child best_friend is the most common rule violation in this product — do not skip any. If the cast budget genuinely cannot fit them all, surface that constraint by giving the harder-to-place friends shorter but real arrivals (one line, one action) rather than dropping them entirely.
 - children[i].comfort_item (optional): THIS child's comfort toy/item. When present, weave it naturally into scenes with this child — it travels with them, sits beside them, gets noticed in a quiet moment. Do not invent details (colour, size, breed) the brief did not give. Different children have different items: honour each one separately, never substitute one child's item for another.
 - children[i].core_interest (optional but LOAD-BEARING when present): the thing THIS child is really into right now (a club, sport, hobby, obsession). When present, this is the SPINE of the story for that child — not a passing mention. If core_interest is "football on Saturday mornings", the story should pivot on a football moment (a championship, a save, a missed kick that becomes a found kick). If "gymnastics class", a vault or routine carries the climax. If "building Lego", a Lego creation can come alive or be the thing that solves the moment. Preserve the parent's specificity verbatim — do not generalise "football on Saturday mornings" into just "football". When MULTIPLE children each have a core_interest, weave the spine so both interests carry weight (e.g. football + ballet → a talent show with two acts; scooter + Lego → a Lego ramp the scooter rides). Never sideline one child's interest in favour of another's.
+- children[i].nickname (optional, EMOTIONAL GOLD when present): the family pet name for THIS child (Bug, Olly, Monkey, Sunshine, etc). Use it ONCE in the entire story, never more. Drop it at a moment of warmth: a parent voice from another room, a hand on the back during a quiet beat, a cuddle. The first listen, the child will gasp and look at the parent. That's the whole point. Two uses dilutes it; three or more breaks the spell. If the brief gives a nickname for one child but not the others, only that child gets theirs — do not invent nicknames for siblings. Preserve exact spelling.
+- children[i].proud_moment (optional, EMOTIONAL TARGET when present): a real-life breakthrough this child is proud of right now (e.g. "learning to ride without stabilisers", "can write her name", "just got moved up at swimming"). DO NOT name the real-life thing in the story. Instead, build a parallel in-story beat where the protagonist has a moment of mastery, courage, or breakthrough that mirrors the same feeling. The parent will read it and know exactly what you did. The child will feel proud of the in-story version, which is the same feeling extended. If multiple children have proud_moments, give each their own beat — never merge them.
+- children[i].future_self (optional, ADVENTURE CLIMAX BEAT when present): what THIS child currently says they want to be when they grow up (firefighter, vet, mermaid, professional Lego builder, etc). When present in an adventure story, the climax should give the child a glimpse of being that thing already, INSIDE the story (the firefighter saves the day, the vet calms a frightened animal, the mermaid breathes underwater). Not preachy, not "one day you will be this". Show them being it, just for a moment. If multiple children have future_selves, the climax should let each have their version of the moment.
+- bedtime_ritual (optional, BEDTIME CLOSING SCENE when present): the parent's described nightly ritual ("I sing You Are My Sunshine", "we do three breaths together", "she says goodnight to the moon"). Bedtime stories only. The story should END settling into a beat that echoes this ritual, so the audio finishes on the same feeling as the real bedtime. Don't quote the parent's words verbatim if it's a song or phrase — instead, frame an in-story echo (the wind hummed something soft, the moon said its quiet goodnight, three slow breaths and the world stilled). Preserve the texture, not the exact words.
 - children[i].quirk + children[i].quirk_type (optional): THIS child's specific quirk. Belongs to that child only — do not give it to a sibling. The quirk_type tells you HOW to weight it:
   - **catchphrase**: land it once or twice in the story for impact. More than three times and it stops being charming.
   - **pattern**: a way of speaking. It must appear in EVERY line of dialogue from this child — that is how they sound. Do not narrate it ("she lisped"); render it (give them lisping dialogue).
