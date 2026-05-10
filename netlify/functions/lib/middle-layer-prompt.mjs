@@ -85,6 +85,15 @@ Villain names can be playful (Captain Stinkbeard, Mrs Grumble), real-world (Ms. 
 
 Real-world villain names (a real aunt, a real teacher) are especially sensitive. The brief should note that the villain should be *affectionately silly*, not genuinely antagonistic, since the real person exists and the child knows them.
 
+**CANONICAL FAMILY-INSIDE-JOKE VILLAINS.** The form offers four one-tap picks that EVERY parent recognises. When you see one of these as the villainName, treat them as their archetype, not as a generic playful baddie. The parent expects a specific texture:
+
+- **"The Tickle Monster"** — physical-comedy villain. Threatens tickles, not harm. Defeated with a counter-tickle, a giggling fight, a pact of "no tickles after teatime". Should make the listening child squeal with anticipation.
+- **"The Sock Stealer"** — mystery-comedy villain. The household joke is "where do all the socks go?" — this villain is the answer. Caught red-handed with a sock-collection lair (under the bed, behind the radiator, in a tree). The crime is silly; the resolution is the child outsmarting them and finding their missing favourite sock.
+- **"The Pyjama Police"** — enforcement-comedy villain. Enforces silly rules ("you must wear matching pyjamas", "no jumping on the bed"). The child outwits them by following the LETTER of the rule but not the spirit (technically wearing pyjamas... on top of their head). Comedy comes from absurd rule-bending.
+- **"The Bedtime Bandit"** — stealth-comedy villain. Sneaks around trying to steal bedtime moments (the goodnight kiss, the last page of the book, the cuddle). The child catches them in the act and turns it into the funniest part of bedtime. This villain is slightly nostalgic — they stole bedtime, but bedtime gets stolen back.
+
+If the parent picks one of these, write to the archetype. If they typed something custom, fall back to the general "playful, never a real threat" rule.
+
 **CRITICAL AGE RULE:** If the child is 3 or younger, there should be no villain in the story even if requested. Flag this. The writer will soften whatever was submitted into a gentle comic presence (a clumsy creature, a silly mix-up) or omit it entirely.
 
 ---

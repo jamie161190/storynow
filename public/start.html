@@ -197,6 +197,12 @@ const VOICES = [
 // reading age right — a 13-year-old should not get the same prose as a 7-year-old.
 function ageNum(v){ const n = parseInt(v, 10); return Number.isFinite(n) && n >= 0 && n <= 17 ? n : null; }
 const PRONOUNS = ['She / her','He / him','They / them'];
+const VILLAINS = [
+  ['🤪','The Tickle Monster'],
+  ['🧦','The Sock Stealer'],
+  ['🛌','The Pyjama Police'],
+  ['🌙','The Bedtime Bandit']
+];
 
 function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'', proudOf:'', wantToBe:'' }; }
 
@@ -423,7 +429,7 @@ const STEPS = [
       </div>`;
     } },
 
-  { key:'villain', title:"Want a baddie in it?", sub:"Optional. Adventures hit harder when there's someone cheeky to outsmart.",
+  { key:'villain', title:"Want a baddie in it?", sub:"Optional. Adventures hit harder when there's someone cheeky to outsmart, like the Tickle Monster, the Sock Stealer, or Dad pretending to be a grumpy giant.",
     valid: () => true,
     showIf: () => state.data.storyKind === 'adventure',
     render: () => `
@@ -433,10 +439,19 @@ const STEPS = [
           <span class="toggle-label">Add a cheeky villain</span>
         </button>
         ${state.data.hasVillain ? `
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
-            <div class="field-label">WHO IS THE BADDIE?</div>
-            <input class="txt" placeholder="e.g. The Tickle Monster, Captain Stinkbeard, big sister Mia" value="${esc(state.data.villainName)}" data-action="setVillainName">
-            <div class="field-hint">Anyone you like: a silly monster, a sneaky pirate, a teacher, even Daddy. They cause trouble. Your child always saves the day.</div>
+          <div style="display:flex;flex-direction:column;gap:14px;margin-top:6px">
+            <div class="field-label">PICK A FAMILY FAVOURITE</div>
+            <div class="grid-2">
+              ${VILLAINS.map(([e,t]) => `
+                <button type="button" class="chip" data-on="${state.data.villainName === t}" data-action="pickVillain" data-v="${esc(t)}" style="flex-direction:column;gap:6px;padding:14px 8px;min-height:80px;display:flex">
+                  <span style="font-size:24px">${e}</span>
+                  <span style="font-size:12px">${t}</span>
+                </button>
+              `).join('')}
+            </div>
+            <div class="kicker" style="margin-top:6px;margin-bottom:0">OR INVENT YOUR OWN</div>
+            <input class="txt" placeholder="e.g. Captain Stinkfeet, big sister Mia in boss mode, the Broccoli Beast, Granny&rsquo;s spider-hand" value="${esc(VILLAINS.some(([,t]) => t === state.data.villainName) ? '' : state.data.villainName)}" data-action="setVillainName">
+            <div class="field-hint">Pick one above or type your own. The family in-jokes work brilliantly. They cause cheeky trouble. Your child always saves the day.</div>
           </div>` : ''}
       </div>` },
 
@@ -865,6 +880,7 @@ function handleAction(action, el, e){
     case 'setToy': state.data.toy = el.value; break;
     case 'toggleVillain': state.data.hasVillain = !state.data.hasVillain; render(); break;
     case 'setVillainName': state.data.villainName = el.value; break;
+    case 'pickVillain': state.data.villainName = v; render(); break;
     case 'setQuirk': state.data.quirk = el.value; break;
     case 'setBedtimeRitual': state.data.bedtimeRitual = el.value; break;
     case 'setVoice': state.data.voice = v; render(); break;
