@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tell us about them · HearTheirName</title>
-<meta name="description" content="Eight quick questions, then a free 2-minute preview ready to play in your browser in about 3 minutes.">
+<meta name="description" content="A few quick questions, then a personalised audio story made by hand, in your inbox within 24 hours.">
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="posthog-key" content="">
@@ -626,19 +626,19 @@ function renderEmailStep(){
   host.innerHTML = `
     <div class="step-head">
       <div class="kicker">REVIEW</div>
-      <h2 style="margin-top:10px;font-size:clamp(28px,3.8vw,40px)">One last look before we write <span class="italic-plum">${esc(childList)}'s</span> story.</h2>
+      <h2 style="margin-top:10px;font-size:clamp(28px,3.8vw,40px)">One last look before we make <span class="italic-plum">${esc(childList)}'s</span> story.</h2>
       <p class="sub" style="max-width:480px;margin-left:auto;margin-right:auto">Take a moment. Tap <em>Edit</em> on anything that&rsquo;s off. The more accurate this is, the more it&rsquo;ll sound like them.</p>
     </div>
 
     <div class="review-stack">${buildReviewCards()}</div>
 
     <div style="margin-top:22px;padding:18px 20px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px">
-      <div class="kicker" style="margin-bottom:10px">WHAT HAPPENS WHEN YOU CLICK GENERATE</div>
+      <div class="kicker" style="margin-bottom:10px">WHAT HAPPENS NEXT</div>
       <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px">
         ${[
-          ['🎧',"A 2-minute audio preview is written and recorded right here in your browser"],
-          ['⚡','Ready in three to four minutes. Play games while you wait'],
-          ['💷','Full 15-minute version <span data-price>£24.99</span>, in your inbox within 24 hours'],
+          ['🔒',"You'll be taken to a secure Stripe page to pay <span data-price>£24.99</span>"],
+          ['✍️','We get to work writing and recording your full 15-minute story'],
+          ['📬','Story lands in your inbox within 24 hours, often much sooner'],
           ['💛','Share it with your loved ones. No login necessary']
         ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.5">${t}</span></li>`).join('')}
       </ul>
@@ -646,11 +646,11 @@ function renderEmailStep(){
 
     <div class="cta-row">
       <button class="btn" id="submitBtn" type="button">
-        Generate ${esc(childList)}'s story
+        Continue to payment &middot; <span data-price>£24.99</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
     </div>
-    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">You&rsquo;ll hear it on the next page in about 3 minutes.</div>`;
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">Secure payment via Stripe. Your story arrives in your inbox within 24 hours.</div>`;
   document.getElementById('submitBtn').addEventListener('click', submitRequest);
 }
 
@@ -901,11 +901,44 @@ async function submitRequest(){
       }
     } catch(e){}
 
-    // No more email-verify step. Redirect customer straight to the in-browser
-    // wait page where the preview generates and plays in the same session.
+    // Direct-purchase flow: as soon as the story record exists, fire the
+    // checkout session and redirect to Stripe. No preview page in between.
     if (data.accessToken) {
-      window.location.href = '/preview/' + encodeURIComponent(data.requestId) + '?t=' + encodeURIComponent(data.accessToken);
-      return;
+      btn.innerHTML = 'Opening checkout&hellip; <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 1-7.07 2.93"/></svg>';
+      try {
+        const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
+        const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
+        const checkoutEventId = 'checkout_' + data.requestId + '_' + Date.now();
+        if (window.htnPixel) {
+          window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: 24.99, currency: 'GBP' }, {
+            eventId: checkoutEventId,
+            email: state.data.email
+          });
+        }
+        const coRes = await fetch('/api/checkout-paid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            storyId: data.requestId,
+            accessToken: data.accessToken,
+            email: state.data.email,
+            fbp, fbc, checkoutEventId
+          })
+        });
+        if (!coRes.ok) throw new Error('Checkout session failed');
+        const co = await coRes.json();
+        if (co.url) {
+          window.location.href = co.url;
+          return;
+        }
+        throw new Error('No checkout URL returned');
+      } catch (e) {
+        // Checkout failed: drop them on the order page (preview.html repurposed
+        // as a "resume your order" page) so they can retry the buy button.
+        window.location.href = '/preview/' + encodeURIComponent(data.requestId) + '?t=' + encodeURIComponent(data.accessToken) + '&checkout_error=1';
+        return;
+      }
     }
 
     // Fallback if accessToken missing for any reason: keep the old step flow.

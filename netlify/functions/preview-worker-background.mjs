@@ -18,7 +18,7 @@
 // preview_ready when retriggering).
 
 import { sanitiseStoryData, SYSTEM_PROMPT, buildUserPrompt, getOldestAge, getWordCount } from './lib/story-prompts.mjs';
-import { chunkedTTS, uploadAudio, callClaude } from './lib/audio-pipeline.mjs';
+import { callClaude } from './lib/audio-pipeline.mjs';
 import { v2ToV1 } from './lib/v2-to-v1.mjs';
 
 // 5 voices in the funnel mapped to ElevenLabs voice IDs.
@@ -245,36 +245,10 @@ export default async (req) => {
   const previewText = previewPrefix + PREVIEW_TEASER;
   console.log('[PREVIEW-WORKER] Preview prefix: ' + wordsInPrefix + ' words, full story: ' + fullStoryWordCount + ' words');
 
-  // TTS the preview prefix + teaser
-  const voiceId = VOICE_MAP[rawData.voice] || VOICE_MAP[storyData.voice] || DEFAULT_VOICE;
-  let previewAudioBuf;
-  try {
-    previewAudioBuf = await chunkedTTS({ text: previewText, voiceId, elevenKey, label: 'PREVIEW-WORKER' });
-  } catch (err) {
-    console.error('[PREVIEW-WORKER] TTS failed:', err.message);
-    await markFailed(supabaseUrl, headersJson, storyId, err.message?.slice(0, 500));
-    return resp({ ok: false, error: 'tts failed' }, 500);
-  }
-
-  // Upload preview MP3
-  let previewUrl;
-  try {
-    previewUrl = await uploadAudio({
-      supabaseUrl, supabaseKey,
-      fileName: `previews/${storyId}-${Date.now()}.mp3`,
-      audioBuf: previewAudioBuf
-    });
-  } catch (err) {
-    console.error('[PREVIEW-WORKER] Upload failed:', err.message);
-    await markFailed(supabaseUrl, headersJson, storyId, err.message?.slice(0, 500));
-    return resp({ ok: false, error: 'storage upload failed' }, 500);
-  }
-
-  // Update story. Critical: persist story_text (the full ~2200-word story)
-  // so the post-payment full-worker has the source of truth without needing
-  // to call Claude again.
-  // Also persist cliffhanger_judge so admin can see judge score + flag any
-  // soft-blocks for human review before send.
+  // Direct-purchase flow: customers no longer hear a preview before paying, so
+  // we skip the ElevenLabs TTS step here. Story text is persisted so full-worker
+  // can render the audio after payment without re-calling Claude. preview_text
+  // is still saved for admin visibility.
   const updatedData = {
     ...rawData,
     cliffhanger_judge: judgeResult ? {
@@ -290,8 +264,7 @@ export default async (req) => {
   await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
     method: 'PATCH', headers: headersJson,
     body: JSON.stringify({
-      preview_url: previewUrl,
-      preview_text: previewText,         // prefix + teaser (what the customer hears in preview)
+      preview_text: previewText,         // prefix + teaser (admin reference only)
       story_text: storyText,             // full ~2200-word story, for full-worker
       story_data: updatedData,           // includes cliffhanger_judge result
       preview_ready_at: new Date().toISOString(),
@@ -299,8 +272,8 @@ export default async (req) => {
     })
   });
 
-  console.log('[PREVIEW-WORKER] Done. Preview at', previewUrl, '— full story text persisted (' + storyText.length + ' chars)');
-  return resp({ ok: true, preview_url: previewUrl });
+  console.log('[PREVIEW-WORKER] Done. Story text persisted (' + storyText.length + ' chars). Preview TTS skipped (direct-purchase flow).');
+  return resp({ ok: true });
 };
 
 async function markFailed(supabaseUrl, headersJson, storyId, error) {

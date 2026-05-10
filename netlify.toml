@@ -71,6 +71,11 @@
   status = 200
 
 [[redirects]]
+  from = "/order-confirmed/*"
+  to = "/order-confirmed.html"
+  status = 200
+
+[[redirects]]
   from = "/listen/*"
   to = "/listen.html"
   status = 200

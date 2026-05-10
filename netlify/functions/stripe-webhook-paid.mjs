@@ -140,7 +140,7 @@ export default async (req) => {
         const sessionCurrency = (sess.currency || 'gbp').toUpperCase();
         const amountMinor = sess.amount_total || 2499;
         const priceDisplay = formatPrice(amountMinor, sessionCurrency);
-        const statusUrl = `${appUrl}/preview/${storyId}?t=${s.access_token}`;
+        const statusUrl = `${appUrl}/order-confirmed/${storyId}?t=${s.access_token}`;
         const tmpl = emailReceipt({
           firstName: s.story_data?.giftFrom || (s.story_data?.children?.[0]?.parentName) || '',
           childList: s.child_name, orderRef: ref, priceDisplay, statusUrl

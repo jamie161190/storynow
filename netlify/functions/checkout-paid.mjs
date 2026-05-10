@@ -100,10 +100,10 @@ export default async (req) => {
       fbc: fbc || '',
       user_agent: req.headers.get('user-agent') || ''
     },
-    // {CHECKOUT_SESSION_ID} is filled in by Stripe — it lets the preview page
-    // fire a client-side Purchase pixel with the same event_id as the CAPI event
-    // (`purchase_<session.id>`). Meta dedups them.
-    success_url: `${appUrl}/preview/${s.id}?t=${s.access_token}&paid=1&cs={CHECKOUT_SESSION_ID}`,
+    // {CHECKOUT_SESSION_ID} is filled in by Stripe. The order-confirmed page
+    // fires a client-side Purchase pixel with the same event_id as the CAPI
+    // event (`purchase_<session.id>`) so Meta dedups them.
+    success_url: `${appUrl}/order-confirmed/${s.id}?t=${s.access_token}&paid=1&cs={CHECKOUT_SESSION_ID}`,
     cancel_url: `${appUrl}/preview/${s.id}?t=${s.access_token}&cancelled=1`,
     allow_promotion_codes: true
   };

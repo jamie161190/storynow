@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Order confirmed · HearTheirName</title>
+<script defer src="/analytics.js"></script>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1a1426">
+<meta name="description" content="Your story is being made. It'll land in your inbox within 24 hours.">
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink: #1a1426;
+  --ink-2: #2d2238;
+  --paper: #f0eee9;
+  --paper-2: #e8e3d6;
+  --paper-3: #ddd5c2;
+  --plum: #3d2a5c;
+  --plum-2: #5a3f83;
+  --honey: #e8a34a;
+  --blush: #d97757;
+  --green: #3a7560;
+  --line: rgba(26, 20, 38, 0.14);
+  --line-2: rgba(26, 20, 38, 0.08);
+  --muted: rgba(26, 20, 38, 0.62);
+  --muted-2: rgba(26, 20, 38, 0.42);
+  --serif: "Newsreader", "Iowan Old Style", "Palatino", Georgia, serif;
+  --sans: "Instrument Sans", ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --container: min(100% - 32px, 540px);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.wrap { width: var(--container); margin: 0 auto; }
+a { color: var(--plum); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Header */
+header.site {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line-2);
+}
+.site .wrap { display: flex; align-items: center; justify-content: center; }
+.wordmark {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+.wordmark .told { color: var(--blush); }
+
+/* Main */
+main { flex: 1; padding: clamp(40px, 8vw, 80px) 0 60px; }
+
+.tick {
+  width: 64px; height: 64px; margin: 0 auto 24px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.kicker {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-family: var(--serif);
+  font-size: clamp(34px, 5.5vw, 48px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+  margin: 0 0 18px;
+  text-align: center;
+}
+h1 .accent { font-style: italic; color: var(--plum); }
+
+.lead {
+  font-size: 16px;
+  color: var(--muted);
+  text-align: center;
+  max-width: 440px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+.lead strong { color: var(--ink); font-weight: 600; }
+
+/* Timeline card */
+.timeline-card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px 24px;
+  margin: 0 0 28px;
+}
+.tl-head {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  margin-bottom: 18px;
+}
+.tl-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 18px; }
+.tl-item { display: flex; gap: 14px; align-items: flex-start; }
+.tl-dot {
+  flex: 0 0 22px;
+  width: 22px; height: 22px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: var(--muted-2);
+  font-weight: 600;
+  margin-top: 1px;
+}
+.tl-item.done .tl-dot { background: var(--plum); border-color: var(--plum); color: #fff; }
+.tl-text {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+.tl-text .when {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  margin-bottom: 3px;
+}
+
+.aside {
+  background: var(--paper);
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.aside strong { color: var(--ink); font-weight: 600; }
+
+.foot-help {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted-2);
+  line-height: 1.6;
+}
+.foot-help a { color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Footer */
+footer.site {
+  padding: 28px 0 36px;
+  border-top: 1px solid var(--line-2);
+  font-size: 12px;
+  color: var(--muted-2);
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a href="/" class="wordmark">heartheir<span class="told">name</span></a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="tick" aria-hidden="true">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+
+    <div class="kicker">Payment received</div>
+    <h1>We're writing <span class="accent" id="childPossSpan">their</span> story now.</h1>
+    <p class="lead">Your full 15-minute story will land in <strong id="emailSpan">your inbox</strong> within 24 hours, often much sooner. Check your spam folder if it doesn't show up.</p>
+
+    <div class="timeline-card">
+      <div class="tl-head">What happens next</div>
+      <ul class="tl-list">
+        <li class="tl-item done">
+          <div class="tl-dot">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="tl-text"><span class="when">Just now</span>Your order is in. We've got everything we need.</div>
+        </li>
+        <li class="tl-item">
+          <div class="tl-dot">2</div>
+          <div class="tl-text"><span class="when">Now</span>We're writing your story by hand, then recording it in the voice you chose.</div>
+        </li>
+        <li class="tl-item">
+          <div class="tl-dot">3</div>
+          <div class="tl-text"><span class="when">Within 24 hours</span>Your story arrives by email with a permanent link to play any time, anywhere.</div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="aside">
+      <strong>One important thing.</strong> Keep an eye on your inbox over the next 24 hours. If anything in the story isn't quite right, just reply to that email and we'll redo it until it is. That's the promise.
+    </div>
+
+    <div class="foot-help">
+      Anything urgent? Email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">made by hand by Jamie &amp; family</div>
+</footer>
+
+<script>
+(function(){
+  // Path: /order-confirmed/{id}?t={token}&paid=1&cs={session_id}
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  const lastSeg = pathParts[pathParts.length - 1] || '';
+  const params = new URLSearchParams(window.location.search);
+  const queryId = params.get('id') || '';
+  const storyId = lastSeg && lastSeg !== 'order-confirmed.html' && lastSeg !== 'order-confirmed' ? lastSeg : queryId;
+  const accessToken = params.get('t') || '';
+  const checkoutSessionId = params.get('cs') || '';
+
+  // Fetch story metadata so we can render the child's name + email.
+  if (storyId) {
+    const url = '/api/preview-meta?id=' + encodeURIComponent(storyId) + (accessToken ? '&t=' + encodeURIComponent(accessToken) : '');
+    fetch(url, { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (!data) return;
+        if (data.childName) {
+          const possessive = data.childName.endsWith('s') ? data.childName + "'" : data.childName + "'s";
+          document.getElementById('childPossSpan').textContent = possessive;
+          document.title = "We're writing " + possessive + " story · HearTheirName";
+        }
+        if (data.email) {
+          const span = document.getElementById('emailSpan');
+          span.textContent = data.email;
+        }
+      })
+      .catch(() => {});
+  }
+
+  // Meta Pixel Purchase event — deduped against the server-side CAPI Purchase
+  // event by using the Stripe checkout session id as the event_id.
+  if (checkoutSessionId && window.htnPixel) {
+    const dedupeKey = 'htn_purchase_fired_' + checkoutSessionId;
+    if (!sessionStorage.getItem(dedupeKey)) {
+      try {
+        window.htnPixel.track('Purchase', { value: 24.99, currency: 'GBP', content_name: 'paid_v2' }, {
+          eventId: 'purchase_' + checkoutSessionId
+        });
+        sessionStorage.setItem(dedupeKey, '1');
+      } catch (e) {}
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
