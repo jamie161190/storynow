@@ -553,9 +553,8 @@ audio { width: 100%; margin-top: 0.5rem; }
   <p class="sub" id="statsLine">Loading...</p>
 
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('attention',this)" id="tab-attention">🔔 Needs your attention <span class="tab-badge" id="attentionBadge" style="display:none"></span></div>
-    <div class="tab" onclick="switchTab('sent',this)" id="tab-sent">🎧 Previews <span class="tab-badge" id="sentBadge" style="display:none"></span></div>
-    <div class="tab" onclick="switchTab('delivered',this)">✅ Delivered</div>
+    <div class="tab active" onclick="switchTab('attention',this)" id="tab-attention">🔔 Queued <span class="tab-badge" id="attentionBadge" style="display:none"></span></div>
+    <div class="tab" onclick="switchTab('delivered',this)">✅ Completed</div>
     <div class="tab" onclick="switchTab('issues',this)" id="tab-issues">⚠️ Issues <span class="tab-badge" id="issuesBadge" style="display:none"></span></div>
     <div class="tab" onclick="switchTab('stats',this)">📊 Stats</div>
   </div>
@@ -656,9 +655,24 @@ function renderGiftBlock(s) {
   const to = s.gift_email || s.gift_recipient_email || sd.giftRecipientEmail || '';
   const recipientMessage = s.gift_message || sd.giftMessage || '';
   const jamieNote = s.gift_delivery_preference || sd.giftDeliveryNote || '';
+  const sendAtRaw = (sd.giftSendAt || '').trim();
+  let sendAtDisplay = 'AS SOON AS READY';
+  let sendAtUrgent = false;
+  if (sendAtRaw) {
+    const dt = new Date(sendAtRaw + 'T00:00:00');
+    if (!isNaN(dt)) {
+      sendAtDisplay = dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
+      const today = new Date(); today.setHours(0,0,0,0);
+      const days = Math.round((dt - today) / 86400000);
+      if (days <= 3 && days >= 0) sendAtUrgent = true;
+      if (days < 0) { sendAtDisplay += ' (OVERDUE)'; sendAtUrgent = true; }
+    } else {
+      sendAtDisplay = sendAtRaw.toUpperCase();
+    }
+  }
 
   let html = '<div style="background:#FFF4E6;border:1px solid #F1B45F;border-radius:10px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.8rem;line-height:1.6">';
-  html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem"><span class="badge" style="background:#F1753B;color:#fff">🎁 GIFT</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.5rem;flex-wrap:wrap"><span class="badge" style="background:#F1753B;color:#fff">🎁 GIFT</span><span class="badge" style="background:' + (sendAtUrgent ? '#C0392B' : '#3D2A5C') + ';color:#fff;font-size:0.72rem;letter-spacing:0.04em">📅 SEND ON: ' + esc(sendAtDisplay) + '</span></div>';
   if (from) html += '<div><strong>From:</strong> ' + esc(from) + '</div>';
   if (to)   html += '<div><strong>Send full story to:</strong> <code style="font-size:0.78rem">' + esc(to) + '</code></div>';
   if (recipientMessage) {
