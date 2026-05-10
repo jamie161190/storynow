@@ -285,8 +285,8 @@ const STEPS = [
         </div>
       </div>` },
 
-  { key:'world', title:"Their world.", sub:"What it's about, where it lives, and what they're into. Pick as many as you like.",
-    valid: () => (state.data.themes.length > 0 || state.data.themesOther.trim().length > 0) && (!!state.data.place || !!state.data.placeReal.trim()),
+  { key:'world', title:"Their world.", sub:"All optional. Tap anything that fits, or leave it blank and Jamie will choose based on everything else you've told us.",
+    valid: () => true,
     render: () => {
       const childLabel = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
       const multi = state.data.children.length > 1;
@@ -294,7 +294,8 @@ const STEPS = [
       <div style="display:flex;flex-direction:column;gap:28px">
 
         <div>
-          <div class="kicker" style="margin-bottom:10px">WHAT'S THE STORY ABOUT?</div>
+          <div class="kicker" style="margin-bottom:6px">WORLDS THEY LOVE (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">If something jumps out, tap it. If nothing fits, leave it.</div>
           <div class="grid-3">
             ${THEMES.map(([e,t]) => `
               <button type="button" class="chip" data-on="${state.data.themes.includes(t)}" data-action="toggleTheme" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:14px 8px;min-height:80px;display:flex">
@@ -308,7 +309,8 @@ const STEPS = [
         </div>
 
         <div style="padding-top:22px;border-top:1px dashed var(--line)">
-          <div class="kicker" style="margin-bottom:10px">WHERE DOES IT TAKE PLACE?</div>
+          <div class="kicker" style="margin-bottom:6px">WHERE IT TAKES PLACE (OPTIONAL)</div>
+          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">If you've got somewhere in mind, pick it. Otherwise leave it to us.</div>
           <div class="grid-3">
             ${PLACES.map(([e,t]) => `
               <button type="button" class="chip" data-on="${state.data.place === t}" data-action="setPlace" data-v="${esc(t)}" style="flex-direction:column;gap:4px;padding:16px 8px;min-height:88px;display:flex">
@@ -322,8 +324,8 @@ const STEPS = [
         </div>
 
         <div style="padding-top:22px;border-top:1px dashed var(--line)">
-          <div class="kicker" style="margin-bottom:6px">${multi ? "WHAT'S EACH OF THEM REALLY INTO RIGHT NOW? (OPTIONAL)" : "WHAT'S SOMETHING THEY'RE REALLY INTO RIGHT NOW? (OPTIONAL)"}</div>
-          <div class="field-hint" style="margin:0 0 14px;line-height:1.55">A club they go to, a sport, a hobby, the thing they can't stop talking about. We'll weave it right into the story so they recognise themselves straight away.</div>
+          <div class="kicker" style="margin-bottom:6px">${multi ? "ANYTHING EACH OF THEM IS REALLY INTO? (OPTIONAL)" : "ANYTHING THEY'RE REALLY INTO RIGHT NOW? (OPTIONAL)"}</div>
+          <div class="field-hint" style="margin:0 0 14px;line-height:1.55">A club they go to, a sport, a hobby, the thing they can't stop talking about. If something springs to mind, we'll weave it right into the story.</div>
           <div style="display:flex;flex-direction:column;gap:10px">
             ${state.data.children.map((c, i) => `
               <div>
