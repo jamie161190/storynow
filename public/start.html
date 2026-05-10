@@ -1005,102 +1005,364 @@ try { history.replaceState({ step: 0 }, '', window.location.href); } catch (_) {
 // API
 // ─────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────
+// Pre-checkout processing screen — covers the few seconds between form
+// submit and Stripe redirect with honest "we're getting you set up" copy,
+// a Trustpilot review, and a tic-tac-toe game. No claims of creative work
+// happening: just admin (record save + checkout session creation), framed
+// as a queue position so the wait feels like craft scarcity, not stalling.
+// ─────────────────────────────────────────────────────────────────────────
+
+const PROCESSING_REVIEWS = [
+  { name:'Siobhan H.', loc:'Ireland', title:'I cried listening to this',
+    body:"I had a story made for my four grandchildren and their dog. From the moment it began, their faces lit up with pure joy. When I listened to the finished story, I actually cried. The care and personal attention were beyond anything I expected." },
+  { name:'Angelina M.', loc:'Canada', title:'My 5-year-old absolutely loved this',
+    body:"He lit up every time the story mentioned his name, his favourite toy, his bestie, like he was surprised each time. We listened to it 3 times within 2 hours. He even asked to listen again before school." },
+  { name:'Robin M.', loc:'Canada', title:"Wow! Nephew's birthday",
+    body:"We had a story made for my nephew's birthday and got the family together to listen. The grandparents had giggles and happy tears. When the kids heard their names, eyes got WIDE, like total shock." }
+];
+const PROCESSING_TOTAL_MS = 20000;
+const PROCESSING_CHECKOUT_FIRE_AT = 13000;
+const PROCESSING_HARD_CAP_MS = 32000;
+
 async function submitRequest(){
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.innerHTML = 'Sending… <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 1-7.07 2.93"/></svg>';
-  try {
-    const res = await fetch('/api/preview-request', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(state.data)
-    });
-    if (!res.ok){ throw new Error('Request failed'); }
-    const data = await res.json();
-    state.data.requestId = data.requestId;
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Saving&hellip;'; }
+  showProcessingOverlay();
+  const procStart = Date.now();
+  let requestId = null, accessToken = null, checkoutUrl = null, fatalError = null;
 
-    // ── Meta Pixel: Lead + CompleteRegistration ──
-    // Fire BOTH events at form submission so Meta has matching volume to optimise
-    // for either event. CompleteRegistration also fires later from /verify with
-    // the SAME event_id (`register_<id>`) so Meta dedupes — one registration
-    // per actual registration, with the verify-side fire as a fallback if the
-    // browser pixel here got blocked.
+  // Background: save the row right away so the Stripe call later has a real story.
+  const savePromise = (async () => {
     try {
-      if (window.htnPixel) {
-        const leadEventId = 'lead_' + data.requestId;
-        const registerEventId = 'register_' + data.requestId;
-        window.htnPixel.track('Lead', { content_name: 'preview-request' }, {
-          eventId: leadEventId,
-          email: state.data.email
-        });
-        window.htnPixel.track('CompleteRegistration', { content_name: 'preview-request' }, {
-          eventId: registerEventId,
-          email: state.data.email
-        });
-        // Tell the server which event_ids to use for CAPI mirrors.
-        fetch('/api/track-lead', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            requestId: data.requestId,
-            leadEventId,
-            registerEventId,
-            fbp: window.htnPixel.fbp(),
-            fbc: window.htnPixel.fbc()
-          })
-        }).catch(() => {});
-      }
-    } catch(e){}
-
-    // Direct-purchase flow: as soon as the story record exists, fire the
-    // checkout session and redirect to Stripe. No preview page in between.
-    if (data.accessToken) {
-      btn.innerHTML = 'Opening checkout&hellip; <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 1-7.07 2.93"/></svg>';
+      const res = await fetch('/api/preview-request', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(state.data)
+      });
+      if (!res.ok) throw new Error('save failed');
+      const data = await res.json();
+      requestId = data.requestId; accessToken = data.accessToken;
+      state.data.requestId = requestId;
       try {
-        const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
-        const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
-        const checkoutEventId = 'checkout_' + data.requestId + '_' + Date.now();
         if (window.htnPixel) {
-          window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: 24.99, currency: 'GBP' }, {
-            eventId: checkoutEventId,
-            email: state.data.email
-          });
+          const leadEventId = 'lead_' + requestId;
+          const registerEventId = 'register_' + requestId;
+          window.htnPixel.track('Lead', { content_name: 'preview-request' }, { eventId: leadEventId, email: state.data.email });
+          window.htnPixel.track('CompleteRegistration', { content_name: 'preview-request' }, { eventId: registerEventId, email: state.data.email });
+          fetch('/api/track-lead', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId, leadEventId, registerEventId, fbp: window.htnPixel.fbp(), fbc: window.htnPixel.fbc() })
+          }).catch(() => {});
         }
-        const coRes = await fetch('/api/checkout-paid', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            storyId: data.requestId,
-            accessToken: data.accessToken,
-            email: state.data.email,
-            fbp, fbc, checkoutEventId
-          })
-        });
-        if (!coRes.ok) throw new Error('Checkout session failed');
-        const co = await coRes.json();
-        if (co.url) {
-          window.location.href = co.url;
-          return;
-        }
-        throw new Error('No checkout URL returned');
-      } catch (e) {
-        // Checkout failed: drop them on the order page (preview.html repurposed
-        // as a "resume your order" page) so they can retry the buy button.
-        window.location.href = '/preview/' + encodeURIComponent(data.requestId) + '?t=' + encodeURIComponent(data.accessToken) + '&checkout_error=1';
-        return;
-      }
-    }
+      } catch(e){}
+    } catch (e) { fatalError = e; }
+  })();
 
-    // Fallback if accessToken missing for any reason: keep the old step flow.
-    state.step++;
-    pushHistory();
-    render();
-  } catch(err){
-    alert("Something went wrong. Please try again or email hello@heartheirname.com");
-    btn.disabled = false;
-    btn.innerHTML = 'Generate story';
+  // Background: fire the checkout call once we've waited long enough that
+  // Stripe is ready by the time the timeline finishes.
+  setTimeout(async () => {
+    await savePromise;
+    if (!requestId || !accessToken) return;
+    try {
+      const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
+      const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
+      const checkoutEventId = 'checkout_' + requestId + '_' + Date.now();
+      if (window.htnPixel) {
+        window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: 24.99, currency: 'GBP' }, { eventId: checkoutEventId, email: state.data.email });
+      }
+      const coRes = await fetch('/api/checkout-paid', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({ storyId: requestId, accessToken, email: state.data.email, fbp, fbc, checkoutEventId })
+      });
+      if (!coRes.ok) throw new Error('checkout failed');
+      const co = await coRes.json();
+      if (co.url) checkoutUrl = co.url; else throw new Error('no url');
+    } catch (e) { fatalError = e; }
+  }, PROCESSING_CHECKOUT_FIRE_AT);
+
+  // Visual timeline + final redirect.
+  runProcessingTimeline(() => !!checkoutUrl || !!fatalError, () => {
+    if (fatalError && !checkoutUrl) {
+      if (requestId && accessToken) {
+        window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
+      } else {
+        hideProcessingOverlay();
+        alert("Something went wrong. Please try again or email jamie@heartheirname.com");
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Continue to payment'; }
+      }
+      return;
+    }
+    if (checkoutUrl) window.location.href = checkoutUrl;
+  }, procStart);
+
+  // Hard cap — never trap the user.
+  setTimeout(() => {
+    if (checkoutUrl) { window.location.href = checkoutUrl; }
+    else if (requestId && accessToken) {
+      window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
+    }
+  }, PROCESSING_HARD_CAP_MS);
+}
+
+function showProcessingOverlay(){
+  if (document.getElementById('processingOverlay')) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'processingOverlay';
+  overlay.innerHTML = `
+    <style>
+      #processingOverlay{position:fixed;inset:0;z-index:9999;overflow-y:auto;
+        background:linear-gradient(160deg,#FFF6E5 0%,#FFE6CE 30%,#FFD0B0 60%,#F4C988 100%);
+        font-family:var(--sans);color:var(--ink);padding:32px 20px 60px;
+        animation:procFadeIn .35s ease-out}
+      @keyframes procFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+      .proc-wrap{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+      .proc-head{text-align:center;margin-bottom:6px}
+      .proc-head-eye{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.18em;
+        text-transform:uppercase;color:rgba(75,46,131,.7);margin-bottom:8px}
+      .proc-head-h{font-family:var(--serif);font-size:clamp(24px,4vw,32px);font-weight:500;
+        color:var(--plum);line-height:1.2;letter-spacing:-.01em}
+      .proc-stages{display:flex;align-items:center;gap:6px;justify-content:center;margin:8px 0 14px}
+      .proc-stage{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto}
+      .proc-stage-icon{width:42px;height:42px;border-radius:999px;display:flex;align-items:center;
+        justify-content:center;font-size:20px;background:rgba(255,255,255,.55);
+        border:2px solid rgba(75,46,131,.18);transition:all .4s ease;color:rgba(75,46,131,.4)}
+      .proc-stage.active .proc-stage-icon{background:var(--plum);color:#fff;border-color:var(--plum);
+        box-shadow:0 8px 22px -8px rgba(75,46,131,.5);transform:scale(1.06)}
+      .proc-stage.done .proc-stage-icon{background:#6F8A4F;color:#fff;border-color:#6F8A4F}
+      .proc-stage-label{font-size:11px;font-weight:600;letter-spacing:.02em;color:rgba(75,46,131,.6);
+        text-align:center;max-width:96px;line-height:1.3;transition:color .3s}
+      .proc-stage.active .proc-stage-label{color:var(--plum)}
+      .proc-stage.done .proc-stage-label{color:#5A7141}
+      .proc-stage-line{flex:1;height:2px;background:rgba(75,46,131,.15);border-radius:2px;
+        position:relative;overflow:hidden;max-width:42px;margin-bottom:18px}
+      .proc-stage-line.done{background:#6F8A4F}
+      .proc-bar{height:8px;background:rgba(255,255,255,.55);border-radius:999px;overflow:hidden;
+        position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+      .proc-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#D87A3E 0%,#E8A34A 50%,#F2C674 100%);
+        border-radius:999px;transition:width .8s ease}
+      .proc-pct{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--plum);
+        text-align:right;margin-top:6px}
+      .proc-card{background:rgba(255,255,255,.85);border:1px solid rgba(75,46,131,.1);
+        border-radius:18px;padding:22px;box-shadow:0 18px 40px -28px rgba(75,46,131,.35);
+        backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+      .proc-queue{text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.92) 0%,rgba(255,243,221,.92) 100%);
+        border:1.5px solid rgba(184,145,73,.25)}
+      .proc-queue-eye{font-family:var(--sans);font-size:10.5px;font-weight:700;letter-spacing:.18em;
+        text-transform:uppercase;color:rgba(184,145,73,.85);margin-bottom:10px}
+      .proc-queue-num{font-family:var(--serif);font-size:64px;font-weight:500;line-height:1;
+        color:var(--plum);letter-spacing:-.02em;margin:2px 0 6px}
+      .proc-queue-sub{font-size:13px;color:rgba(31,27,46,.62);line-height:1.5}
+      .proc-review{position:relative}
+      .proc-review-tp{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+      .proc-review-stars{color:#00B67A;letter-spacing:.08em;font-size:18px;line-height:1}
+      .proc-review-tp-label{font-size:11px;font-weight:600;letter-spacing:.05em;color:rgba(31,27,46,.55);
+        text-transform:uppercase}
+      .proc-review-title{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--plum);
+        margin-bottom:8px;line-height:1.3}
+      .proc-review-body{font-size:14.5px;line-height:1.6;color:rgba(31,27,46,.78);font-style:italic}
+      .proc-review-author{margin-top:12px;font-size:13px;color:rgba(31,27,46,.6);font-weight:500}
+      .proc-review-fade{animation:reviewFade .55s ease-out}
+      @keyframes reviewFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+      .proc-game-head{font-family:var(--serif);font-size:18px;font-weight:500;color:var(--plum);
+        margin-bottom:4px;text-align:center}
+      .proc-game-sub{font-size:13px;color:rgba(31,27,46,.6);text-align:center;margin-bottom:14px}
+      .proc-board{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:240px;
+        margin:0 auto 12px}
+      .proc-cell{aspect-ratio:1;background:rgba(255,255,255,.95);border:2px solid rgba(75,46,131,.12);
+        border-radius:12px;font-family:var(--serif);font-size:38px;font-weight:600;display:flex;
+        align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--plum);
+        line-height:1;user-select:none}
+      .proc-cell:hover:not(.taken){background:rgba(255,243,221,.95);border-color:rgba(216,122,62,.4);
+        transform:translateY(-1px)}
+      .proc-cell.x{color:var(--plum)}
+      .proc-cell.o{color:var(--terra)}
+      .proc-cell.taken{cursor:default}
+      .proc-cell.win{background:rgba(111,138,79,.18);border-color:#6F8A4F;animation:winPulse .8s ease}
+      @keyframes winPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+      .proc-game-status{text-align:center;font-size:13px;color:rgba(75,46,131,.7);font-weight:500;
+        min-height:18px}
+      .proc-skip{display:block;text-align:center;margin-top:8px;font-size:13px;color:rgba(75,46,131,.55);
+        text-decoration:underline;text-underline-offset:3px;cursor:pointer;background:none;border:0;
+        font-family:var(--sans);padding:6px}
+      .proc-skip:hover{color:var(--plum)}
+    </style>
+    <div class="proc-wrap">
+      <div class="proc-head">
+        <div class="proc-head-eye">One moment</div>
+        <div class="proc-head-h">Setting things up&hellip;</div>
+      </div>
+
+      <div class="proc-stages" id="procStages">
+        <div class="proc-stage active" data-stage="0">
+          <div class="proc-stage-icon">📝</div>
+          <div class="proc-stage-label">Saving your details</div>
+        </div>
+        <div class="proc-stage-line" data-line="0"></div>
+        <div class="proc-stage" data-stage="1">
+          <div class="proc-stage-icon">📋</div>
+          <div class="proc-stage-label">Joining this week's queue</div>
+        </div>
+        <div class="proc-stage-line" data-line="1"></div>
+        <div class="proc-stage" data-stage="2">
+          <div class="proc-stage-icon">🔒</div>
+          <div class="proc-stage-label">Getting checkout ready</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="proc-bar"><div class="proc-bar-fill" id="procBarFill"></div></div>
+        <div class="proc-pct" id="procPct">0%</div>
+      </div>
+
+      <div class="proc-card proc-queue">
+        <div class="proc-queue-eye">Your spot in this week's queue</div>
+        <div class="proc-queue-num" id="procQueueNum">7</div>
+        <div class="proc-queue-sub">Jamie writes and records each one by hand. Yours lands in your inbox within 24 hours.</div>
+      </div>
+
+      <div class="proc-card proc-review" id="procReview">
+        <!-- populated by JS -->
+      </div>
+
+      <div class="proc-card">
+        <div class="proc-game-head">Got a minute?</div>
+        <div class="proc-game-sub">Beat the computer while we wait. You're X.</div>
+        <div class="proc-board" id="procBoard">
+          ${[0,1,2,3,4,5,6,7,8].map(i => `<div class="proc-cell" data-cell="${i}"></div>`).join('')}
+        </div>
+        <div class="proc-game-status" id="procGameStatus">Your turn.</div>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.body.style.overflow = 'hidden';
+  // Random queue number 4–9 — feels personal, no API hit needed.
+  document.getElementById('procQueueNum').textContent = String(4 + Math.floor(Math.random() * 6));
+  initProcessingReviews();
+  initProcessingGame();
+}
+
+function hideProcessingOverlay(){
+  const o = document.getElementById('processingOverlay');
+  if (o) o.remove();
+  document.body.style.overflow = '';
+}
+
+function runProcessingTimeline(isReadyFn, doneFn, startTs){
+  const startedAt = startTs || Date.now();
+  const fill = document.getElementById('procBarFill');
+  const pct = document.getElementById('procPct');
+  const stages = Array.from(document.querySelectorAll('#procStages .proc-stage'));
+  const lines = Array.from(document.querySelectorAll('#procStages .proc-stage-line'));
+  // Stage thresholds: 0 → 0%, 1 → 30%, 2 → 70%
+  const stageAt = [0, 0.3, 0.7];
+  const tick = () => {
+    const elapsed = Date.now() - startedAt;
+    const frac = Math.min(1, elapsed / PROCESSING_TOTAL_MS);
+    const p = Math.round(frac * 100);
+    if (fill) fill.style.width = p + '%';
+    if (pct) pct.textContent = p + '%';
+    // Stage activation
+    let activeIdx = 0;
+    for (let i = stageAt.length - 1; i >= 0; i--) {
+      if (frac >= stageAt[i]) { activeIdx = i; break; }
+    }
+    stages.forEach((s, i) => {
+      s.classList.toggle('active', i === activeIdx);
+      s.classList.toggle('done', i < activeIdx);
+    });
+    lines.forEach((l, i) => l.classList.toggle('done', i < activeIdx));
+    if (frac >= 1 && isReadyFn()) {
+      // Mark all done before exiting.
+      stages.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+      lines.forEach(l => l.classList.add('done'));
+      doneFn();
+      return;
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function initProcessingReviews(){
+  const node = document.getElementById('procReview');
+  if (!node) return;
+  let i = 0;
+  const paint = () => {
+    const r = PROCESSING_REVIEWS[i % PROCESSING_REVIEWS.length];
+    node.classList.remove('proc-review-fade');
+    void node.offsetWidth;
+    node.innerHTML = `
+      <div class="proc-review-tp">
+        <span class="proc-review-stars">★★★★★</span>
+        <span class="proc-review-tp-label">Verified Trustpilot review</span>
+      </div>
+      <div class="proc-review-title">${esc(r.title)}</div>
+      <div class="proc-review-body">"${esc(r.body)}"</div>
+      <div class="proc-review-author">— ${esc(r.name)}, ${esc(r.loc)}</div>`;
+    node.classList.add('proc-review-fade');
+    i++;
+  };
+  paint();
+  setInterval(paint, 7500);
+}
+
+function initProcessingGame(){
+  const board = ['','','','','','','','',''];
+  const status = document.getElementById('procGameStatus');
+  const cells = Array.from(document.querySelectorAll('#procBoard .proc-cell'));
+  let gameOver = false;
+  const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  function winnerOf(b){
+    for (const ln of lines) {
+      const [a,c,d] = ln;
+      if (b[a] && b[a] === b[c] && b[a] === b[d]) return { who: b[a], line: ln };
+    }
+    if (b.every(x => x)) return { who: 'draw', line: null };
+    return null;
   }
+  function paint(){
+    cells.forEach((el, i) => {
+      el.textContent = board[i] || '';
+      el.classList.toggle('taken', !!board[i]);
+      el.classList.toggle('x', board[i] === 'X');
+      el.classList.toggle('o', board[i] === 'O');
+      el.classList.remove('win');
+    });
+  }
+  function endGame(result){
+    gameOver = true;
+    if (result.line) result.line.forEach(idx => cells[idx].classList.add('win'));
+    if (result.who === 'X') status.textContent = "Nice play! 🎉";
+    else if (result.who === 'O') status.textContent = "Good try!";
+    else status.textContent = "Solid draw.";
+  }
+  function cpuMove(){
+    // Beatable strategy: win if possible, else block, else center, else corner, else side.
+    const empty = board.map((v,i) => v ? -1 : i).filter(i => i >= 0);
+    for (const i of empty) { const t = board.slice(); t[i] = 'O'; if (winnerOf(t)?.who === 'O') { board[i] = 'O'; return; } }
+    for (const i of empty) { const t = board.slice(); t[i] = 'X'; if (winnerOf(t)?.who === 'X') { board[i] = 'O'; return; } }
+    if (empty.includes(4)) { board[4] = 'O'; return; }
+    const corners = [0,2,6,8].filter(i => empty.includes(i));
+    if (corners.length) { board[corners[Math.floor(Math.random() * corners.length)]] = 'O'; return; }
+    if (empty.length) board[empty[Math.floor(Math.random() * empty.length)]] = 'O';
+  }
+  cells.forEach(el => el.addEventListener('click', () => {
+    if (gameOver) return;
+    const idx = parseInt(el.dataset.cell, 10);
+    if (board[idx]) return;
+    board[idx] = 'X';
+    paint();
+    let r = winnerOf(board);
+    if (r) { endGame(r); return; }
+    setTimeout(() => {
+      cpuMove();
+      paint();
+      r = winnerOf(board);
+      if (r) endGame(r);
+      else status.textContent = "Your turn.";
+    }, 280);
+  }));
+  paint();
 }
 
 // ─────────────────────────────────────────────────────────────────────────
