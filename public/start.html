@@ -204,7 +204,7 @@ const VILLAINS = [
   ['🌙','The Bedtime Bandit']
 ];
 
-function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'', proudOf:'', wantToBe:'' }; }
+function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', quirk:'', intoNow:'', nickname:'' }; }
 
 // If the customer typed their child's name on the homepage cover-tryon
 // before clicking through, the homepage appended ?name=Chase so the funnel
@@ -225,7 +225,7 @@ const state = {
     bestFriend: '', others: '',
     hasPet: false, petKind:'', petName:'',
     toy: '',
-    hasVillain: false, villainName: '',
+    hasVillain: true, villainName: '',
     themes: [], themesOther: '',
     place: '', placeReal: '',
     quirk: '',
@@ -383,7 +383,6 @@ const STEPS = [
     valid: () => true,
     render: () => {
       const childLabel = (c, i) => (c.name && c.name.trim()) ? c.name.trim() : `child ${i + 1}`;
-      const isAdventure = state.data.storyKind === 'adventure';
       const isBedtime = state.data.storyKind === 'bedtime';
       const childPiece = (c, i, k, kicker, hint, ph) => `
         <div>
@@ -401,23 +400,6 @@ const STEPS = [
             ${state.data.children.map((c, i) => childPiece(c, i, 'nickname', `WHAT DO YOU CALL ${esc(childLabel(c, i).toUpperCase())}? (OPTIONAL)`, '', 'e.g. Olly, Bug, Monkey, Mate, Sunshine')).join('')}
           </div>
         </div>
-
-        <div>
-          <div class="kicker" style="margin-bottom:4px">A SMALL THING THEY'RE PROUD OF RIGHT NOW (OPTIONAL)</div>
-          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">A new skill, a small win, something they figured out lately. The story can quietly mirror it as a moment of pride for them.</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            ${state.data.children.map((c, i) => childPiece(c, i, 'proudOf', `WHAT ${esc(childLabel(c, i).toUpperCase())} IS PROUD OF (OPTIONAL)`, '', 'e.g. learning to ride without stabilisers, can write her name, just got moved up at swimming')).join('')}
-          </div>
-        </div>
-
-        ${isAdventure ? `
-        <div>
-          <div class="kicker" style="margin-bottom:4px">WHAT DO THEY WANT TO BE WHEN THEY GROW UP? (OPTIONAL)</div>
-          <div class="field-hint" style="margin:0 0 12px;line-height:1.55">Whatever they say right now. The story can give them a glimpse of it.</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            ${state.data.children.map((c, i) => childPiece(c, i, 'wantToBe', `${esc(childLabel(c, i).toUpperCase())} WANTS TO BE (OPTIONAL)`, '', 'e.g. firefighter, vet, professional Lego builder, mermaid')).join('')}
-          </div>
-        </div>` : ''}
 
         ${isBedtime ? `
         <div>
@@ -678,14 +660,6 @@ function buildReviewCards(){
     .filter(c => c.nickname && c.nickname.trim())
     .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.nickname.trim())}`);
 
-  const proudOfLines = d.children
-    .filter(c => c.proudOf && c.proudOf.trim())
-    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.proudOf.trim())}`);
-
-  const wantToBeLines = d.children
-    .filter(c => c.wantToBe && c.wantToBe.trim())
-    .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.wantToBe.trim())}`);
-
   const bedtimeRitualLine = (d.bedtimeRitual && d.bedtimeRitual.trim()) ? esc(d.bedtimeRitual.trim()) : '';
 
   const voiceLine = d.voice ? `🎙 <strong>${esc(d.voice)}</strong>` : '';
@@ -709,8 +683,6 @@ function buildReviewCards(){
     card('Where it takes place', 'place', placeBits.map(t => esc(t))),
     card('Who’s in it', 'casting', castingLines),
     nicknameLines.length ? card('What you call them', 'little-things', nicknameLines) : '',
-    proudOfLines.length ? card('Proud of right now', 'little-things', proudOfLines) : '',
-    wantToBeLines.length ? card('Wants to be', 'little-things', wantToBeLines) : '',
     bedtimeRitualLine ? card('Your bedtime ritual', 'little-things', [bedtimeRitualLine]) : '',
     villainLine ? card('The baddie', 'villain', [villainLine]) : '',
     card('Tiny details', 'quirks', quirkLines),
