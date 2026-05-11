@@ -50,6 +50,7 @@ export default async (req) => {
     email: s.email || null,
     status: s.status,
     deliveryMode: s.story_data?.delivery_mode || 'auto',
+    silentPayment: s.story_data?.silent_payment === true,
     verified: !!s.verified_at,
     preview: s.preview_url ? {
       url: s.preview_url,

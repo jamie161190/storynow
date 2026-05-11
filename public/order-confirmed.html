@@ -258,6 +258,32 @@ footer.site {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return;
+        // Silent payment: customer already received the product off-band.
+        // Strip the page to a simple "Thank you for your payment" — no
+        // story framing, no timeline, no inbox promise.
+        if (data.silentPayment) {
+          // Silent payments are off-funnel — do not fire the Meta Purchase
+          // pixel. The webhook also skips the CAPI Purchase event for these,
+          // keeping the two sides in sync.
+          document.title = "Thank you for your payment · HearTheirName";
+          const wrap = document.querySelector('main .wrap');
+          if (wrap) {
+            const tick = wrap.querySelector('.tick');
+            const kicker = wrap.querySelector('.kicker');
+            if (kicker) kicker.textContent = 'Payment received';
+            const h1 = wrap.querySelector('h1');
+            if (h1) h1.textContent = 'Thank you for your payment.';
+            const lead = wrap.querySelector('.lead');
+            if (lead) lead.textContent = 'Your payment has been received. Nothing else to do.';
+            const timeline = wrap.querySelector('.timeline-card');
+            if (timeline) timeline.remove();
+            const aside = wrap.querySelector('.aside');
+            if (aside) aside.remove();
+            const help = wrap.querySelector('.foot-help');
+            if (help) help.innerHTML = 'Questions? Email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>';
+          }
+          return;
+        }
         if (data.childName) {
           const possessive = data.childName.endsWith('s') ? data.childName + "'" : data.childName + "'s";
           document.getElementById('childPossSpan').textContent = possessive;
@@ -267,22 +293,23 @@ footer.site {
           const span = document.getElementById('emailSpan');
           span.textContent = data.email;
         }
+        // Meta Pixel Purchase event for normal customers, deduped against the
+        // server-side CAPI Purchase event by Stripe checkout session id.
+        // Fires inside the fetch handler so silent payments (which return
+        // early above) skip it cleanly.
+        if (checkoutSessionId && window.htnPixel) {
+          const dedupeKey = 'htn_purchase_fired_' + checkoutSessionId;
+          if (!sessionStorage.getItem(dedupeKey)) {
+            try {
+              window.htnPixel.track('Purchase', { value: 24.99, currency: 'GBP', content_name: 'paid_v2' }, {
+                eventId: 'purchase_' + checkoutSessionId
+              });
+              sessionStorage.setItem(dedupeKey, '1');
+            } catch (e) {}
+          }
+        }
       })
       .catch(() => {});
-  }
-
-  // Meta Pixel Purchase event — deduped against the server-side CAPI Purchase
-  // event by using the Stripe checkout session id as the event_id.
-  if (checkoutSessionId && window.htnPixel) {
-    const dedupeKey = 'htn_purchase_fired_' + checkoutSessionId;
-    if (!sessionStorage.getItem(dedupeKey)) {
-      try {
-        window.htnPixel.track('Purchase', { value: 24.99, currency: 'GBP', content_name: 'paid_v2' }, {
-          eventId: 'purchase_' + checkoutSessionId
-        });
-        sessionStorage.setItem(dedupeKey, '1');
-      } catch (e) {}
-    }
   }
 })();
 </script>

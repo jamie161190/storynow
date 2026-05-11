@@ -243,12 +243,42 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     if (cancelled) document.getElementById('cancelledBanner').style.display = 'block';
     if (checkoutError) document.getElementById('errorBanner').style.display = 'block';
 
+    if (data.email) loadedEmail = data.email;
+
+    // Silent payment: customer has already received the product off-band.
+    // Strip the page back to the bare essentials: just a "Make payment"
+    // button. No story details, no delivery promises, no story framing.
+    if (data.silentPayment) {
+      document.title = "Make payment · HearTheirName";
+      const main = document.getElementById('mainContent');
+      // Remove cancelled/error banners' story-framed copy
+      const cb = document.getElementById('cancelledBanner');
+      if (cb) cb.innerHTML = '<strong>Checkout cancelled.</strong> Tap the button below when you’re ready to pay.';
+      const eb = document.getElementById('errorBanner');
+      if (eb) eb.innerHTML = '<strong>Something went wrong opening checkout.</strong> Tap the button below to try again, or email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>.';
+      // Replace the header copy and remove the order-summary card
+      const kicker = main.querySelector('.kicker');
+      if (kicker) kicker.textContent = 'Payment';
+      const h1 = main.querySelector('h1');
+      if (h1) h1.textContent = 'Make a payment.';
+      const lead = main.querySelector('.lead');
+      if (lead) lead.textContent = 'Tap the button below to pay securely.';
+      const summaryCard = document.getElementById('summaryRows')?.closest('.card');
+      if (summaryCard) summaryCard.remove();
+      const btn = document.getElementById('buyBtn');
+      if (btn) btn.innerHTML = 'Make payment <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+      const sub = main.querySelector('.btn-sub');
+      if (sub) sub.textContent = 'Secure payment via Stripe.';
+      const help = main.querySelector('.foot-help');
+      if (help) help.innerHTML = 'Questions? Email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>';
+      return;
+    }
+
     if (data.childName) {
       const possessive = data.childName.endsWith('s') ? data.childName + "'" : data.childName + "'s";
       document.getElementById('childPossSpan').textContent = possessive;
       document.title = "Your order for " + possessive + " story · HearTheirName";
     }
-    if (data.email) loadedEmail = data.email;
 
     const sd = data.storyData || {};
     const rows = [];
