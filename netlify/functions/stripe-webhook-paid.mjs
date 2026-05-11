@@ -58,6 +58,11 @@ export default async (req) => {
     const preRows = preLookup.ok ? await preLookup.json() : [];
     const preData = preRows[0]?.story_data || {};
     const isManualDelivery = preData.delivery_mode === 'manual';
+    // Silent payment: customer has already received the story by hand (or
+    // there's some other off-band arrangement). The webhook records the
+    // payment and exits without firing the full worker, sending any
+    // customer/admin emails, or pushing the Meta CAPI Purchase event.
+    const isSilent = preData.silent_payment === true;
 
     // Mark paid. If we let Stripe collect email (no customer_email passed at
     // checkout), it now lives in customer_details.email — patch it onto the
@@ -66,9 +71,10 @@ export default async (req) => {
     const paidPatch = {
       payment_status: 'paid',
       paid_at: new Date().toISOString(),
-      // Manual delivery: status reflects "paid, awaiting Jamie". Auto delivery:
-      // status reflects "the worker is now writing the audio".
-      status: isManualDelivery ? 'paid_manual_pending' : 'full_running'
+      // Silent: customer already received the story off-band, we just record
+      // the payment. Manual: paid + awaiting Jamie to deliver. Auto: worker
+      // is now writing audio.
+      status: isSilent ? 'paid_silent' : (isManualDelivery ? 'paid_manual_pending' : 'full_running')
     };
     if (stripeEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stripeEmail)) {
       paidPatch.email = stripeEmail;
@@ -77,6 +83,13 @@ export default async (req) => {
       method: 'PATCH', headers: headersJson,
       body: JSON.stringify(paidPatch)
     });
+
+    // Silent payment: record only, exit without side effects (no pixel,
+    // no worker trigger, no customer receipt, no admin notification).
+    if (isSilent) {
+      console.log('[STRIPE-WH-V2] Silent payment recorded for', storyId);
+      return new Response('ok-silent', { status: 200 });
+    }
 
     // ── Meta Pixel: Purchase (server-side) ──
     // Use the Stripe session id as the deterministic event_id so the browser
