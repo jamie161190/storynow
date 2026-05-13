@@ -772,7 +772,7 @@ function renderEmailStep(){
 
     <div class="cta-row">
       <button class="btn" id="submitBtn" type="button">
-        See your story &rarr;
+        Start making your story &rarr;
       </button>
     </div>
     <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">No payment yet. You'll see the opening of your story first, then decide.</div>`;
@@ -1003,6 +1003,46 @@ try { history.replaceState({ step: 0 }, '', window.location.href); } catch (_) {
 // API
 // ─────────────────────────────────────────────────────────────────────────
 
+
+// ─────────────────────────────────────────────────────────────────────────
+// Submit — saves the row via /api/preview-request, fires the Lead +
+// CompleteRegistration pixels (with deduped eventIds for CAPI), then
+// redirects to /preview/{id}?t={token}. The preview page handles the
+// wait-for-text, edit-the-opening, pick-a-voice, and Lock-it-in flow.
+// ─────────────────────────────────────────────────────────────────────────
+
+async function submitRequest(){
+  const btn = document.getElementById('submitBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Saving&hellip;'; }
+  try {
+    const res = await fetch('/api/preview-request', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state.data)
+    });
+    if (!res.ok) throw new Error('save failed: ' + res.status);
+    const data = await res.json();
+    const requestId = data.requestId;
+    const accessToken = data.accessToken;
+    state.data.requestId = requestId;
+    try {
+      if (window.htnPixel){
+        const leadEventId = 'lead_' + requestId;
+        const registerEventId = 'register_' + requestId;
+        window.htnPixel.track('Lead', { content_name: 'preview-request' }, { eventId: leadEventId, email: state.data.email });
+        window.htnPixel.track('CompleteRegistration', { content_name: 'preview-request' }, { eventId: registerEventId, email: state.data.email });
+        fetch('/api/track-lead', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requestId, leadEventId, registerEventId, fbp: window.htnPixel.fbp(), fbc: window.htnPixel.fbc() })
+        }).catch(() => {});
+      }
+    } catch(e){}
+    window.location.href = '/preview/' + encodeURIComponent(requestId) + (accessToken ? '?t=' + encodeURIComponent(accessToken) : '');
+  } catch (err) {
+    console.error('[submitRequest] failed', err);
+    if (btn) { btn.disabled = false; btn.innerHTML = 'Start making your story &rarr;'; }
+    alert("Something went wrong saving your story. Please try again or email jamie@heartheirname.com.");
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────
 // Bootstrap
