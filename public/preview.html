@@ -286,6 +286,66 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 .tp-title { font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
 .tp-body { font-size: 12.5px; line-height: 1.55; color: rgba(26,20,38,.78); }
 
+/* Phase 1 wait — tic-tac-toe distraction game */
+.ttt-card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+.ttt-head {
+  font-family: var(--serif);
+  font-size: 18px; font-weight: 500;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.ttt-sub {
+  font-size: 13px; color: var(--muted);
+  text-align: center;
+  margin-bottom: 14px;
+}
+.ttt-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-width: 220px;
+  margin: 0 auto 12px;
+}
+.ttt-cell {
+  aspect-ratio: 1;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif);
+  font-size: 32px; font-weight: 600;
+  color: var(--plum);
+  cursor: pointer;
+  user-select: none;
+  transition: all 120ms;
+}
+.ttt-cell:hover:not(.taken) {
+  background: #faf7ee;
+  border-color: var(--plum);
+}
+.ttt-cell.taken { cursor: default; }
+.ttt-cell.x { color: var(--plum); }
+.ttt-cell.o { color: var(--terra); }
+.ttt-cell.win {
+  background: rgba(111, 138, 79, 0.18);
+  border-color: var(--green);
+  animation: ttt-pulse 0.8s ease;
+}
+@keyframes ttt-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+.ttt-status {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  min-height: 18px;
+}
+
 /* Phase 1 wait — soft progress strip */
 .wait-strip {
   height: 4px;
@@ -376,6 +436,17 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
             <div class="tp-body">I cannot recommend Heartheirname highly enough. I recently had a personalised story created featuring my four grandchildren and their beloved dog, Gucci, as the main characters — and I was completely blown away. When I listened to the finished story, I actually cried. It was that beautiful.</div>
           </div>
         </div>
+
+        <div class="ttt-card" id="tttCard">
+          <div class="ttt-head">Best of three?</div>
+          <div class="ttt-sub">A little tic-tac-toe to pass the time. You're X.</div>
+          <div class="ttt-board" id="tttBoard">
+            <div class="ttt-cell" data-cell="0"></div><div class="ttt-cell" data-cell="1"></div><div class="ttt-cell" data-cell="2"></div>
+            <div class="ttt-cell" data-cell="3"></div><div class="ttt-cell" data-cell="4"></div><div class="ttt-cell" data-cell="5"></div>
+            <div class="ttt-cell" data-cell="6"></div><div class="ttt-cell" data-cell="7"></div><div class="ttt-cell" data-cell="8"></div>
+          </div>
+          <div class="ttt-status" id="tttStatus">Game 1 of 3. Your turn.</div>
+        </div>
       </div>
 
       <!-- Phase 2: reveal -->
@@ -464,6 +535,11 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   let loadedEmail = '';
   let pollTimer = null;
   let stripeJsLoading = null;
+  let phase1StartedAt = null;
+  const PHASE1_MIN_MS = 60000; // hold Phase 1 for at least 60s so the customer has time for tic-tac-toe
+  let pendingPhase2Data = null;
+  let phase1Timer = null;
+  let tttInitialised = false;
 
   function showError(){
     document.getElementById('loadingState').style.display = 'none';
@@ -495,6 +571,8 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     document.getElementById('phase1').style.display = 'block';
     document.getElementById('phase2').style.display = 'none';
     document.getElementById('phaseSilent').style.display = 'none';
+    if (phase1StartedAt === null) phase1StartedAt = Date.now();
+    if (!tttInitialised) { initTttGame(); tttInitialised = true; }
   }
 
   function paintPhase2(data){
@@ -702,6 +780,115 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   function escHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
   function escAttr(s){ return escHtml(s); }
 
+  // ────── Tic-tac-toe (best of three, scripted W-L-W arc) ──────
+  // Ported from the old start.html processing overlay. CPU plays defensive
+  // (lets the customer win) on games 1 and 3, optimal (likely wins) on game
+  // 2. So the customer experiences a "comeback" before paying.
+  function initTttGame(){
+    const board = ['','','','','','','','',''];
+    const status = document.getElementById('tttStatus');
+    const cells = Array.from(document.querySelectorAll('#tttBoard .ttt-cell'));
+    if (!status || !cells.length) return;
+    const totalGames = 3;
+    let gameIndex = 0;
+    let gamesWon = 0;
+    let gameOver = false;
+    let allDone = false;
+    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    function winnerOf(b){
+      for (const ln of lines){
+        const [a,c,d] = ln;
+        if (b[a] && b[a] === b[c] && b[a] === b[d]) return { who: b[a], line: ln };
+      }
+      if (b.every(x => x)) return { who: 'draw', line: null };
+      return null;
+    }
+    function paint(){
+      cells.forEach((el, i) => {
+        el.textContent = board[i] || '';
+        el.classList.toggle('taken', !!board[i]);
+        el.classList.toggle('x', board[i] === 'X');
+        el.classList.toggle('o', board[i] === 'O');
+        el.classList.remove('win');
+      });
+    }
+    function resetBoard(){
+      for (let i = 0; i < 9; i++) board[i] = '';
+      gameOver = false;
+      cells.forEach(c => { c.classList.remove('win','taken','x','o'); });
+      paint();
+    }
+    function setStatus(){
+      if (allDone) return;
+      status.textContent = `Game ${gameIndex + 1} of ${totalGames}. Your turn.`;
+    }
+    function endGame(result){
+      gameOver = true;
+      if (result.line) result.line.forEach(idx => cells[idx].classList.add('win'));
+      if (result.who === 'X') gamesWon++;
+      const wasLast = gameIndex === totalGames - 1;
+      if (!wasLast){
+        if (result.who === 'X')      status.textContent = "Got it! Next round…";
+        else if (result.who === 'O') status.textContent = "Computer pulled one back. Decider next…";
+        else                          status.textContent = "Draw. Next round…";
+        setTimeout(() => { gameIndex++; resetBoard(); setStatus(); }, 1800);
+      } else {
+        allDone = true;
+        if (result.who === 'X')      status.textContent = `And you've taken it! ${gamesWon} of ${totalGames}. Nicely played 🎉`;
+        else if (result.who === 'O') status.textContent = `Computer takes that one. ${gamesWon} of ${totalGames}. Good fight!`;
+        else                          status.textContent = `A draw to finish. ${gamesWon} of ${totalGames}.`;
+      }
+    }
+    function cpuMove(){
+      const empty = board.map((v,i) => v ? -1 : i).filter(i => i >= 0);
+      if (!empty.length) return;
+      const winsThisTurn = i => { const t = board.slice(); t[i] = 'O'; return winnerOf(t)?.who === 'O'; };
+      const blocksCustomerWin = i => {
+        const t = board.slice(); t[i] = 'O';
+        for (const j of empty){
+          if (j === i) continue;
+          const tt = board.slice(); tt[j] = 'X';
+          if (winnerOf(tt)?.who === 'X') return true;
+        }
+        return false;
+      };
+      if (gameIndex === 1){
+        for (const i of empty){ if (winsThisTurn(i)){ board[i] = 'O'; return; } }
+        for (const i of empty){
+          const t = board.slice(); t[i] = 'X';
+          if (winnerOf(t)?.who === 'X'){ board[i] = 'O'; return; }
+        }
+        if (empty.includes(4)){ board[4] = 'O'; return; }
+        const corners = [0,2,6,8].filter(i => empty.includes(i));
+        if (corners.length){ board[corners[Math.floor(Math.random() * corners.length)]] = 'O'; return; }
+        board[empty[Math.floor(Math.random() * empty.length)]] = 'O';
+        return;
+      }
+      const ideal = empty.filter(i => !winsThisTurn(i) && !blocksCustomerWin(i));
+      const safe = empty.filter(i => !winsThisTurn(i));
+      const pool = ideal.length ? ideal : (safe.length ? safe : empty);
+      board[pool[Math.floor(Math.random() * pool.length)]] = 'O';
+    }
+    cells.forEach(el => el.addEventListener('click', () => {
+      if (gameOver || allDone) return;
+      const idx = parseInt(el.dataset.cell, 10);
+      if (board[idx]) return;
+      board[idx] = 'X';
+      paint();
+      let r = winnerOf(board);
+      if (r){ endGame(r); return; }
+      setTimeout(() => {
+        cpuMove();
+        paint();
+        r = winnerOf(board);
+        if (r) endGame(r);
+        else setStatus();
+      }, 280);
+    }));
+    paint();
+    setStatus();
+  }
+
   // Initial state machine
   if (!storyId){ showError(); return; }
 
@@ -723,7 +910,10 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       paintPhaseSilent();
       return;
     }
-    // Opening text not yet ready: show Phase 1 and poll
+    // Opening text not yet ready: show Phase 1 and poll. We always hold Phase 1
+    // for at least PHASE1_MIN_MS so the customer has time for tic-tac-toe and
+    // the Trustpilot review even if Claude finishes early. When the opening
+    // arrives early, we stash it and let the timer transition us at the 60s mark.
     if (!data.opening){
       paintPhase1(data);
       if (!pollTimer){
@@ -732,14 +922,26 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
           if (fresh && fresh.opening){
             clearInterval(pollTimer);
             pollTimer = null;
-            paintPhase2(fresh);
+            armPhase2(fresh);
           }
         }, 1800);
       }
       return;
     }
-    // Opening ready: show Phase 2
-    paintPhase2(data);
+    // Opening already ready when we landed (page reload or fast Claude).
+    // Still respect the 60s hold so the experience feels consistent.
+    paintPhase1(data);
+    armPhase2(data);
+  }
+
+  function armPhase2(data){
+    pendingPhase2Data = data;
+    const elapsed = phase1StartedAt ? Date.now() - phase1StartedAt : 0;
+    const wait = Math.max(0, PHASE1_MIN_MS - elapsed);
+    if (phase1Timer) clearTimeout(phase1Timer);
+    phase1Timer = setTimeout(() => {
+      if (pendingPhase2Data) paintPhase2(pendingPhase2Data);
+    }, wait);
   }
 
   fetchMeta().then(process).catch(showError);
