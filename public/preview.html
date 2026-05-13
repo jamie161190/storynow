@@ -3,34 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Your order · HearTheirName</title>
+<title>Your story · HearTheirName</title>
 <script defer src="/analytics.js"></script>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1a1426">
-<meta name="description" content="Your personalised story is ready to buy.">
+<meta name="description" content="Your personalised story is ready to read.">
 <link rel="icon" type="image/png" href="/favicon.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Caveat:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 :root {
   --ink: #1a1426;
   --paper: #f0eee9;
   --paper-2: #e8e3d6;
+  --paper-3: #ddd6c4;
   --plum: #3d2a5c;
   --plum-2: #5a3f83;
   --honey: #e8a34a;
   --blush: #d97757;
   --green: #3a7560;
+  --rose: #d9b09a;
+  --terra: #d97a3e;
   --line: rgba(26, 20, 38, 0.14);
   --line-2: rgba(26, 20, 38, 0.08);
   --muted: rgba(26, 20, 38, 0.62);
   --muted-2: rgba(26, 20, 38, 0.42);
   --serif: "Newsreader", "Iowan Old Style", "Palatino", Georgia, serif;
   --sans: "Instrument Sans", ui-sans-serif, -apple-system, "Helvetica Neue", Arial, sans-serif;
-  --container: min(100% - 32px, 520px);
+  --hand: "Caveat", "Bradley Hand", cursive;
+  --container: min(100% - 32px, 560px);
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -53,7 +57,7 @@ header.site { padding: 16px 0; border-bottom: 1px solid var(--line-2); }
 .wordmark { font-family: var(--serif); font-size: 19px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; text-decoration: none; }
 .wordmark .told { color: var(--blush); }
 
-main { flex: 1; padding: clamp(36px, 7vw, 72px) 0 60px; }
+main { flex: 1; padding: clamp(28px, 5vw, 56px) 0 60px; }
 
 .kicker {
   font-family: var(--sans);
@@ -67,7 +71,7 @@ main { flex: 1; padding: clamp(36px, 7vw, 72px) 0 60px; }
 
 h1 {
   font-family: var(--serif);
-  font-size: clamp(32px, 5vw, 44px);
+  font-size: clamp(30px, 4.8vw, 42px);
   font-weight: 400; line-height: 1.1; letter-spacing: -0.015em;
   margin: 0 0 16px;
   text-align: center;
@@ -77,7 +81,7 @@ h1 .accent { font-style: italic; color: var(--plum); }
 .lead {
   font-size: 16px; color: var(--muted);
   text-align: center;
-  max-width: 440px; margin: 0 auto 32px;
+  max-width: 460px; margin: 0 auto 28px;
   line-height: 1.6;
 }
 .lead strong { color: var(--ink); font-weight: 600; }
@@ -87,7 +91,7 @@ h1 .accent { font-style: italic; color: var(--plum); }
   border: 1px solid var(--line);
   border-radius: 18px;
   padding: 22px 22px;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 }
 .card-head {
   font-family: var(--sans);
@@ -96,16 +100,95 @@ h1 .accent { font-style: italic; color: var(--plum); }
   color: var(--muted-2);
   margin-bottom: 14px;
 }
-.detail-row {
-  display: flex; justify-content: space-between; align-items: baseline;
-  padding: 8px 0;
-  border-bottom: 1px dashed var(--line-2);
-  font-size: 14.5px;
-  gap: 14px;
+.card-sub {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: -8px 0 14px;
+  line-height: 1.5;
 }
-.detail-row:last-child { border-bottom: 0; }
-.detail-label { color: var(--muted); flex: 0 0 auto; }
-.detail-value { color: var(--ink); font-weight: 500; text-align: right; }
+
+/* Opening card */
+.opening-card {
+  background: #faf7ee;
+  border-color: rgba(184, 145, 73, 0.25);
+}
+.opening-textarea {
+  width: 100%;
+  min-height: 280px;
+  border: 0;
+  background: transparent;
+  font-family: var(--serif);
+  font-size: 17.5px;
+  line-height: 1.65;
+  color: var(--ink);
+  resize: vertical;
+  padding: 0;
+  outline: none;
+}
+.opening-textarea:focus { background: rgba(255,253,247,0.6); border-radius: 8px; padding: 8px 10px; margin: -8px -10px; }
+.opening-foot {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line-2);
+  font-size: 12px; color: var(--muted-2);
+}
+.opening-foot .continues {
+  font-family: var(--hand);
+  font-size: 20px;
+  color: var(--plum);
+  letter-spacing: 0.01em;
+}
+
+/* Voice picker */
+.voice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.voice-chip {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 14px;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.voice-chip:hover { background: #fdfbf6; }
+.voice-chip.selected {
+  border-color: var(--plum);
+  background: rgba(61, 42, 92, 0.05);
+}
+.voice-chip.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 8px; right: 10px;
+  color: var(--plum);
+  font-size: 14px; font-weight: 700;
+}
+.voice-play {
+  flex: 0 0 36px;
+  width: 36px; height: 36px;
+  border-radius: 999px;
+  background: var(--plum);
+  color: #fff;
+  border: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.voice-play:hover { background: var(--plum-2); }
+.voice-play.playing { background: var(--terra); }
+.voice-meta { flex: 1; min-width: 0; }
+.voice-name {
+  font-family: var(--sans);
+  font-size: 14px; font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.voice-accent {
+  font-size: 12px; color: var(--muted);
+  margin-top: 2px;
+}
 
 .btn {
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -131,6 +214,7 @@ h1 .accent { font-style: italic; color: var(--plum); }
   margin-top: 12px;
   line-height: 1.55;
 }
+.btn-sub strong { color: var(--green); font-weight: 600; }
 
 .banner {
   background: rgba(217, 119, 87, 0.08);
@@ -164,6 +248,75 @@ h1 .accent { font-style: italic; color: var(--plum); }
 footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-size: 12px; color: var(--muted-2); text-align: center; }
 
 #mainContent { display: none; }
+
+/* Phase 1 wait — Trustpilot card */
+.tp-card {
+  background: #fff;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  padding: 0;
+  margin-bottom: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 14px -10px rgba(26,20,38,.4);
+}
+.tp-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line-2);
+}
+.tp-bar-name { font-size: 14px; font-weight: 700; color: #191919; }
+.tp-bar-verified {
+  margin-left: auto;
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.06em; color: #00B67A; text-transform: uppercase;
+}
+.tp-content { padding: 14px 16px 16px; }
+.tp-author { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.tp-avatar {
+  width: 36px; height: 36px; border-radius: 999px;
+  background: var(--terra); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px;
+  flex-shrink: 0;
+}
+.tp-author-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.tp-author-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.tp-stars { display: flex; gap: 2px; margin-bottom: 6px; }
+.tp-star { width: 14px; height: 14px; background: #00B67A; border-radius: 2px; }
+.tp-title { font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.tp-body { font-size: 12.5px; line-height: 1.55; color: rgba(26,20,38,.78); }
+
+/* Phase 1 wait — soft progress strip */
+.wait-strip {
+  height: 4px;
+  background: rgba(61,42,92,0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 auto 28px;
+  max-width: 240px;
+  position: relative;
+}
+.wait-strip::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: -30%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, var(--plum), transparent);
+  animation: wait-slide 1.8s ease-in-out infinite;
+}
+@keyframes wait-slide {
+  0% { left: -30%; } 100% { left: 100%; }
+}
+
+/* Checkout mount card */
+.checkout-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 14px;
+}
+#stripeMount { min-height: 420px; }
 </style>
 </head>
 <body>
@@ -176,41 +329,109 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 
 <main>
   <div class="wrap">
-    <div id="loading" class="loading">
+    <div id="loadingState" class="loading">
       <div class="spinner" aria-hidden="true"></div>
-      <div style="margin-top:14px">Loading your order&hellip;</div>
+      <div style="margin-top:14px">Loading your story&hellip;</div>
     </div>
 
     <div id="errorState" class="error" style="display:none">
-      <h1 style="margin-bottom:14px">We can't find this order.</h1>
+      <h1 style="margin-bottom:14px">We can't find this story.</h1>
       <p class="lead">The link may have expired. <a href="/start">Start a new story</a> or email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>.</p>
     </div>
 
     <div id="mainContent">
+      <!-- Banners (cancelled checkout, etc.) -->
       <div id="cancelledBanner" class="banner" style="display:none">
-        <strong>Checkout cancelled.</strong> No worries, your story details are saved. Tap the button below when you're ready to pay.
+        <strong>Checkout cancelled.</strong> No worries, your story is still here. Tap the button below when you're ready to lock it in.
       </div>
       <div id="errorBanner" class="banner" style="display:none">
         <strong>Something went wrong opening checkout.</strong> Tap the button below to try again, or email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a> if it keeps happening.
       </div>
 
-      <div class="kicker">Your order, ready to pay</div>
-      <h1>Make <span class="accent" id="childPossSpan">their</span> story.</h1>
-      <p class="lead">Everything's saved. One tap and we'll start writing.</p>
+      <!-- Phase 1: waiting for opening text -->
+      <div id="phase1" style="display:none">
+        <div class="kicker">Writing it now</div>
+        <h1>Writing the opening of <span class="accent" id="phase1Name">their</span> story&hellip;</h1>
+        <p class="lead">This takes about half a minute. We're putting them at the centre of every scene.</p>
+        <div class="wait-strip" aria-label="Writing in progress"></div>
 
-      <div class="card">
-        <div class="card-head">Order summary</div>
-        <div id="summaryRows"></div>
+        <div class="tp-card">
+          <div class="tp-bar">
+            <div style="width:16px;height:16px;background:#00B67A;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px">★</div>
+            <span class="tp-bar-name">Trustpilot</span>
+            <span class="tp-bar-verified">Verified review</span>
+          </div>
+          <div class="tp-content">
+            <div class="tp-author">
+              <div class="tp-avatar">SH</div>
+              <div>
+                <div class="tp-author-name">Siobhan Holmes</div>
+                <div class="tp-author-sub">IE · 15 reviews</div>
+              </div>
+            </div>
+            <div class="tp-stars">
+              <div class="tp-star"></div><div class="tp-star"></div><div class="tp-star"></div><div class="tp-star"></div><div class="tp-star"></div>
+            </div>
+            <div class="tp-title">"I Cried Listening to This… Absolutely Magical 💛"</div>
+            <div class="tp-body">I cannot recommend Heartheirname highly enough. I recently had a personalised story created featuring my four grandchildren and their beloved dog, Gucci, as the main characters — and I was completely blown away. When I listened to the finished story, I actually cried. It was that beautiful.</div>
+          </div>
+        </div>
       </div>
 
-      <button class="btn" id="buyBtn" type="button">
-        Pay <span data-price>£24.99</span> &amp; make their story
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </button>
-      <div class="btn-sub">Secure payment via Stripe. Story arrives in your inbox within 24 hours.</div>
+      <!-- Phase 2: reveal -->
+      <div id="phase2" style="display:none">
+        <div class="kicker">Where the story begins</div>
+        <h1>The opening of <span class="accent" id="phase2Name">their</span> story.</h1>
+        <p class="lead">Read it. Edit anything you'd like. Pick a voice. Then we'll record the full 15 minutes.</p>
+
+        <div class="card opening-card">
+          <div class="card-head"><span id="openingHeadLabel">The opening</span> &middot; <span id="wordCount">~290</span> words &middot; to be continued</div>
+          <textarea id="openingTextarea" class="opening-textarea" aria-label="Your story's opening" spellcheck="true"></textarea>
+          <div class="opening-foot">
+            <span>Click the text to edit. Saves automatically.</span>
+            <span class="continues">(to be continued&hellip;)</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">Pick a voice</div>
+          <p class="card-sub">Five narrators. Tap to listen, tap the chip to choose.</p>
+          <div class="voice-grid" id="voiceGrid"></div>
+          <audio id="voiceAudio" preload="none"></audio>
+        </div>
+
+        <div id="ctaArea">
+          <button class="btn" id="lockInBtn" type="button" disabled>
+            Lock it in &amp; make it &middot; <span data-price>£24.99</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+          <div class="btn-sub">Secure payment via Stripe. <strong>Money back if it isn't right.</strong> Story arrives in your inbox within 24 hours.</div>
+        </div>
+
+        <div id="checkoutCard" class="checkout-card" style="display:none">
+          <div class="card-head">Your secure checkout</div>
+          <div id="stripeMount"></div>
+        </div>
+      </div>
+
+      <!-- Phase silent: customer already received the product off-band -->
+      <div id="phaseSilent" style="display:none">
+        <div class="kicker">Payment</div>
+        <h1>Make a payment.</h1>
+        <p class="lead">Tap the button below to pay securely.</p>
+        <button class="btn" id="silentPayBtn" type="button">
+          Make payment
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+        <div class="btn-sub">Secure payment via Stripe.</div>
+        <div id="silentCheckoutCard" class="checkout-card" style="display:none">
+          <div class="card-head">Your secure checkout</div>
+          <div id="silentStripeMount"></div>
+        </div>
+      </div>
 
       <div class="foot-help">
-        Need to change something? <a href="/start">Start over</a> or email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>
+        Questions? Email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>
       </div>
     </div>
   </div>
@@ -231,156 +452,151 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   const cancelled = params.get('cancelled') === '1';
   const checkoutError = params.get('checkout_error') === '1';
 
-  let loadedEmail = '';
+  const VOICES = [
+    { id: 'British (gentle)',    label: 'Gentle',  accent: 'British',   sample: '/audio/voice-samples/british-gentle.mp3' },
+    { id: 'Irish (lilting)',     label: 'Lilting', accent: 'Irish',     sample: '/audio/voice-samples/irish-lilting.mp3' },
+    { id: 'American (cosy)',     label: 'Cosy',    accent: 'American',  sample: '/audio/voice-samples/american-cosy.mp3' },
+    { id: 'Scottish (kind)',     label: 'Kind',    accent: 'Scottish',  sample: '/audio/voice-samples/scottish-kind.mp3' },
+    { id: 'Australian (bright)', label: 'Bright',  accent: 'Australian',sample: '/audio/voice-samples/australian-bright.mp3' }
+  ];
 
-  function showError() {
-    document.getElementById('loading').style.display = 'none';
+  let selectedVoice = null;
+  let loadedEmail = '';
+  let pollTimer = null;
+  let stripeJsLoading = null;
+
+  function showError(){
+    document.getElementById('loadingState').style.display = 'none';
     document.getElementById('errorState').style.display = 'block';
   }
-  function show(data) {
-    document.getElementById('loading').style.display = 'none';
+  function showMain(){
+    document.getElementById('loadingState').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     if (cancelled) document.getElementById('cancelledBanner').style.display = 'block';
     if (checkoutError) document.getElementById('errorBanner').style.display = 'block';
+  }
 
+  function fetchMeta(){
+    const url = '/api/preview-meta?id=' + encodeURIComponent(storyId) + (accessToken ? '&t=' + encodeURIComponent(accessToken) : '');
+    return fetch(url, { credentials: 'include' })
+      .then(r => {
+        if (r.status === 403 || !r.ok) return null;
+        return r.json();
+      });
+  }
+
+  function paintPhase1(data){
+    showMain();
+    if (data.childName){
+      const possessive = data.childName.endsWith('s') ? data.childName + "'" : data.childName + "'s";
+      document.getElementById('phase1Name').textContent = possessive;
+      document.title = "Writing " + possessive + " story · HearTheirName";
+    }
+    document.getElementById('phase1').style.display = 'block';
+    document.getElementById('phase2').style.display = 'none';
+    document.getElementById('phaseSilent').style.display = 'none';
+  }
+
+  function paintPhase2(data){
+    showMain();
+    if (data.childName){
+      const possessive = data.childName.endsWith('s') ? data.childName + "'" : data.childName + "'s";
+      document.getElementById('phase2Name').textContent = possessive;
+      document.getElementById('openingHeadLabel').textContent = data.childName + "'s opening";
+      document.title = "The opening of " + possessive + " story · HearTheirName";
+    }
     if (data.email) loadedEmail = data.email;
 
-    // Silent payment: customer has already received the product off-band.
-    // Strip the page back to the bare essentials: just a "Make payment"
-    // button. No story details, no delivery promises, no story framing.
-    if (data.silentPayment) {
-      document.title = "Make payment · HearTheirName";
-      const main = document.getElementById('mainContent');
-      // Remove cancelled/error banners' story-framed copy
-      const cb = document.getElementById('cancelledBanner');
-      if (cb) cb.innerHTML = '<strong>Checkout cancelled.</strong> Tap the button below when you’re ready to pay.';
-      const eb = document.getElementById('errorBanner');
-      if (eb) eb.innerHTML = '<strong>Something went wrong opening checkout.</strong> Tap the button below to try again, or email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>.';
-      // Replace the header copy and remove the order-summary card
-      const kicker = main.querySelector('.kicker');
-      if (kicker) kicker.textContent = 'Payment';
-      const h1 = main.querySelector('h1');
-      if (h1) h1.textContent = 'Make a payment.';
-      const lead = main.querySelector('.lead');
-      if (lead) lead.textContent = 'Tap the button below to pay securely.';
-      const summaryCard = document.getElementById('summaryRows')?.closest('.card');
-      if (summaryCard) summaryCard.remove();
-      const btn = document.getElementById('buyBtn');
-      if (btn) btn.innerHTML = 'Make payment <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
-      const sub = main.querySelector('.btn-sub');
-      if (sub) sub.textContent = 'Secure payment via Stripe.';
-      const help = main.querySelector('.foot-help');
-      if (help) help.innerHTML = 'Questions? Email <a href="mailto:jamie@heartheirname.com">jamie@heartheirname.com</a>';
-      return;
-    }
+    const ta = document.getElementById('openingTextarea');
+    ta.value = data.opening || '';
+    updateWordCount();
+    ta.addEventListener('input', updateWordCount);
 
-    if (data.childName) {
-      const possessive = data.childName.endsWith('s') ? data.childName + "'" : data.childName + "'s";
-      document.getElementById('childPossSpan').textContent = possessive;
-      document.title = "Your order for " + possessive + " story · HearTheirName";
-    }
+    renderVoices();
 
-    const sd = data.storyData || {};
-    const rows = [];
-    if (data.childName) rows.push(['For', data.childName]);
-    if (sd.storyKind) rows.push(['Story type', sd.storyKind === 'bedtime' ? 'Bedtime' : 'Adventure']);
-    if (sd.voice) rows.push(['Narrator', sd.voice]);
-    if (data.email) rows.push(['Delivery to', data.email]);
-    rows.push(['Price', '£24.99']);
-    document.getElementById('summaryRows').innerHTML = rows.map(([k,v]) =>
-      '<div class="detail-row"><span class="detail-label">' + k + '</span><span class="detail-value">' + escapeHtml(String(v)) + '</span></div>'
-    ).join('');
-  }
-  function escapeHtml(s) {
-    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+    document.getElementById('phase1').style.display = 'none';
+    document.getElementById('phase2').style.display = 'block';
+    document.getElementById('phaseSilent').style.display = 'none';
   }
 
-  if (!storyId) { showError(); return; }
+  function paintPhaseSilent(){
+    showMain();
+    document.title = "Make payment · HearTheirName";
+    document.getElementById('phase1').style.display = 'none';
+    document.getElementById('phase2').style.display = 'none';
+    document.getElementById('phaseSilent').style.display = 'block';
+  }
 
-  const url = '/api/preview-meta?id=' + encodeURIComponent(storyId) + (accessToken ? '&t=' + encodeURIComponent(accessToken) : '');
-  fetch(url, { credentials: 'include' })
-    .then(r => {
-      if (r.status === 403 || !r.ok) { showError(); return null; }
-      return r.json();
-    })
-    .then(data => {
-      if (!data) return;
-      // Already paid — bounce to listen page.
-      if (data.paid && data.full) {
-        window.location.replace('/listen/' + encodeURIComponent(storyId) + (accessToken ? '?t=' + encodeURIComponent(accessToken) : ''));
-        return;
-      }
-      // Already paid, story still being made — bounce to order-confirmed.
-      if (data.paid) {
-        const qs = accessToken ? ('?t=' + encodeURIComponent(accessToken) + '&paid=1') : '?paid=1';
-        window.location.replace('/order-confirmed/' + encodeURIComponent(storyId) + qs);
-        return;
-      }
-      show(data);
-    })
-    .catch(showError);
+  function updateWordCount(){
+    const ta = document.getElementById('openingTextarea');
+    const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+    document.getElementById('wordCount').textContent = words;
+    // Enable Lock-in only when there's a voice AND text in valid range
+    const lockBtn = document.getElementById('lockInBtn');
+    const valid = words >= 80 && words <= 600 && !!selectedVoice;
+    lockBtn.disabled = !valid;
+  }
 
-  // Buy button
-  let inFlight = false;
-  document.getElementById('buyBtn').addEventListener('click', async () => {
-    if (inFlight) return;
-    inFlight = true;
-    const btn = document.getElementById('buyBtn');
-    btn.disabled = true;
-    btn.innerHTML = 'Opening checkout&hellip;';
-    try {
-      const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
-      const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
-      const checkoutEventId = 'checkout_' + storyId + '_' + Date.now();
-      if (window.htnPixel) {
-        window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: 24.99, currency: 'GBP' }, {
-          eventId: checkoutEventId,
-          email: loadedEmail
-        });
-      }
-      const res = await fetch('/api/checkout-paid', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ storyId, accessToken, email: loadedEmail, fbp, fbc, checkoutEventId })
+  function renderVoices(){
+    const grid = document.getElementById('voiceGrid');
+    grid.innerHTML = VOICES.map((v, i) => `
+      <div class="voice-chip" data-voice="${escAttr(v.id)}" role="button" tabindex="0">
+        <button class="voice-play" type="button" data-play="${escAttr(v.sample)}" aria-label="Play ${escAttr(v.label)} ${escAttr(v.accent)} sample">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="voice-meta">
+          <div class="voice-name">${escHtml(v.label)}</div>
+          <div class="voice-accent">${escHtml(v.accent)}</div>
+        </div>
+      </div>
+    `).join('');
+    grid.querySelectorAll('.voice-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        if (e.target.closest('.voice-play')) return; // play button handled separately
+        const id = chip.dataset.voice;
+        selectVoice(id);
       });
-      if (!res.ok) throw new Error('Checkout failed');
-      const data = await res.json();
-      if (!data.clientSecret || !data.publishableKey) throw new Error('No checkout');
-      // Embedded checkout — mount in-page so the buyer never leaves the order
-      // review. Replace the order summary card area with the Stripe form.
-      await loadStripeJs();
-      if (!window.Stripe) throw new Error('stripe unavailable');
-      const main = document.querySelector('main .wrap');
-      if (main) {
-        const checkoutHost = document.createElement('div');
-        checkoutHost.innerHTML = `
-          <div class="card">
-            <div class="card-head">Your secure checkout</div>
-            <div id="embeddedCheckout" style="min-height:420px"></div>
-          </div>`;
-        // Hide the buy button + footer help; keep the order summary above visible.
-        document.getElementById('buyBtn').remove();
-        const sub = document.querySelector('.btn-sub'); if (sub) sub.remove();
-        main.appendChild(checkoutHost);
-      }
-      const stripe = window.Stripe(data.publishableKey);
-      const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
-      checkout.mount('#embeddedCheckout');
-      return;
-    } catch (e) {
-      btn.disabled = false;
-      btn.innerHTML = 'Try again';
-      document.getElementById('errorBanner').style.display = 'block';
-      inFlight = false;
-    }
-  });
+      chip.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); selectVoice(chip.dataset.voice); }
+      });
+    });
+    grid.querySelectorAll('.voice-play').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSample(btn);
+      });
+    });
+  }
 
-  let _stripeJsLoading = null;
+  function selectVoice(id){
+    selectedVoice = id;
+    document.querySelectorAll('.voice-chip').forEach(c => {
+      c.classList.toggle('selected', c.dataset.voice === id);
+    });
+    updateWordCount();
+  }
+
+  function playSample(btn){
+    const audio = document.getElementById('voiceAudio');
+    const src = btn.dataset.play;
+    // Reset all play buttons
+    document.querySelectorAll('.voice-play').forEach(b => b.classList.remove('playing'));
+    if (audio.dataset.currentSrc === src && !audio.paused){
+      audio.pause();
+      return;
+    }
+    audio.src = src;
+    audio.dataset.currentSrc = src;
+    btn.classList.add('playing');
+    audio.play().catch(() => {/* autoplay blocked, do nothing */});
+    audio.onended = () => btn.classList.remove('playing');
+    audio.onpause = () => btn.classList.remove('playing');
+  }
+
   function loadStripeJs(){
     if (window.Stripe) return Promise.resolve();
-    if (_stripeJsLoading) return _stripeJsLoading;
-    _stripeJsLoading = new Promise((resolve, reject) => {
+    if (stripeJsLoading) return stripeJsLoading;
+    stripeJsLoading = new Promise((resolve, reject) => {
       const s = document.createElement('script');
       s.src = 'https://js.stripe.com/v3/';
       s.async = true;
@@ -388,8 +604,151 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       s.onerror = () => reject(new Error('stripe.js failed to load'));
       document.head.appendChild(s);
     });
-    return _stripeJsLoading;
+    return stripeJsLoading;
   }
+
+  async function lockInAndMount(){
+    const btn = document.getElementById('lockInBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Locking it in&hellip;';
+    document.getElementById('errorBanner').style.display = 'none';
+
+    const editedOpening = document.getElementById('openingTextarea').value.trim();
+    if (!editedOpening || !selectedVoice){
+      btn.disabled = false;
+      btn.innerHTML = 'Lock it in &amp; make it · £24.99 →';
+      return;
+    }
+
+    try {
+      const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
+      const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
+      const checkoutEventId = 'checkout_' + storyId + '_' + Date.now();
+      if (window.htnPixel){
+        window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: 24.99, currency: 'GBP' }, {
+          eventId: checkoutEventId, email: loadedEmail
+        });
+      }
+      const res = await fetch('/api/lock-in', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          storyId,
+          accessToken,
+          editedOpening,
+          voiceId: selectedVoice,
+          musicId: 'none',
+          email: loadedEmail,
+          fbp, fbc, checkoutEventId
+        })
+      });
+      if (!res.ok){
+        const txt = await res.text();
+        console.error('[lock-in] failed', res.status, txt);
+        throw new Error('lock-in failed');
+      }
+      const data = await res.json();
+      if (!data.clientSecret || !data.publishableKey) throw new Error('No checkout');
+
+      // Mount Stripe Embedded Checkout in-page
+      await loadStripeJs();
+      if (!window.Stripe) throw new Error('stripe unavailable');
+      document.getElementById('ctaArea').style.display = 'none';
+      document.getElementById('checkoutCard').style.display = 'block';
+      const stripe = window.Stripe(data.publishableKey);
+      const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+      checkout.mount('#stripeMount');
+    } catch (err){
+      console.error(err);
+      btn.disabled = false;
+      btn.innerHTML = 'Try again';
+      document.getElementById('errorBanner').style.display = 'block';
+    }
+  }
+
+  // Silent payment flow (kept from previous version)
+  async function silentPay(){
+    const btn = document.getElementById('silentPayBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Opening checkout&hellip;';
+    try {
+      const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
+      const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
+      const checkoutEventId = 'checkout_' + storyId + '_' + Date.now();
+      const res = await fetch('/api/checkout-paid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ storyId, accessToken, email: loadedEmail, fbp, fbc, checkoutEventId })
+      });
+      if (!res.ok) throw new Error('checkout failed');
+      const data = await res.json();
+      if (!data.clientSecret || !data.publishableKey) throw new Error('No checkout');
+      await loadStripeJs();
+      if (!window.Stripe) throw new Error('stripe unavailable');
+      document.getElementById('silentPayBtn').remove();
+      document.getElementById('silentCheckoutCard').style.display = 'block';
+      const stripe = window.Stripe(data.publishableKey);
+      const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
+      checkout.mount('#silentStripeMount');
+    } catch (err){
+      btn.disabled = false;
+      btn.innerHTML = 'Try again';
+      document.getElementById('errorBanner').style.display = 'block';
+    }
+  }
+
+  function escHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+  function escAttr(s){ return escHtml(s); }
+
+  // Initial state machine
+  if (!storyId){ showError(); return; }
+
+  function process(data){
+    if (!data){ showError(); return; }
+    // Already fully delivered: bounce to listen page
+    if (data.paid && data.full){
+      window.location.replace('/listen/' + encodeURIComponent(storyId) + (accessToken ? '?t=' + encodeURIComponent(accessToken) : ''));
+      return;
+    }
+    // Paid but full not ready: bounce to order-confirmed
+    if (data.paid){
+      const qs = accessToken ? ('?t=' + encodeURIComponent(accessToken) + '&paid=1') : '?paid=1';
+      window.location.replace('/order-confirmed/' + encodeURIComponent(storyId) + qs);
+      return;
+    }
+    // Silent payment: minimal UI
+    if (data.silentPayment){
+      paintPhaseSilent();
+      return;
+    }
+    // Opening text not yet ready: show Phase 1 and poll
+    if (!data.opening){
+      paintPhase1(data);
+      if (!pollTimer){
+        pollTimer = setInterval(async () => {
+          const fresh = await fetchMeta();
+          if (fresh && fresh.opening){
+            clearInterval(pollTimer);
+            pollTimer = null;
+            paintPhase2(fresh);
+          }
+        }, 1800);
+      }
+      return;
+    }
+    // Opening ready: show Phase 2
+    paintPhase2(data);
+  }
+
+  fetchMeta().then(process).catch(showError);
+
+  // Wire buttons
+  document.addEventListener('click', e => {
+    if (e.target.closest('#lockInBtn')){ lockInAndMount(); }
+    else if (e.target.closest('#silentPayBtn')){ silentPay(); }
+  });
 })();
 </script>
 
