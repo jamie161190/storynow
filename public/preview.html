@@ -5,6 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Your story · HearTheirName</title>
 <script defer src="/analytics.js"></script>
+<script>
+// Page-view tracking — fires once on load so we can see /start → /preview
+// drop-off in the page_views table.
+try {
+  fetch('/api/track-pageview', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      page: '/preview',
+      referrer: document.referrer || '',
+      device: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? 'mobile' : 'desktop'
+    })
+  }).catch(()=>{});
+} catch(e){}
+</script>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1a1426">
 <meta name="description" content="Your personalised story is ready to read.">
