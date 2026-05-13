@@ -51,6 +51,13 @@ export default async (req) => {
     status: s.status,
     deliveryMode: s.story_data?.delivery_mode || 'auto',
     silentPayment: s.story_data?.silent_payment === true,
+    // G+ flow: the customer-editable opening of the story (~290 words ending
+    // on a cliffhanger). Falls back to the legacy preview_text (which had a
+    // teaser line appended) stripped of the teaser, then to story_text's first
+    // ~290 words for the very oldest rows. Null until preview-worker finishes.
+    opening: s.story_data?.opening
+      || (s.preview_text ? s.preview_text.replace(/\n+\.\.\.\s*To hear what happens next[\s\S]*$/i, '').trim() : null)
+      || null,
     verified: !!s.verified_at,
     preview: s.preview_url ? {
       url: s.preview_url,

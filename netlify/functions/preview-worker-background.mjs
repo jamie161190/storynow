@@ -249,8 +249,18 @@ export default async (req) => {
   // we skip the ElevenLabs TTS step here. Story text is persisted so full-worker
   // can render the audio after payment without re-calling Claude. preview_text
   // is still saved for admin visibility.
+  //
+  // G+ flow: also save the clean opening (preview prefix without the teaser
+  // line) and the continuation (everything after it in the full story) so the
+  // /preview page can show the opening for the customer to read/edit before
+  // payment. Lock-it-in rebuilds story_text = edited opening + continuation.
+  const continuationText = storyText.length > previewPrefix.length
+    ? storyText.slice(previewPrefix.length).replace(/^\s+/, '')
+    : '';
   const updatedData = {
     ...rawData,
+    opening: previewPrefix,
+    continuation: continuationText,
     cliffhanger_judge: judgeResult ? {
       score: judgeResult.score,
       last_sentence: judgeResult.last_sentence,

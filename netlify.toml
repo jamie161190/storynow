@@ -156,6 +156,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/lock-in"
+  to = "/.netlify/functions/lock-in"
+  status = 200
+
+[[redirects]]
   from = "/api/stripe-webhook-paid"
   to = "/.netlify/functions/stripe-webhook-paid"
   status = 200
