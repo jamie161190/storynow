@@ -461,17 +461,10 @@ const STEPS = [
       </div>`;
     } },
 
-  { key:'voice', title:"Choose a storyteller.", sub:"Five warm voices, all human-toned.",
-    valid: () => !!state.data.voice,
-    render: () => `
-      <div class="grid-2">
-        ${VOICES.map(v => `
-          <button type="button" class="chip" data-on="${state.data.voice === v}" data-action="setVoice" data-v="${esc(v)}" style="justify-content:flex-start;padding:14px 16px">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5L7 4.5z"/></svg>
-            <span style="margin-left:10px">${v}</span>
-          </button>
-        `).join('')}
-      </div>` },
+  // Voice step removed from the form — narrator voice is now picked on the
+  // /preview page after the customer reads their generated opening. Keeps
+  // the form to 5 question screens instead of 6 and groups the audio
+  // decisions (voice + music) with the audio purchase moment.
 
   { key:'gift', title:"Is this a gift?", sub:"",
     valid: () => {
@@ -719,7 +712,7 @@ function buildReviewCards(){
     nicknameLines.length ? card('What you call them', 'bits', nicknameLines) : '',
     foodNoLines.length ? card('Won’t touch', 'bits', foodNoLines) : '',
     villainLine ? card('The baddie', 'bits', [villainLine]) : '',
-    card('Storyteller', 'voice', [voiceLine]),
+    voiceLine ? card('Storyteller', 'voice', [voiceLine]) : '',
     card('Gift', 'gift', giftLines)
   ].filter(Boolean).join('');
 }
@@ -750,9 +743,9 @@ function renderEmailStep(){
       <div class="kicker" style="margin-bottom:12px">FROM HERE</div>
       <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px">
         ${[
-          ['☕',"In a moment, you&rsquo;ll be paying right here on this page (no redirects, no faff)."],
-          ['✍️',"We&rsquo;ll take everything you&rsquo;ve told us, every name, every detail, every little moment, and weave it all into a story that&rsquo;s only theirs."],
-          ['📬','It lands in your inbox within 24 hours.'],
+          ['✍️',"We&rsquo;ll write the opening of your story right now, with every name and detail you&rsquo;ve given us."],
+          ['👀',"You&rsquo;ll see it on the next page. Read it. Edit anything that isn&rsquo;t right. Pick a voice."],
+          ['🔒',"Then pay £24.99 to lock it in. The full 15-minute audio lands in your inbox within 24 hours."],
           ['💛','If anything isn&rsquo;t quite right when you hear it, just let us know. We&rsquo;ll tweak it until everything&rsquo;s absolutely perfect.'],
           ['🌙','Then it&rsquo;s theirs forever. Replay it, share it with grandparents, treasure it.']
         ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.55">${t}</span></li>`).join('')}
@@ -761,11 +754,10 @@ function renderEmailStep(){
 
     <div class="cta-row">
       <button class="btn" id="submitBtn" type="button">
-        Continue to payment &middot; <span data-price>£24.99</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        See your story &rarr;
       </button>
     </div>
-    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">You stay right here. Secured by Stripe. Story arrives in your inbox within 24 hours.</div>`;
+    <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">No payment yet. You'll see the opening of your story first, then decide.</div>`;
   document.getElementById('submitBtn').addEventListener('click', submitRequest);
 }
 
@@ -1051,95 +1043,45 @@ const PROCESSING_TOTAL_MS = 60000;
 const PROCESSING_CHECKOUT_FIRE_AT = 53000;
 const PROCESSING_HARD_CAP_MS = 72000;
 
+// G+ flow: form submit saves the story, fires Lead + CompleteRegistration
+// pixels, then redirects to /preview/{id}?t={token}. The preview page handles
+// the wait-for-text experience, the opening-reveal + voice picker + lock-it-in
+// CTA, and the embedded checkout mount. No more in-form processing overlay or
+// embedded checkout on this page.
 async function submitRequest(){
   const btn = document.getElementById('submitBtn');
-  if (btn) { btn.disabled = true; btn.innerHTML = 'Just a moment&hellip;'; }
-  // Small breathing pause so the transition into the processing overlay
-  // doesn't feel like another form-button click. Lets the buyer feel the
-  // shift from "filling a form" to "something's happening for me".
-  await new Promise(r => setTimeout(r, 950));
-  showProcessingOverlay();
-  const procStart = Date.now();
-  let requestId = null, accessToken = null, checkoutData = null, fatalError = null;
-
-  // Background: save the row right away so the Stripe call later has a real story.
-  const savePromise = (async () => {
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Saving&hellip;'; }
+  try {
+    const res = await fetch('/api/preview-request', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(state.data)
+    });
+    if (!res.ok) throw new Error('save failed');
+    const data = await res.json();
+    const requestId = data.requestId;
+    const accessToken = data.accessToken;
+    state.data.requestId = requestId;
+    // Lead + CompleteRegistration pixels (browser + server CAPI mirror)
     try {
-      const res = await fetch('/api/preview-request', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(state.data)
-      });
-      if (!res.ok) throw new Error('save failed');
-      const data = await res.json();
-      requestId = data.requestId; accessToken = data.accessToken;
-      state.data.requestId = requestId;
-      try {
-        if (window.htnPixel) {
-          const leadEventId = 'lead_' + requestId;
-          const registerEventId = 'register_' + requestId;
-          window.htnPixel.track('Lead', { content_name: 'preview-request' }, { eventId: leadEventId, email: state.data.email });
-          window.htnPixel.track('CompleteRegistration', { content_name: 'preview-request' }, { eventId: registerEventId, email: state.data.email });
-          fetch('/api/track-lead', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ requestId, leadEventId, registerEventId, fbp: window.htnPixel.fbp(), fbc: window.htnPixel.fbc() })
-          }).catch(() => {});
-        }
-      } catch(e){}
-    } catch (e) { fatalError = e; }
-  })();
-
-  // Background: fire the checkout call once we've waited long enough that
-  // Stripe is ready by the time the timeline finishes.
-  setTimeout(async () => {
-    await savePromise;
-    if (!requestId || !accessToken) return;
-    try {
-      const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
-      const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
-      const checkoutEventId = 'checkout_' + requestId + '_' + Date.now();
       if (window.htnPixel) {
-        window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: 24.99, currency: 'GBP' }, { eventId: checkoutEventId, email: state.data.email });
+        const leadEventId = 'lead_' + requestId;
+        const registerEventId = 'register_' + requestId;
+        window.htnPixel.track('Lead', { content_name: 'preview-request' }, { eventId: leadEventId, email: state.data.email });
+        window.htnPixel.track('CompleteRegistration', { content_name: 'preview-request' }, { eventId: registerEventId, email: state.data.email });
+        fetch('/api/track-lead', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requestId, leadEventId, registerEventId, fbp: window.htnPixel.fbp(), fbc: window.htnPixel.fbc() })
+        }).catch(() => {});
       }
-      const coRes = await fetch('/api/checkout-paid', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-        body: JSON.stringify({ storyId: requestId, accessToken, email: state.data.email, fbp, fbc, checkoutEventId })
-      });
-      if (!coRes.ok) throw new Error('checkout failed');
-      const co = await coRes.json();
-      if (co.clientSecret && co.publishableKey) checkoutData = co; else throw new Error('no client secret');
-    } catch (e) { fatalError = e; }
-  }, PROCESSING_CHECKOUT_FIRE_AT);
-
-  // Visual timeline → mount embedded checkout in-page.
-  runProcessingTimeline(() => !!checkoutData || !!fatalError, async () => {
-    if (fatalError && !checkoutData) {
-      if (requestId && accessToken) {
-        window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
-      } else {
-        hideProcessingOverlay();
-        alert("Something went wrong. Please try again or email jamie@heartheirname.com");
-        if (btn) { btn.disabled = false; btn.innerHTML = 'Continue to payment'; }
-      }
-      return;
-    }
-    if (checkoutData) {
-      try {
-        await mountEmbeddedCheckout(checkoutData);
-      } catch (e) {
-        if (requestId && accessToken) {
-          window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
-        }
-      }
-    }
-  }, procStart);
-
-  // Hard cap — never trap the user.
-  setTimeout(() => {
-    if (checkoutData || document.getElementById('procCheckout')) return;
-    if (requestId && accessToken) {
-      window.location.href = '/preview/' + encodeURIComponent(requestId) + '?t=' + encodeURIComponent(accessToken) + '&checkout_error=1';
-    }
-  }, PROCESSING_HARD_CAP_MS);
+    } catch(e){}
+    // Redirect to the preview page. It will poll preview-meta and reveal the
+    // opening once Claude has finished writing it.
+    window.location.href = '/preview/' + encodeURIComponent(requestId) + (accessToken ? '?t=' + encodeURIComponent(accessToken) : '');
+  } catch (err) {
+    console.error('[submitRequest] failed', err);
+    if (btn) { btn.disabled = false; btn.innerHTML = 'See your story &rarr;'; }
+    alert("Something went wrong saving your story. Please try again or email jamie@heartheirname.com.");
+  }
 }
 
 let _stripeJsLoading = null;
