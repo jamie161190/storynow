@@ -431,6 +431,24 @@ h1 .accent { font-style: italic; color: var(--plum); }
 .opening-textarea[readonly]:hover { border-color: rgba(184, 145, 73, 0.4); }
 .opening-textarea[readonly]:focus { border-color: rgba(184, 145, 73, 0.4); background: #f6efdf; box-shadow: none; }
 
+/* What happens next */
+.next-steps {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.next-steps li {
+  display: flex; gap: 12px; align-items: flex-start;
+  font-size: 14.5px; line-height: 1.5; color: var(--ink);
+}
+.next-num {
+  flex: 0 0 24px; width: 24px; height: 24px;
+  border-radius: 999px;
+  background: var(--plum); color: #fff;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+
 /* static (non-playable) chip icon — used by the "You choose for me" music option */
 .voice-play--static {
   background: var(--paper-3);
@@ -742,6 +760,16 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
           <p class="card-sub" id="musicSub">A soft score under the narration. Tap to listen, tap the chip to choose.</p>
           <div class="voice-grid" id="musicGrid"></div>
           <audio id="musicAudio" preload="none"></audio>
+        </div>
+
+        <div class="card next-card">
+          <div class="card-head">What happens next</div>
+          <ol class="next-steps">
+            <li><span class="next-num">1</span><span>You lock your story in.</span></li>
+            <li><span class="next-num">2</span><span>You pay.</span></li>
+            <li><span class="next-num">3</span><span>We send you the full 15-minute story, narrated by your choice of narrator, with your chosen music.</span></li>
+            <li><span class="next-num">4</span><span>If you're not happy, we'll make amendments to it until it's right.</span></li>
+          </ol>
         </div>
 
         <div id="ctaArea">
