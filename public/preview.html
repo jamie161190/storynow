@@ -257,37 +257,61 @@ h1 .accent { font-style: italic; color: var(--plum); }
 .btn:hover { background: var(--plum-2); }
 .btn:disabled { opacity: 0.6; cursor: wait; }
 
-/* Premium "seal it in" button + wax-seal stamp animation */
-.btn-seal {
+/* Premium buttons — dimensional, inviting, clearly want-to-click.
+   .btn-premium is the base (used by the payment CTA, plum).
+   .btn-seal layers a warm honey face + the wax-seal stamp animation
+   on top (used by the "lock in the opening" button). */
+.btn-premium {
   position: relative;
   overflow: hidden;
   min-height: 60px;
   padding: 18px 24px;
-  background: linear-gradient(135deg, var(--plum-2) 0%, var(--plum) 70%);
+  background: linear-gradient(135deg, #6a4caa 0%, var(--plum) 78%);
   box-shadow:
-    0 1px 0 rgba(255,255,255,0.18) inset,
-    0 10px 22px -8px rgba(61,42,92,0.55),
-    0 2px 6px -2px rgba(61,42,92,0.4);
+    0 1px 0 rgba(255,255,255,0.22) inset,
+    0 12px 26px -8px rgba(61,42,92,0.6),
+    0 3px 8px -2px rgba(61,42,92,0.45);
   transition: transform 140ms cubic-bezier(.34,1.56,.64,1), box-shadow 140ms ease, filter 140ms ease;
 }
-.btn-seal:not(:disabled):hover {
-  background: linear-gradient(135deg, var(--plum-2) 0%, var(--plum) 70%);
-  filter: brightness(1.07);
-  transform: translateY(-1px);
+.btn-premium:not(:disabled):hover {
+  background: linear-gradient(135deg, #6a4caa 0%, var(--plum) 78%);
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.22) inset,
+    0 16px 30px -8px rgba(61,42,92,0.6),
+    0 4px 10px -2px rgba(61,42,92,0.45);
 }
-.btn-seal:not(:disabled):active { transform: translateY(1px) scale(0.992); }
+.btn-premium:not(:disabled):active { transform: translateY(1px) scale(0.99); }
 /* shimmer sweep across the face */
-.btn-seal::before {
+.btn-premium::before {
   content: '';
   position: absolute; top: 0; bottom: 0; left: -40%;
   width: 35%;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.28), transparent);
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.32), transparent);
   transform: skewX(-18deg);
   transition: left 600ms ease;
 }
-.btn-seal:not(:disabled):hover::before { left: 130%; }
-.btn-seal:disabled { cursor: default; }
-.btn-seal:disabled::before { display: none; }
+.btn-premium:not(:disabled):hover::before { left: 130%; }
+.btn-premium:disabled { cursor: default; opacity: 0.5; }
+.btn-premium:disabled::before { display: none; }
+
+/* warm honey/terra face for the "lock in the opening" button */
+.btn-seal {
+  background: linear-gradient(135deg, var(--honey) 0%, var(--terra) 100%);
+  color: #3a2412;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.4) inset,
+    0 12px 26px -8px rgba(217,122,62,0.6),
+    0 3px 8px -2px rgba(217,122,62,0.5);
+}
+.btn-seal:not(:disabled):hover {
+  background: linear-gradient(135deg, var(--honey) 0%, var(--terra) 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.4) inset,
+    0 16px 30px -8px rgba(217,122,62,0.6),
+    0 4px 10px -2px rgba(217,122,62,0.5);
+}
 
 .seal-label {
   display: flex; align-items: center; justify-content: center; gap: 8px;
@@ -331,13 +355,13 @@ h1 .accent { font-style: italic; color: var(--plum); }
 /* sealing state: label out, stamp in */
 .btn-seal.sealing .seal-label { opacity: 0; transform: scale(0.9); }
 .btn-seal.sealing .seal-stamp { opacity: 1; }
-.btn-seal.sealing { background: linear-gradient(135deg, var(--plum) 0%, #2b1d40 90%); pointer-events: none; }
+.btn-seal.sealing { background: linear-gradient(135deg, var(--terra) 0%, #7a3f17 92%); color: #fff; pointer-events: none; }
 .btn-seal.sealing .seal-wax { animation: seal-stamp 620ms cubic-bezier(.34,1.56,.64,1) 90ms forwards; }
 .btn-seal.sealing .seal-ring { animation: seal-ripple 640ms ease-out 240ms forwards; }
 .btn-seal.sealing .seal-done { animation: seal-reveal 360ms ease 720ms forwards; }
 .btn-seal.sealing .seal-wax { animation-fill-mode: forwards; }
-/* once "Sealed" shows, drift the wax to the left so the word has room */
-.btn-seal.sealing.sealed .seal-wax { transform: translateX(-34px) scale(0.78) rotate(0deg); transition: transform 320ms ease; }
+/* once "Locked in" shows, drift the wax to the left so the word has room */
+.btn-seal.sealing.sealed .seal-wax { transform: translateX(-40px) scale(0.78) rotate(0deg); transition: transform 320ms ease; }
 
 @keyframes seal-stamp {
   0%   { transform: scale(0) rotate(-24deg); }
@@ -367,6 +391,45 @@ h1 .accent { font-style: italic; color: var(--plum); }
   line-height: 1.55;
 }
 .btn-sub strong { color: var(--green); font-weight: 600; }
+
+/* Lock-in-the-opening area */
+#openingLockArea { margin-bottom: 18px; }
+.locked-confirm {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: rgba(58, 117, 96, 0.1);
+  border: 1.5px solid rgba(58, 117, 96, 0.4);
+  border-radius: 14px;
+}
+.locked-confirm-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--sans);
+  font-size: 14px; font-weight: 600;
+  color: var(--green);
+}
+.locked-edit-again {
+  flex: 0 0 auto;
+  background: transparent; border: 0;
+  font-family: var(--sans); font-size: 13px; font-weight: 600;
+  color: var(--plum); cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px;
+  padding: 4px 2px;
+}
+.locked-edit-again:hover { color: var(--plum-2); }
+
+/* sealed opening card — calm, locked, no longer editable */
+.opening-card.sealed { background: #f1e9d6; }
+.opening-card.sealed .opening-intro { opacity: 0.6; }
+.opening-card.sealed .edit-badge { display: none; }
+.opening-textarea[readonly] {
+  border-color: rgba(184, 145, 73, 0.4);
+  background: #f6efdf;
+  cursor: default;
+  box-shadow: none;
+}
+.opening-textarea[readonly]:hover { border-color: rgba(184, 145, 73, 0.4); }
+.opening-textarea[readonly]:focus { border-color: rgba(184, 145, 73, 0.4); background: #f6efdf; box-shadow: none; }
 
 /* static (non-playable) chip icon — used by the "You choose for me" music option */
 .voice-play--static {
@@ -621,7 +684,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
         <h1>The opening of <span class="accent" id="phase2Name">their</span> story.</h1>
         <p class="lead">Read it. Edit anything you'd like. Pick a voice. Then we'll record the full 15 minutes.</p>
 
-        <div class="card opening-card">
+        <div class="card opening-card" id="openingCard">
           <div class="card-head"><span id="openingHeadLabel">The opening</span> &middot; <span id="wordCount">~290</span> words &middot; to be continued</div>
           <p class="opening-intro">This will be the start of <strong id="openingIntroName">their</strong> story, and we'll use it to shape the rest. <strong class="cue">Tap anywhere in the text below to change it</strong> &mdash; a name, a word, any detail you'd like different.</p>
           <div class="opening-editor" id="openingEditor">
@@ -632,8 +695,38 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
             </span>
           </div>
           <div class="opening-foot">
-            <span id="openingFootNote">Saves automatically as you type.</span>
+            <span id="openingFootNote">Edit anything you'd like, then lock it in below.</span>
             <span class="continues">(to be continued&hellip;)</span>
+          </div>
+        </div>
+
+        <!-- Lock in the opening — the customer's deliberate "I'm happy with this" moment -->
+        <div id="openingLockArea">
+          <div id="openingLockPrompt">
+            <button class="btn btn-premium btn-seal" id="lockOpeningBtn" type="button">
+              <span class="seal-label">
+                Lock in <span id="lockOpeningName">the</span> opening
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </span>
+              <span class="seal-stamp" aria-hidden="true">
+                <span class="seal-ring"></span>
+                <svg class="seal-wax" width="50" height="50" viewBox="0 0 50 50" aria-hidden="true">
+                  <circle class="seal-blob" cx="25" cy="25" r="20"/>
+                  <circle class="seal-edge" cx="25" cy="25" r="20"/>
+                  <circle class="seal-inner" cx="25" cy="25" r="14.5"/>
+                  <text class="seal-mono" x="25" y="30" text-anchor="middle">HTN</text>
+                </svg>
+                <span class="seal-done">Locked in</span>
+              </span>
+            </button>
+            <div class="btn-sub">This becomes the start of the story. You can still edit again before you pay.</div>
+          </div>
+          <div id="openingLockedConfirm" class="locked-confirm" style="display:none">
+            <span class="locked-confirm-label">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <span id="lockedConfirmText">The opening is locked in</span>
+            </span>
+            <button type="button" class="locked-edit-again" id="editAgainBtn">Edit again</button>
           </div>
         </div>
 
@@ -652,23 +745,11 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
         </div>
 
         <div id="ctaArea">
-          <button class="btn btn-seal" id="lockInBtn" type="button" disabled>
-            <span class="seal-label">
-              Lock it in &amp; make it &middot; <span data-price>£24.99</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </span>
-            <span class="seal-stamp" aria-hidden="true">
-              <span class="seal-ring"></span>
-              <svg class="seal-wax" width="50" height="50" viewBox="0 0 50 50" aria-hidden="true">
-                <circle class="seal-blob" cx="25" cy="25" r="20"/>
-                <circle class="seal-edge" cx="25" cy="25" r="20"/>
-                <circle class="seal-inner" cx="25" cy="25" r="14.5"/>
-                <text class="seal-mono" x="25" y="30" text-anchor="middle">HTN</text>
-              </svg>
-              <span class="seal-done">Sealed</span>
-            </span>
+          <button class="btn btn-premium" id="lockInBtn" type="button" disabled>
+            Make the full story &middot; <span data-price>£24.99</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
-          <div class="btn-sub">Secure payment via Stripe. <strong>Money back if it isn't right.</strong> Story arrives in your inbox within 24 hours.</div>
+          <div class="btn-sub" id="payBtnSub">Lock in the opening above first.</div>
         </div>
 
         <div id="checkoutCard" class="checkout-card" style="display:none">
@@ -729,20 +810,23 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   // ship for now; the worker-side mixing is a later step.
   const MUSIC = {
     bedtime: [
-      { id: 'bedtime-piano',   label: 'Soft piano',   note: 'Gentle, drifting', sample: '/audio/music/bedtime-piano.mp3' },
-      { id: 'bedtime-strings', label: 'Warm strings', note: 'Tender and cosy',  sample: '/audio/music/bedtime-strings.mp3' },
-      { id: 'pick',            label: 'You choose for me', note: 'We pick what fits the story best', sample: null }
+      { id: 'bedtime-ambient', label: 'Bedtime ambient', note: 'Our classic, soft and familiar', sample: '/music/bedtime-ambient.mp3' },
+      { id: 'bedtime-piano',   label: 'Soft piano',      note: 'Gentle, drifting',  sample: '/audio/music/bedtime-piano.mp3' },
+      { id: 'bedtime-strings', label: 'Warm strings',    note: 'Tender and cosy',   sample: '/audio/music/bedtime-strings.mp3' },
+      { id: 'pick',            label: 'You choose for me', note: 'We pick what fits best', sample: null }
     ],
     adventure: [
-      { id: 'adventure-orchestral', label: 'Sweeping orchestral', note: 'Big and cinematic',  sample: '/audio/music/adventure-orchestral.mp3' },
+      { id: 'adventure-ambient',    label: 'Adventure ambient',     note: 'Our classic, bright and familiar', sample: '/music/adventure-ambient.mp3' },
+      { id: 'adventure-orchestral', label: 'Sweeping orchestral',   note: 'Big and cinematic',  sample: '/audio/music/adventure-orchestral.mp3' },
       { id: 'adventure-whimsy',     label: 'Playful and whimsical', note: 'Light, fun, bouncy', sample: '/audio/music/adventure-whimsy.mp3' },
-      { id: 'pick',                 label: 'You choose for me', note: 'We pick what fits the story best', sample: null }
+      { id: 'pick',                 label: 'You choose for me',     note: 'We pick what fits best', sample: null }
     ]
   };
 
   let selectedVoice = null;
   let selectedMusic = 'pick';
   let storyCategory = 'bedtime';
+  let openingLocked = false;
   let loadedEmail = '';
   let pollTimer = null;
   let stripeJsLoading = null;
@@ -793,6 +877,8 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       document.getElementById('phase2Name').textContent = possessive;
       document.getElementById('openingHeadLabel').textContent = data.childName + "'s opening";
       document.getElementById('openingIntroName').textContent = possessive;
+      document.getElementById('lockOpeningName').textContent = possessive;
+      document.getElementById('lockedConfirmText').textContent = possessive + ' opening is locked in';
       document.title = "The opening of " + possessive + " story · HearTheirName";
     }
     if (data.email) loadedEmail = data.email;
@@ -804,19 +890,22 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 
     // Make editing obvious: the field changes colour on focus, and the
     // little badge flips from "Tap to edit" to "Editing" so the customer
-    // knows the text is theirs to change.
+    // knows the text is theirs to change. Nothing saves automatically —
+    // they commit it deliberately with the "lock in the opening" button.
     const editor = document.getElementById('openingEditor');
     const badgeText = document.querySelector('#editBadge .edit-badge-text');
     const footNote = document.getElementById('openingFootNote');
     ta.addEventListener('focus', () => {
+      if (openingLocked) return;
       editor.classList.add('editing');
       if (badgeText) badgeText.textContent = 'Editing';
-      if (footNote) footNote.textContent = 'Saving as you type.';
+      if (footNote) footNote.textContent = 'Make any changes you like, then lock it in below.';
     });
     ta.addEventListener('blur', () => {
       editor.classList.remove('editing');
       if (badgeText) badgeText.textContent = 'Tap to edit';
-      if (footNote) footNote.textContent = 'Saved. Tap the text again any time to change more.';
+      if (openingLocked) return;
+      if (footNote) footNote.textContent = "Edit anything you'd like, then lock it in below.";
     });
 
     storyCategory = (data.storyData && data.storyData.storyKind === 'adventure') ? 'adventure' : 'bedtime';
@@ -840,10 +929,73 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     const ta = document.getElementById('openingTextarea');
     const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
     document.getElementById('wordCount').textContent = words;
-    // Enable Lock-in only when there's a voice AND text in valid range
-    const lockBtn = document.getElementById('lockInBtn');
-    const valid = words >= 80 && words <= 600 && !!selectedVoice;
-    lockBtn.disabled = !valid;
+
+    // The payment button only opens up once the customer has deliberately
+    // locked their opening AND picked a voice.
+    const payBtn = document.getElementById('lockInBtn');
+    const wordsOk = words >= 80 && words <= 600;
+    payBtn.disabled = !(openingLocked && !!selectedVoice && wordsOk);
+
+    // Helpful hint under the payment button, walking them through what's left.
+    const sub = document.getElementById('payBtnSub');
+    if (sub){
+      if (!openingLocked){
+        sub.textContent = 'Lock in the opening above first.';
+      } else if (!selectedVoice){
+        sub.textContent = 'Pick a voice to continue.';
+      } else {
+        sub.innerHTML = "Secure payment via Stripe. <strong>Money back if it isn't right.</strong> Story arrives in your inbox within 24 hours.";
+      }
+    }
+  }
+
+  // The customer's deliberate "I'm happy with this" moment. Plays the
+  // wax-seal animation, then locks the opening read-only and swaps the
+  // button for a confirmation with an "edit again" escape hatch. Nothing
+  // is sent to the server here — the locked text travels with the payment
+  // call. They can unlock and re-lock as many times as they want.
+  function lockOpening(){
+    const btn = document.getElementById('lockOpeningBtn');
+    if (btn.classList.contains('sealing')) return;
+    const ta = document.getElementById('openingTextarea');
+    const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
+    const footNote = document.getElementById('openingFootNote');
+    if (words < 80 || words > 600){
+      if (footNote){
+        footNote.textContent = words < 80
+          ? 'The opening is a little short. Add a few more lines, then lock it in.'
+          : 'The opening is a little long. Trim it back a touch, then lock it in.';
+      }
+      ta.focus();
+      return;
+    }
+    btn.classList.add('sealing');
+    setTimeout(() => btn.classList.add('sealed'), 740);
+    setTimeout(() => {
+      openingLocked = true;
+      ta.readOnly = true;
+      ta.blur();
+      document.getElementById('openingEditor').classList.remove('editing');
+      document.getElementById('openingCard').classList.add('sealed');
+      document.getElementById('openingLockPrompt').style.display = 'none';
+      document.getElementById('openingLockedConfirm').style.display = 'flex';
+      if (footNote) footNote.textContent = 'Locked in. Tap "Edit again" if you want to change anything.';
+      btn.classList.remove('sealing', 'sealed'); // reset so it can replay next time
+      updateWordCount();
+    }, 1200);
+  }
+
+  function unlockOpening(){
+    openingLocked = false;
+    const ta = document.getElementById('openingTextarea');
+    ta.readOnly = false;
+    document.getElementById('openingCard').classList.remove('sealed');
+    document.getElementById('openingLockedConfirm').style.display = 'none';
+    document.getElementById('openingLockPrompt').style.display = 'block';
+    const footNote = document.getElementById('openingFootNote');
+    if (footNote) footNote.textContent = "Edit anything you'd like, then lock it in below.";
+    updateWordCount();
+    ta.focus();
   }
 
   function renderVoices(){
@@ -967,17 +1119,16 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 
   async function lockInAndMount(){
     const btn = document.getElementById('lockInBtn');
-    if (btn.classList.contains('sealing')) return; // already in progress
+    if (btn.disabled || btn.dataset.busy === '1') return;
     document.getElementById('errorBanner').style.display = 'none';
 
     const editedOpening = document.getElementById('openingTextarea').value.trim();
-    if (!editedOpening || !selectedVoice) return;
+    if (!editedOpening || !selectedVoice || !openingLocked) return;
 
-    // Kick off the wax-seal "commit" moment. The /api/lock-in call runs in
-    // parallel; we hold the checkout reveal until the seal has had its beat.
-    btn.classList.add('sealing');
-    setTimeout(() => btn.classList.add('sealed'), 740);
-    const sealDone = new Promise(r => setTimeout(r, 1120));
+    btn.dataset.busy = '1';
+    btn.disabled = true;
+    const restoreLabel = btn.innerHTML;
+    btn.textContent = 'Opening secure checkout…';
 
     try {
       const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
@@ -1010,10 +1161,9 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       const data = await res.json();
       if (!data.clientSecret || !data.publishableKey) throw new Error('No checkout');
 
-      // Mount Stripe Embedded Checkout in-page once the seal has settled
+      // Mount Stripe Embedded Checkout in-page
       await loadStripeJs();
       if (!window.Stripe) throw new Error('stripe unavailable');
-      await sealDone;
       document.getElementById('ctaArea').style.display = 'none';
       const cardEl = document.getElementById('checkoutCard');
       cardEl.style.display = 'block';
@@ -1023,8 +1173,9 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       checkout.mount('#stripeMount');
     } catch (err){
       console.error(err);
-      btn.classList.remove('sealing', 'sealed');
+      btn.dataset.busy = '0';
       btn.disabled = false;
+      btn.innerHTML = restoreLabel;
       document.getElementById('errorBanner').style.display = 'block';
     }
   }
@@ -1232,7 +1383,9 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 
   // Wire buttons
   document.addEventListener('click', e => {
-    if (e.target.closest('#lockInBtn')){ lockInAndMount(); }
+    if (e.target.closest('#lockOpeningBtn')){ lockOpening(); }
+    else if (e.target.closest('#editAgainBtn')){ unlockOpening(); }
+    else if (e.target.closest('#lockInBtn')){ lockInAndMount(); }
     else if (e.target.closest('#silentPayBtn')){ silentPay(); }
   });
 })();

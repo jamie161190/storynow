@@ -31,8 +31,8 @@ const VALID_VOICES = new Set([
 // chosen track into the final audio is a later step — for now we just
 // persist the choice on the story row.
 const VALID_MUSIC = new Set([
-  'bedtime-piano', 'bedtime-strings',
-  'adventure-orchestral', 'adventure-whimsy',
+  'bedtime-ambient', 'bedtime-piano', 'bedtime-strings',
+  'adventure-ambient', 'adventure-orchestral', 'adventure-whimsy',
   'pick', 'none'
 ]);
 
