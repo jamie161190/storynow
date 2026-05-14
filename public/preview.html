@@ -126,20 +126,56 @@ h1 .accent { font-style: italic; color: var(--plum); }
   background: #faf7ee;
   border-color: rgba(184, 145, 73, 0.25);
 }
+.opening-intro {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+.opening-intro strong { color: var(--ink); font-weight: 600; }
+.opening-intro .cue { color: var(--plum); font-weight: 600; }
+
+.opening-editor { position: relative; }
+.edit-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--sans);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 5px 10px 5px 8px;
+  border-radius: 999px;
+  background: var(--plum);
+  color: #fff;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 2px 6px -2px rgba(61,42,92,0.5);
+  transition: background 140ms ease, transform 140ms ease;
+}
+.opening-editor.editing .edit-badge { background: var(--green); transform: scale(0.96); }
+
 .opening-textarea {
   width: 100%;
-  min-height: 280px;
-  border: 0;
-  background: transparent;
+  min-height: 300px;
+  border: 1.5px solid rgba(184, 145, 73, 0.5);
+  background: #fffdf7;
+  border-radius: 12px;
   font-family: var(--serif);
   font-size: 17.5px;
   line-height: 1.65;
   color: var(--ink);
   resize: vertical;
-  padding: 0;
+  padding: 40px 16px 16px;
   outline: none;
+  cursor: text;
+  transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
 }
-.opening-textarea:focus { background: rgba(255,253,247,0.6); border-radius: 8px; padding: 8px 10px; margin: -8px -10px; }
+.opening-textarea:hover { border-color: rgba(184, 145, 73, 0.85); }
+.opening-textarea:focus {
+  border-color: var(--plum);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(61, 42, 92, 0.13);
+}
 .opening-foot {
   display: flex; justify-content: space-between; align-items: center;
   margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line-2);
@@ -587,9 +623,16 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 
         <div class="card opening-card">
           <div class="card-head"><span id="openingHeadLabel">The opening</span> &middot; <span id="wordCount">~290</span> words &middot; to be continued</div>
-          <textarea id="openingTextarea" class="opening-textarea" aria-label="Your story's opening" spellcheck="true"></textarea>
+          <p class="opening-intro">This will be the start of <strong id="openingIntroName">their</strong> story, and we'll use it to shape the rest. <strong class="cue">Tap anywhere in the text below to change it</strong> &mdash; a name, a word, any detail you'd like different.</p>
+          <div class="opening-editor" id="openingEditor">
+            <textarea id="openingTextarea" class="opening-textarea" aria-label="The opening of your story, editable" spellcheck="true"></textarea>
+            <span class="edit-badge" id="editBadge">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+              <span class="edit-badge-text">Tap to edit</span>
+            </span>
+          </div>
           <div class="opening-foot">
-            <span>Click the text to edit. Saves automatically.</span>
+            <span id="openingFootNote">Saves automatically as you type.</span>
             <span class="continues">(to be continued&hellip;)</span>
           </div>
         </div>
@@ -749,6 +792,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       const possessive = data.childName.endsWith('s') ? data.childName + "'" : data.childName + "'s";
       document.getElementById('phase2Name').textContent = possessive;
       document.getElementById('openingHeadLabel').textContent = data.childName + "'s opening";
+      document.getElementById('openingIntroName').textContent = possessive;
       document.title = "The opening of " + possessive + " story · HearTheirName";
     }
     if (data.email) loadedEmail = data.email;
@@ -757,6 +801,23 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     ta.value = data.opening || '';
     updateWordCount();
     ta.addEventListener('input', updateWordCount);
+
+    // Make editing obvious: the field changes colour on focus, and the
+    // little badge flips from "Tap to edit" to "Editing" so the customer
+    // knows the text is theirs to change.
+    const editor = document.getElementById('openingEditor');
+    const badgeText = document.querySelector('#editBadge .edit-badge-text');
+    const footNote = document.getElementById('openingFootNote');
+    ta.addEventListener('focus', () => {
+      editor.classList.add('editing');
+      if (badgeText) badgeText.textContent = 'Editing';
+      if (footNote) footNote.textContent = 'Saving as you type.';
+    });
+    ta.addEventListener('blur', () => {
+      editor.classList.remove('editing');
+      if (badgeText) badgeText.textContent = 'Tap to edit';
+      if (footNote) footNote.textContent = 'Saved. Tap the text again any time to change more.';
+    });
 
     storyCategory = (data.storyData && data.storyData.storyKind === 'adventure') ? 'adventure' : 'bedtime';
     renderVoices();
