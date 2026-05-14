@@ -9,7 +9,7 @@
 //         fbp, fbc, checkoutEventId }
 //   editedOpening: string, ~100-600 words (validate to keep abuse out)
 //   voiceId: one of the known narrator voice ids
-//   musicId: one of 'bedtime', 'adventure', 'none'
+//   musicId: one of the recorded track ids, 'pick', or 'none' (see VALID_MUSIC)
 //
 // Returns: { clientSecret, sessionId, publishableKey } same shape as the
 // existing /api/checkout-paid endpoint, so the frontend Stripe mount code
@@ -25,7 +25,16 @@ const VALID_VOICES = new Set([
   'British (gentle)', 'Irish (lilting)', 'American (cosy)',
   'Scottish (kind)', 'Australian (bright)'
 ]);
-const VALID_MUSIC = new Set(['bedtime', 'adventure', 'none']);
+// Music options the preview page can send. The four named tracks are the
+// recorded candidates; 'pick' means "you choose for me" (Jamie picks the
+// best fit); 'none' is the legacy/no-music value. Worker-side mixing of the
+// chosen track into the final audio is a later step — for now we just
+// persist the choice on the story row.
+const VALID_MUSIC = new Set([
+  'bedtime-piano', 'bedtime-strings',
+  'adventure-orchestral', 'adventure-whimsy',
+  'pick', 'none'
+]);
 
 export default async (req) => {
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });

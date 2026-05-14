@@ -221,6 +221,108 @@ h1 .accent { font-style: italic; color: var(--plum); }
 .btn:hover { background: var(--plum-2); }
 .btn:disabled { opacity: 0.6; cursor: wait; }
 
+/* Premium "seal it in" button + wax-seal stamp animation */
+.btn-seal {
+  position: relative;
+  overflow: hidden;
+  min-height: 60px;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, var(--plum-2) 0%, var(--plum) 70%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.18) inset,
+    0 10px 22px -8px rgba(61,42,92,0.55),
+    0 2px 6px -2px rgba(61,42,92,0.4);
+  transition: transform 140ms cubic-bezier(.34,1.56,.64,1), box-shadow 140ms ease, filter 140ms ease;
+}
+.btn-seal:not(:disabled):hover {
+  background: linear-gradient(135deg, var(--plum-2) 0%, var(--plum) 70%);
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+.btn-seal:not(:disabled):active { transform: translateY(1px) scale(0.992); }
+/* shimmer sweep across the face */
+.btn-seal::before {
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: -40%;
+  width: 35%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.28), transparent);
+  transform: skewX(-18deg);
+  transition: left 600ms ease;
+}
+.btn-seal:not(:disabled):hover::before { left: 130%; }
+.btn-seal:disabled { cursor: default; }
+.btn-seal:disabled::before { display: none; }
+
+.seal-label {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.seal-stamp {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+}
+.seal-ring {
+  position: absolute;
+  width: 46px; height: 46px;
+  border-radius: 999px;
+  border: 2px solid rgba(232,163,74,0.9);
+  opacity: 0;
+}
+.seal-wax {
+  transform: scale(0) rotate(-24deg);
+  transform-origin: center;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,0.32));
+}
+.seal-blob { fill: var(--honey); }
+.seal-edge { fill: none; stroke: #b9802f; stroke-width: 1.5; stroke-dasharray: 2.6 2.6; }
+.seal-inner { fill: none; stroke: rgba(92,60,18,0.5); stroke-width: 1; }
+.seal-mono {
+  font-family: var(--serif);
+  font-size: 13px; font-weight: 600;
+  fill: #5c3c12;
+  letter-spacing: 0.06em;
+}
+.seal-done {
+  position: absolute;
+  font-family: var(--sans);
+  font-size: 16px; font-weight: 600;
+  color: #fff;
+  opacity: 0;
+  transform: translateX(34px);
+}
+
+/* sealing state: label out, stamp in */
+.btn-seal.sealing .seal-label { opacity: 0; transform: scale(0.9); }
+.btn-seal.sealing .seal-stamp { opacity: 1; }
+.btn-seal.sealing { background: linear-gradient(135deg, var(--plum) 0%, #2b1d40 90%); pointer-events: none; }
+.btn-seal.sealing .seal-wax { animation: seal-stamp 620ms cubic-bezier(.34,1.56,.64,1) 90ms forwards; }
+.btn-seal.sealing .seal-ring { animation: seal-ripple 640ms ease-out 240ms forwards; }
+.btn-seal.sealing .seal-done { animation: seal-reveal 360ms ease 720ms forwards; }
+.btn-seal.sealing .seal-wax { animation-fill-mode: forwards; }
+/* once "Sealed" shows, drift the wax to the left so the word has room */
+.btn-seal.sealing.sealed .seal-wax { transform: translateX(-34px) scale(0.78) rotate(0deg); transition: transform 320ms ease; }
+
+@keyframes seal-stamp {
+  0%   { transform: scale(0) rotate(-24deg); }
+  55%  { transform: scale(1.16) rotate(4deg); }
+  78%  { transform: scale(0.94) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes seal-ripple {
+  0%   { opacity: 0.85; transform: scale(0.55); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+@keyframes seal-reveal {
+  0%   { opacity: 0; transform: translateX(34px); }
+  100% { opacity: 1; transform: translateX(34px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-seal.sealing .seal-wax,
+  .btn-seal.sealing .seal-ring,
+  .btn-seal.sealing .seal-done { animation-duration: 1ms; }
+}
+
 .btn-sub {
   text-align: center;
   font-size: 12.5px;
@@ -229,6 +331,20 @@ h1 .accent { font-style: italic; color: var(--plum); }
   line-height: 1.55;
 }
 .btn-sub strong { color: var(--green); font-weight: 600; }
+
+/* static (non-playable) chip icon — used by the "You choose for me" music option */
+.voice-play--static {
+  background: var(--paper-3);
+  color: var(--plum);
+  cursor: default;
+}
+.voice-play--static:hover { background: var(--paper-3); }
+
+.checkout-card.slide-in { animation: checkout-slide 380ms cubic-bezier(.22,.61,.36,1) both; }
+@keyframes checkout-slide {
+  0%   { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
 
 .banner {
   background: rgba(217, 119, 87, 0.08);
@@ -485,10 +601,29 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
           <audio id="voiceAudio" preload="none"></audio>
         </div>
 
+        <div class="card">
+          <div class="card-head">Add background music</div>
+          <p class="card-sub" id="musicSub">A soft score under the narration. Tap to listen, tap the chip to choose.</p>
+          <div class="voice-grid" id="musicGrid"></div>
+          <audio id="musicAudio" preload="none"></audio>
+        </div>
+
         <div id="ctaArea">
-          <button class="btn" id="lockInBtn" type="button" disabled>
-            Lock it in &amp; make it &middot; <span data-price>£24.99</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <button class="btn btn-seal" id="lockInBtn" type="button" disabled>
+            <span class="seal-label">
+              Lock it in &amp; make it &middot; <span data-price>£24.99</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+            <span class="seal-stamp" aria-hidden="true">
+              <span class="seal-ring"></span>
+              <svg class="seal-wax" width="50" height="50" viewBox="0 0 50 50" aria-hidden="true">
+                <circle class="seal-blob" cx="25" cy="25" r="20"/>
+                <circle class="seal-edge" cx="25" cy="25" r="20"/>
+                <circle class="seal-inner" cx="25" cy="25" r="14.5"/>
+                <text class="seal-mono" x="25" y="30" text-anchor="middle">HTN</text>
+              </svg>
+              <span class="seal-done">Sealed</span>
+            </span>
           </button>
           <div class="btn-sub">Secure payment via Stripe. <strong>Money back if it isn't right.</strong> Story arrives in your inbox within 24 hours.</div>
         </div>
@@ -542,10 +677,29 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     { id: 'Irish (lilting)',     label: 'Lilting', accent: 'Irish',     sample: '/audio/voice-samples/irish-lilting.mp3' },
     { id: 'American (cosy)',     label: 'Cosy',    accent: 'American',  sample: '/audio/voice-samples/american-cosy.mp3' },
     { id: 'Scottish (kind)',     label: 'Kind',    accent: 'Scottish',  sample: '/audio/voice-samples/scottish-kind.mp3' },
-    { id: 'Australian (bright)', label: 'Bright',  accent: 'Australian',sample: '/audio/voice-samples/australian-bright.mp3' }
+    { id: 'Australian (bright)', label: 'Bright',  accent: 'British',   sample: '/audio/voice-samples/australian-bright.mp3' }
   ];
 
+  // Background music. Category-aware: bedtime stories see calm tracks,
+  // adventure stories see bigger ones. "You choose for me" lets Jamie
+  // pick the best fit. Only the 4 recorded tracks plus the pick option
+  // ship for now; the worker-side mixing is a later step.
+  const MUSIC = {
+    bedtime: [
+      { id: 'bedtime-piano',   label: 'Soft piano',   note: 'Gentle, drifting', sample: '/audio/music/bedtime-piano.mp3' },
+      { id: 'bedtime-strings', label: 'Warm strings', note: 'Tender and cosy',  sample: '/audio/music/bedtime-strings.mp3' },
+      { id: 'pick',            label: 'You choose for me', note: 'We pick what fits the story best', sample: null }
+    ],
+    adventure: [
+      { id: 'adventure-orchestral', label: 'Sweeping orchestral', note: 'Big and cinematic',  sample: '/audio/music/adventure-orchestral.mp3' },
+      { id: 'adventure-whimsy',     label: 'Playful and whimsical', note: 'Light, fun, bouncy', sample: '/audio/music/adventure-whimsy.mp3' },
+      { id: 'pick',                 label: 'You choose for me', note: 'We pick what fits the story best', sample: null }
+    ]
+  };
+
   let selectedVoice = null;
+  let selectedMusic = 'pick';
+  let storyCategory = 'bedtime';
   let loadedEmail = '';
   let pollTimer = null;
   let stripeJsLoading = null;
@@ -604,7 +758,9 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     updateWordCount();
     ta.addEventListener('input', updateWordCount);
 
+    storyCategory = (data.storyData && data.storyData.storyKind === 'adventure') ? 'adventure' : 'bedtime';
     renderVoices();
+    renderMusic();
 
     document.getElementById('phase1').style.display = 'none';
     document.getElementById('phase2').style.display = 'block';
@@ -655,23 +811,72 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     grid.querySelectorAll('.voice-play').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        playSample(btn);
+        playSample(btn, 'voiceAudio');
       });
     });
   }
 
   function selectVoice(id){
     selectedVoice = id;
-    document.querySelectorAll('.voice-chip').forEach(c => {
+    document.querySelectorAll('#voiceGrid .voice-chip').forEach(c => {
       c.classList.toggle('selected', c.dataset.voice === id);
     });
     updateWordCount();
   }
 
-  function playSample(btn){
-    const audio = document.getElementById('voiceAudio');
+  function renderMusic(){
+    const grid = document.getElementById('musicGrid');
+    const list = MUSIC[storyCategory] || MUSIC.bedtime;
+    grid.innerHTML = list.map(m => `
+      <div class="voice-chip" data-music="${escAttr(m.id)}" role="button" tabindex="0">
+        ${m.sample
+          ? `<button class="voice-play" type="button" data-play="${escAttr(m.sample)}" aria-label="Play ${escAttr(m.label)} sample">
+               <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+             </button>`
+          : `<span class="voice-play voice-play--static" aria-hidden="true">
+               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.9L21 11l-6.6 2.1L12 20l-2.4-6.9L3 11l6.6-2.1L12 2z"/></svg>
+             </span>`}
+        <div class="voice-meta">
+          <div class="voice-name">${escHtml(m.label)}</div>
+          <div class="voice-accent">${escHtml(m.note)}</div>
+        </div>
+      </div>
+    `).join('');
+    grid.querySelectorAll('.voice-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        if (e.target.closest('.voice-play:not(.voice-play--static)')) return;
+        selectMusic(chip.dataset.music);
+      });
+      chip.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); selectMusic(chip.dataset.music); }
+      });
+    });
+    grid.querySelectorAll('.voice-play:not(.voice-play--static)').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSample(btn, 'musicAudio');
+      });
+    });
+    selectMusic(selectedMusic); // reflect the default ("You choose for me")
+  }
+
+  function selectMusic(id){
+    selectedMusic = id;
+    document.querySelectorAll('#musicGrid .voice-chip').forEach(c => {
+      c.classList.toggle('selected', c.dataset.music === id);
+    });
+  }
+
+  // Shared sample player for both the voice and music pickers. audioId picks
+  // which <audio> element to drive; the two never play at once.
+  function playSample(btn, audioId){
+    const audio = document.getElementById(audioId);
     const src = btn.dataset.play;
-    // Reset all play buttons
+    // Stop the other picker's audio so voice + music never overlap
+    ['voiceAudio', 'musicAudio'].forEach(aid => {
+      const a = document.getElementById(aid);
+      if (a && a !== audio) a.pause();
+    });
     document.querySelectorAll('.voice-play').forEach(b => b.classList.remove('playing'));
     if (audio.dataset.currentSrc === src && !audio.paused){
       audio.pause();
@@ -701,16 +906,17 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 
   async function lockInAndMount(){
     const btn = document.getElementById('lockInBtn');
-    btn.disabled = true;
-    btn.innerHTML = 'Locking it in&hellip;';
+    if (btn.classList.contains('sealing')) return; // already in progress
     document.getElementById('errorBanner').style.display = 'none';
 
     const editedOpening = document.getElementById('openingTextarea').value.trim();
-    if (!editedOpening || !selectedVoice){
-      btn.disabled = false;
-      btn.innerHTML = 'Lock it in &amp; make it · £24.99 →';
-      return;
-    }
+    if (!editedOpening || !selectedVoice) return;
+
+    // Kick off the wax-seal "commit" moment. The /api/lock-in call runs in
+    // parallel; we hold the checkout reveal until the seal has had its beat.
+    btn.classList.add('sealing');
+    setTimeout(() => btn.classList.add('sealed'), 740);
+    const sealDone = new Promise(r => setTimeout(r, 1120));
 
     try {
       const fbp = window.htnPixel ? window.htnPixel.fbp() : '';
@@ -730,7 +936,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
           accessToken,
           editedOpening,
           voiceId: selectedVoice,
-          musicId: 'none',
+          musicId: selectedMusic,
           email: loadedEmail,
           fbp, fbc, checkoutEventId
         })
@@ -743,18 +949,21 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       const data = await res.json();
       if (!data.clientSecret || !data.publishableKey) throw new Error('No checkout');
 
-      // Mount Stripe Embedded Checkout in-page
+      // Mount Stripe Embedded Checkout in-page once the seal has settled
       await loadStripeJs();
       if (!window.Stripe) throw new Error('stripe unavailable');
+      await sealDone;
       document.getElementById('ctaArea').style.display = 'none';
-      document.getElementById('checkoutCard').style.display = 'block';
+      const cardEl = document.getElementById('checkoutCard');
+      cardEl.style.display = 'block';
+      cardEl.classList.add('slide-in');
       const stripe = window.Stripe(data.publishableKey);
       const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
       checkout.mount('#stripeMount');
     } catch (err){
       console.error(err);
+      btn.classList.remove('sealing', 'sealed');
       btn.disabled = false;
-      btn.innerHTML = 'Try again';
       document.getElementById('errorBanner').style.display = 'block';
     }
   }
