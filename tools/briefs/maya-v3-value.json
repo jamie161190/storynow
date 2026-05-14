@@ -5,17 +5,17 @@
   "music": "public/music/bedtime-ambient.mp3",
   "music_volume": 0.12,
   "walkthrough_hook": "60 SECONDS TO MAKE. 15 MINUTES OF GOLD.",
-  "walkthrough_voiceover": "One minute. Five questions. You read the opening there and then, free. Edit anything you want. Then the full fifteen minutes, made by hand, with her name woven through. Twenty four ninety nine. Yours forever. Tonight's story is hers. The hero is... Maya.",
+  "walkthrough_voiceover": "One minute. Five questions. You read the opening there and then, free. Edit anything you want. Then the full fifteen minutes, made by hand, with her name woven through. Twenty nine ninety nine. Yours forever. Tonight's story is hers. The hero is... Maya.",
   "spoken_captions": [
     { "text": "1 MINUTE TO MAKE",      "start": 0.0, "end": 1.5 },
     { "text": "15 MIN OF AUDIO",       "start": 1.5, "end": 3.0 },
-    { "text": "£24.99 ONE-OFF",        "start": 3.0, "end": 4.0 },
+    { "text": "€29.99 ONE-OFF",        "start": 3.0, "end": 4.0 },
     { "text": "Maya.",                 "start": 4.1, "end": 6.5, "highlight": true }
   ],
   "end_card": {
     "duration": 3,
     "eyebrow": "HEARTHEIRNAME.COM",
-    "headline": "£24.99. Within a day. Yours forever.",
+    "headline": "€29.99. Within a day. Yours forever.",
     "subline": "Read the opening free · No card today"
   }
 }

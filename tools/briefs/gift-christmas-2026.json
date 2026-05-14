@@ -3,7 +3,7 @@
   "voice": "British (warm)",
   "music": "public/music/bedtime-ambient.mp3",
   "music_volume": 0.18,
-  "voiceover": "This Christmas, give them something they'll remember. A story made just for them. Their name woven through. Made by hand. Just twenty four ninety nine. heartheirname dot com.",
+  "voiceover": "This Christmas, give them something they'll remember. A story made just for them. Their name woven through. Made by hand. Just twenty nine ninety nine. heartheirname dot com.",
   "scenes": [
     {
       "duration": 5,
@@ -28,6 +28,6 @@
     "duration": 3,
     "eyebrow": "HEARTHEIRNAME.COM",
     "headline": "Their name. Their world.",
-    "subline": "£24.99 · Read the opening free"
+    "subline": "€29.99 · Read the opening free"
   }
 }

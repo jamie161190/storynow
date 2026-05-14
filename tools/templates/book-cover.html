@@ -151,7 +151,7 @@ document.getElementById('headlineName').textContent = name;
 const headlineCopy = {
   statement: { h: `A story made just for <em>${name}</em>.`, s: '15 minutes of audio. Their name, woven through.' },
   question:  { h: `What if <em>${name}</em> heard <em>their</em> name in a story tonight?`, s: 'Read the opening free. Full story in your inbox within 24h.' },
-  soft:      { h: `<em>${name}</em>, the hero of their own story.`, s: '£24.99. Yours forever. By Jamie + family.' }
+  soft:      { h: `<em>${name}</em>, the hero of their own story.`, s: '€29.99. Yours forever. By Jamie + family.' }
 };
 const copy = headlineCopy[tone] || headlineCopy.statement;
 document.getElementById('headline').innerHTML = copy.h;

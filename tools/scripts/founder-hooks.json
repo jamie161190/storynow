@@ -26,14 +26,14 @@
       "id": "gift-grandparent",
       "angle": "gift",
       "duration_target": 32,
-      "script": "If you're trying to find a gift for a grandchild that isn't another piece of plastic, try this. A 15-minute audio story made by hand, with their name woven through, their best friend, their pet. Twenty four ninety nine. They'll listen to it dozens of times. It lives in their inbox forever. Read the opening free at heartheirname.com.",
+      "script": "If you're trying to find a gift for a grandchild that isn't another piece of plastic, try this. A 15-minute audio story made by hand, with their name woven through, their best friend, their pet. Twenty nine ninety nine. They'll listen to it dozens of times. It lives in their inbox forever. Read the opening free at heartheirname.com.",
       "tone_note": "Slightly older speaker. Practical, confident. The kind of thing a grandparent would tell another grandparent."
     },
     {
       "id": "gift-actually-remembers",
       "angle": "gift",
       "duration_target": 28,
-      "script": "My niece is four. The two things she remembered from her birthday were the trampoline her mum and dad got her, and the audio story I sent. The trampoline cost nine hundred. The story cost twenty four ninety nine. Make of that what you will. Heartheirname.com.",
+      "script": "My niece is four. The two things she remembered from her birthday were the trampoline her mum and dad got her, and the audio story I sent. The trampoline cost nine hundred. The story cost twenty nine ninety nine. Make of that what you will. Heartheirname.com.",
       "tone_note": "Dry, slightly amused. The implicit punchline lands without overselling."
     },
     {
