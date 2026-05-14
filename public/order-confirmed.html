@@ -296,16 +296,28 @@ footer.site {
         // Meta Pixel Purchase event for normal customers, deduped against the
         // server-side CAPI Purchase event by Stripe checkout session id.
         // Fires inside the fetch handler so silent payments (which return
-        // early above) skip it cleanly.
+        // early above) skip it cleanly. Value + currency come from
+        // /api/get-pricing (geo-based, same country the customer paid from)
+        // so non-UK sales no longer report a hardcoded £24.99 GBP. The
+        // server-side CAPI event remains the authoritative figure.
         if (checkoutSessionId && window.htnPixel) {
           const dedupeKey = 'htn_purchase_fired_' + checkoutSessionId;
           if (!sessionStorage.getItem(dedupeKey)) {
-            try {
-              window.htnPixel.track('Purchase', { value: 24.99, currency: 'GBP', content_name: 'paid_v2' }, {
-                eventId: 'purchase_' + checkoutSessionId
-              });
-              sessionStorage.setItem(dedupeKey, '1');
-            } catch (e) {}
+            const firePurchase = (value, currency) => {
+              try {
+                window.htnPixel.track('Purchase', { value, currency, content_name: 'paid_v2' }, {
+                  eventId: 'purchase_' + checkoutSessionId
+                });
+                sessionStorage.setItem(dedupeKey, '1');
+              } catch (e) {}
+            };
+            fetch('/api/get-pricing', { credentials: 'omit' })
+              .then(r => r.ok ? r.json() : null)
+              .then(pr => firePurchase(
+                pr && pr.amount ? pr.amount : 24.99,
+                pr && pr.currency ? pr.currency : 'GBP'
+              ))
+              .catch(() => firePurchase(24.99, 'GBP'));
           }
         }
       })

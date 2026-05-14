@@ -1179,7 +1179,8 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       const fbc = window.htnPixel ? window.htnPixel.fbc() : '';
       const checkoutEventId = 'checkout_' + storyId + '_' + Date.now();
       if (window.htnPixel){
-        window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: 24.99, currency: 'GBP' }, {
+        const pr = window.htnPricing || { amount: 24.99, currency: 'GBP' };
+        window.htnPixel.track('InitiateCheckout', { content_name: 'paid_v2', value: pr.amount, currency: pr.currency }, {
           eventId: checkoutEventId, email: loadedEmail
         });
       }
@@ -1451,6 +1452,29 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     else if (e.target.closest('#lockInBtn')){ lockInAndMount(); }
     else if (e.target.closest('#silentPayBtn')){ silentPay(); }
   });
+})();
+</script>
+<script>
+// Localised pricing — fetches /api/get-pricing once, swaps every [data-price]
+// span, and stashes the result on window.htnPricing so the checkout pixels
+// report the customer's real amount + currency (not a hardcoded £24.99).
+(async function localisePrice(){
+  let p = { display: '£24.99', amount: 24.99, currency: 'GBP' };
+  try {
+    const r = await fetch('/api/get-pricing', { credentials: 'omit' });
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.display) p = j;
+    }
+  } catch (e) {}
+  window.htnPricing = p;
+  const apply = () => document.querySelectorAll('[data-price]').forEach(el => { el.textContent = p.display; });
+  apply();
+  // Re-apply after Phase 2 mounts (the price button only exists once the
+  // opening is revealed).
+  setTimeout(apply, 400);
+  setTimeout(apply, 1500);
+  setTimeout(apply, 3000);
 })();
 </script>
 

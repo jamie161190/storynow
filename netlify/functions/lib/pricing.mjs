@@ -4,8 +4,8 @@
 //
 //   UK            → GBP £24.99   (£5 returning discount → £19.99)
 //   Europe        → EUR €29.99   (€5 returning discount → €24.99)
-//   United States → USD $39.99   ($5 returning discount → $34.99)
-//   Australia/NZ  → AUD A$45.99  (A$5 returning discount → A$40.99)
+//   United States → USD $34.99   ($5 returning discount → $29.99)
+//   Australia/NZ  → AUD A$44.99  (A$5 returning discount → A$39.99)
 //   Anywhere else → USD $45.99   ($5 returning discount → $40.99)
 //
 // The country code is read from the Netlify edge geo header server-side
@@ -30,8 +30,8 @@ const AU_NZ = new Set(['AU','NZ']);
 const BUCKETS = {
   UK:    { currency: 'GBP', symbol: '£',  amountMinor: 2499, returningDiscountMinor: 500 },
   EU:    { currency: 'EUR', symbol: '€',  amountMinor: 2999, returningDiscountMinor: 500 },
-  US:    { currency: 'USD', symbol: '$',  amountMinor: 3999, returningDiscountMinor: 500 },
-  AU:    { currency: 'AUD', symbol: 'A$', amountMinor: 4599, returningDiscountMinor: 500 },
+  US:    { currency: 'USD', symbol: '$',  amountMinor: 3499, returningDiscountMinor: 500 },
+  AU:    { currency: 'AUD', symbol: 'A$', amountMinor: 4499, returningDiscountMinor: 500 },
   ROW:   { currency: 'USD', symbol: '$',  amountMinor: 4599, returningDiscountMinor: 500 },
 };
 

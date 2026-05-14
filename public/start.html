@@ -758,7 +758,7 @@ function renderEmailStep(){
         ${[
           ['✍️',"We&rsquo;ll write the opening of your story right now, with every name and detail you&rsquo;ve given us."],
           ['👀',"You&rsquo;ll see it on the next page. Read it. Edit anything that isn&rsquo;t right. Pick a voice."],
-          ['🔒',"Then pay £24.99 to lock it in. The full 15-minute audio lands in your inbox within 24 hours."],
+          ['🔒',"Then pay <span data-price>£24.99</span> to lock it in. The full 15-minute audio lands in your inbox within 24 hours."],
           ['💛','If anything isn&rsquo;t quite right when you hear it, just let us know. We&rsquo;ll tweak it until everything&rsquo;s absolutely perfect.'],
           ['🌙','Then it&rsquo;s theirs forever. Replay it, share it with grandparents, treasure it.']
         ].map(([e,t]) => `<li style="display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink)"><span style="flex:0 0 22px;font-size:16px">${e}</span><span style="color:var(--muted);line-height:1.55">${t}</span></li>`).join('')}
@@ -772,6 +772,8 @@ function renderEmailStep(){
     </div>
     <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--muted-2)">No payment yet. You'll see the opening of your story first, then decide.</div>`;
   document.getElementById('submitBtn').addEventListener('click', submitRequest);
+  // The FROM HERE list has a [data-price] span; localise it now that it exists.
+  if (window.htnApplyPrice) window.htnApplyPrice();
 }
 
 function render(){
@@ -985,8 +987,9 @@ render();
 </script>
 <script>
 // Localised pricing — fetches /api/get-pricing and swaps every [data-price]
-// span. Polls a few times so dynamically-rendered review/CTA blocks get the
-// right text once they mount. Falls back to inline £24.99 if the call fails.
+// span. The review/email step builds its DOM in JS (and the customer may
+// reach it minutes later), so we expose window.htnApplyPrice for render()
+// to call on every step. Falls back to inline £24.99 if the call fails.
 (async function localisePrice(){
   let display = '£24.99';
   try {
@@ -994,11 +997,12 @@ render();
     if (r.ok) {
       const p = await r.json();
       if (p && p.display) display = p.display;
+      if (p) window.htnPricing = p;
     }
   } catch (e) {}
   const apply = () => document.querySelectorAll('[data-price]').forEach(el => { el.textContent = display; });
+  window.htnApplyPrice = apply;
   apply();
-  // Re-apply after later renders (the review-summary block builds its DOM in JS).
   setTimeout(apply, 300);
   setTimeout(apply, 1200);
 })();
