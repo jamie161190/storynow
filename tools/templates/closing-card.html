@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--
+  Closing brand card for the side-panel ads. Rendered as a short PNG
+  sequence (transparent-friendly but here it has a full plum background)
+  and appended after the main footage. Replaces the old v3-derived
+  closing card that no longer exists.
+
+  Driven by window.setTime(t). fmt query param picks the canvas size.
+-->
+<style>
+  @font-face { font-family: 'NewsreaderLocal'; src: local('Newsreader'); }
+  :root {
+    --plum: #3d2a5c;
+    --plum-2: #5a3f83;
+    --paper: #f0eee9;
+    --honey: #e8a34a;
+    --blush: #d97757;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; }
+  body {
+    background:
+      radial-gradient(120% 80% at 50% 0%, #4d3578 0%, var(--plum) 60%, #2b1d40 100%);
+    font-family: "Newsreader", "Iowan Old Style", Georgia, serif;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 0 9%;
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+  .wordmark {
+    font-size: 40px; font-weight: 500; letter-spacing: -0.01em;
+    color: var(--paper);
+  }
+  .wordmark .name { color: var(--blush); }
+  .rule {
+    width: 54px; height: 3px; border-radius: 2px;
+    background: var(--honey);
+    margin: 30px 0;
+  }
+  .headline {
+    font-size: 58px; font-weight: 400; line-height: 1.12;
+    letter-spacing: -0.015em;
+    color: var(--paper);
+    max-width: 14ch;
+  }
+  .headline em { font-style: italic; color: var(--honey); }
+  .cta {
+    margin-top: 38px;
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 27px; font-weight: 600;
+    color: var(--plum);
+    background: var(--honey);
+    padding: 18px 34px;
+    border-radius: 999px;
+    box-shadow: 0 12px 30px -10px rgba(232,163,74,0.6);
+  }
+  .url {
+    margin-top: 26px;
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 22px; font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(240,238,233,0.72);
+  }
+  /* Format-specific sizing */
+  body[data-fmt="45"] .headline { font-size: 52px; }
+  body[data-fmt="11"] .headline { font-size: 46px; }
+  body[data-fmt="11"] .wordmark { font-size: 34px; }
+  body[data-fmt="11"] .cta { font-size: 24px; padding: 16px 30px; }
+  body[data-fmt="11"] .rule { margin: 22px 0; }
+</style>
+</head>
+<body data-fmt="916">
+  <div class="card" id="card">
+    <div class="wordmark">heartheir<span class="name">name</span></div>
+    <div class="rule"></div>
+    <div class="headline">A story that knows <em>their name</em>.</div>
+    <div class="cta">Read the opening free</div>
+    <div class="url">heartheirname.com</div>
+  </div>
+
+<script>
+  (function () {
+    const params = new URLSearchParams(location.search);
+    const fmt = params.get('fmt') || '916';
+    document.body.dataset.fmt = fmt;
+    const card = document.getElementById('card');
+
+    // Gentle fade + settle over the first 0.6s, then hold.
+    window.setTime = function (t) {
+      const p = Math.min(1, t / 0.6);
+      const ease = 1 - Math.pow(1 - p, 3);
+      card.style.opacity = String(ease);
+      card.style.transform =
+        'translateY(' + (14 * (1 - ease)).toFixed(2) + 'px) scale(' +
+        (0.99 + 0.01 * ease).toFixed(4) + ')';
+    };
+    window.setTime(0);
+    document.body.setAttribute('data-ready', 'true');
+  })();
+</script>
+</body>
+</html>
