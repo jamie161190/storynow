@@ -207,10 +207,6 @@ const PETS = [
   ['🐶','Dog'],['🐱','Cat'],['🐰','Rabbit'],['🐹','Hamster'],
   ['🐠','Fish'],['🦎','Reptile'],['🐴','Horse'],['🦜','Other']
 ];
-const VOICES = [
-  'British (gentle)','Irish (lilting)',
-  'American (cosy)','Scottish (kind)','Australian (bright)'
-];
 // Numeric age now (was banded). The writer needs an actual number to pitch the
 // reading age right — a 13-year-old should not get the same prose as a 7-year-old.
 function ageNum(v){ const n = parseInt(v, 10); return Number.isFinite(n) && n >= 0 && n <= 17 ? n : null; }
@@ -249,7 +245,6 @@ const state = {
     place: '', placeReal: '',
     quirk: '',
     heartOut: '',
-    voice: '',
     isGift: STARTS_AS_GIFT || STARTS_AS_GIFTCARD,
     isGiftCard: STARTS_AS_GIFTCARD,
     giftFrom: '', giftMessage: '', giftDeliveryNote: '', giftSendAt: '',
@@ -258,7 +253,10 @@ const state = {
   }
 };
 
-const TOTAL_STEPS = 10; // 7 questionnaire (kind, children, themes, place, casting, quirks, voice) + email + confirm-inbox + ordered. Adventure stories add a villain step (11 total). Variable is informational only — actual count uses STEPS.length at runtime.
+// Step count is informational only. The questionnaire steps plus the final
+// review step are counted at runtime from STEPS.length. After the review
+// step, submitRequest navigates straight to /preview/{id}, so there are no
+// further in-funnel steps. Adventure stories add a conditional villain step.
 
 const STEPS = [
   { key:'kind', title:"What kind of story?", sub:"This shapes the pace, voice and where it ends.",
@@ -700,8 +698,6 @@ function buildReviewCards(){
     .filter(c => c.foodNo && c.foodNo.trim())
     .map(c => `<strong>${esc((c.name || '').trim() || 'Them')}:</strong> ${esc(c.foodNo.trim())}`);
 
-  const voiceLine = d.voice ? `🎙 <strong>${esc(d.voice)}</strong>` : '';
-
   const giftLines = [];
   if (d.isGift){
     giftLines.push(`🎁 <strong>This is a gift</strong>`);
@@ -730,7 +726,6 @@ function buildReviewCards(){
     nicknameLines.length ? card('What you call them', 'bits', nicknameLines) : '',
     foodNoLines.length ? card('Won’t touch', 'bits', foodNoLines) : '',
     villainLine ? card('The baddie', 'bits', [villainLine]) : '',
-    voiceLine ? card('Storyteller', 'voice', [voiceLine]) : '',
     card('Gift', 'gift', giftLines)
   ].filter(Boolean).join('');
 }
@@ -779,83 +774,23 @@ function renderEmailStep(){
   document.getElementById('submitBtn').addEventListener('click', submitRequest);
 }
 
-function renderConfirmInboxStep(){
-  const host = document.getElementById('stepHost');
-  host.classList.add('narrow');
-  host.classList.remove('wide');
-  host.innerHTML = `
-    <div class="step-head">
-      <div style="width:64px;height:64px;border-radius:18px;background:var(--paper-2);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto">✉️</div>
-      <div class="kicker" style="margin-top:18px">ONE QUICK CONFIRMATION</div>
-      <h2 style="margin-top:10px">Pop over to your inbox<br>and tap the link from us.</h2>
-      <p class="sub" style="max-width:480px;margin-left:auto;margin-right:auto;line-height:1.65">We've just sent a quick "is this really you?" email to <strong style="color:var(--ink)">${esc(state.data.email || 'your inbox')}</strong>. Tapping the link inside tells your inbox we're a real person, not a robot. That way the actual preview lands where you'll find it, <em>not</em> in your spam folder.</p>
-    </div>
-    <div style="background:rgba(255,253,247,.7);border:1px solid var(--line);border-radius:18px;padding:clamp(20px,3vw,26px)">
-      <div class="kicker" style="margin-bottom:14px">WHY WE ASK</div>
-      <div style="display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.6;color:var(--muted)">
-        <p style="margin:0"><strong style="color:var(--ink)">Stories shouldn't get lost in spam.</strong> About one in three of our previews ended up in junk folders before we started doing this.</p>
-        <p style="margin:0">The link tells Gmail, Outlook and Apple Mail that you actually want to hear from us. After you tap it, the preview email lands cleanly in your main inbox.</p>
-        <p style="margin:0">That's it. We don't store the link, sell your email, or ever email you about anything else. <span style="color:var(--ink);font-weight:500">It's a one-time hello.</span></p>
-      </div>
-    </div>
-    <div style="margin-top:18px;padding:16px;border-radius:14px;background:var(--paper-2);border:1px dashed var(--line);display:flex;gap:14px;align-items:flex-start">
-      <div style="font-size:18px;margin-top:1px">🔍</div>
-      <div style="font-size:13px;color:var(--muted);line-height:1.6"><strong style="color:var(--ink)">Can't find it?</strong> Check Promotions, Updates, or your Spam folder. Search for <em>"hello@heartheirname.com"</em>. Drag the email into your main inbox if you can. That'll keep our future emails out of junk too.</div>
-    </div>
-    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted-2)">Once you tap the link, your preview generation starts automatically.</div>`;
-}
-
-function renderOrderedStep(){
-  const list = state.data.children.map(c => c.name).filter(Boolean).join(' & ') || 'their';
-  const host = document.getElementById('stepHost');
-  host.classList.add('wide');
-  host.classList.remove('narrow');
-  host.innerHTML = `
-    <div style="text-align:center">
-      <div style="width:72px;height:72px;border-radius:999px;background:var(--plum);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin:0 auto">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <div class="kicker" style="margin-top:18px">YOU'RE ALL SET</div>
-      <h2 class="serif" style="font-size:clamp(28px,4vw,42px);margin:10px 0 0;font-weight:500;line-height:1.2">We're writing <span class="italic-plum">${esc(list)}'s</span> preview now.</h2>
-      <p style="color:var(--muted);font-size:15px;max-width:500px;margin:16px auto 0;line-height:1.65">It plays in your browser in about 3 minutes, no inbox check needed. We've also sent a backup link to <strong style="color:var(--ink)">${esc(state.data.email || 'your inbox')}</strong> in case you close the page.</p>
-    </div>
-    <div style="margin:30px auto 0;max-width:520px;padding:22px;border-radius:18px;background:rgba(255,253,247,.7);border:1px solid var(--line);text-align:left">
-      <div class="kicker" style="margin-bottom:14px">WHAT HAPPENS NEXT</div>
-      <ul class="timeline">
-        <li><span class="when">RIGHT NOW</span><span class="what">We read what you sent us. Properly. We think about your child for a few minutes. What would make them gasp?</span></li>
-        <li><span class="when">IN A MINUTE</span><span class="what">We write a 2-minute opening. The kind that makes them sit up and listen.</span></li>
-        <li><span class="when">NEXT</span><span class="what">A storyteller records it in the voice you chose. Mixed and mastered by us.</span></li>
-        <li><span class="when">IN ABOUT 3 MIN</span><span class="what">It plays in your browser. Listen with them. If you love it, the full story is one tap away.</span></li>
-      </ul>
-    </div>
-    <div class="cta-row">
-      <a class="btn btn--ghost btn--sm" href="/">Back to home</a>
-    </div>
-    <div style="text-align:center"><div class="hand" style="font-size:24px;color:var(--plum);margin-top:30px">thank you, truly.</div>
-    <div style="font-size:12px;color:var(--muted-2)">Jamie & family</div></div>`;
-}
-
 function render(){
   const isQuestion = state.step < STEPS.length;
   const isEmail = state.step === STEPS.length;
-  const isConfirm = state.step === STEPS.length + 1;
-  const isOrdered = state.step === STEPS.length + 2;
 
   // Effective step counter — skips conditionally hidden steps (e.g. villain on bedtime)
   const visibleQuestionCount = STEPS.reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0);
   const visibleStepNumber = isQuestion
     ? STEPS.slice(0, state.step + 1).reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0)
-    : visibleQuestionCount + (isEmail ? 1 : isConfirm ? 2 : 3);
-  const totalShown = visibleQuestionCount + 3;
+    : visibleQuestionCount + 1;
+  const totalShown = visibleQuestionCount + 1;
 
   const counter = document.getElementById('stepCounter');
-  counter.textContent = isOrdered ? 'DONE' : `${visibleStepNumber} / ${totalShown}`;
+  counter.textContent = `${visibleStepNumber} / ${totalShown}`;
   document.getElementById('progressFill').style.width = `${(visibleStepNumber / totalShown) * 100}%`;
 
   if (isQuestion) renderQuestionStep();
   else if (isEmail) renderEmailStep();
-  else if (isConfirm) renderConfirmInboxStep();
-  else if (isOrdered) renderOrderedStep();
 
   attachActions();
 }
@@ -924,7 +859,6 @@ function handleAction(action, el, e){
     case 'setVillainName': state.data.villainName = el.value; break;
     case 'pickVillain': state.data.villainName = v; render(); break;
     case 'setHeartOut': state.data.heartOut = el.value; break;
-    case 'setVoice': state.data.voice = v; render(); break;
     case 'setIsGift': state.data.isGift = (v === 'true'); render(); break;
     case 'setGiftFrom': state.data.giftFrom = el.value; break;
     case 'setGiftMessage': state.data.giftMessage = el.value; break;
@@ -965,7 +899,6 @@ function next(){
 }
 
 function back(){
-  if (state.step === STEPS.length + 2) return; // can't go back from "ordered"
   // Use the browser's history. This way both the on-screen back button and
   // the device/browser back button take the user one step back instead of
   // jumping all the way to the homepage. popstate handles the actual state
@@ -987,8 +920,8 @@ function pushHistory() {
 
 window.addEventListener('popstate', (e) => {
   const newStep = (e.state && typeof e.state.step === 'number') ? e.state.step : 0;
-  // Only honour valid step indices: questions, email, confirm, ordered.
-  if (newStep < 0 || newStep > STEPS.length + 2) return;
+  // Only honour valid step indices: questionnaire steps plus the review step.
+  if (newStep < 0 || newStep > STEPS.length) return;
   state.step = newStep;
   // Skip past any hidden conditional steps (e.g. villain on bedtime)
   while (state.step > 0 && state.step < STEPS.length && !isStepShown(state.step)) state.step--;

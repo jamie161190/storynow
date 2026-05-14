@@ -131,7 +131,7 @@ export default async (req) => {
   const amount = isReturning ? pricing.returningAmountMinor : pricing.amountMinor;
   const childList = normalizeNameList(s.child_name);
   const productName = isReturning
-    ? `Full story for ${childList} (returning-customer ${pricing.returningDiscountDisplay} off)`
+    ? `Full story for ${childList} (welcome back, ${pricing.returningDiscountDisplay} off)`
     : `Full story for ${childList}`;
 
   const stripe = new Stripe(stripeKey);

@@ -83,8 +83,8 @@ function render(data){
       <div class="empty">
         <div class="e">📖</div>
         <h1 class="serif" style="font-size:24px;margin:0 0 6px">No stories yet.</h1>
-        <p style="margin:0 0 18px">Order a free preview to get started.</p>
-        <a class="btn" href="/start">Get a free preview</a>
+        <p style="margin:0 0 18px">Make your first story to get started.</p>
+        <a class="btn" href="/start">Make their story</a>
       </div>`;
     return;
   }
@@ -114,10 +114,10 @@ function storyCard(s){
     statusEl = `<span class="story-status delivered">Listen</span>`;
     actionEl = `<a class="btn" href="/listen/${s.id}?t=${s.accessToken}">Listen</a>`;
   } else if (s.previewReady){
-    statusEl = `<span class="story-status">Preview ready</span>`;
-    actionEl = `<a class="btn" href="/preview/${s.id}?t=${s.accessToken}">Open preview</a>`;
+    statusEl = `<span class="story-status">Ready to read</span>`;
+    actionEl = `<a class="btn" href="/preview/${s.id}?t=${s.accessToken}">Open story</a>`;
   } else {
-    statusEl = `<span class="story-status">Preview being written</span>`;
+    statusEl = `<span class="story-status">Opening being written</span>`;
     actionEl = `<a class="btn btn--ghost" href="/preview/${s.id}?t=${s.accessToken}">View status</a>`;
   }
   if (s.refunded) statusEl = `<span class="story-status" style="background:#eee;color:var(--muted)">Refunded</span>`;

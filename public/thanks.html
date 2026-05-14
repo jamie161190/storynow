@@ -2,187 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Your preview is on its way · HearTheirName</title>
-<meta name="description" content="Thanks for confirming. Your child's free 2-minute preview is being written now and will play in your browser in about 3 minutes.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HearTheirName</title>
 <meta name="robots" content="noindex">
-<script defer src="/analytics.js"></script>
 <link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<style>
-:root{
-  --paper:#F4ECDB; --paper-2:#EFE4CD; --paper-3:#E7D9BA;
-  --ink:#1F1B2E; --ink-2:#3D2E5A;
-  --muted:#5C5240; --muted-2:#8A7E64;
-  --line:rgba(31,27,46,.12); --line-2:#D6C7A4;
-  --plum:#4B2E83; --plum-2:#7A55C9;
-  --terra:#D87A3E; --terra-2:#C46A2E;
-  --serif:"Cormorant Garamond","Iowan Old Style","Palatino Linotype",Georgia,serif;
-  --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --hand:"Caveat","Bradley Hand",cursive;
-  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;background-image:radial-gradient(rgba(80,60,30,.05) 1px,transparent 1px),radial-gradient(rgba(80,60,30,.04) 1px,transparent 1px);background-size:3px 3px,7px 7px;background-position:0 0,1px 2px;opacity:.55;mix-blend-mode:multiply}
-::selection{background:var(--plum);color:var(--paper)}
-a{color:inherit}
-img{max-width:100%;display:block}
-.app{position:relative;z-index:2}
-.container{width:100%;max-width:1200px;margin:0 auto;padding:0 24px}
-@media(min-width:900px){.container{padding:0 40px}}
-.serif{font-family:var(--serif);font-weight:500;letter-spacing:-.005em}
-.hand{font-family:var(--hand)}
-.mono{font-family:var(--mono);font-size:.78em;letter-spacing:.04em;text-transform:uppercase}
-.italic-plum{font-style:italic;color:var(--plum)}
-.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);font-weight:500}
-
-.btn{appearance:none;border:0;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:16px;padding:18px 28px;border-radius:999px;background:var(--terra);color:#fff;box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 8px 24px -10px rgba(216,122,62,.55);transition:transform .15s ease,background .15s ease;display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none}
-.btn:hover{background:var(--terra-2);transform:translateY(-1px)}
-.btn--ghost{background:transparent;color:var(--ink);border:1px solid var(--line);box-shadow:none}
-.btn--ghost:hover{background:rgba(0,0,0,.04)}
-.btn--sm{padding:12px 18px;font-size:14px}
-
-header.site{position:sticky;top:0;z-index:50;background:rgba(244,236,219,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-.headerbar{display:flex;align-items:center;justify-content:space-between;height:64px}
-
-.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
-.logo svg{flex-shrink:0}
-.logo-text{font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
-.logo-text em{font-style:italic;font-weight:500;color:var(--plum)}
-
-main{padding:60px 0 80px}
-@media(max-width:760px){main{padding:36px 0 56px}}
-.card{max-width:640px;margin:0 auto;text-align:center}
-.checkmark{width:72px;height:72px;border-radius:999px;background:var(--plum);color:#fff;display:inline-flex;align-items:center;justify-content:center;margin:0 auto}
-h1.serif-display{font-family:var(--serif);font-size:clamp(28px,4vw,44px);margin:14px 0 0;font-weight:500;line-height:1.18;letter-spacing:-.005em}
-.sub{color:var(--muted);font-size:15px;max-width:520px;margin:18px auto 0;line-height:1.65}
-.sub strong{color:var(--ink);font-weight:600}
-
-.next{margin:32px auto 0;max-width:540px;padding:24px;border-radius:18px;background:rgba(255,253,247,.7);border:1px solid var(--line);text-align:left}
-.timeline{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px}
-.timeline li{display:flex;gap:14px;align-items:flex-start}
-.timeline li .when{flex:0 0 110px;font-family:var(--mono);font-size:10px;color:var(--plum);padding-top:3px;letter-spacing:.06em;text-transform:uppercase}
-.timeline li .what{font-size:14px;color:var(--muted);line-height:1.55}
-
-.cta-row{display:flex;justify-content:center;gap:12px;margin-top:24px;flex-wrap:wrap}
-.signoff{text-align:center;margin-top:32px}
-.signoff .hand{font-size:24px;color:var(--plum)}
-.signoff .name{font-size:12px;color:var(--muted-2);margin-top:2px}
-
-footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
-.footer-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
-.footer-text{font-size:12px;color:var(--muted-2)}
-.footer-links{display:flex;gap:14px}
-.footer-links a{font-size:12px;color:var(--muted-2);text-decoration:none}
-.footer-links a:hover{color:var(--ink)}
-</style>
-</head>
-<body>
-<div class="app">
-
-<header class="site">
-  <div class="container headerbar">
-    <a href="/" class="logo" aria-label="HearTheirName home">
-      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect x="3" y="6" width="26" height="20" rx="3" fill="#1F1B2E"/>
-        <path d="M16 8v18M11 12v10M21 12v10M7 14v6M25 14v6" stroke="#F4ECDB" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <span class="logo-text">Hear<em>Their</em>Name</span>
-    </a>
-    <a class="btn btn--ghost btn--sm" href="/">Home</a>
-  </div>
-</header>
-
-<main>
-  <div class="container">
-    <div class="card">
-      <div class="checkmark" aria-hidden="true">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <div class="kicker" style="margin-top:18px">THANKS</div>
-      <h1 class="serif-display"><span class="italic-plum" id="childPossessive">Their</span> preview is being written right now.</h1>
-      <p class="sub">It's generating in the background. If you have the original tab open, the player will start playing the moment it's ready. If you closed it, check your inbox for the link we sent you when you submitted the form.</p>
-
-      <div class="next">
-        <div class="kicker" style="margin-bottom:14px">WHAT HAPPENS NEXT</div>
-        <ul class="timeline">
-          <li><span class="when">RIGHT NOW</span><span class="what">The middle layer is reading every detail you sent and shaping the brief.</span></li>
-          <li><span class="when">IN A MINUTE</span><span class="what">The 2-minute opening is written and recorded in the voice you chose.</span></li>
-          <li><span class="when">IN ABOUT 3 MIN</span><span class="what">It plays in your browser. Listen with them. If you love it, the full 15-minute story is one tap away.</span></li>
-        </ul>
-      </div>
-
-      <div class="cta-row">
-        <a class="btn btn--ghost btn--sm" href="/">Back to home</a>
-      </div>
-
-      <div class="signoff">
-        <div class="hand">thank you, truly.</div>
-        <div class="name">Jamie &amp; family</div>
-      </div>
-    </div>
-  </div>
-</main>
-
-<footer class="site">
-  <div class="container footer-row">
-    <a href="/" class="logo">
-      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect x="3" y="6" width="26" height="20" rx="3" fill="#1F1B2E"/>
-        <path d="M16 8v18M11 12v10M21 12v10M7 14v6M25 14v6" stroke="#F4ECDB" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <span class="logo-text" style="font-size:16px">Hear<em>Their</em>Name</span>
-    </a>
-    <div class="footer-text">© HearTheirName · Created by a dad and his son · hello@heartheirname.com</div>
-    <div class="footer-links">
-      <a href="/privacy">Privacy</a>
-      <a href="/terms">Terms</a>
-    </div>
-  </div>
-</footer>
-
-</div>
-
 <script>
+// Legacy route. The old verify-email flow used to land here. The current
+// flow sends customers straight from /start to /preview/{id}?t={token},
+// so this page only ever sees stragglers from very old mailings.
+// If a story id + token are present, bounce to the live preview page.
+// Otherwise send them home.
 (function(){
-  const params = new URLSearchParams(window.location.search);
-
-  // If the verify endpoint redirected us here with a story id and access
-  // token (the new in-browser flow), bounce straight to /preview/{id}?t=...
-  // where the customer hears the preview live. The thanks page is now only
-  // a fallback for verify links that came in without a token (very old
-  // mailings).
-  const id = params.get('id');
-  const token = params.get('t');
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+  var token = params.get('t');
   if (id && token) {
     window.location.replace('/preview/' + encodeURIComponent(id) + '?t=' + encodeURIComponent(token));
-    return;
+  } else {
+    window.location.replace('/');
   }
-
-  // NOTE: We deliberately do NOT fire CompleteRegistration here. It already
-  // fired at form submission (browser + CAPI pair from /start) with reliable
-  // dedup. Adding a verify-time fire was producing duplicate counts in Meta
-  // because the timing gap between submit-time and verify-time fires causes
-  // dedup misses on a fraction of users. One submission = one event.
-
-  const raw = (params.get('child') || '').trim();
-  if (!raw) return;
-  // Trim each name and split on common separators (& , and). Use the first
-  // child's name in possessive form so the headline reads naturally.
-  const names = raw.split(/\s*(?:&|,|\band\b)\s*/i).map(n => n.trim()).filter(Boolean);
-  if (!names.length) return;
-  const display = names.length === 1
-    ? names[0] + (names[0].endsWith('s') ? "'" : "'s")
-    : names.slice(0, -1).join(', ') + ' & ' + names[names.length - 1] + (names[names.length - 1].endsWith('s') ? "'" : "'s");
-  const el = document.getElementById('childPossessive');
-  if (el) el.textContent = display;
 })();
 </script>
-</body>
+</head>
+<body></body>
 </html>

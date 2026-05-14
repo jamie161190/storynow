@@ -51,22 +51,22 @@ function btn(href, label, style = 'ink') {
 export function emailPreviewReady({ firstName, childList, previewTitle, previewUrl, jamieNote }) {
   const greeting = firstName ? `Hi ${esc(firstName)},` : 'Hi,';
   const noteHtml = jamieNote && jamieNote.trim() ? `
-    <div style="margin:0 0 22px;padding:16px 20px;background:#F0E8D7;border-left:3px solid ${PLUM};border-radius:10px;font-size:14.5px;line-height:1.6;font-family:'Inter',Arial,sans-serif;color:#1F1B2E;white-space:pre-wrap">${esc(jamieNote.trim())}<br><span style="font-style:italic;color:${PLUM};font-size:13px;display:inline-block;margin-top:6px">— Jamie</span></div>
+    <div style="margin:0 0 22px;padding:16px 20px;background:#F0E8D7;border-left:3px solid ${PLUM};border-radius:10px;font-size:14.5px;line-height:1.6;font-family:'Inter',Arial,sans-serif;color:#1F1B2E;white-space:pre-wrap">${esc(jamieNote.trim())}<br><span style="font-style:italic;color:${PLUM};font-size:13px;display:inline-block;margin-top:6px">Jamie</span></div>
   ` : '';
-  const noteText = jamieNote && jamieNote.trim() ? `\n\n${jamieNote.trim()}\n— Jamie\n` : '';
+  const noteText = jamieNote && jamieNote.trim() ? `\n\n${jamieNote.trim()}\nJamie\n` : '';
   const body = `
     <p style="margin:0 0 14px">${greeting}</p>
-    <p style="margin:0 0 14px">${esc(childList)}'s 2-minute preview is ready. Have a listen first, on your own. Headphones if you can.</p>
-    <p style="margin:0 0 22px">If the pronunciation, voice and feel are right, you'll know straight away. If anything's off, just reply to this email and I'll redo it before anyone else hears it.</p>
+    <p style="margin:0 0 14px">${esc(childList)}'s story opening is ready to read. Open it on your own first if you can.</p>
+    <p style="margin:0 0 22px">If the names, tone and feel are right, you'll know straight away. If anything's off, you can edit it right there on the page before you pay a penny.</p>
     ${noteHtml}
-    ${btn(previewUrl, `Listen to ${childList}'s preview`, 'terra')}
-    <p style="margin:22px 0 14px">If you're happy with it, the full 15-minute version is one tap away from the same page. £24.99, with you within 24 hours.</p>
+    ${btn(previewUrl, `Read ${childList}'s opening`, 'terra')}
+    <p style="margin:22px 0 14px">From the same page you'll pick the narrator's voice and lock in the full 15-minute story. £24.99, with you within 24 hours.</p>
     <p style="margin:24px 0 0;font-style:italic;color:${PLUM}">Speak soon,<br>Jamie</p>
   `;
   return {
-    subject: `${childList}'s 2-minute preview is ready`,
-    html: frame({ title: 'Your preview is ready', body }),
-    text: `${greeting}\n\n${childList}'s 2-minute preview is ready. Have a listen first, on your own. Headphones if you can.\n\nIf the pronunciation, voice and feel are right, you'll know straight away. If anything's off, just reply to this email and I'll redo it before anyone else hears it.${noteText}\nListen here: ${previewUrl}\n\nIf you're happy with it, the full 15-minute version is one tap away from the same page. £24.99, with you within 24 hours.\n\nSpeak soon,\nJamie\nHearTheirName · jamie@heartheirname.com`
+    subject: `${childList}'s story opening is ready`,
+    html: frame({ title: 'Your story opening is ready', body }),
+    text: `${greeting}\n\n${childList}'s story opening is ready to read. Open it on your own first if you can.\n\nIf the names, tone and feel are right, you'll know straight away. If anything's off, you can edit it right there on the page before you pay a penny.${noteText}\nRead it here: ${previewUrl}\n\nFrom the same page you'll pick the narrator's voice and lock in the full 15-minute story. £24.99, with you within 24 hours.\n\nSpeak soon,\nJamie\nHearTheirName · jamie@heartheirname.com`
   };
 }
 
