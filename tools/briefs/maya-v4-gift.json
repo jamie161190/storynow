@@ -5,7 +5,7 @@
   "music": "public/music/bedtime-ambient.mp3",
   "music_volume": 0.10,
   "walkthrough_hook": "I LIVE 200 MILES FROM MY NIECE",
-  "walkthrough_voiceover": "I never get to read her bedtime stories. So I made one. Five questions. A note from auntie. Same day, sent right to her parents' inbox. Tonight's story is hers. The hero is... Maya.",
+  "walkthrough_voiceover": "I never get to read her bedtime stories. So I made one. Five questions. A note from auntie. Within a day, sent right to her parents' inbox. Tonight's story is hers. The hero is... Maya.",
   "spoken_captions": [
     { "text": "I never read her bedtime stories.",  "start": 0.0, "end": 2.0 },
     { "text": "So I made her one.",                  "start": 2.0, "end": 3.5 },
@@ -16,6 +16,6 @@
     "duration": 3,
     "eyebrow": "HEARTHEIRNAME.COM · GIFT MODE",
     "headline": "The gift they'll actually remember.",
-    "subline": "Same day. £24.99. Theirs forever."
+    "subline": "Within a day. £24.99. Theirs forever."
   }
 }

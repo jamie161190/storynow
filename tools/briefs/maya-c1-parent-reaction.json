@@ -5,16 +5,16 @@
   "music": "public/music/bedtime-ambient.mp3",
   "music_volume": 0.10,
   "walkthrough_hook": "I MADE ONE FOR MY 5-YEAR-OLD",
-  "walkthrough_voiceover": "I made a story for my five-year-old. Twenty-four hours later, the preview landed in my inbox. I cried before it finished playing. I bought the full one. Now she asks for it every night.",
+  "walkthrough_voiceover": "I made a story for my five-year-old. A minute later, I was reading the opening on my phone. Her name, her best friend, her dog. I cried before I finished it. So I bought the full fifteen minutes. Now she asks for it every night.",
   "spoken_captions": [
-    { "text": "24 hours later, the preview landed.", "start": 0.0, "end": 2.2 },
-    { "text": "I cried before it finished playing.",  "start": 2.4, "end": 5.0 },
-    { "text": "I bought it.",                          "start": 5.2, "end": 7.5, "highlight": true }
+    { "text": "A minute later, I was reading the opening.", "start": 0.0, "end": 2.4 },
+    { "text": "I cried before I finished it.",              "start": 2.6, "end": 5.0 },
+    { "text": "I bought it.",                                "start": 5.2, "end": 7.5, "highlight": true }
   ],
   "end_card": {
     "duration": 3,
     "eyebrow": "HEARTHEIRNAME.COM",
-    "headline": "The preview converts. Listen and see.",
-    "subline": "Free 2-min preview · £24.99 if you love it"
+    "headline": "Read the opening. You'll know.",
+    "subline": "Read the opening free · £24.99 if you love it"
   }
 }
