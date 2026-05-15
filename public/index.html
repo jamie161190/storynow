@@ -502,15 +502,14 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
     <div class="section-head">
       <div class="kicker">HEAR THE QUALITY</div>
       <h2 style="margin-top:14px">Listen to a real one first.</h2>
-      <p class="sub">Three real samples. Hear what yours could sound like. One for one child, one for an only-child adventure, one for siblings together. Yours will be nothing like these, it'll be theirs alone.</p>
+      <p class="sub">Two real samples. Hear what yours could sound like. One for a single child, one for siblings together. Yours will be nothing like these, it'll be theirs alone.</p>
     </div>
 
     <div class="sample-tabs-row">
       <span class="kicker">SAMPLE</span>
       <div class="sample-tabs" role="tablist" aria-label="Sample stories">
-        <button class="sample-tab" data-on="true" data-i="0" data-name="Oliver" data-age="5" data-kind="bedtime" data-voice="British (warm)" data-title="and the Fox Who Was Waiting"><span>Oliver</span><span style="font-size:10px;opacity:.6">🌙</span></button>
-        <button class="sample-tab" data-on="false" data-i="1" data-name="Maya" data-age="6" data-kind="adventure" data-voice="Irish (lilting)" data-title="and the Map Inside the Drawer"><span>Maya</span><span style="font-size:10px;opacity:.6">⭐</span></button>
-        <button class="sample-tab" data-on="false" data-i="2" data-name="Isla & Oliver" data-age="5 + 3" data-kind="adventure" data-voice="British (warm)" data-title="and the Forest at the End of the Garden"><span>Isla &amp; Oliver</span><span style="font-size:10px;opacity:.6">👫</span></button>
+        <button class="sample-tab" data-on="true" data-i="0" data-name="Maya" data-age="6" data-kind="adventure" data-voice="Irish (lilting)" data-title="and the Map Inside the Drawer"><span>Maya</span><span style="font-size:10px;opacity:.6">⭐</span></button>
+        <button class="sample-tab" data-on="false" data-i="1" data-name="Isla & Oliver" data-age="5 + 3" data-kind="adventure" data-voice="British (warm)" data-title="and the Forest at the End of the Garden"><span>Isla &amp; Oliver</span><span style="font-size:10px;opacity:.6">👫</span></button>
       </div>
     </div>
     <div class="sample-meta" id="sampleMeta">A bedtime story · for Oliver, age 5 · told in a british (warm) voice</div>
@@ -728,18 +727,6 @@ function scrollToId(id){
 
 // Sample tabs: real audio playback
 const SAMPLES = [
-  { name:'Oliver', age:5, kind:'bedtime', voice:'British (warm)', title:'and the Fox Who Was Waiting', src:'/audio/samples/oliver.mp3',
-    lines:[
-      "It was a quiet evening at the end of Sycamore Lane,",
-      "and {N} was tucked beneath a blanket the colour of moonlight.",
-      "\"Tonight,\" whispered the wind through the window,",
-      "\"there is a story for {N}, and only for {N}.\"",
-      "{N} sat up and listened, hardly daring to breathe.",
-      "From the floorboards came the smallest sound, tap, tap, tap,",
-      "and there, in the silver light, stood a small fox with a kind face.",
-      "\"Hello, {N},\" said the fox. \"I've been waiting for you.\""
-    ]
-  },
   { name:'Maya', age:6, kind:'adventure', voice:'Irish (lilting)', title:'and the Map Inside the Drawer', src:'/audio/samples/maya.mp3',
     lines:[
       "{N} found the drawer on a Tuesday afternoon,",
