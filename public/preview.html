@@ -985,13 +985,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   let pollTimer = null;
   let stripeJsLoading = null;
   let phase1StartedAt = null;
-  // The full ~2200-word generation can take up to two minutes. We hold the
-  // wait screen open at most this long if the opening is ready early — but
-  // either game finishing also triggers the reveal as soon as the opening
-  // is available.
-  const PHASE1_MAX_MS = 120000;
   let pendingPhase2Data = null;
-  let phase1Timer = null;
   let tttInitialised = false;
   let tttAllDone = false;
   let matchInitialised = false;
@@ -1641,10 +1635,9 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       paintPhaseSilent();
       return;
     }
-    // Opening text not yet ready: show Phase 1 and poll. Phase 1 holds until
-    // the opening is ready AND (TTT done OR memory match done OR PHASE1_MAX_MS
-    // (2 min) elapsed), whichever comes first. If the opening arrives early
-    // we stash it and maybeRevealPhase2 handles the timing.
+    // Opening text not yet ready: show Phase 1 and poll. The page reveals
+    // the instant the opening lands — no artificial hold. The TTT and
+    // memory-match are optional distractions while the customer waits.
     if (!data.opening){
       paintPhase1(data);
       if (!pollTimer){
@@ -1655,7 +1648,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
             pollTimer = null;
             armPhase2(fresh);
           }
-        }, 1800);
+        }, 1000);
       }
       return;
     }
@@ -1667,29 +1660,19 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   // Reveal Phase 2 as soon as the opening is ready AND either the customer
   // has finished their three games of tic-tac-toe, or 30 seconds have
   // passed — whichever comes first.
+  // Reveal Phase 2 the instant the opening is ready. No artificial hold —
+  // games (TTT, memory match) are optional distractions, never gates.
   function maybeRevealPhase2(){
     if (!pendingPhase2Data) return;
-    const elapsed = phase1StartedAt ? Date.now() - phase1StartedAt : 0;
-    if (tttAllDone || matchAllDone || elapsed >= PHASE1_MAX_MS){
-      if (phase1Timer){ clearTimeout(phase1Timer); phase1Timer = null; }
-      completeProgressBar();
-      const d = pendingPhase2Data;
-      pendingPhase2Data = null;
-      paintPhase2(d);
-    }
+    completeProgressBar();
+    const d = pendingPhase2Data;
+    pendingPhase2Data = null;
+    paintPhase2(d);
   }
 
   function armPhase2(data){
     pendingPhase2Data = data;
     maybeRevealPhase2();
-    if (pendingPhase2Data && !phase1Timer){
-      const elapsed = phase1StartedAt ? Date.now() - phase1StartedAt : 0;
-      const wait = Math.max(0, PHASE1_MAX_MS - elapsed);
-      phase1Timer = setTimeout(() => {
-        phase1Timer = null;
-        maybeRevealPhase2();
-      }, wait);
-    }
   }
 
   fetchMeta().then(process).catch(showError);
