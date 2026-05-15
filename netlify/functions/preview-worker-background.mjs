@@ -180,66 +180,37 @@ export default async (req) => {
   const category = storyData.category || 'bedtime';
   console.log('[PREVIEW-WORKER] Generating FULL story text (' + fullWordCount + ' words target)…');
 
-  // Generate full story. Up to 2 attempts: if the first preview's cliffhanger
-  // judge scores below CLIFFHANGER_JUDGE_THRESHOLD, regenerate with extra
-  // emphasis on the cliffhanger requirement. Second failure → soft-block flag.
+  // Single generation. Earlier this had a retry-on-bad-cliffhanger loop, but
+  // a second 2200-word call adds 30-60s to the customer wait — unacceptable.
+  // The cliffhanger judge now runs AFTER persistence as a fire-and-forget
+  // quality check that flags weak cliffhangers for admin review without
+  // blocking the customer.
   let storyText;
   let previewPrefix;
   let wordsInPrefix;
   let sliceKind;
-  let judgeResult = null;
-  let cliffhangerFlag = null; // string set to a reason if we soft-block
 
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    const retryNote = attempt === 2
-      ? '\n\nIMPORTANT — RETRY: the previous attempt landed the preview cut on a SOFT BEAT and lost the cliffhanger. The first ~290 words MUST end on the unresolved beat described in `preview_cliffhanger.beat`. Plant the setup, land the beat, close the paragraph on it. The next paragraph can begin Act 1\'s continuation. Do not let the cut fall on a satisfying or complete moment.'
-      : '';
-    try {
-      const userPrompt = buildUserPrompt(brief, fullWordCount, category) + retryNote;
-      storyText = await callClaude({
-        apiKey: anthropicKey,
-        system: SYSTEM_PROMPT,
-        user: userPrompt,
-        maxTokens: 16000,
-        temperature: 1
-      });
-      if (!storyText) throw new Error('Empty story text');
-    } catch (err) {
-      console.error(`[PREVIEW-WORKER] Text generation failed (attempt ${attempt}):`, err.message);
-      if (attempt === 2) {
-        await markFailed(supabaseUrl, headersJson, storyId, err.message?.slice(0, 500));
-        return resp({ ok: false, error: 'text generation failed' }, 500);
-      }
-      continue;
-    }
-
-    // Slice. Then judge the cliffhanger.
-    const sliced = sliceForPreview(storyText);
-    previewPrefix = sliced.prefix;
-    wordsInPrefix = sliced.wordsInPrefix;
-    sliceKind = sliced.kind;
-    console.log(`[PREVIEW-WORKER] attempt ${attempt}: ${wordsInPrefix} words, cut=${sliceKind}`);
-
-    judgeResult = await judgeCliffhanger(previewPrefix, anthropicKey);
-    if (judgeResult) {
-      console.log(`[PREVIEW-WORKER] Judge score: ${judgeResult.score} — "${judgeResult.last_sentence}" — ${judgeResult.reasoning}`);
-    } else {
-      console.log('[PREVIEW-WORKER] Judge unavailable; soft-passing');
-    }
-
-    if (!judgeResult || judgeResult.score >= CLIFFHANGER_JUDGE_THRESHOLD) {
-      // Judge passed (or unavailable). Ship.
-      cliffhangerFlag = null;
-      break;
-    }
-
-    if (attempt === 2) {
-      // Both attempts failed the judge. Soft-block: deliver anyway (SLA matters)
-      // but flag for human review in admin.
-      cliffhangerFlag = `cliffhanger judge failed twice — final score ${judgeResult.score}, last sentence: "${judgeResult.last_sentence}"`;
-      console.warn('[PREVIEW-WORKER] Soft-block:', cliffhangerFlag);
-    }
+  try {
+    const userPrompt = buildUserPrompt(brief, fullWordCount, category);
+    storyText = await callClaude({
+      apiKey: anthropicKey,
+      system: SYSTEM_PROMPT,
+      user: userPrompt,
+      maxTokens: 16000,
+      temperature: 1
+    });
+    if (!storyText) throw new Error('Empty story text');
+  } catch (err) {
+    console.error('[PREVIEW-WORKER] Text generation failed:', err.message);
+    await markFailed(supabaseUrl, headersJson, storyId, err.message?.slice(0, 500));
+    return resp({ ok: false, error: 'text generation failed' }, 500);
   }
+
+  const sliced = sliceForPreview(storyText);
+  previewPrefix = sliced.prefix;
+  wordsInPrefix = sliced.wordsInPrefix;
+  sliceKind = sliced.kind;
+  console.log(`[PREVIEW-WORKER] sliced: ${wordsInPrefix} words, cut=${sliceKind}`);
 
   const fullStoryWordCount = storyText.split(/\s+/).filter(Boolean).length;
   const previewText = previewPrefix + PREVIEW_TEASER;
@@ -261,28 +232,53 @@ export default async (req) => {
     ...rawData,
     opening: previewPrefix,
     continuation: continuationText,
-    cliffhanger_judge: judgeResult ? {
-      score: judgeResult.score,
-      last_sentence: judgeResult.last_sentence,
-      reasoning: judgeResult.reasoning,
-      flagged: !!cliffhangerFlag,
-      flag_reason: cliffhangerFlag,
-      slice_kind: sliceKind,
-      checked_at: new Date().toISOString()
-    } : { skipped: true, checked_at: new Date().toISOString() }
+    cliffhanger_judge: { pending: true, slice_kind: sliceKind, checked_at: null }
   };
   await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
     method: 'PATCH', headers: headersJson,
     body: JSON.stringify({
       preview_text: previewText,         // prefix + teaser (admin reference only)
       story_text: storyText,             // full ~2200-word story, for full-worker
-      story_data: updatedData,           // includes cliffhanger_judge result
+      story_data: updatedData,
       preview_ready_at: new Date().toISOString(),
       status: 'preview_ready'
     })
   });
 
   console.log('[PREVIEW-WORKER] Done. Story text persisted (' + storyText.length + ' chars). Preview TTS skipped (direct-purchase flow).');
+
+  // Cliffhanger judge runs AFTER persistence so it never blocks the customer
+  // reveal. Result is written back into story_data.cliffhanger_judge as an
+  // async update; the admin Issues tab surfaces flagged ones.
+  (async () => {
+    try {
+      const judge = await judgeCliffhanger(previewPrefix, anthropicKey);
+      const flagged = judge && judge.score < CLIFFHANGER_JUDGE_THRESHOLD;
+      const judgeData = judge ? {
+        score: judge.score,
+        last_sentence: judge.last_sentence,
+        reasoning: judge.reasoning,
+        flagged,
+        flag_reason: flagged ? `cliffhanger judge score ${judge.score} (last sentence: "${judge.last_sentence}")` : null,
+        slice_kind: sliceKind,
+        checked_at: new Date().toISOString()
+      } : { skipped: true, slice_kind: sliceKind, checked_at: new Date().toISOString() };
+      // Read-modify-write so we don't clobber any concurrent updates.
+      const cur = await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}&select=story_data`, { headers });
+      if (cur.ok) {
+        const [row] = await cur.json();
+        const merged = { ...(row?.story_data || {}), cliffhanger_judge: judgeData };
+        await fetch(`${supabaseUrl}/rest/v1/stories?id=eq.${encodeURIComponent(storyId)}`, {
+          method: 'PATCH', headers: headersJson,
+          body: JSON.stringify({ story_data: merged })
+        });
+      }
+      console.log(`[PREVIEW-WORKER] Async cliffhanger judge: score=${judge?.score ?? 'n/a'} flagged=${!!flagged}`);
+    } catch (err) {
+      console.warn('[PREVIEW-WORKER] Async cliffhanger judge failed:', err.message);
+    }
+  })();
+
   return resp({ ok: true });
 };
 

@@ -666,26 +666,36 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 }
 
 /* Phase 1 wait — soft progress strip */
+/* Progress bar — time-based estimate that eases up to ~95% over the expected
+   wait, then crawls slowly so the customer always sees motion. Snaps to 100%
+   when the opening actually arrives and the page reveals. */
 .wait-strip {
-  height: 4px;
+  height: 6px;
   background: rgba(61,42,92,0.1);
   border-radius: 999px;
   overflow: hidden;
-  margin: 0 auto 28px;
-  max-width: 240px;
+  margin: 0 auto 8px;
+  max-width: 320px;
   position: relative;
 }
-.wait-strip::after {
-  content: '';
+.wait-fill {
   position: absolute;
-  top: 0; bottom: 0; left: -30%;
-  width: 30%;
-  background: linear-gradient(90deg, transparent, var(--plum), transparent);
-  animation: wait-slide 1.8s ease-in-out infinite;
+  top: 0; bottom: 0; left: 0;
+  width: 0%;
+  background: linear-gradient(90deg, var(--plum-2), var(--plum));
+  border-radius: 999px;
+  transition: width 0.6s ease;
 }
-@keyframes wait-slide {
-  0% { left: -30%; } 100% { left: 100%; }
+.wait-progress {
+  text-align: center;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-2);
+  letter-spacing: 0.04em;
+  margin-bottom: 22px;
 }
+.wait-progress .pct { color: var(--plum); font-variant-numeric: tabular-nums; }
 
 /* Checkout mount card */
 .checkout-card {
@@ -732,7 +742,8 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
         <div class="kicker">Writing it now</div>
         <h1>Writing the opening of <span class="accent" id="phase1Name">their</span> story&hellip;</h1>
         <p class="lead">This can take up to two minutes. We're putting them at the centre of every scene. Have a play while we make it.</p>
-        <div class="wait-strip" aria-label="Writing in progress"></div>
+        <div class="wait-strip" aria-label="Writing in progress"><div class="wait-fill" id="waitFill"></div></div>
+        <div class="wait-progress"><span id="waitLabel">Reading what you sent us</span> &middot; <span class="pct" id="waitPct">0%</span></div>
 
         <div class="ttt-card" id="tttCard">
           <div class="ttt-head">Best of three?</div>
@@ -985,6 +996,49 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   let tttAllDone = false;
   let matchInitialised = false;
   let matchAllDone = false;
+  let progressTimer = null;
+  // Expected wait for the brief + ~2200-word story generation. The bar eases
+  // toward ~95% over this duration, then crawls so the customer always sees
+  // motion. Snaps to 100% when the opening arrives.
+  const PROGRESS_EXPECTED_MS = 85000;
+  const PROGRESS_STAGES = [
+    { from: 0,    label: 'Reading what you sent us' },
+    { from: 0.12, label: 'Sketching their world' },
+    { from: 0.30, label: 'Writing the opening' },
+    { from: 0.70, label: 'Polishing the cliffhanger' },
+    { from: 0.92, label: 'Just about ready' },
+  ];
+  function startProgressBar(){
+    if (progressTimer) return;
+    const fill = document.getElementById('waitFill');
+    const pct = document.getElementById('waitPct');
+    const label = document.getElementById('waitLabel');
+    if (!fill || !pct || !label) return;
+    const tick = () => {
+      const elapsed = phase1StartedAt ? Date.now() - phase1StartedAt : 0;
+      // Ease toward 95% over expected duration; then crawl asymptotically.
+      const t = elapsed / PROGRESS_EXPECTED_MS;
+      let value;
+      if (t < 1) value = 0.95 * (1 - Math.pow(1 - t, 2));
+      else value = 0.95 + 0.04 * (1 - 1 / (1 + (t - 1) * 0.5));
+      const percent = Math.min(99, Math.round(value * 100));
+      fill.style.width = percent + '%';
+      pct.textContent = percent + '%';
+      const stage = PROGRESS_STAGES.slice().reverse().find(s => value >= s.from);
+      if (stage) label.textContent = stage.label;
+    };
+    tick();
+    progressTimer = setInterval(tick, 600);
+  }
+  function completeProgressBar(){
+    const fill = document.getElementById('waitFill');
+    const pct = document.getElementById('waitPct');
+    const label = document.getElementById('waitLabel');
+    if (fill) fill.style.width = '100%';
+    if (pct) pct.textContent = '100%';
+    if (label) label.textContent = 'Opening ready';
+    if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+  }
 
   function showError(){
     document.getElementById('loadingState').style.display = 'none';
@@ -1019,6 +1073,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     if (phase1StartedAt === null) phase1StartedAt = Date.now();
     if (!tttInitialised) { initTttGame(); tttInitialised = true; }
     if (!matchInitialised) { initMatchGame(); matchInitialised = true; }
+    startProgressBar();
   }
 
   function paintPhase2(data){
@@ -1617,6 +1672,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     const elapsed = phase1StartedAt ? Date.now() - phase1StartedAt : 0;
     if (tttAllDone || matchAllDone || elapsed >= PHASE1_MAX_MS){
       if (phase1Timer){ clearTimeout(phase1Timer); phase1Timer = null; }
+      completeProgressBar();
       const d = pendingPhase2Data;
       pendingPhase2Data = null;
       paintPhase2(d);
