@@ -221,21 +221,25 @@ const VILLAINS = [
 function newChild(){ return { id: Math.random().toString(36).slice(2,8), name:'', age:'', pronouns:'', bestFriend:'', toy:'', intoNow:'', nickname:'', foodNo:'' }; }
 function newPet(){ return { kind:'', name:'' }; }
 
-// If the customer typed their child's name on the homepage cover-tryon
-// before clicking through, the homepage appended ?name=Chase so the funnel
-// can pre-fill it. Read once at boot and use to seed the first child.
-function _firstChildFromUrl(){
+// If the customer typed their child(ren)'s name(s) on the homepage hero
+// before clicking through, the homepage appends one ?name=... param per
+// child (up to 4). Read all of them once at boot and seed the children
+// array. Falls back to a single empty child when nothing was passed in.
+function _childrenFromUrl(){
   try {
-    const n = (new URLSearchParams(window.location.search).get('name') || '').trim().slice(0, 24);
-    if (!n) return newChild();
-    return { ...newChild(), name: n };
-  } catch (_) { return newChild(); }
+    const names = new URLSearchParams(window.location.search).getAll('name')
+      .map(n => (n || '').trim().slice(0, 24))
+      .filter(Boolean)
+      .slice(0, 4);
+    if (!names.length) return [newChild()];
+    return names.map(name => ({ ...newChild(), name }));
+  } catch (_) { return [newChild()]; }
 }
 
 const state = {
   step: 0,
   data: {
-    children: [_firstChildFromUrl()],
+    children: _childrenFromUrl(),
     storyKind: '',
     bestFriend: '', others: '',
     hasPet: false, pets: [], petKind:'', petName:'',

@@ -97,20 +97,42 @@ h1.hero-h{font-family:var(--serif);font-size:clamp(38px,5.6vw,76px);line-height:
 .hero-sub{font-size:clamp(16px,1.6vw,19px);color:var(--muted);max-width:520px;margin-top:clamp(28px,4.5vw,40px);margin-bottom:0;line-height:1.6}
 
 .hero-cta-row{display:flex;align-items:flex-start;gap:14px;margin-top:28px;flex-wrap:wrap;flex-direction:column}
-/* Hero name-capture row: a single input + CTA. Typing binds the CTA label
-   to the child's name and hands off via ?name= to /start. */
-.hero-name-row{display:flex;gap:10px;width:100%;max-width:520px;flex-wrap:wrap}
+/* Hero name-capture row: 1-4 name inputs + "Add another child" + CTA. Typing
+   binds the CTA label to the children's names and hands off via repeated
+   ?name= params to /start, where _childrenFromUrl() pre-fills the form. */
+.hero-name-row{display:flex;flex-direction:column;gap:10px;width:100%;max-width:380px}
+.hero-name-inputs{display:flex;flex-direction:column;gap:8px}
+.hero-name-field{position:relative}
 .hero-name-input{
-  flex:1 1 220px;min-width:200px;padding:18px 20px;border:1.5px solid rgba(31,27,46,.18);
-  border-radius:14px;background:#fffdf7;font-family:var(--sans);font-size:17px;
+  width:100%;padding:14px 16px;border:1.5px solid rgba(31,27,46,.18);
+  border-radius:12px;background:#fffdf7;font-family:var(--sans);font-size:16px;
   color:var(--ink);outline:none;
   transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;
 }
+.hero-name-field--extra .hero-name-input{padding-right:42px}
 .hero-name-input::placeholder{color:rgba(31,27,46,.42)}
 .hero-name-input:hover{border-color:rgba(31,27,46,.32)}
 .hero-name-input:focus{border-color:var(--plum,#4B2E83);background:#fff;box-shadow:0 0 0 3px rgba(75,46,131,.13)}
-.hero-name-btn{flex:0 0 auto;align-self:stretch}
-@media(max-width:540px){.hero-name-row{flex-direction:column}.hero-name-btn{width:100%}}
+.hero-name-remove{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border-radius:999px;border:0;background:transparent;
+  color:rgba(31,27,46,.45);font-size:20px;line-height:1;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;padding:0;
+}
+.hero-name-remove:hover{background:rgba(31,27,46,.06);color:var(--ink)}
+.hero-name-add{
+  align-self:flex-start;background:transparent;border:1px dashed var(--line);
+  border-radius:999px;padding:7px 14px;font-family:var(--sans);font-size:13px;
+  font-weight:600;color:var(--plum);cursor:pointer;
+  transition:background .12s ease,border-color .12s ease;
+}
+.hero-name-add:hover{background:rgba(75,46,131,.05);border-color:rgba(75,46,131,.3)}
+.hero-name-add[hidden]{display:none}
+.hero-name-btn{width:100%;margin-top:4px}
+@media(min-width:600px){
+  .hero-name-row{max-width:420px}
+  .hero-name-input{padding:16px 18px;font-size:16.5px}
+}
 .siblings-chip{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 12px;border-radius:999px;background:rgba(75,46,131,.10);border:1px solid rgba(75,46,131,.16);color:var(--plum);font-size:12.5px;font-weight:600}
 .siblings-chip .e{font-size:14px;line-height:1}
 .risk-pills{margin-top:18px;display:inline-flex;align-items:center;gap:14px;padding:10px 16px;border-radius:12px;background:rgba(255,253,247,.65);border:1px solid var(--line);flex-wrap:wrap}
@@ -398,7 +420,12 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
 
         <div class="hero-cta-row">
           <form class="hero-name-row" id="heroNameForm" action="/start" method="get" autocomplete="off">
-            <input type="text" class="hero-name-input" id="heroName" name="name" maxlength="24" placeholder="Their name…" autocomplete="off" spellcheck="false">
+            <div class="hero-name-inputs" id="heroNameInputs">
+              <div class="hero-name-field">
+                <input type="text" class="hero-name-input" name="name" maxlength="24" placeholder="Their name…" autocomplete="off" spellcheck="false">
+              </div>
+            </div>
+            <button type="button" class="hero-name-add" id="heroNameAdd">+ Add another child</button>
             <button class="btn hero-name-btn" id="heroCta" type="submit"><span id="heroCtaLabel">Make their story</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
           </form>
           <div style="margin-top:12px;font-size:13.5px;color:var(--muted,#5C5240);line-height:1.55">Free to preview &amp; amend. <strong style="color:var(--ink,#1F1B2E)"><span data-price>£24.99</span> once you&rsquo;re happy.</strong> Money back if it isn&rsquo;t right.</div>
@@ -1293,27 +1320,66 @@ document.addEventListener('DOMContentLoaded', renderFaq);
 })();
 </script>
 <script>
-// Hero name-capture: bind the CTA label to the typed name and hand off via
-// ?name= to /start, where _firstChildFromUrl() pre-fills the first child.
-// The form has GET action="/start" name="name" so this is purely a progressive
-// enhancement: typing updates the label, empty input submits cleanly to /start
-// without an empty ?name= in the URL.
+// Hero name-capture: 1-4 name inputs. Typing updates the CTA label
+// ("Make Chase & Ethan's story"). Submit hands off via repeated ?name=
+// params to /start, where _childrenFromUrl() pre-fills the children step.
 (function(){
   const form = document.getElementById('heroNameForm');
-  const input = document.getElementById('heroName');
+  const inputsWrap = document.getElementById('heroNameInputs');
+  const addBtn = document.getElementById('heroNameAdd');
   const label = document.getElementById('heroCtaLabel');
-  if (!form || !input || !label) return;
-  const update = () => {
-    const v = (input.value || '').trim();
-    label.textContent = v ? `Make ${v}'s story` : 'Make their story';
+  if (!form || !inputsWrap || !addBtn || !label) return;
+  const MAX = 4;
+
+  const formatNames = (arr) => {
+    if (arr.length === 0) return null;
+    if (arr.length === 1) return arr[0];
+    if (arr.length === 2) return arr[0] + ' & ' + arr[1];
+    return arr.slice(0, -1).join(', ') + ' & ' + arr[arr.length - 1];
   };
-  input.addEventListener('input', update);
+  const possessive = (s) => /s$/i.test(s) ? s + "'" : s + "'s";
+
+  const update = () => {
+    const inputs = Array.from(inputsWrap.querySelectorAll('input[name="name"]'));
+    const values = inputs.map(el => (el.value || '').trim()).filter(Boolean);
+    const joined = formatNames(values);
+    label.textContent = joined ? 'Make ' + possessive(joined) + ' story' : 'Make their story';
+    addBtn.hidden = inputs.length >= MAX;
+  };
+
+  const wireField = (field) => {
+    const input = field.querySelector('input[name="name"]');
+    const removeBtn = field.querySelector('.hero-name-remove');
+    if (input) input.addEventListener('input', update);
+    if (removeBtn) removeBtn.addEventListener('click', () => { field.remove(); update(); });
+  };
+
+  Array.from(inputsWrap.querySelectorAll('.hero-name-field')).forEach(wireField);
+
+  addBtn.addEventListener('click', () => {
+    const count = inputsWrap.querySelectorAll('input[name="name"]').length;
+    if (count >= MAX) return;
+    const field = document.createElement('div');
+    field.className = 'hero-name-field hero-name-field--extra';
+    field.innerHTML =
+      '<input type="text" class="hero-name-input" name="name" maxlength="24" placeholder="Another name…" autocomplete="off" spellcheck="false">' +
+      '<button type="button" class="hero-name-remove" aria-label="Remove this name">×</button>';
+    inputsWrap.appendChild(field);
+    wireField(field);
+    field.querySelector('input').focus();
+    update();
+  });
+
   form.addEventListener('submit', (e) => {
-    if (!(input.value || '').trim()) {
-      // No name typed: navigate to a clean /start instead of /start?name=
-      e.preventDefault();
-      window.location.href = '/start';
-    }
+    e.preventDefault();
+    const inputs = Array.from(inputsWrap.querySelectorAll('input[name="name"]'));
+    const params = new URLSearchParams();
+    inputs.forEach(el => {
+      const v = (el.value || '').trim();
+      if (v) params.append('name', v);
+    });
+    const q = params.toString();
+    window.location.href = q ? '/start?' + q : '/start';
   });
 })();
 </script>
