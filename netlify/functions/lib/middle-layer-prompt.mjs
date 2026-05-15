@@ -122,8 +122,6 @@ There are THREE sources of "extras" input now:
 
 - The TOP-LEVEL \`extraDetails\` field: legacy free-text, shared. Read in tandem with heartOut; if heartOut is non-empty, it carries the same content (we map heartOut → extraDetails). If only extraDetails is present, treat as you would heartOut.
 
-- Each child in \`children\` may have their own \`quirk\` field: this is THIS child's personality detail (catchphrases, lisps, habits), set on the per-child step. Lower stakes than heartOut. Belongs to that specific child only.
-
 **A SEPARATE per-child input — \`children[i].intoNow\`** — captures what the child is really into RIGHT NOW. A club they go to, a sport, a hobby, the thing they can't stop talking about. This is the highest-leverage single input the parent gives you. Treat it as the SPINE of the story for that child whenever it is present:
 - If a child has \`intoNow = "football on Saturday mornings"\`, the story should be set in/around football, OR pivot on a football moment.
 - If \`intoNow = "gymnastics class"\`, the climax can happen on a vault, or the protagonist's gymnastics skill solves the moment.
@@ -145,15 +143,7 @@ If intoNow is empty for a child, fall back to the standard interpretation of \`t
 
 - \`children[i].foodNo\` — the food this child refuses to eat (e.g. "broccoli", "anything green", "tomatoes", "the bits in soup"). Pure comedy material. The writer builds ONE beat into the story where this food becomes a small obstacle the protagonist navigates in character (negotiates a swap with a wise creature, picks the bits out of magic stew, refuses the villain's bribe of it). Never moralise about eating veg, never frame the child as naughty for refusing — the joke is the universal childhood truth that some foods are just not happening. Surface in \`portrait\` and in the new \`children[i].food_dislike\` output field.
 
-**Resolution rule:** Per-child \`quirk\` (when present) belongs to that specific child and should be woven into THEIR portrait and their scenes. Top-level \`extraDetails\` may apply to one child, multiple, or all — read carefully and attribute correctly.
-
-**QUIRK TYPE CLASSIFICATION:** Quirks come in three textures, and they want different narrative weighting from the writer. When you populate \`children[i].quirk\` and \`character_texture\`, label each quirk with its type so the writer knows how to handle it:
-
-- **catchphrase** — a fixed word/phrase the child uses ("calls spaghetti pasketti", "says 'oopsie'", "calls everyone Boss"). Best landed once or twice in the story for maximum effect. Don't overuse — it stops being charming after the third repetition.
-- **pattern** — a way of speaking that runs through everything they say (a lisp, slow deliberate sentences, sing-song rhythm, ending statements with questions). This should appear in EVERY line of dialogue from that child, not as a setpiece but as how they sound.
-- **habit** — a repeated action, posture, or ritual ("rocks when thinking", "lines up toys", "always carries the bunny", "hums when nervous"). Surfaces in 2-4 scenes where it fits naturally, never narrated as significant.
-
-If a quirk doesn't clearly fit one type, classify by best-fit and note the ambiguity in writer_instructions. Distinguish these in the output so the writer doesn't treat a speech pattern like a catchphrase (overusing it) or a catchphrase like a pattern (forgetting to land it).
+**Attribution rule:** Top-level \`heartOut\` / \`extraDetails\` may apply to one child, multiple, or all — read carefully and attribute correctly when surfacing into a child's portrait or into \`character_texture\`.
 
 This is the most important set of fields for making the story feel like it was written for these specific children.
 
@@ -279,8 +269,6 @@ Return ONLY valid JSON, no preamble, no explanation, no markdown fences.
       "portrait": "One or two sentences that capture who this child actually is: weaving together their comfort object, their quirks, their communication style, their energy. Not a list of attributes. A living person.",
       "best_friend": "string or null: this child's personal best friend if the parent provided one (from the per-child bestFriend input), otherwise null. Distinct from household.friend (which is the shared/main companion). When present, the writer should give this friend real dialogue and presence in scenes featuring this child.",
       "comfort_item": "string or null: THIS child's comfort toy/item, drawn from per-child favTeddy (preferred) or correctly attributed slice of top-level favTeddy. Preserve specificity. Null if neither input mentions one for this child.",
-      "quirk": "string or null: THIS child's specific quirk, drawn from per-child quirk (preferred) or the correctly attributed slice of top-level extraDetails. Null if neither input mentions one.",
-      "quirk_type": "string or null: one of 'catchphrase' | 'pattern' | 'habit', classifying the quirk above so the writer knows how to weight it. Null if quirk is null.",
       "core_interest": "string or null: THIS child's intoNow value (the thing they're really into right now — a club, sport, hobby, obsession). LOAD-BEARING: when present, the writer should treat this as the spine of the story for this child. Preserve the parent's specificity (e.g. 'football on Saturday mornings' not just 'football'). Null only if the parent left intoNow empty for this child.",
       "nickname": "string or null: THIS child's family pet name from per-child nickname input. Used ONCE in the story for a stop-everything emotional moment. Null if no nickname provided. Preserve exact spelling and capitalisation.",
       "food_dislike": "string or null: THIS child's refused food from per-child foodNo input. Writer should build ONE in-story comedy beat where this food becomes a small obstacle the protagonist navigates in character. Never moralise about veg. Null if no foodNo provided. Preserve the parent's specificity (e.g. 'the bits in soup' not just 'soup')."

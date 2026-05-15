@@ -31,15 +31,14 @@ export function v2ToV1(v2) {
     // them in scenes featuring that child.
     favTeddy: (c.toy || '').trim(),         // per-child comfort item
     bestFriend: (c.bestFriend || '').trim(), // per-child main friend
-    quirk: (c.quirk || '').trim(),           // per-child personality detail
     intoNow: (c.intoNow || '').trim(),       // per-child current passion (story spine input)
     nickname: (c.nickname || '').trim(),     // per-child pet name (slip in once for emotional hit)
     foodNo: (c.foodNo || '').trim()          // per-child food they refuse (comedy beat)
   }));
 
-  // "Pour your heart out" textarea on the review screen — top-level free
-  // text. Use it as the new primary source for extraDetails, falling back
-  // to the (now unused) top-level quirk field for any legacy rows.
+  // "In your own words" textarea — top-level free text. The form's catch-all
+  // personality / feel / sensitive-context field, surfaced into the brief as
+  // both extraDetails and the dedicated heartOut input.
   const heartOut = (v2.heartOut || '').trim();
 
   const childCount = children.length;
@@ -109,9 +108,8 @@ export function v2ToV1(v2) {
     setting: v2.place || '',
     customWhere: v2.placeReal || '',
 
-    // "Pour your heart out" review-screen textarea is the primary source
-    // for extraDetails. The top-level quirk field is legacy fallback only.
-    extraDetails: heartOut || v2.quirk || '',
+    // "In your own words" textarea is the primary source for extraDetails.
+    extraDetails: heartOut || '',
     heartOut,
 
     // Voice
