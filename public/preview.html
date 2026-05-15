@@ -597,6 +597,74 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   min-height: 18px;
 }
 
+/* Memory match game — second optional distraction on the wait screen */
+.match-card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 18px;
+}
+.match-head {
+  font-family: var(--serif);
+  font-size: 18px; font-weight: 500;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.match-sub {
+  font-size: 13px; color: var(--muted);
+  text-align: center;
+  margin-bottom: 14px;
+}
+.match-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  max-width: 280px;
+  margin: 0 auto 12px;
+}
+.match-tile {
+  aspect-ratio: 3 / 4;
+  background: var(--plum);
+  border: 1.5px solid var(--plum);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  color: var(--paper);
+  cursor: pointer;
+  user-select: none;
+  transition: background 140ms ease, transform 140ms ease, color 140ms ease, border-color 140ms ease;
+  position: relative;
+}
+.match-tile::before {
+  content: '';
+  position: absolute; inset: 6px;
+  border-radius: 6px;
+  border: 1px dashed rgba(244, 236, 219, 0.25);
+}
+.match-tile.flipped {
+  background: #fffdf7;
+  border-color: var(--plum);
+  color: var(--ink);
+}
+.match-tile.flipped::before { display: none; }
+.match-tile.matched {
+  background: rgba(111, 138, 79, 0.18);
+  border-color: var(--green);
+  color: var(--ink);
+  cursor: default;
+  animation: match-pulse 0.6s ease;
+}
+.match-tile.matched::before { display: none; }
+@keyframes match-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.match-status {
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+  min-height: 18px;
+}
+
 /* Phase 1 wait — soft progress strip */
 .wait-strip {
   height: 4px;
@@ -663,7 +731,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       <div id="phase1" style="display:none">
         <div class="kicker">Writing it now</div>
         <h1>Writing the opening of <span class="accent" id="phase1Name">their</span> story&hellip;</h1>
-        <p class="lead">This takes about half a minute. We're putting them at the centre of every scene.</p>
+        <p class="lead">This can take up to two minutes. We're putting them at the centre of every scene. Have a play while we make it.</p>
         <div class="wait-strip" aria-label="Writing in progress"></div>
 
         <div class="ttt-card" id="tttCard">
@@ -675,6 +743,13 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
             <div class="ttt-cell" data-cell="6"></div><div class="ttt-cell" data-cell="7"></div><div class="ttt-cell" data-cell="8"></div>
           </div>
           <div class="ttt-status" id="tttStatus">Game 1 of 3. Your turn.</div>
+        </div>
+
+        <div class="match-card" id="matchCard">
+          <div class="match-head">Memory match</div>
+          <div class="match-sub">Or flip the pairs. Six to find.</div>
+          <div class="match-board" id="matchBoard"></div>
+          <div class="match-status" id="matchStatus">Tap two cards. Find the match.</div>
         </div>
       </div>
 
@@ -882,11 +957,17 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   let pollTimer = null;
   let stripeJsLoading = null;
   let phase1StartedAt = null;
-  const PHASE1_MAX_MS = 30000; // cap the wait at 30s — reveal sooner if the games finish first
+  // The full ~2200-word generation can take up to two minutes. We hold the
+  // wait screen open at most this long if the opening is ready early — but
+  // either game finishing also triggers the reveal as soon as the opening
+  // is available.
+  const PHASE1_MAX_MS = 120000;
   let pendingPhase2Data = null;
   let phase1Timer = null;
   let tttInitialised = false;
   let tttAllDone = false;
+  let matchInitialised = false;
+  let matchAllDone = false;
 
   function showError(){
     document.getElementById('loadingState').style.display = 'none';
@@ -920,6 +1001,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     document.getElementById('phaseSilent').style.display = 'none';
     if (phase1StartedAt === null) phase1StartedAt = Date.now();
     if (!tttInitialised) { initTttGame(); tttInitialised = true; }
+    if (!matchInitialised) { initMatchGame(); matchInitialised = true; }
   }
 
   function paintPhase2(data){
@@ -1380,6 +1462,83 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     setStatus();
   }
 
+  // ────── Memory match (6 pairs, story-themed icons) ──────────────
+  // Optional second distraction. Independent of the tic-tac-toe game.
+  // Finishing this also triggers maybeRevealPhase2 so the opening reveals
+  // as soon as the customer engages with either game (and the opening is
+  // ready).
+  function initMatchGame(){
+    const ICONS = ['🌙', '⭐', '📖', '🦊', '🌳', '🐻'];
+    const board = document.getElementById('matchBoard');
+    const status = document.getElementById('matchStatus');
+    if (!board || !status) return;
+
+    // Two of each icon, shuffled.
+    const deck = [];
+    ICONS.forEach(ic => { deck.push(ic); deck.push(ic); });
+    for (let i = deck.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+
+    let flippedIdx = null;     // index of the first flipped card waiting for its match
+    let lockBoard = false;     // brief lock during the no-match unflip animation
+    let matchesFound = 0;
+    const totalPairs = ICONS.length;
+
+    // Render tiles
+    board.innerHTML = '';
+    deck.forEach((icon, idx) => {
+      const tile = document.createElement('button');
+      tile.type = 'button';
+      tile.className = 'match-tile';
+      tile.dataset.idx = String(idx);
+      tile.dataset.icon = icon;
+      tile.setAttribute('aria-label', 'Hidden card');
+      tile.textContent = '';
+      tile.addEventListener('click', () => onTileClick(idx, tile));
+      board.appendChild(tile);
+    });
+
+    function onTileClick(idx, tile){
+      if (lockBoard) return;
+      if (tile.classList.contains('matched') || tile.classList.contains('flipped')) return;
+      tile.classList.add('flipped');
+      tile.textContent = tile.dataset.icon;
+      if (flippedIdx === null){
+        flippedIdx = idx;
+        return;
+      }
+      // Second tile flipped — compare.
+      const first = board.querySelector('.match-tile[data-idx="' + flippedIdx + '"]');
+      const second = tile;
+      if (first && first.dataset.icon === second.dataset.icon){
+        first.classList.remove('flipped'); first.classList.add('matched');
+        second.classList.remove('flipped'); second.classList.add('matched');
+        matchesFound++;
+        flippedIdx = null;
+        if (matchesFound >= totalPairs){
+          status.textContent = `All ${totalPairs} pairs found. Nicely done 🎉`;
+          matchAllDone = true;
+          maybeRevealPhase2();
+        } else {
+          status.textContent = `${matchesFound} of ${totalPairs} pairs found. Keep going.`;
+        }
+      } else {
+        lockBoard = true;
+        status.textContent = 'No match. Try again.';
+        setTimeout(() => {
+          if (first){ first.classList.remove('flipped'); first.textContent = ''; }
+          second.classList.remove('flipped'); second.textContent = '';
+          flippedIdx = null;
+          lockBoard = false;
+          if (matchesFound > 0) status.textContent = `${matchesFound} of ${totalPairs} pairs found.`;
+          else status.textContent = 'Tap two cards. Find the match.';
+        }, 800);
+      }
+    }
+  }
+
   // Initial state machine
   if (!storyId){ showError(); return; }
 
@@ -1402,9 +1561,9 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       return;
     }
     // Opening text not yet ready: show Phase 1 and poll. Phase 1 holds until
-    // the opening is ready and either the customer finishes their three games
-    // of tic-tac-toe or PHASE1_MAX_MS (30s) passes, whichever is first. If the
-    // opening arrives early we stash it and maybeRevealPhase2 handles timing.
+    // the opening is ready AND (TTT done OR memory match done OR PHASE1_MAX_MS
+    // (2 min) elapsed), whichever comes first. If the opening arrives early
+    // we stash it and maybeRevealPhase2 handles the timing.
     if (!data.opening){
       paintPhase1(data);
       if (!pollTimer){
@@ -1430,7 +1589,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   function maybeRevealPhase2(){
     if (!pendingPhase2Data) return;
     const elapsed = phase1StartedAt ? Date.now() - phase1StartedAt : 0;
-    if (tttAllDone || elapsed >= PHASE1_MAX_MS){
+    if (tttAllDone || matchAllDone || elapsed >= PHASE1_MAX_MS){
       if (phase1Timer){ clearTimeout(phase1Timer); phase1Timer = null; }
       const d = pendingPhase2Data;
       pendingPhase2Data = null;
