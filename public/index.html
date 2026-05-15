@@ -205,11 +205,11 @@ h1.hero-h{font-family:var(--serif);font-size:clamp(38px,5.6vw,76px);line-height:
 .section-head h2{font-family:var(--serif);font-size:clamp(28px, 4vw, 44px);line-height:1.1;margin:0;font-weight:500}
 .section-head .sub{font-size:16px;color:var(--muted);margin-top:14px;line-height:1.6}
 
-/* Sample section. A soft top divider + bumped padding gives the page a
-   clear break between the hero (trust pills) and the samples block —
-   both sections share the paper background, so without the line the
-   transition reads as continuous. */
-section.sample{padding-top:clamp(56px,6vw,84px);padding-bottom:clamp(50px,6vw,80px);border-top:1px solid var(--line)}
+/* Sample section. The page alternates between the two paper tones so every
+   section visibly reads as a new section (hero=paper, sample=paper-2,
+   how=paper, pricing=paper-2, gift=paper, founder=paper-2, reviews=paper,
+   faq=paper-2, final=paper). */
+section.sample{padding-top:clamp(56px,6vw,84px);padding-bottom:clamp(50px,6vw,80px);background:var(--paper-2)}
 .sample-tabs-row{margin-top:28px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
 .sample-tabs{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:rgba(255,253,247,.7)}
 .sample-tab{appearance:none;border:0;padding:10px 16px;cursor:pointer;background:transparent;color:var(--ink);font-family:var(--sans);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
@@ -249,7 +249,7 @@ section.sample{padding-top:clamp(56px,6vw,84px);padding-bottom:clamp(50px,6vw,80
 
 
 /* How section */
-section.how{padding:clamp(50px,6vw,80px) 0;background:var(--paper-2)}
+section.how{padding:clamp(50px,6vw,80px) 0}
 .how-grid{margin-top:40px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 .how-card{background:rgba(255,253,247,.65);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:10px;min-height:200px}
 .how-num{font-family:var(--mono);color:var(--plum);font-size:11px;letter-spacing:.12em}
@@ -291,7 +291,7 @@ section.brood{padding:clamp(40px,5vw,64px) 0;background:var(--paper-2)}
 @media(max-width:540px){.brood-name{font-size:16px;padding:8px 14px}}
 
 /* Pricing section */
-section.pricing{padding:clamp(50px,6vw,80px) 0}
+section.pricing{padding:clamp(50px,6vw,80px) 0;background:var(--paper-2)}
 .pricing-card{margin-top:36px;padding:36px 32px;border-radius:20px;background:rgba(255,253,247,.7);border:1px solid var(--line)}
 .pricing-num{display:flex;align-items:baseline;justify-content:center;gap:12px;line-height:1.1;padding-bottom:.1em}
 .pricing-num .price{font-family:var(--serif);font-size:clamp(56px,8vw,80px);font-weight:500;letter-spacing:-.02em;color:var(--ink)}
@@ -303,7 +303,7 @@ section.pricing{padding:clamp(50px,6vw,80px) 0}
 .pricing-fineprint{margin-top:14px;font-size:12.5px;color:var(--muted-2);text-align:center}
 
 /* Gift section */
-section.gift{padding:clamp(50px,6vw,80px) 0;background:var(--paper-2)}
+section.gift{padding:clamp(50px,6vw,80px) 0}
 .gift-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:980px;margin:0 auto}
 .gift-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(255,253,247,.7);border:1px solid var(--line);margin-bottom:18px}
 .gift-pill-emoji{font-size:14px}
@@ -417,7 +417,7 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
           <span class="tp-pill-suffix">· <span id="reviewCount">14</span> parents</span>
         </div>
 
-        <h1 class="hero-h">A story with <span class="italic-plum">their name and the things they love</span> woven through&nbsp;it.</h1>
+        <h1 class="hero-h">An audio story with <span class="italic-plum">their name and the things they love</span> woven through&nbsp;it.</h1>
 
         <p class="hero-sub">Tell us about them. We&rsquo;ll write the opening for you to read, edit anything that isn&rsquo;t quite right, then pay <span data-price>£24.99</span> to record the full 15-minute audio in the voice you choose. Lands in your inbox within 24 hours.</p>
 
