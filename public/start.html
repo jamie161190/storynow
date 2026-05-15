@@ -301,6 +301,21 @@ const STEPS = [
         </div>
       </div>` },
 
+  // "In your own words" — the free-text personality/feel field. Deliberately
+  // placed early (right after the names), while motivation is highest and
+  // before form fatigue: it's the highest-signal input for the writer, and
+  // filling it lifts overall completion. The copy explicitly tells people
+  // NOT to put facts here (names, ages, favourites) because the structured
+  // steps after this collect all of that.
+  { key:'heart', title:"In your own words.", sub:"Optional, but it's the part that makes the story sound like yours.",
+    valid: () => true,
+    render: () => `
+      <div>
+        <div class="field-hint" style="margin:0 0 14px;line-height:1.6">Tell us who they are. Their personality, how they are with their brother or sister, the in-jokes, the feeling you want the story to leave them with. Don&rsquo;t worry about names, ages or favourite things, we&rsquo;ll ask all that next.</div>
+        <textarea class="txt" rows="6" placeholder="e.g. &lsquo;He&rsquo;s all noise and energy until his sister cries, then he&rsquo;s the gentlest boy in the world.&rsquo; Or &lsquo;She&rsquo;s just started big school and she&rsquo;s a bit nervous, I&rsquo;d love this to feel like a warm hug.&rsquo; Or &lsquo;They&rsquo;ve had a hard year and they really need a win.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
+        <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">A sentence or two is plenty. This is the part that makes it really theirs.</div>
+      </div>` },
+
   { key:'world', title:"Their world.", sub:"All optional. Tap anything that fits, or leave it blank and we'll choose based on everything else you've told us.",
     valid: () => true,
     render: () => {
@@ -557,11 +572,11 @@ function renderQuestionStep(){
   const cur = STEPS[state.step];
   const host = document.getElementById('stepHost');
   host.classList.remove('wide','narrow');
-  // Match the global counter: visible questions + email + confirm + ordered
-  // = total flow length. Keeping inner and outer in sync so the user
+  // Match the global counter: visible question steps + the final review
+  // step = total flow length. Keeping inner and outer in sync so the user
   // doesn't see "STEP 2 OF 6" next to "2 / 9".
   const visibleQuestionCount = STEPS.reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0);
-  const totalShown = visibleQuestionCount + 3;
+  const totalShown = visibleQuestionCount + 1;
   const visibleStepNumber = STEPS.slice(0, state.step + 1).reduce((n, _, i) => n + (isStepShown(i) ? 1 : 0), 0);
   host.innerHTML = `
     <div class="step-head">
@@ -660,6 +675,8 @@ function buildReviewCards(){
     return bits.join(' · ');
   });
 
+  const heartLines = d.heartOut && d.heartOut.trim() ? [`<em>${esc(d.heartOut.trim())}</em>`] : [];
+
   const themeBits = [...d.themes];
   if (d.themesOther && d.themesOther.trim()) themeBits.push(d.themesOther.trim());
 
@@ -719,6 +736,7 @@ function buildReviewCards(){
   return [
     card('Story type', 'kind', [kindLabel]),
     card('Who it’s for', 'children', childrenLines),
+    heartLines.length ? card('In your words', 'heart', heartLines) : '',
     card('What it’s about', 'world', themeBits.map(t => esc(t))),
     card('Where it takes place', 'world', placeBits.map(t => esc(t))),
     intoNowLines.length ? card('Really into right now', 'world', intoNowLines) : '',
@@ -743,14 +761,6 @@ function renderEmailStep(){
     </div>
 
     <div class="review-stack">${buildReviewCards()}</div>
-
-    <div style="margin-top:28px;padding:24px 22px;background:rgba(255,253,247,.85);border:1.5px solid var(--rose);border-radius:18px;position:relative;overflow:hidden">
-      <div style="position:absolute;top:-12px;right:18px;font-size:48px;opacity:.18;line-height:1;transform:rotate(8deg)">✍️</div>
-      <div style="font-family:var(--hand);font-size:34px;color:var(--plum);line-height:1;margin-bottom:8px">In your own words.</div>
-      <div style="font-size:14.5px;color:var(--muted);margin-bottom:14px;line-height:1.55;max-width:440px">Tell us about them. The personality, the dynamics with their siblings, the funny things they do, the in-jokes. Anything that helps us write the story you want them to hear.</div>
-      <textarea class="txt" rows="5" placeholder="e.g. &lsquo;Chase bosses his little cousin around but he&rsquo;s ridiculously thoughtful and caring with his sister.&rsquo; Or &lsquo;She calls spaghetti pasketti and only sleeps with a green dinosaur called Steve.&rsquo; Or &lsquo;Her grandpa passed last week and we want this to feel like a hug from him.&rsquo; Or just &lsquo;please make this magic, they really need it.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
-      <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">Optional.</div>
-    </div>
 
     <div style="margin-top:22px;padding:20px 22px;background:var(--paper-2);border:1px solid var(--line);border-radius:16px">
       <div class="kicker" style="margin-bottom:12px">FROM HERE</div>
