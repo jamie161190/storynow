@@ -309,12 +309,25 @@ const STEPS = [
   // steps after this collect all of that.
   { key:'heart', title:"In your own words.", sub:"Optional, but it's the part that makes the story sound like yours.",
     valid: () => true,
-    render: () => `
+    render: () => {
+      // Copy adapts to one child vs several: a solo story has no sibling
+      // dynamics to describe, so we focus purely on them; a multi-child
+      // story needs the dynamics between them, which is high-signal for
+      // the writer.
+      const multi = state.data.children.length > 1;
+      const intro = multi
+        ? "Tell us who they are. Their personalities, how they are with each other, who&rsquo;s the bossy one, who&rsquo;s the softie, the in-jokes, and the feeling you want the story to leave them with. Don&rsquo;t worry about names, ages or favourite things, we&rsquo;ll ask all that next."
+        : "Tell us who they are. Their personality, the funny little things they do, the in-jokes, how they are with the people they love, and the feeling you want the story to leave them with. Don&rsquo;t worry about names, ages or favourite things, we&rsquo;ll ask all that next.";
+      const placeholder = multi
+        ? "e.g. &lsquo;Chase bosses his little sister around but he&rsquo;s the first to comfort her when she cries.&rsquo; Or &lsquo;They&rsquo;re best friends one minute and at war the next, I&rsquo;d love this to feel like a hug for both of them.&rsquo; Or &lsquo;They&rsquo;ve had a hard year and they really need a win.&rsquo;"
+        : "e.g. &lsquo;She&rsquo;s just started big school and she&rsquo;s a bit nervous, I&rsquo;d love this to feel like a warm hug.&rsquo; Or &lsquo;He&rsquo;s all energy and noise, but he goes quiet and gentle the second the dog walks in.&rsquo; Or &lsquo;They&rsquo;ve had a hard year and they really need a win.&rsquo;";
+      return `
       <div>
-        <div class="field-hint" style="margin:0 0 14px;line-height:1.6">Tell us who they are. Their personality, how they are with their brother or sister, the in-jokes, the feeling you want the story to leave them with. Don&rsquo;t worry about names, ages or favourite things, we&rsquo;ll ask all that next.</div>
-        <textarea class="txt" rows="6" placeholder="e.g. &lsquo;He&rsquo;s all noise and energy until his sister cries, then he&rsquo;s the gentlest boy in the world.&rsquo; Or &lsquo;She&rsquo;s just started big school and she&rsquo;s a bit nervous, I&rsquo;d love this to feel like a warm hug.&rsquo; Or &lsquo;They&rsquo;ve had a hard year and they really need a win.&rsquo;" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
+        <div class="field-hint" style="margin:0 0 14px;line-height:1.6">${intro}</div>
+        <textarea class="txt" rows="6" placeholder="${placeholder}" data-action="setHeartOut">${esc(state.data.heartOut || '')}</textarea>
         <div class="field-hint" style="margin-top:10px;font-style:italic;color:var(--muted-2)">A sentence or two is plenty. This is the part that makes it really theirs.</div>
-      </div>` },
+      </div>`;
+    } },
 
   { key:'world', title:"Their world.", sub:"All optional. Tap anything that fits, or leave it blank and we'll choose based on everything else you've told us.",
     valid: () => true,
