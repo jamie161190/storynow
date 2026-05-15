@@ -78,7 +78,7 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(244,236,219,.85);ba
 .logo-text em{font-style:italic;font-weight:500;color:var(--plum)}
 
 /* Hero */
-.hero{padding-top:clamp(40px,7vw,80px);padding-bottom:clamp(40px,6vw,70px)}
+.hero{padding-top:clamp(40px,7vw,80px);padding-bottom:clamp(56px,6vw,80px)}
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:60px;align-items:center}
 .hero-grid > div:first-child{min-width:0}
 .hero-art{position:relative;overflow:visible;min-width:0}
@@ -205,8 +205,11 @@ h1.hero-h{font-family:var(--serif);font-size:clamp(38px,5.6vw,76px);line-height:
 .section-head h2{font-family:var(--serif);font-size:clamp(28px, 4vw, 44px);line-height:1.1;margin:0;font-weight:500}
 .section-head .sub{font-size:16px;color:var(--muted);margin-top:14px;line-height:1.6}
 
-/* Sample section */
-section.sample{padding-top:clamp(40px,5vw,70px);padding-bottom:clamp(50px,6vw,80px)}
+/* Sample section. A soft top divider + bumped padding gives the page a
+   clear break between the hero (trust pills) and the samples block —
+   both sections share the paper background, so without the line the
+   transition reads as continuous. */
+section.sample{padding-top:clamp(56px,6vw,84px);padding-bottom:clamp(50px,6vw,80px);border-top:1px solid var(--line)}
 .sample-tabs-row{margin-top:28px;display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap}
 .sample-tabs{display:flex;align-items:center;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:rgba(255,253,247,.7)}
 .sample-tab{appearance:none;border:0;padding:10px 16px;cursor:pointer;background:transparent;color:var(--ink);font-family:var(--sans);font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
