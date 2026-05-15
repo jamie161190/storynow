@@ -344,9 +344,6 @@ section.final{padding:clamp(50px,6vw,80px) 0 clamp(60px,7vw,100px)}
 .final-card{background:var(--ink);color:var(--paper);border-radius:24px;padding:clamp(32px,5vw,56px);text-align:center;position:relative;overflow:hidden;max-width:920px;margin:0 auto}
 .final-glow{position:absolute;inset:-20%;background:radial-gradient(circle at 50% 0%,rgba(122,85,201,.4),transparent 60%);pointer-events:none}
 .final-inner{position:relative}
-.scarcity-badge{display:inline-flex;align-items:center;gap:10px;padding:7px 14px;border-radius:999px;background:rgba(216,122,62,.15);border:1px solid rgba(216,122,62,.4);margin-bottom:18px}
-.scarcity-dot{width:6px;height:6px;border-radius:999px;background:var(--terra)}
-.scarcity-text{font-family:var(--mono);font-size:11px;color:var(--rose);letter-spacing:.08em}
 .final-kicker{font-family:var(--mono);color:var(--rose);margin-bottom:14px;opacity:.7;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
 .final-h{font-family:var(--serif);font-size:clamp(32px,4.5vw,52px);margin:0;font-weight:500;line-height:1.1}
 .final-sub{max-width:520px;margin:18px auto 0;color:rgba(244,236,219,.75);font-size:clamp(15px,1.5vw,17px)}
@@ -679,10 +676,6 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
     <div class="final-card">
       <div class="final-glow"></div>
       <div class="final-inner">
-        <div class="scarcity-badge" id="scarcityBadge">
-          <span class="scarcity-dot"></span>
-          <span class="scarcity-text" id="scarcityText">BOOKING NOW</span>
-        </div>
         <div class="final-kicker">READY?</div>
         <h2 class="final-h">Let's make a story<br>only they (and their crew) could star in.</h2>
         <p class="final-sub">Fill in the form, read the opening free, then lock it in for <span data-price>£24.99</span>. Full story in your inbox within 24 hours.</p>
@@ -948,24 +941,6 @@ function renderFaq(){
   `).join('');
 }
 document.addEventListener('DOMContentLoaded', renderFaq);
-
-// Scarcity badge: wired to live weekly count via API
-async function updateScarcity(){
-  try {
-    const res = await fetch('/api/weekly-count');
-    if (!res.ok) return;
-    const data = await res.json();
-    const cap = data.cap || 10;
-    const used = data.count || 0;
-    const left = Math.max(0, cap - used);
-    if (left <= 0){
-      document.getElementById('scarcityText').textContent = 'BOOKING CLOSED · OPENS MONDAY';
-    } else {
-      document.getElementById('scarcityText').textContent = `BOOKING NOW · ${left} ${left === 1 ? 'STORY' : 'STORIES'} LEFT THIS WEEK`;
-    }
-  } catch(e){ /* leave default */ }
-}
-document.addEventListener('DOMContentLoaded', updateScarcity);
 
 // Review count from Trustpilot (best-effort, falls back to default 14)
 // Wire to /api/trustpilot-count if you build it later.
