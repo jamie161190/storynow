@@ -534,6 +534,8 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 .tp-star { width: 14px; height: 14px; background: #00B67A; border-radius: 2px; }
 .tp-title { font-size: 13.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
 .tp-body { font-size: 12.5px; line-height: 1.55; color: rgba(26,20,38,.78); }
+.tp-body p { margin: 0 0 10px; }
+.tp-body p:last-child { margin-bottom: 0; }
 
 /* Phase 1 wait — tic-tac-toe distraction game */
 .ttt-card {
@@ -791,7 +793,13 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
               <div class="tp-star"></div><div class="tp-star"></div><div class="tp-star"></div><div class="tp-star"></div><div class="tp-star"></div>
             </div>
             <div class="tp-title">"I Cried Listening to This… Absolutely Magical 💛"</div>
-            <div class="tp-body">I cannot recommend Heartheirname highly enough. I recently had a personalised story created featuring my four grandchildren and their beloved dog, Gucci, as the main characters, and I was completely blown away. When I listened to the finished story, I actually cried. It was that beautiful.</div>
+            <div class="tp-body">
+              <p>I cannot recommend Heartheirname highly enough!</p>
+              <p>I recently had a personalised story created featuring my four grandchildren and their beloved dog, Gucci, as the main characters &mdash; and I was completely blown away. From the moment the story began and the children heard their own names woven throughout the adventure, their faces lit up with pure excitement and joy. It was absolutely magical.</p>
+              <p>What made the experience even more special was Jamie, the owner. His customer service was exceptional from start to finish. He stayed in constant contact, checked in regularly, and genuinely wanted to make sure every detail was perfect. Nothing was too much trouble &mdash; if I wanted anything changed or added, he did it willingly and with such kindness.</p>
+              <p>When I listened to the finished story, I actually cried. It was that beautiful. The care, creativity, and personal attention that went into it were beyond anything I expected.</p>
+              <p>If you're looking for a truly meaningful, unique gift that children (and grandparents!) will treasure, this is it. Heartheirname has created something really special, and I sincerely hope this business thrives because talent and customer care like this deserve every success.</p>
+            </div>
           </div>
         </div>
 
@@ -1326,14 +1334,14 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
       const empty = board.map((v,i) => v ? -1 : i).filter(i => i >= 0);
       if (!empty.length) return;
       const winsThisTurn = i => { const t = board.slice(); t[i] = 'O'; return winnerOf(t)?.who === 'O'; };
+      // Would playing here block a customer winning line? i.e., is THIS square
+      // (i) a square where the customer would win if they played it next?
+      // (Previous version of this function asked "can customer win at some
+      // OTHER square j != i", which inverted the intent and made the CPU
+      // block instead of avoiding on the "let them win" games.)
       const blocksCustomerWin = i => {
-        const t = board.slice(); t[i] = 'O';
-        for (const j of empty){
-          if (j === i) continue;
-          const tt = board.slice(); tt[j] = 'X';
-          if (winnerOf(tt)?.who === 'X') return true;
-        }
-        return false;
+        const t = board.slice(); t[i] = 'X';
+        return winnerOf(t)?.who === 'X';
       };
       if (gameIndex === 1){
         for (const i of empty){ if (winsThisTurn(i)){ board[i] = 'O'; return; } }
