@@ -760,7 +760,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
         <p class="lead">Read it. Edit anything you'd like. Pick a voice. Then we'll record the full 15 minutes.</p>
 
         <div class="card opening-card" id="openingCard">
-          <div class="card-head"><span id="openingHeadLabel">The opening</span> &middot; <span id="wordCount">~290</span> words &middot; to be continued</div>
+          <div class="card-head"><span id="openingHeadLabel">The opening</span> &middot; to be continued</div>
           <p class="opening-intro">This will be the start of <strong id="openingIntroName">their</strong> story, and we'll use it to shape the rest. <strong class="cue">Tap anywhere in the text below to change it</strong> &mdash; a name, a word, any detail you'd like different.</p>
           <div class="opening-editor" id="openingEditor">
             <textarea id="openingTextarea" class="opening-textarea" aria-label="The opening of your story, editable" spellcheck="true"></textarea>
@@ -794,7 +794,7 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
                 <span class="seal-done">Locked in</span>
               </span>
             </button>
-            <div class="btn-sub">This becomes the start of the story. You can still edit again before you pay.</div>
+            <div class="btn-sub">This becomes the start of the story. Leave the rest to us&hellip;</div>
           </div>
           <div id="openingLockedConfirm" class="locked-confirm" style="display:none">
             <span class="locked-confirm-label">
@@ -951,6 +951,23 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
 
   let selectedVoice = null;
   let selectedMusic = 'pick';
+  // Track both the customer-facing (cleaned) opening and the raw opening
+  // (which contains ElevenLabs TTS stage directions like "[laugh softly]",
+  // "[whisper]" etc. that belong in the audio but never in the read text).
+  // On lock-in, if the customer hasn't edited the cleaned version, we send
+  // the raw back so the stage directions survive into the final audio.
+  let openingRawText = '';
+  let openingDisplayText = '';
+  function stripStageDirections(text) {
+    if (!text) return '';
+    return text
+      .replace(/\[[^\]\n]{1,60}\]/g, '') // inline TTS cues
+      .replace(/[ \t]+\n/g, '\n')        // trailing spaces before newlines
+      .replace(/\n[ \t]+/g, '\n')        // leading spaces after newlines
+      .replace(/[ \t]{2,}/g, ' ')        // double spaces
+      .replace(/\n{3,}/g, '\n\n')        // triple+ blank lines
+      .trim();
+  }
   let storyCategory = 'bedtime';
   let openingLocked = false;
   let loadedEmail = '';
@@ -1018,7 +1035,9 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     if (data.email) loadedEmail = data.email;
 
     const ta = document.getElementById('openingTextarea');
-    ta.value = data.opening || '';
+    openingRawText = data.opening || '';
+    openingDisplayText = stripStageDirections(openingRawText);
+    ta.value = openingDisplayText;
     updateWordCount();
     ta.addEventListener('input', updateWordCount);
 
@@ -1256,7 +1275,14 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
     if (btn.disabled || btn.dataset.busy === '1') return;
     document.getElementById('errorBanner').style.display = 'none';
 
-    const editedOpening = document.getElementById('openingTextarea').value.trim();
+    // The textarea shows the cleaned text (stage directions stripped for
+    // readability). If the customer didn't change anything we still want the
+    // RAW opening (with TTS cues) to survive into the audio. Only fall back
+    // to their edited text if it differs from what we showed them.
+    const currentText = document.getElementById('openingTextarea').value.trim();
+    const editedOpening = currentText && currentText === openingDisplayText.trim()
+      ? openingRawText.trim()
+      : currentText;
     if (!editedOpening || !selectedVoice || !openingLocked) return;
 
     btn.dataset.busy = '1';
