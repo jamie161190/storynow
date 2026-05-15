@@ -281,6 +281,21 @@ const STEPS = [
 
   { key:'children', title:"Who's the story for?", sub:"You can add a sibling or two. They'll share the adventure.",
     valid: () => state.data.children.length > 0 && state.data.children.every(c => c.name.trim() && ageNum(c.age) !== null && c.pronouns),
+    invalidHint: () => {
+      const issues = state.data.children.map((c, i) => {
+        const missing = [];
+        if (!c.name.trim()) missing.push('a name');
+        if (ageNum(c.age) === null) missing.push('an age');
+        if (!c.pronouns) missing.push('pronouns');
+        if (missing.length === 0) return null;
+        const who = c.name.trim() || `Child ${i + 1}`;
+        const joined = missing.length === 1 ? missing[0]
+          : missing.length === 2 ? missing.join(' and ')
+          : missing.slice(0, -1).join(', ') + ' and ' + missing[missing.length - 1];
+        return `${who} still needs ${joined}`;
+      }).filter(Boolean);
+      return issues.length ? issues.join(' · ') : null;
+    },
     render: () => `
       <div style="display:flex;flex-direction:column;gap:14px">
         ${state.data.children.map((c, i) => `
@@ -607,7 +622,8 @@ function renderQuestionStep(){
         Continue
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
-    </div>`;
+    </div>
+    <div id="stepHint" style="text-align:center;margin-top:10px;font-size:13px;color:var(--blush,#d97757);line-height:1.5;min-height:18px">${(!cur.valid() && cur.invalidHint) ? esc(cur.invalidHint() || '') : ''}</div>`;
   document.getElementById('continueBtn').addEventListener('click', next);
 }
 
@@ -901,8 +917,14 @@ function handleAction(action, el, e){
 function updateContinueState(){
   const cur = STEPS[state.step];
   if (!cur) return;
+  const valid = cur.valid();
   const btn = document.getElementById('continueBtn');
-  if (btn) btn.disabled = !cur.valid();
+  if (btn) btn.disabled = !valid;
+  // Surface a per-step hint when Continue is disabled so the user knows
+  // exactly what they still need to fill in (e.g. which child is missing
+  // age or pronouns when multiple were pre-filled from the homepage).
+  const hint = document.getElementById('stepHint');
+  if (hint) hint.textContent = (!valid && cur.invalidHint) ? (cur.invalidHint() || '') : '';
 }
 
 // Conditional steps: villain only shown for adventure stories
