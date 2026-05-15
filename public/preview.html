@@ -1130,7 +1130,12 @@ footer.site { padding: 28px 0 36px; border-top: 1px solid var(--line-2); font-si
   function updateWordCount(){
     const ta = document.getElementById('openingTextarea');
     const words = ta.value.trim().split(/\s+/).filter(Boolean).length;
-    document.getElementById('wordCount').textContent = words;
+    // wordCount display element was removed from the card header — keep this
+    // guarded so the rest of updateWordCount still runs (this used to throw
+    // here and silently abort paintPhase2, leaving the wait page stuck on
+    // "Opening ready").
+    const wordCountEl = document.getElementById('wordCount');
+    if (wordCountEl) wordCountEl.textContent = words;
 
     // The payment button only opens up once the customer has deliberately
     // locked their opening AND picked a voice.
