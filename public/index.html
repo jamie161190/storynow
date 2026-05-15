@@ -96,7 +96,21 @@ header.site{position:sticky;top:0;z-index:50;background:rgba(244,236,219,.85);ba
 h1.hero-h{font-family:var(--serif);font-size:clamp(38px,5.6vw,76px);line-height:1.05;margin:20px 0 0;font-weight:500;letter-spacing:-.01em;padding-bottom:.15em}
 .hero-sub{font-size:clamp(16px,1.6vw,19px);color:var(--muted);max-width:520px;margin-top:clamp(28px,4.5vw,40px);margin-bottom:0;line-height:1.6}
 
-.hero-cta-row{display:flex;align-items:center;gap:14px;margin-top:28px;flex-wrap:wrap}
+.hero-cta-row{display:flex;align-items:flex-start;gap:14px;margin-top:28px;flex-wrap:wrap;flex-direction:column}
+/* Hero name-capture row: a single input + CTA. Typing binds the CTA label
+   to the child's name and hands off via ?name= to /start. */
+.hero-name-row{display:flex;gap:10px;width:100%;max-width:520px;flex-wrap:wrap}
+.hero-name-input{
+  flex:1 1 220px;min-width:200px;padding:18px 20px;border:1.5px solid rgba(31,27,46,.18);
+  border-radius:14px;background:#fffdf7;font-family:var(--sans);font-size:17px;
+  color:var(--ink);outline:none;
+  transition:border-color .15s ease,background .15s ease,box-shadow .15s ease;
+}
+.hero-name-input::placeholder{color:rgba(31,27,46,.42)}
+.hero-name-input:hover{border-color:rgba(31,27,46,.32)}
+.hero-name-input:focus{border-color:var(--plum,#4B2E83);background:#fff;box-shadow:0 0 0 3px rgba(75,46,131,.13)}
+.hero-name-btn{flex:0 0 auto;align-self:stretch}
+@media(max-width:540px){.hero-name-row{flex-direction:column}.hero-name-btn{width:100%}}
 .siblings-chip{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:6px 12px;border-radius:999px;background:rgba(75,46,131,.10);border:1px solid rgba(75,46,131,.16);color:var(--plum);font-size:12.5px;font-weight:600}
 .siblings-chip .e{font-size:14px;line-height:1}
 .risk-pills{margin-top:18px;display:inline-flex;align-items:center;gap:14px;padding:10px 16px;border-radius:12px;background:rgba(255,253,247,.65);border:1px solid var(--line);flex-wrap:wrap}
@@ -393,7 +407,10 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
         <p class="hero-sub">Tell us about them. We&rsquo;ll write the opening for you to read, edit anything that isn&rsquo;t quite right, then pay <span data-price>£24.99</span> to record the full 15-minute audio in the voice you choose. Lands in your inbox within 24 hours.</p>
 
         <div class="hero-cta-row">
-          <a class="btn" href="/start">Make their story &rarr;</a>
+          <form class="hero-name-row" id="heroNameForm" action="/start" method="get" autocomplete="off">
+            <input type="text" class="hero-name-input" id="heroName" name="name" maxlength="24" placeholder="Their name…" autocomplete="off" spellcheck="false">
+            <button class="btn hero-name-btn" id="heroCta" type="submit"><span id="heroCtaLabel">Make their story</span> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+          </form>
           <div style="margin-top:12px;font-size:13.5px;color:var(--muted,#5C5240);line-height:1.55">Free to preview &amp; amend. <strong style="color:var(--ink,#1F1B2E)"><span data-price>£24.99</span> once you&rsquo;re happy.</strong> Money back if it isn&rsquo;t right.</div>
         </div>
 
@@ -552,51 +569,6 @@ footer.site{padding:30px 0 40px;border-top:1px solid var(--line)}
       <div class="how-card"><div class="how-num">02</div><div class="how-t">Read the opening</div><div class="how-d">We write the opening then and there. Edit anything that isn&rsquo;t quite right, then pick the narrator&rsquo;s voice.</div></div>
       <div class="how-card"><div class="how-num">03</div><div class="how-t">Pay <span data-price>£24.99</span> to lock it in</div><div class="how-d">Once it sounds right, lock it in. We record the full 15-minute audio in your chosen voice and email it within 24 hours.</div></div>
       <div class="how-card"><div class="how-num">04</div><div class="how-t">Theirs forever</div><div class="how-d">Keep it, replay it, share it with grandparents, copy it to a Yoto card. No subscription, no expiry, no fuss.</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- What's inside -->
-<section class="inside">
-  <div class="container">
-    <div class="inside-grid">
-      <div><div class="inside-img" role="img" aria-label="A parent reading with a child at bedtime"></div></div>
-      <div>
-        <div class="kicker" style="margin-bottom:12px">WHAT'S INSIDE</div>
-        <h2>Their world,<br>woven into one story.</h2>
-        <ul class="inside-list">
-          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>Their name</strong><span style="color:var(--muted)">. spoken back to them, the way they recognise it</span></span></li>
-          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>Their sibling, cousin, best friend, pet</strong><span style="color:var(--muted)">. real people they know, with real roles. Or up to four kids sharing the adventure together.</span></span></li>
-          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>Their favourite thing</strong><span style="color:var(--muted)">. dinosaurs, ballet, trains, the toy they sleep with</span></span></li>
-          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>A storyteller you choose</strong><span style="color:var(--muted)">. British, Irish, American, Scottish, Australian, five warm voices</span></span></li>
-          <li><span class="inside-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><span><strong>The little quirks</strong><span style="color:var(--muted)">. the bit only you know, calls spaghetti "pasketti"</span></span></li>
-        </ul>
-        <div class="inside-includes">
-          <div style="flex:1">
-            <div class="inside-includes-k">EVERY STORY INCLUDES</div>
-            <div class="inside-includes-v">~15 mins of audio · plays in any browser · no login, instantly shareable · yours to keep forever</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- For the whole brood (multi-child) -->
-<section class="brood">
-  <div class="container">
-    <div class="brood-card">
-      <div class="brood-eyebrow">FOR SIBLINGS, COUSINS, THE WHOLE BROOD</div>
-      <h2 class="brood-h">One story. <em>Every name woven in.</em></h2>
-      <p class="brood-sub">Add up to four kids and they'll all share the adventure together. Same story, same voice, same evening.</p>
-      <div class="brood-rolodex">
-        <span class="brood-name n1"><span class="dot"></span>Chase</span>
-        <span class="brood-name n2"><span class="dot"></span>Ethan</span>
-        <span class="brood-name n3"><span class="dot"></span>Darcy</span>
-        <span class="brood-name n4"><span class="dot"></span>+ one more</span>
-      </div>
-      <a class="brood-cta" href="/start">Make their story →</a>
-      <div class="brood-foot">One purchase. One shared adventure.</div>
     </div>
   </div>
 </section>
@@ -961,18 +933,11 @@ document.addEventListener('DOMContentLoaded', renderReviews);
 
 // FAQ
 const FAQS = [
-  { q:'How long is the full story?', a:'Around 15 minutes. Long enough to be a proper bedtime ritual, short enough to listen in one sitting. You can replay it as many times as you like.' },
   { q:'Is the preview a sample, or actually my story?', a:'It\'s actually your story. The opening is written with your child\'s name, age, the things they love, and the message you wrote, before you pay a penny. No generic samples, no bait and switch.' },
-  { q:'Can I really change the words?', a:'Yes. The opening sits in an editable box. Fix a nickname, swap a detail, soften a line, whatever you want. What you see is what gets recorded.' },
   { q:'How long does delivery take?', a:'After you fill in the form, you wait about a minute while we write the opening of your story. You read it, tweak any words that aren\'t quite right, pick the narrator\'s voice, then pay. The full 15-minute audio is recorded and emailed within 24 hours, with a permanent link you can play any time, anywhere.' },
-  { q:'Why is there a short wait before I see the opening?', a:'Writing the opening properly takes about a minute. We\'re not pulling a template off a shelf, we\'re writing the first scene of your child\'s story, with their name, their interests, and the bits you told us about them. Worth the cup of tea.' },
-  { q:'What if I read the opening and don\'t want to buy?', a:'Close the tab. You\'ve paid nothing, you owe nothing. The preview is free and there\'s no email follow-up unless you ask for one.' },
   { q:'How do I pick the narrator\'s voice?', a:'Five voices to choose from on the preview page: Gentle (British), Lilting (Irish), Cosy (American), Kind (Scottish), and Bright (Australian). Tap any of them to hear a short sample, then pick the one that sounds right for bedtime in your house.' },
-  { q:'What ages does it work for?', a:'Roughly 2 to 9. We tune the language, pace and complexity to the age you give us, so a story for a 3-year-old is different from one for a 7-year-old.' },
-  { q:'Can I add multiple children?', a:'Yes. You can add up to four children (siblings, cousins, friends) and they\'ll all be woven into the same story together. One purchase, one shared adventure.' },
+  { q:'What ages does it work for?', a:'Roughly 2 to 9. We tune the language, pace and complexity to the age you give us, so a story for a 3-year-old is different from one for a 7-year-old. You can also add up to four children to share the same story.' },
   { q:'Can I give this as a gift?', a:'Absolutely. You can switch on Gift mode during checkout, add a note from yourself, and choose how the recipient gets it. Send it to their email straight away, or hold it in your account and share the link yourself when the time is right.' },
-  { q:'Can they listen more than once?', a:'Yes. The audio is yours forever. Replay, share with grandparents, copy it to a Yoto card, whatever you like. No subscription, no expiry.' },
-  { q:'What if I want to add or change something after I\'ve bought?', a:'You shape the story before you pay. You read the opening, edit anything that isn\'t quite right, then pick the voice. Once you lock it in, you\'ve already approved it. If the finished audio doesn\'t sound how you wanted (a name mispronounced, a detail off), reply to the email and we\'ll re-record or refund you.' },
   { q:'What if it isn\'t right?', a:'You\'ll have read and approved the opening before paying, so the words are yours. If the finished audio has a name mispronounced or a detail off, write to us and we\'ll re-record the bit or give your money back.' }
 ];
 function renderFaq(){
@@ -1376,6 +1341,31 @@ document.addEventListener('DOMContentLoaded', updateScarcity);
     if (!p || !p.display) return;
     document.querySelectorAll('[data-price]').forEach(el => { el.textContent = p.display; });
   } catch (e) {}
+})();
+</script>
+<script>
+// Hero name-capture: bind the CTA label to the typed name and hand off via
+// ?name= to /start, where _firstChildFromUrl() pre-fills the first child.
+// The form has GET action="/start" name="name" so this is purely a progressive
+// enhancement: typing updates the label, empty input submits cleanly to /start
+// without an empty ?name= in the URL.
+(function(){
+  const form = document.getElementById('heroNameForm');
+  const input = document.getElementById('heroName');
+  const label = document.getElementById('heroCtaLabel');
+  if (!form || !input || !label) return;
+  const update = () => {
+    const v = (input.value || '').trim();
+    label.textContent = v ? `Make ${v}'s story` : 'Make their story';
+  };
+  input.addEventListener('input', update);
+  form.addEventListener('submit', (e) => {
+    if (!(input.value || '').trim()) {
+      // No name typed: navigate to a clean /start instead of /start?name=
+      e.preventDefault();
+      window.location.href = '/start';
+    }
+  });
 })();
 </script>
 </body>
